@@ -1,5 +1,27 @@
 {
   "sourceLanguage" : "nb",
-  "strings" : { },
+  "strings" : {
+    "DIKTAFON" : {
+
+    },
+    "Fróði" : {
+
+    },
+    "Fróði trenger tilgang til mikrofonen. Du kan gi den i Innstillinger." : {
+
+    },
+    "Ingen opptak ennå" : {
+
+    },
+    "OPPTAK" : {
+
+    },
+    "Startet med handlingsknappen" : {
+
+    },
+    "Trykk på mikrofonen, eller bruk handlingsknappen når du er på farten." : {
+
+    }
+  },
   "version" : "1.0"
 }
