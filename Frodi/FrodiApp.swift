@@ -11,6 +11,9 @@ struct FrodiApp: App {
         WindowGroup {
             RecordingListView()
                 .environment(launchRequest)
+                // Designsystemet definerer kun lys modus i v0.1.
+                .preferredColorScheme(.light)
+                .tint(Color.Frodi.accentRecord)
         }
         .modelContainer(for: Recording.self)
     }

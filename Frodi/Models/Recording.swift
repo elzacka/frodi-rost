@@ -14,6 +14,9 @@ final class Recording {
     var transcript: String?
     var transcriptionFailed: Bool = false
 
+    /// Ble opptaket startet med handlingsknappen? Vises som en pille i listen.
+    var startedWithActionButton: Bool = false
+
     init(createdAt: Date = Date(), duration: TimeInterval, fileName: String) {
         self.createdAt = createdAt
         self.duration = duration

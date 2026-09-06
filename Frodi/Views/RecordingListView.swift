@@ -11,54 +11,109 @@ struct RecordingListView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if recordings.isEmpty {
-                    emptyState
-                } else {
-                    list
+            ZStack {
+                Color.Frodi.background.ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    header
+
+                    if recordings.isEmpty {
+                        Spacer()
+                        emptyState
+                        Spacer()
+                    } else {
+                        list
+                    }
                 }
             }
-            .navigationTitle("Fróði")
+            .navigationBarHidden(true)
             .safeAreaInset(edge: .bottom) {
                 RecorderBar(recorder: recorder, onStop: save)
             }
             .alert("Noe gikk galt", isPresented: .constant(errorMessage != nil)) {
                 Button("Greit") { errorMessage = nil }
             } message: {
-                Text(errorMessage ?? "")
+                Text(errorMessage ?? "").font(.Frodi.body)
             }
         }
         .task(id: launchRequest.shouldStartRecording) {
             guard launchRequest.shouldStartRecording else { return }
             launchRequest.shouldStartRecording = false
+            startedWithActionButton = true
             await recorder.start()
         }
     }
 
-    private var emptyState: some View {
-        ContentUnavailableView {
-            Label("Ingen opptak ennå", systemImage: "waveform")
-        } description: {
-            Text("Trykk på knappen under for å ta opp. Du kan også legge Fróði på handlingsknappen.")
+    /// Husker at dette opptaket kom fra handlingsknappen, slik at raden kan si det.
+    @State private var startedWithActionButton = false
+
+    /// Logohodet. Navnet settes i Fraunces, ikke i systemfonten, fordi det er
+    /// appens eneste merkevareelement.
+    private var header: some View {
+        VStack(alignment: .leading, spacing: Space.s1) {
+            Text("DIKTAFON")
+                .font(.Frodi.eyebrow)
+                .eyebrowTracking()
+                .foregroundStyle(Color.Frodi.textSecondary)
+
+            Text("Fróði")
+                .font(.Frodi.display)
+                .foregroundStyle(Color.Frodi.textPrimary)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, Space.s5)
+        .padding(.top, Space.s3)
+        .padding(.bottom, Space.s5)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Fróði, diktafon")
+        .accessibilityAddTraits(.isHeader)
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: Space.s3) {
+            Text("Ingen opptak ennå")
+                .font(.Frodi.title)
+                .foregroundStyle(Color.Frodi.textPrimary)
+
+            Text("Trykk på mikrofonen, eller bruk handlingsknappen når du er på farten.")
+                .font(.Frodi.caption)
+                .foregroundStyle(Color.Frodi.textSecondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(Space.s8)
+        .frame(maxWidth: 360)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.card)
+                .strokeBorder(Color.Frodi.border, style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+        )
+        .padding(Space.s6)
     }
 
     private var list: some View {
-        List {
-            ForEach(recordings) { recording in
-                NavigationLink {
-                    RecordingDetailView(recording: recording)
-                } label: {
-                    RecordingRow(recording: recording)
+        ScrollView {
+            LazyVStack(spacing: Space.s3) {
+                ForEach(recordings) { recording in
+                    NavigationLink {
+                        RecordingDetailView(recording: recording)
+                    } label: {
+                        RecordingRow(recording: recording)
+                    }
+                    .buttonStyle(.plain)
+                    .contextMenu {
+                        Button("Slett", role: .destructive) { delete(recording) }
+                    }
                 }
             }
-            .onDelete(perform: delete)
+            .padding(.horizontal, Space.s4)
+            .padding(.top, Space.s4)
         }
-        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 
     private func save(fileName: String, duration: TimeInterval) {
         let recording = Recording(duration: duration, fileName: fileName)
+        recording.startedWithActionButton = startedWithActionButton
+        startedWithActionButton = false
         context.insert(recording)
         try? context.save()
 
@@ -77,12 +132,9 @@ struct RecordingListView: View {
         try? context.save()
     }
 
-    private func delete(at offsets: IndexSet) {
-        for index in offsets {
-            let recording = recordings[index]
-            AudioStorage.delete(fileName: recording.fileName)
-            context.delete(recording)
-        }
+    private func delete(_ recording: Recording) {
+        AudioStorage.delete(fileName: recording.fileName)
+        context.delete(recording)
         try? context.save()
     }
 }

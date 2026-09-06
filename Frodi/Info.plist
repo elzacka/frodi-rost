@@ -32,6 +32,13 @@
 	<string>Fróði gjør opptakene dine om til tekst på telefonen. Ingenting sendes ut av enheten.</string>
 	<key>UIAccessibilityPerformEscapeEnabled</key>
 	<true/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Inter-Regular.ttf</string>
+		<string>Inter-Medium.ttf</string>
+		<string>Inter-SemiBold.ttf</string>
+		<string>Fraunces-Medium.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

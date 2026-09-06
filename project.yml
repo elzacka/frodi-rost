@@ -29,6 +29,8 @@ targets:
           - "**/.DS_Store"
     resources:
       - path: Frodi/Resources/Assets.xcassets
+      - path: Frodi/Resources/Fonts
+        buildPhase: resources
     settings:
       base:
         CODE_SIGN_STYLE: Automatic
@@ -46,6 +48,11 @@ targets:
         CFBundleDisplayName: "Fróði"
         CFBundleLocalizations:
           - nb
+        UIAppFonts:
+          - Inter-Regular.ttf
+          - Inter-Medium.ttf
+          - Inter-SemiBold.ttf
+          - Fraunces-Medium.ttf
         UILaunchScreen:
           UIColorName: LaunchBackground
         # Opptak må overleve at skjermen låses. Uten dette stopper iOS

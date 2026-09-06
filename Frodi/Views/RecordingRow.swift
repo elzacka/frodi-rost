@@ -4,28 +4,66 @@ struct RecordingRow: View {
     let recording: Recording
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(recording.createdAt, format: .dateTime.day().month().hour().minute())
-                .font(.headline)
+        HStack(alignment: .center, spacing: Space.s3) {
+            VStack(alignment: .leading, spacing: Space.s1) {
+                Text(title)
+                    .font(.Frodi.bodyMedium)
+                    .foregroundStyle(Color.Frodi.textPrimary)
 
-            Text(preview)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .lineLimit(2)
+                Text(meta)
+                    .font(.Frodi.meta)
+                    .foregroundStyle(Color.Frodi.textSecondary)
 
-            Text(Duration.seconds(recording.duration).formatted(.time(pattern: .minuteSecond)))
-                .font(.caption)
-                .foregroundStyle(.tertiary)
-                .monospacedDigit()
+                if recording.startedWithActionButton {
+                    ActionButtonChip()
+                        .padding(.top, Space.s1)
+                }
+            }
+
+            Spacer(minLength: Space.s2)
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color.Frodi.textSecondary)
         }
-        .padding(.vertical, 4)
+        .padding(Space.s3)
+        .background(Color.Frodi.surface, in: RoundedRectangle(cornerRadius: Radius.control))
+        .overlay(
+            RoundedRectangle(cornerRadius: Radius.control)
+                .strokeBorder(Color.Frodi.border, lineWidth: 1)
+        )
         .accessibilityElement(children: .combine)
     }
 
-    private var preview: String {
-        if recording.hasTranscript { return recording.transcript ?? "" }
+    private var title: String {
+        recording.createdAt.formatted(.dateTime.day().month(.abbreviated).hour().minute())
+    }
+
+    private var meta: String {
+        let length = Duration.seconds(recording.duration).formatted(.time(pattern: .minuteSecond))
+        if recording.hasTranscript { return length }
         return recording.transcriptionFailed
-            ? String(localized: "Ingen tekst")
-            : String(localized: "Gjør om til tekst …")
+            ? "\(length) · ingen tekst"
+            : "\(length) · venter på transkribering"
+    }
+}
+
+/// Liten pille som forteller at opptaket ble startet med handlingsknappen.
+struct ActionButtonChip: View {
+    var body: some View {
+        HStack(spacing: Space.s1 + 2) {
+            Circle()
+                .fill(Color.Frodi.accentRecord)
+                .frame(width: 6, height: 6)
+
+            Text("Startet med handlingsknappen")
+                .font(.Frodi.meta)
+                .foregroundStyle(Color.Frodi.textSecondary)
+        }
+        .padding(.leading, Space.s2 + 2)
+        .padding(.trailing, Space.s3 + 2)
+        .padding(.vertical, Space.s1 + 2)
+        .background(Color.Frodi.surface, in: Capsule())
+        .overlay(Capsule().strokeBorder(Color.Frodi.border, lineWidth: 1))
     }
 }

@@ -5,35 +5,75 @@ struct RecorderBar: View {
     let onStop: (String, TimeInterval) -> Void
 
     var body: some View {
-        VStack(spacing: 12) {
-            if recorder.isRecording {
-                Text(Duration.seconds(recorder.duration).formatted(.time(pattern: .minuteSecond)))
-                    .font(.system(.title2, design: .rounded))
-                    .monospacedDigit()
-                    .contentTransition(.numericText())
-            }
+        VStack(spacing: Space.s4) {
+            // Timeren holder plassen sin også i hvile, ellers hopper knappen
+            // nedover i det opptaket starter.
+            Text(recorder.isRecording ? elapsed : " ")
+                .font(.Frodi.timer)
+                .monospacedDigit()
+                .foregroundStyle(Color.Frodi.textPrimary)
+                .contentTransition(.numericText())
+                .accessibilityHidden(!recorder.isRecording)
 
             Button(action: toggle) {
-                Image(systemName: recorder.isRecording ? "stop.fill" : "mic.fill")
-                    .font(.title)
-                    .frame(width: 72, height: 72)
-                    .background(recorder.isRecording ? Color.red : Color.accentColor, in: .circle)
-                    .foregroundStyle(.white)
+                ZStack {
+                    Circle()
+                        .strokeBorder(ringColor, lineWidth: RecordButton.ring)
+                        .frame(width: RecordButton.diameter, height: RecordButton.diameter)
+
+                    Circle()
+                        .fill(innerColor)
+                        .frame(width: RecordButton.inner, height: RecordButton.inner)
+
+                    Image(systemName: recorder.isRecording ? "stop.fill" : "mic.fill")
+                        .font(.system(size: 26, weight: .medium))
+                        .foregroundStyle(iconColor)
+                }
             }
             .buttonStyle(.plain)
             .accessibilityLabel(recorder.isRecording ? "Stopp opptak" : "Start opptak")
+            .accessibilityAddTraits(.isButton)
 
             if case .denied = recorder.state {
                 Text("Fróði trenger tilgang til mikrofonen. Du kan gi den i Innstillinger.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .font(.Frodi.caption)
+                    .foregroundStyle(Color.Frodi.textSecondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+                    .padding(.horizontal, Space.s6)
             }
         }
-        .padding(.vertical, 16)
+        .padding(.vertical, Space.s5)
         .frame(maxWidth: .infinity)
-        .background(.bar)
+        .background(Color.Frodi.background)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Color.Frodi.border)
+                .frame(height: 1)
+        }
+    }
+
+    private var elapsed: String {
+        Duration.seconds(recorder.duration).formatted(.time(pattern: .minuteSecond))
+    }
+
+    private var ringColor: Color {
+        recorder.state == .denied ? Color.Frodi.border : Color.Frodi.accentRecord
+    }
+
+    private var innerColor: Color {
+        switch recorder.state {
+        case .recording: Color.Frodi.recordingActive
+        case .denied: Color.Frodi.border
+        default: Color.Frodi.accentRecord
+        }
+    }
+
+    private var iconColor: Color {
+        switch recorder.state {
+        case .recording: Color.Frodi.surface
+        case .denied: Color.Frodi.textSecondary
+        default: Color.Frodi.accentRecordOn
+        }
     }
 
     private func toggle() {
