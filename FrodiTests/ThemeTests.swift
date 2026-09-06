@@ -7,7 +7,7 @@ struct ThemeTests {
     /// En font som ikke blir registrert faller stille tilbake til systemfonten.
     /// Da ser appen nesten riktig ut, og feilen oppdages aldri.
     @Test("Alle bundlede fonter lar seg laste", arguments: [
-        "Inter-Regular", "Inter-Medium", "Inter-SemiBold", "Fraunces-Medium"
+        "Inter-Regular", "Inter-Medium", "Inter-SemiBold", "Norse", "Norse-Bold"
     ])
     func fontsAreRegistered(name: String) {
         #expect(UIFont(name: name, size: 12) != nil, "Fant ikke fonten \(name)")

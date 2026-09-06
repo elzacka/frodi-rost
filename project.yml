@@ -52,7 +52,8 @@ targets:
           - Inter-Regular.ttf
           - Inter-Medium.ttf
           - Inter-SemiBold.ttf
-          - Fraunces-Medium.ttf
+          - Norse-Regular.otf
+          - Norse-Bold.otf
         UILaunchScreen:
           UIColorName: LaunchBackground
         # Opptak må overleve at skjermen låses. Uten dette stopper iOS

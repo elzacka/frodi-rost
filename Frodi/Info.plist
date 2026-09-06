@@ -35,7 +35,8 @@
 		<string>Inter-Regular.ttf</string>
 		<string>Inter-Medium.ttf</string>
 		<string>Inter-SemiBold.ttf</string>
-		<string>Fraunces-Medium.ttf</string>
+		<string>Norse-Regular.otf</string>
+		<string>Norse-Bold.otf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
