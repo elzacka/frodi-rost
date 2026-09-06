@@ -10,6 +10,8 @@ Formatet følger [Keep a Changelog](https://keepachangelog.com/no/1.1.0/).
   og viser ikke lenger Apples melding om at taledata sendes til dem
 
 ### Lagt til
+- Norsk tale til tekst, bekreftet på enhet
+- Handlingsknappen starter og stopper opptak
 - Banner som sier fra når den norske språkmodellen mangler, med nedlasting
 - Mulighet for å prøve transkriberingen på nytt
 - Opptak uten tekst blir forsøkt på nytt når språkmodellen er på plass
