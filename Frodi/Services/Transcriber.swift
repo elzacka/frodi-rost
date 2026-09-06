@@ -78,7 +78,7 @@ struct SystemTranscriber: Transcriber {
     let locale: Locale
 
     func transcribe(fileURL: URL) async throws -> String {
-        guard let resolved = await SpeechEngine.resolve(for: locale) else {
+        guard let resolved = await SpeechEngine.resolve() else {
             throw TranscriptionError.localeUnsupported
         }
 

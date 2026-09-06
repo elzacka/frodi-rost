@@ -1,31 +1,48 @@
 import Foundation
 import Speech
 
-/// Hvilken av modulene i Speech-rammeverket som brukes for et språk.
+/// Hvilken av modulene i Speech-rammeverket som brukes.
 ///
 /// SpeechTranscriber er den lange transkriberingsmodellen, men den dekker bare
 /// åtte språk og ingen nordiske. DictationTranscriber følger språkene i
-/// tastaturdiktat, og der finnes norsk. Begge kjører på enheten, uten
+/// tastaturdiktat, og der finnes norsk bokmål. Begge kjører på enheten, uten
 /// serverfallback, så personvernet er det samme.
 enum SpeechEngine: Equatable {
     case transcription
     case dictation
 
-    /// Finner den beste modulen for språket. Foretrekker transkribering, som er
-    /// laget for lange opptak, og faller tilbake til diktat der språket mangler.
-    static func resolve(for locale: Locale) async -> (engine: SpeechEngine, locale: Locale)? {
-        if let match = await SpeechTranscriber.supportedLocale(equivalentTo: locale),
-           AppLocale.isBokmal(match) {
+    var name: String {
+        switch self {
+        case .transcription: "transkribering"
+        case .dictation: "diktat"
+        }
+    }
+
+    /// Finner den beste modulen for bokmål.
+    ///
+    /// Vi leter gjennom `supportedLocales` selv i stedet for å bruke
+    /// `supportedLocale(equivalentTo:)`. Apple advarer selv om at likhet mellom
+    /// Locale-objekter avhenger av hvordan de ble laget, og hjelperen ga nil for
+    /// nb-NO på enhet selv om nb-NO stod i listen. Ved å plukke objektet rett ut
+    /// av rammeverkets egen liste slipper vi hele det problemet.
+    static func resolve() async -> (engine: SpeechEngine, locale: Locale)? {
+        if let match = bokmal(in: await SpeechTranscriber.supportedLocales) {
             return (.transcription, match)
         }
-        // Diktatmodulen dekker flere språk, og der finnes norsk bokmål.
-        if let match = await DictationTranscriber.supportedLocale(equivalentTo: locale),
-           AppLocale.isBokmal(match) {
+        if let match = bokmal(in: await DictationTranscriber.supportedLocales) {
             return (.dictation, match)
         }
         // Ingen match vi vil ha. Vi tar heller ingen tekst enn tekst på feil
         // språk — nynorsk eller et nabospråk ville vært verre enn ingenting.
         return nil
+    }
+
+    /// Plukker bokmål ut av en liste. Foretrekker nb-NO, godtar nb og no.
+    /// Intern og ikke privat fordi den er testet — det var her feilen lå.
+    static func bokmal(in locales: [Locale]) -> Locale? {
+        let bokmalOnly = locales.filter(AppLocale.isBokmal)
+        return bokmalOnly.first { $0.identifier(.bcp47).lowercased() == "nb-no" }
+            ?? bokmalOnly.first
     }
 
     /// Bygger modulen. `longDictation` er valgt for diktat fordi et opptak her

@@ -46,7 +46,7 @@ final class SpeechModel {
 
     /// Sjekker hva systemet har. Trygg å kalle flere ganger.
     func refresh() async {
-        guard let resolved = await SpeechEngine.resolve(for: locale) else {
+        guard let resolved = await SpeechEngine.resolve() else {
             engine = nil
             state = .unsupported
             return
@@ -66,7 +66,7 @@ final class SpeechModel {
 
     /// Laster ned den norske språkmodellen. Krever nett, men bare denne ene gangen.
     func download() async {
-        guard let resolved = await SpeechEngine.resolve(for: locale) else {
+        guard let resolved = await SpeechEngine.resolve() else {
             engine = nil
             state = .unsupported
             return
