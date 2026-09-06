@@ -43,7 +43,7 @@ struct RecordingRow: View {
         let length = Duration.seconds(recording.duration).formatted(.time(pattern: .minuteSecond))
         if recording.hasTranscript { return length }
         return recording.transcriptionFailed
-            ? "\(length) · ingen tekst"
+            ? "\(length) · \(TranscriptionError.shortText(for: recording.failureCode))"
             : "\(length) · venter på transkribering"
     }
 }

@@ -4,7 +4,8 @@ import SwiftUI
 struct SpeechModelBanner: View {
     let model: SpeechModel
 
-    @State private var supported: [String] = []
+    @State private var transcriberLocales: [String] = []
+    @State private var dictationLocales: [String] = []
     @State private var showDiagnostics = false
 
     var body: some View {
@@ -48,18 +49,20 @@ struct SpeechModelBanner: View {
                 .foregroundStyle(Color.Frodi.textSecondary)
 
                 if showDiagnostics {
-                    Text(supported.isEmpty ? "Ingen språk tilgjengelig." : supported.joined(separator: ", "))
-                        .font(.Frodi.meta)
-                        .foregroundStyle(Color.Frodi.textSecondary)
-                        .textSelection(.enabled)
-                        .fixedSize(horizontal: false, vertical: true)
+                    VStack(alignment: .leading, spacing: Space.s2) {
+                        localeList("Transkribering", transcriberLocales)
+                        localeList("Diktat", dictationLocales)
+                    }
+                    .padding(.top, Space.s1)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(Space.s4)
             .background(card)
             .task {
-                supported = await model.diagnostics().supported
+                let result = await model.diagnostics()
+                transcriberLocales = result.transcriber
+                dictationLocales = result.dictation
             }
 
         case .failed(let message):
@@ -97,6 +100,21 @@ struct SpeechModelBanner: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(Space.s4)
         .background(card)
+    }
+
+    private func localeList(_ title: String, _ locales: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.Frodi.eyebrow)
+                .eyebrowTracking()
+                .foregroundStyle(Color.Frodi.textSecondary)
+
+            Text(locales.isEmpty ? "ingen" : locales.joined(separator: ", "))
+                .font(.Frodi.meta)
+                .foregroundStyle(Color.Frodi.textSecondary)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 
     private var card: some View {

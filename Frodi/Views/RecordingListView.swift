@@ -145,17 +145,24 @@ struct RecordingListView: View {
         // Uten modell er det ingen vits i å prøve. Banneret sier allerede fra.
         guard speechModel.isReady else {
             recording.transcriptionFailed = true
+            recording.failureCode = speechModel.state == .unsupported ? "localeUnsupported" : "modelMissing"
             try? context.save()
             return
         }
 
         recording.transcriptionFailed = false
+        recording.failureCode = nil
         do {
             let text = try await SystemTranscriber(locale: speechModel.locale)
                 .transcribe(fileURL: recording.fileURL)
             recording.transcript = text
+        } catch let error as TranscriptionError {
+            recording.transcriptionFailed = true
+            recording.failureCode = error.code
+            if surfaceErrors { errorMessage = error.localizedDescription }
         } catch {
             recording.transcriptionFailed = true
+            recording.failureCode = "other"
             if surfaceErrors { errorMessage = error.localizedDescription }
         }
         try? context.save()

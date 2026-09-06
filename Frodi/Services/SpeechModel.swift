@@ -74,10 +74,14 @@ final class SpeechModel {
         return SpeechTranscriber(locale: normalized, preset: .transcription)
     }
 
-    /// Til feilsøking på enhet: hva støtter systemet, og hva er faktisk lastet ned?
-    func diagnostics() async -> (supported: [String], installed: [String]) {
-        let supported = await SpeechTranscriber.supportedLocales.map { $0.identifier(.bcp47) }.sorted()
-        let installed = await SpeechTranscriber.installedLocales.map { $0.identifier(.bcp47) }.sorted()
-        return (supported, installed)
+    /// Til feilsøking på enhet: hva støtter de to modulene i rammeverket?
+    ///
+    /// SpeechTranscriber er den lange transkriberingsmodellen. DictationTranscriber
+    /// er diktatmodellen, som følger språkene i tastaturdiktat og derfor kan ha
+    /// andre språk. Begge kjører på enheten.
+    func diagnostics() async -> (transcriber: [String], dictation: [String]) {
+        let transcriber = await SpeechTranscriber.supportedLocales.map { $0.identifier(.bcp47) }.sorted()
+        let dictation = await DictationTranscriber.supportedLocales.map { $0.identifier(.bcp47) }.sorted()
+        return (transcriber, dictation)
     }
 }

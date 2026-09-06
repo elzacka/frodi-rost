@@ -14,6 +14,43 @@ enum TranscriptionError: LocalizedError {
     case empty
     case underlying(String)
 
+    /// Lagres på opptaket slik at listen og detaljene kan si den ekte årsaken.
+    var code: String {
+        switch self {
+        case .localeUnsupported: "localeUnsupported"
+        case .modelMissing: "modelMissing"
+        case .empty: "empty"
+        case .underlying: "other"
+        }
+    }
+
+    /// Kort tekst til listeraden.
+    static func shortText(for code: String?) -> String {
+        switch code {
+        case "localeUnsupported": String(localized: "norsk mangler i iOS")
+        case "modelMissing": String(localized: "språkmodell mangler")
+        case "empty": String(localized: "ingen tale")
+        case "other": String(localized: "teksten feilet")
+        default: String(localized: "ingen tekst")
+        }
+    }
+
+    /// Lengre forklaring til detaljskjermen.
+    static func explanation(for code: String?) -> String {
+        switch code {
+        case "localeUnsupported":
+            String(localized: "iOS har ingen norsk språkmodell for tale til tekst på denne enheten, så opptaket kan ikke gjøres om til tekst ennå.")
+        case "modelMissing":
+            String(localized: "Språkmodellen er ikke lastet ned. Last den ned på forsiden, så prøver Fróði på nytt.")
+        case "empty":
+            String(localized: "Fant ingen tale i dette opptaket.")
+        case "other":
+            String(localized: "Teksten kunne ikke lages denne gangen.")
+        default:
+            String(localized: "Venter på transkribering.")
+        }
+    }
+
     var errorDescription: String? {
         switch self {
         case .localeUnsupported:

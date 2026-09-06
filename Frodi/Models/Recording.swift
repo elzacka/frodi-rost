@@ -17,6 +17,10 @@ final class Recording {
     /// Ble opptaket startet med handlingsknappen? Vises som en pille i listen.
     var startedWithActionButton: Bool = false
 
+    /// Hvorfor teksten mangler. Uten denne sier appen «fant ingen tale» også når
+    /// årsaken er at språkmodellen ikke finnes, og det er en usann beskjed.
+    var failureCode: String?
+
     init(createdAt: Date = Date(), duration: TimeInterval, fileName: String) {
         self.createdAt = createdAt
         self.duration = duration

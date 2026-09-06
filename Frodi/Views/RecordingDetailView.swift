@@ -26,20 +26,22 @@ struct RecordingDetailView: View {
                             .foregroundStyle(Color.Frodi.textPrimary)
                             .textSelection(.enabled)
                     } else {
-                        Text(recording.transcriptionFailed
-                             ? "Fant ingen tekst i dette opptaket."
-                             : "Venter på transkribering.")
+                        Text(TranscriptionError.explanation(for: recording.failureCode))
                             .font(.Frodi.body)
                             .foregroundStyle(Color.Frodi.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
 
-                        Button("Prøv på nytt") {
-                            Task { await onRetry() }
+                        // Et nytt forsøk hjelper ikke når iOS mangler språket.
+                        if recording.failureCode != "localeUnsupported" {
+                            Button("Prøv på nytt") {
+                                Task { await onRetry() }
+                            }
+                            .font(.Frodi.bodyMedium)
+                            .foregroundStyle(Color.Frodi.accentRecordOn)
+                            .padding(.horizontal, Space.s4)
+                            .padding(.vertical, Space.s2)
+                            .background(Color.Frodi.accentRecord, in: Capsule())
                         }
-                        .font(.Frodi.bodyMedium)
-                        .foregroundStyle(Color.Frodi.accentRecordOn)
-                        .padding(.horizontal, Space.s4)
-                        .padding(.vertical, Space.s2)
-                        .background(Color.Frodi.accentRecord, in: Capsule())
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
