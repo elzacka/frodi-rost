@@ -14,6 +14,19 @@ enum TranscriptionError: LocalizedError {
     case empty
     case underlying(String)
 
+    var errorDescription: String? {
+        switch self {
+        case .localeUnsupported:
+            String(localized: "iOS har ingen norsk språkmodell for tale til tekst på denne enheten.")
+        case .modelMissing:
+            String(localized: "Språkmodellen er ikke lastet ned ennå.")
+        case .empty:
+            String(localized: "Fant ingen tale i opptaket.")
+        case .underlying(let message):
+            message
+        }
+    }
+
     /// Lagres på opptaket slik at listen og detaljene kan si den ekte årsaken.
     var code: String {
         switch self {
@@ -50,27 +63,14 @@ enum TranscriptionError: LocalizedError {
             String(localized: "Venter på transkribering.")
         }
     }
-
-    var errorDescription: String? {
-        switch self {
-        case .localeUnsupported:
-            String(localized: "iOS har ingen norsk språkmodell for tale til tekst på denne enheten.")
-        case .modelMissing:
-            String(localized: "Språkmodellen er ikke lastet ned ennå.")
-        case .empty:
-            String(localized: "Fant ingen tale i opptaket.")
-        case .underlying(let message):
-            message
-        }
-    }
 }
 
 /// Apples SpeechAnalyzer, innført i iOS 26.
 ///
-/// Hele analysen skjer på enheten. Lyden forlater aldri telefonen, og
-/// rammeverket krever ingen tillatelse til talegjenkjenning for filanalyse.
-/// Det er grunnen til at appen ikke lenger viser Apples dialog om at taledata
-/// sendes til deres servere — den dialogen hørte til det gamle SFSpeechRecognizer.
+/// Hele analysen skjer på enheten, uten serverfallback. Lyden forlater aldri
+/// telefonen, og rammeverket krever ingen tillatelse til talegjenkjenning for
+/// filanalyse. Det er derfor appen slipper Apples dialog om at taledata sendes
+/// til dem — den hørte til det gamle SFSpeechRecognizer.
 ///
 /// Språkmodellen eies av systemet, ikke av appen. Den teller ikke mot
 /// appstørrelsen og ligger utenfor appens minne.
@@ -78,24 +78,34 @@ struct SystemTranscriber: Transcriber {
     let locale: Locale
 
     func transcribe(fileURL: URL) async throws -> String {
-        guard let normalized = await SpeechTranscriber.supportedLocale(equivalentTo: locale) else {
+        guard let resolved = await SpeechEngine.resolve(for: locale) else {
             throw TranscriptionError.localeUnsupported
         }
 
-        let transcriber = SpeechTranscriber(locale: normalized, preset: .transcription)
+        let module = resolved.engine.module(locale: resolved.locale)
 
-        guard await AssetInventory.status(forModules: [transcriber]) == .installed else {
+        guard await AssetInventory.status(forModules: [module]) == .installed else {
             throw TranscriptionError.modelMissing
         }
 
         do {
             let file = try AVAudioFile(forReading: fileURL)
-            let analyzer = SpeechAnalyzer(modules: [transcriber])
+            let analyzer = SpeechAnalyzer(modules: [module])
 
-            // Leseren må startes før analysen, ellers går de første resultatene tapt.
-            async let collected = transcriber.results.reduce(into: "") { text, result in
-                text += String(result.text.characters)
-            }
+            // Leseren må startes før analysen, ellers går de første resultatene
+            // tapt. De to modulene har hver sin resultattype, derfor to grener.
+            async let collected: String = {
+                switch module {
+                case let transcriber as SpeechTranscriber:
+                    return try await transcriber.results
+                        .reduce(into: "") { $0 += String($1.text.characters) }
+                case let dictation as DictationTranscriber:
+                    return try await dictation.results
+                        .reduce(into: "") { $0 += String($1.text.characters) }
+                default:
+                    return ""
+                }
+            }()
 
             if let last = try await analyzer.analyzeSequence(from: file) {
                 try await analyzer.finalizeAndFinish(through: last)

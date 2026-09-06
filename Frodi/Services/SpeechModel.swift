@@ -2,6 +2,22 @@ import Foundation
 import Observation
 import Speech
 
+/// Fróði transkriberer norsk bokmål og ingenting annet.
+///
+/// Språket er bevisst hardkodet, ikke hentet fra `Locale.current`. Står
+/// telefonen på engelsk, skal appen fortsatt lage norsk bokmål.
+///
+/// `nb` er bokmål. `nn` er nynorsk og skal aldri brukes her.
+enum AppLocale {
+    static let norwegian = Locale(identifier: "nb-NO")
+
+    /// Er dette bokmål? `nb` og det eldre `no` godtas, `nn` aldri.
+    static func isBokmal(_ locale: Locale) -> Bool {
+        guard let code = locale.language.languageCode?.identifier.lowercased() else { return false }
+        return code == "nb" || code == "no"
+    }
+}
+
 /// Holder styr på språkmodellen for tale til tekst.
 ///
 /// Modellen eies av systemet og lastes ned én gang. Det er den eneste gangen
@@ -12,7 +28,7 @@ import Speech
 final class SpeechModel {
     enum State: Equatable {
         case unknown
-        /// iOS har ingen modell for dette språket på denne enheten.
+        /// iOS har ingen norsk modell i noen av modulene.
         case unsupported
         /// Støttet, men ikke lastet ned.
         case needsDownload
@@ -22,19 +38,24 @@ final class SpeechModel {
     }
 
     private(set) var state: State = .unknown
+    private(set) var engine: SpeechEngine?
 
-    let locale = Locale(identifier: "nb-NO")
+    let locale = AppLocale.norwegian
 
     var isReady: Bool { state == .ready }
 
     /// Sjekker hva systemet har. Trygg å kalle flere ganger.
     func refresh() async {
-        guard let transcriber = await makeTranscriber() else {
+        guard let resolved = await SpeechEngine.resolve(for: locale) else {
+            engine = nil
             state = .unsupported
             return
         }
 
-        switch await AssetInventory.status(forModules: [transcriber]) {
+        engine = resolved.engine
+        let module = resolved.engine.module(locale: resolved.locale)
+
+        switch await AssetInventory.status(forModules: [module]) {
         case .installed: state = .ready
         case .downloading: state = .downloading
         case .supported: state = .needsDownload
@@ -43,22 +64,23 @@ final class SpeechModel {
         }
     }
 
-    /// Laster ned språkmodellen. Krever nett, men bare denne ene gangen.
+    /// Laster ned den norske språkmodellen. Krever nett, men bare denne ene gangen.
     func download() async {
-        guard let transcriber = await makeTranscriber() else {
+        guard let resolved = await SpeechEngine.resolve(for: locale) else {
+            engine = nil
             state = .unsupported
             return
         }
 
         state = .downloading
+        let module = resolved.engine.module(locale: resolved.locale)
+
         do {
             // Reservasjon holder modellen installert. Uten den kan systemet
             // frigi den igjen når det trenger plass, og appen står uten tekst.
-            if let normalized = await SpeechTranscriber.supportedLocale(equivalentTo: locale) {
-                _ = try? await AssetInventory.reserve(locale: normalized)
-            }
+            _ = try? await AssetInventory.reserve(locale: resolved.locale)
 
-            if let request = try await AssetInventory.assetInstallationRequest(supporting: [transcriber]) {
+            if let request = try await AssetInventory.assetInstallationRequest(supporting: [module]) {
                 try await request.downloadAndInstall()
             }
             await refresh()
@@ -67,18 +89,7 @@ final class SpeechModel {
         }
     }
 
-    private func makeTranscriber() async -> SpeechTranscriber? {
-        guard let normalized = await SpeechTranscriber.supportedLocale(equivalentTo: locale) else {
-            return nil
-        }
-        return SpeechTranscriber(locale: normalized, preset: .transcription)
-    }
-
     /// Til feilsøking på enhet: hva støtter de to modulene i rammeverket?
-    ///
-    /// SpeechTranscriber er den lange transkriberingsmodellen. DictationTranscriber
-    /// er diktatmodellen, som følger språkene i tastaturdiktat og derfor kan ha
-    /// andre språk. Begge kjører på enheten.
     func diagnostics() async -> (transcriber: [String], dictation: [String]) {
         let transcriber = await SpeechTranscriber.supportedLocales.map { $0.identifier(.bcp47) }.sorted()
         let dictation = await DictationTranscriber.supportedLocales.map { $0.identifier(.bcp47) }.sorted()

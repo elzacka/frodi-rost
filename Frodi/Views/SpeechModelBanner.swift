@@ -16,7 +16,7 @@ struct SpeechModelBanner: View {
         case .needsDownload:
             banner(
                 title: "Last ned norsk språkmodell",
-                body: "Fróði trenger Apples norske språkmodell for å lage tekst. Den lastes ned én gang, og etterpå virker alt uten nett.",
+                body: "Fróði trenger den norske språkmodellen fra iOS for å lage tekst. Den lastes ned én gang, og etterpå virker alt uten nett.",
                 action: "Last ned"
             )
 
