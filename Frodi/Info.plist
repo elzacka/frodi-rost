@@ -28,8 +28,6 @@
 	<false/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på telefonen.</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Fróði gjør opptakene dine om til tekst på telefonen. Ingenting sendes ut av enheten.</string>
 	<key>UIAccessibilityPerformEscapeEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>

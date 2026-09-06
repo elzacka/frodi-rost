@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RecordingDetailView: View {
     let recording: Recording
+    let onRetry: () async -> Void
 
     var body: some View {
         ZStack {
@@ -30,6 +31,15 @@ struct RecordingDetailView: View {
                              : "Venter på transkribering.")
                             .font(.Frodi.body)
                             .foregroundStyle(Color.Frodi.textSecondary)
+
+                        Button("Prøv på nytt") {
+                            Task { await onRetry() }
+                        }
+                        .font(.Frodi.bodyMedium)
+                        .foregroundStyle(Color.Frodi.accentRecordOn)
+                        .padding(.horizontal, Space.s4)
+                        .padding(.vertical, Space.s2)
+                        .background(Color.Frodi.accentRecord, in: Capsule())
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

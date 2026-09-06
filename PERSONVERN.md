@@ -23,17 +23,30 @@ blir på telefonen din.
 
 ## Tillatelser appen ber om
 
-**Mikrofon.** Nødvendig for å ta opp. Uten den kan ikke appen gjøre jobben sin.
+**Mikrofon.** Nødvendig for å ta opp. Det er den eneste tillatelsen Fróði ber om.
 
-**Talegjenkjenning.** Brukes for å gjøre opptaket om til tekst. Fróði tvinger
-gjenkjenningen til å skje på enheten. Lyden din blir aldri sendt til Apple.
+Fróði ber **ikke** om tilgang til talegjenkjenning. Tale til tekst går gjennom
+iOS 26 sin SpeechAnalyzer, som analyserer lyden på enheten og derfor ikke krever
+den tillatelsen. Den eldre talegjenkjenningen i iOS sender lyd til Apples
+servere, og Fróði bruker den ikke.
+
+## Språkmodellen
+
+Første gang du bruker tale til tekst, må iOS laste ned en norsk språkmodell.
+
+- Nedlastingen gjøres av systemet, ikke av Fróði
+- Det er den eneste gangen noe her trenger nett
+- Det er språkmodellen som lastes ned. Opptakene dine sendes ingen steder
+- Etter nedlastingen virker tale til tekst helt uten nett
+
+Modellen eies av iOS og ligger utenfor appen.
 
 ## Rettighetene dine
 
 Siden ingenting forlater telefonen, er det ingen server å be om innsyn i.
 
 - **Innsyn og eksport:** opptakene ligger i appen, og du kan lese dem der
-- **Sletting:** stryk til venstre på et opptak i listen. Sletter du appen,
+- **Sletting:** hold på et opptak i listen og velg «Slett». Sletter du appen,
   slettes alt sammen med den
 
 ## Sikkerhet

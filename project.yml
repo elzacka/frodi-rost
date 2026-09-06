@@ -60,7 +60,6 @@ targets:
         # skjer når du legger fra deg telefonen i bilen.
         UIBackgroundModes: [audio]
         NSMicrophoneUsageDescription: "Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på telefonen."
-        NSSpeechRecognitionUsageDescription: "Fróði gjør opptakene dine om til tekst på telefonen. Ingenting sendes ut av enheten."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         ITSAppUsesNonExemptEncryption: false
