@@ -52,7 +52,7 @@ final class AudioRecorder {
                 return false
             }
 
-            AudioStorage.protect(url)
+            AudioStorage.protectWhileRecording(url)
             recorder = newRecorder
             duration = 0
             state = .recording
@@ -82,6 +82,9 @@ final class AudioRecorder {
             AudioStorage.delete(fileName: recorder.url.lastPathComponent)
             return nil
         }
+
+        // Filen er lukket nå, og kan strammes til.
+        AudioStorage.protectFinished(recorder.url)
         return (recorder.url.lastPathComponent, length)
     }
 
