@@ -1,0 +1,97 @@
+name: Frodi
+options:
+  bundleIdPrefix: com.Tazk
+  deploymentTarget:
+    iOS: "26.5"
+  xcodeVersion: "26.6"
+  developmentLanguage: nb
+  generateEmptyDirectories: true
+settings:
+  base:
+    # Language mode, not toolchain version. Valid values: 4, 4.2, 5, 6.
+    SWIFT_VERSION: "6"
+    TARGETED_DEVICE_FAMILY: "1"
+    INFOPLIST_FILE: Frodi/Info.plist
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    PRODUCT_BUNDLE_IDENTIFIER: com.Tazk.Frodi
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_APPROACHABLE_CONCURRENCY: true
+    ENABLE_USER_SCRIPT_SANDBOXING: true
+targets:
+  Frodi:
+    type: application
+    platform: iOS
+    sources:
+      - path: Frodi
+        excludes:
+          - "**/.DS_Store"
+    resources:
+      - path: Frodi/Resources/Assets.xcassets
+    settings:
+      base:
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "Apple Development"
+        DEVELOPMENT_TEAM: 8NW62A7PRA
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
+        SUPPORTS_MACCATALYST: false
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: false
+    info:
+      path: Frodi/Info.plist
+      properties:
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        CFBundleDisplayName: "Fróði"
+        CFBundleLocalizations:
+          - nb
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        # Opptak må overleve at skjermen låses. Uten dette stopper iOS
+        # opptaket i det appen går i bakgrunnen, som er nettopp det som
+        # skjer når du legger fra deg telefonen i bilen.
+        UIBackgroundModes: [audio]
+        NSMicrophoneUsageDescription: "Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på telefonen."
+        NSSpeechRecognitionUsageDescription: "Fróði gjør opptakene dine om til tekst på telefonen. Ingenting sendes ut av enheten."
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        ITSAppUsesNonExemptEncryption: false
+        UIAccessibilityPerformEscapeEnabled: true
+  FrodiTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: FrodiTests
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1"
+    dependencies:
+      - target: Frodi
+  FrodiUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: FrodiUITests
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1"
+    dependencies:
+      - target: Frodi
+schemes:
+  Frodi:
+    build:
+      targets:
+        Frodi: all
+    run:
+      config: Debug
+    test:
+      targets:
+        - FrodiTests
+        - FrodiUITests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
