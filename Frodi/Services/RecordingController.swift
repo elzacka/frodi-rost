@@ -1,0 +1,64 @@
+import Foundation
+import Observation
+import SwiftData
+
+/// Eier opptaket, og er stedet både grensesnittet og handlingsknappen snakker med.
+///
+/// Den må være delt fordi en App Intent kjører uten tilgang til SwiftUI. Skulle
+/// opptakeren ligget i et view, kunne ikke handlingsknappen stoppe et opptak som
+/// alt går.
+@MainActor
+@Observable
+final class RecordingController {
+    static let shared = RecordingController()
+
+    private(set) var recorder = AudioRecorder()
+
+    /// Settes når databasen ikke lot seg åpne. Da lagres opptakene bare i minnet.
+    private(set) var storageFailed = false
+
+    private var container: ModelContainer?
+    private var startedWithActionButton = false
+
+    private init() {}
+
+    var isRecording: Bool { recorder.isRecording }
+
+    func attach(container: ModelContainer, storageFailed: Bool) {
+        self.container = container
+        self.storageFailed = storageFailed
+    }
+
+    /// Starter hvis stille, stopper hvis den går. Dette er det handlingsknappen kaller.
+    /// Returnerer true hvis et opptak nå pågår.
+    @discardableResult
+    func toggle(fromActionButton: Bool = false) async -> Bool {
+        if recorder.isRecording {
+            stopAndSave()
+            return false
+        }
+        startedWithActionButton = fromActionButton
+        return await recorder.start()
+    }
+
+    func start(fromActionButton: Bool = false) async {
+        guard !recorder.isRecording else { return }
+        startedWithActionButton = fromActionButton
+        await recorder.start()
+    }
+
+    func stopAndSave() {
+        guard let result = recorder.stop() else { return }
+
+        let recording = Recording(duration: result.duration, fileName: result.fileName)
+        recording.startedWithActionButton = startedWithActionButton
+        startedWithActionButton = false
+
+        guard let context = container?.mainContext else { return }
+        context.insert(recording)
+        try? context.save()
+
+        // Teksten lages etterpå. Feiler den, står årsaken på opptaket.
+        Task { await Transcription.run(for: recording, context: context) }
+    }
+}

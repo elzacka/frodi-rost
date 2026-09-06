@@ -3,18 +3,33 @@ import SwiftUI
 
 @main
 struct FrodiApp: App {
-    // Broen mellom App Intent og appen. Handlingsknappen kjører intenten
-    // før noen view finnes, så flagget må ligge et sted begge når.
-    @State private var launchRequest = LaunchRequest.shared
+    private let container: ModelContainer
+
+    init() {
+        // Feiler disken, faller vi tilbake til minnet slik at appen fortsatt tar
+        // opp. Brukeren får beskjed om at opptakene ikke overlever omstart, i
+        // stedet for at appen kræsjer ved oppstart.
+        var failed = false
+        var resolved: ModelContainer
+        do {
+            resolved = try ModelContainer(for: Recording.self)
+        } catch {
+            failed = true
+            let memoryOnly = ModelConfiguration(isStoredInMemoryOnly: true)
+            // Klarer vi ikke engang dette, er det ingenting igjen å redde.
+            resolved = try! ModelContainer(for: Recording.self, configurations: memoryOnly)
+        }
+        container = resolved
+        RecordingController.shared.attach(container: resolved, storageFailed: failed)
+    }
 
     var body: some Scene {
         WindowGroup {
             RecordingListView()
-                .environment(launchRequest)
                 // Designsystemet definerer kun lys modus i v0.1.
                 .preferredColorScheme(.light)
                 .tint(Color.Frodi.accentRecord)
         }
-        .modelContainer(for: Recording.self)
+        .modelContainer(container)
     }
 }

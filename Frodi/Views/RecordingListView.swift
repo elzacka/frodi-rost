@@ -3,15 +3,11 @@ import SwiftUI
 
 struct RecordingListView: View {
     @Environment(\.modelContext) private var context
-    @Environment(LaunchRequest.self) private var launchRequest
     @Query(sort: \Recording.createdAt, order: .reverse) private var recordings: [Recording]
 
-    @State private var recorder = AudioRecorder()
+    @State private var controller = RecordingController.shared
     @State private var speechModel = SpeechModel()
     @State private var errorMessage: String?
-
-    /// Husker at neste opptak kom fra handlingsknappen, slik at raden kan si det.
-    @State private var startedWithActionButton = false
 
     var body: some View {
         NavigationStack {
@@ -36,7 +32,7 @@ struct RecordingListView: View {
             }
             .navigationBarHidden(true)
             .safeAreaInset(edge: .bottom) {
-                RecorderBar(recorder: recorder, onStop: save)
+                RecorderBar(controller: controller)
             }
             .alert("Noe gikk galt", isPresented: .constant(errorMessage != nil)) {
                 Button("Greit") { errorMessage = nil }
@@ -48,12 +44,6 @@ struct RecordingListView: View {
             await speechModel.refresh()
             // Opptak som ventet på modellen får teksten sin nå.
             await transcribePending()
-        }
-        .task(id: launchRequest.shouldStartRecording) {
-            guard launchRequest.shouldStartRecording else { return }
-            launchRequest.shouldStartRecording = false
-            startedWithActionButton = true
-            await recorder.start()
         }
     }
 
@@ -122,16 +112,6 @@ struct RecordingListView: View {
         .scrollContentBackground(.hidden)
     }
 
-    private func save(fileName: String, duration: TimeInterval) {
-        let recording = Recording(duration: duration, fileName: fileName)
-        recording.startedWithActionButton = startedWithActionButton
-        startedWithActionButton = false
-        context.insert(recording)
-        try? context.save()
-
-        Task { await transcribe(recording) }
-    }
-
     /// Transkriberer alt som mangler tekst. Kalles ved oppstart, slik at opptak
     /// tatt før språkmodellen var på plass ikke blir stående uten tekst.
     private func transcribePending() async {
@@ -142,30 +122,10 @@ struct RecordingListView: View {
     }
 
     private func transcribe(_ recording: Recording, surfaceErrors: Bool = true) async {
-        // Uten modell er det ingen vits i å prøve. Banneret sier allerede fra.
-        guard speechModel.isReady else {
-            recording.transcriptionFailed = true
-            recording.failureCode = speechModel.state == .unsupported ? "localeUnsupported" : "modelMissing"
-            try? context.save()
-            return
+        await Transcription.run(for: recording, context: context)
+        if surfaceErrors, recording.transcriptionFailed {
+            errorMessage = TranscriptionError.explanation(for: recording.failureCode)
         }
-
-        recording.transcriptionFailed = false
-        recording.failureCode = nil
-        do {
-            let text = try await SystemTranscriber(locale: speechModel.locale)
-                .transcribe(fileURL: recording.fileURL)
-            recording.transcript = text
-        } catch let error as TranscriptionError {
-            recording.transcriptionFailed = true
-            recording.failureCode = error.code
-            if surfaceErrors { errorMessage = error.localizedDescription }
-        } catch {
-            recording.transcriptionFailed = true
-            recording.failureCode = "other"
-            if surfaceErrors { errorMessage = error.localizedDescription }
-        }
-        try? context.save()
     }
 
     private func delete(_ recording: Recording) {

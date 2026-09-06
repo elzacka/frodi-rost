@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct RecorderBar: View {
-    let recorder: AudioRecorder
-    let onStop: (String, TimeInterval) -> Void
+    let controller: RecordingController
+
+    private var recorder: AudioRecorder { controller.recorder }
 
     var body: some View {
         VStack(spacing: Space.s4) {
@@ -77,12 +78,6 @@ struct RecorderBar: View {
     }
 
     private func toggle() {
-        if recorder.isRecording {
-            if let result = recorder.stop() {
-                onStop(result.fileName, result.duration)
-            }
-        } else {
-            Task { await recorder.start() }
-        }
+        Task { await controller.toggle() }
     }
 }
