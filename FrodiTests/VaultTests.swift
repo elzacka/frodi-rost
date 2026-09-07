@@ -63,3 +63,48 @@ struct VaultTests {
         #expect(throws: (any Error).self) { try RecordingVault.open(Data()) }
     }
 }
+
+@Suite("Forsegling av tekst")
+struct TranscriptSealingTests {
+    @Test("Tekst kan forsegles og åpnes igjen")
+    func textRoundTrip() throws {
+        let text = "Dette er en ny test. Jeg lurer på om den tar med tegnsetting."
+        let sealed = try RecordingVault.seal(text)
+        #expect(try RecordingVault.openText(sealed) == text)
+    }
+
+    /// Æ, ø og å må overleve turen gjennom UTF-8 og AES-GCM.
+    @Test("Norske tegn overlever forseglingen")
+    func norwegianCharactersSurvive() throws {
+        let text = "Ærlig talt: øvingen på Sørlandet gikk rått. Fróði skrev ð og ó."
+        let sealed = try RecordingVault.seal(text)
+        #expect(try RecordingVault.openText(sealed) == text)
+    }
+
+    /// Poenget med hele øvelsen: teksten skal ikke kunne leses ut av lagringen.
+    @Test("Teksten finnes ikke i klartekst i det forseglede")
+    func textIsNotReadable() throws {
+        let secret = "hemmelig setning som ikke skal kunne leses"
+        let sealed = try RecordingVault.seal(secret)
+        #expect(sealed.range(of: Data(secret.utf8)) == nil)
+    }
+
+    @Test("Et opptak uten tekst sier at det ikke har noen")
+    func recordingWithoutTranscript() throws {
+        let recording = Recording(duration: 5, fileName: "a.m4a.enc")
+        #expect(recording.hasTranscript == false)
+        #expect(try recording.transcript() == nil)
+    }
+
+    @Test("Et opptak med tekst gir den tilbake uendret")
+    func recordingWithTranscript() throws {
+        let recording = Recording(duration: 5, fileName: "a.m4a.enc")
+        try recording.setTranscript("Opptaket ble lagret lokalt.")
+
+        #expect(recording.hasTranscript)
+        #expect(try recording.transcript() == "Opptaket ble lagret lokalt.")
+        // Og det som faktisk ligger på disk skal ikke være lesbart.
+        let stored = try #require(recording.sealedTranscript)
+        #expect(stored.range(of: Data("Opptaket".utf8)) == nil)
+    }
+}

@@ -5,6 +5,7 @@ struct RecordingDetailView: View {
     let onRetry: () async -> Void
 
     @State private var player = AudioPlayer.shared
+    @State private var transcript: String = ""
     @State private var exportURLs: [URL] = []
     @State private var exportError: String?
 
@@ -55,15 +56,24 @@ struct RecordingDetailView: View {
         } message: {
             Text(exportError ?? "").font(.Frodi.body)
         }
+        .task(id: recording.persistentModelID) {
+            // Teksten låses opp først når den skal vises.
+            transcript = (try? recording.transcript()) ?? ""
+        }
+        .onDisappear {
+            // Ingen grunn til å la klarteksten ligge i minnet etterpå.
+            transcript = ""
+        }
     }
 
     private var transcriptCard: some View {
         VStack(alignment: .leading, spacing: Space.s4) {
             if recording.hasTranscript {
-                Text(recording.transcript ?? "")
+                Text(transcript)
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .textSelection(.enabled)
+                    .hiddenWhileScreenCaptured()
             } else {
                 Text(TranscriptionError.explanation(for: recording.failureCode))
                     .font(.Frodi.body)

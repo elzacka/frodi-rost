@@ -19,7 +19,7 @@ enum Transcription {
             let text = try await AudioStorage.withDecrypted(fileName: recording.fileName) { url in
                 try await transcriber(for: url)
             }
-            recording.transcript = text
+            try recording.setTranscript(text)
             recording.transcriptionFailed = false
             recording.failureCode = nil
         } catch let error as TranscriptionError {

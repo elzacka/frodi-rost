@@ -39,7 +39,23 @@ enum RecordingVault {
     // MARK: - Kryptering
 
     static func seal(fileAt url: URL) throws -> Data {
-        let plaintext = try Data(contentsOf: url)
+        try seal(try Data(contentsOf: url))
+    }
+
+    /// Forsegler tekst. Brukes til transkripsjoner, som ofte er mer
+    /// eksponerende enn lydfilen: teksten er søkbar og lesbar på et blikk.
+    static func seal(_ text: String) throws -> Data {
+        try seal(Data(text.utf8))
+    }
+
+    static func openText(_ blob: Data) throws -> String {
+        guard let text = String(data: try open(blob), encoding: .utf8) else {
+            throw VaultError.decryptionFailed
+        }
+        return text
+    }
+
+    static func seal(_ plaintext: Data) throws -> Data {
         let dataKey = SymmetricKey(size: .bits256)
         let sealed = try AES.GCM.seal(plaintext, using: dataKey)
 

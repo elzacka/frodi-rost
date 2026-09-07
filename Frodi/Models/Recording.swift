@@ -11,7 +11,13 @@ final class Recording {
     /// etter neste versjon.
     var fileName: String = ""
 
-    var transcript: String?
+    /// Teksten forsegles på samme måte som lyden.
+    ///
+    /// En transkripsjon er ofte mer eksponerende enn lydfilen. Den er søkbar,
+    /// lesbar på et blikk, og kan kopieres uten å spilles av. Å beskytte lyden
+    /// og la teksten ligge i klartekst ville vært å låse døren og la vinduet stå.
+    var sealedTranscript: Data?
+
     var transcriptionFailed: Bool = false
 
     /// Hvorfor teksten mangler. Uten denne sier appen «fant ingen tale» også når
@@ -28,8 +34,15 @@ final class Recording {
         AudioStorage.directory.appendingPathComponent(fileName)
     }
 
-    var hasTranscript: Bool {
-        guard let transcript else { return false }
-        return !transcript.isEmpty
+    var hasTranscript: Bool { sealedTranscript != nil }
+
+    /// Låser opp teksten. Kalles bare når den faktisk skal vises eller hentes ut.
+    func transcript() throws -> String? {
+        guard let sealedTranscript else { return nil }
+        return try RecordingVault.openText(sealedTranscript)
+    }
+
+    func setTranscript(_ text: String) throws {
+        sealedTranscript = try RecordingVault.seal(text)
     }
 }

@@ -11,13 +11,13 @@ struct RecordingTests {
         #expect(recording.fileURL.path.contains("Opptak"))
     }
 
-    @Test("hasTranscript er false for tom tekst")
-    func emptyTranscriptCountsAsMissing() {
-        let recording = Recording(duration: 1, fileName: "a.m4a")
+    @Test("hasTranscript følger om teksten er forseglet")
+    func hasTranscriptTracksSealedText() throws {
+        let recording = Recording(duration: 1, fileName: "a.m4a.enc")
         #expect(recording.hasTranscript == false)
-        recording.transcript = ""
-        #expect(recording.hasTranscript == false)
-        recording.transcript = "hei"
+
+        try recording.setTranscript("hei")
         #expect(recording.hasTranscript == true)
+        #expect(try recording.transcript() == "hei")
     }
 }

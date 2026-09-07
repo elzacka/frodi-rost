@@ -73,12 +73,23 @@ Recordings are also marked `isExcludedFromBackup`, re-applied on every folder
 access because Apple documents the flag as guidance that file operations can
 reset. The encryption above is what actually carries the guarantee.
 
-### Known gap
+### Transcripts
 
-Transcripts are stored as plain text in the SwiftData store. The store is
-covered by the app sandbox and file protection, but is not sealed by the vault
-the way audio is. An attacker with the device unlocked, or with a way past file
-protection, would read transcripts but not audio.
+Transcripts are sealed with the same scheme as audio and stored as ciphertext in
+the SwiftData store. A transcript is arguably the more exposing of the two: it is
+searchable, readable at a glance, and copyable without playing anything back.
+Protecting the audio and leaving the text in the clear would have locked the door
+and left the window open.
+
+Plaintext exists only while a recording's detail screen is open, and is cleared
+when it closes.
+
+### Screen recording
+
+Transcript text is hidden while `UIScreen.isCaptured` is true, and reappears when
+capture stops. Unlike a screenshot, a recording or mirroring session persists,
+so it can capture text the user never meant to share. This is a supported API
+and cheap; it is not a defence against someone holding the unlocked device.
 
 ## Speech processing
 
@@ -109,5 +120,8 @@ time. It should be removed when WhisperKit annotates its own types.
 - **No biometric lock on the app.** The primary use is hands-busy capture while
   driving, and a Face ID gate at the moment of recording would defeat it.
 - **No certificate pinning, no transport hardening.** There is no transport.
-- **No screenshot or screen-recording blocking.** It would not stop a determined
-  reader and would break legitimate use.
+- **No screenshot blocking.** iOS offers no supported way to prevent one.
+  `userDidTakeScreenshotNotification` fires after the image exists, and the
+  hidden `isSecureTextEntry` layer trick is undocumented and can break without
+  warning. Detection after the fact protects nothing, so the app does not
+  pretend to offer this.

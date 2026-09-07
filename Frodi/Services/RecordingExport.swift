@@ -24,7 +24,7 @@ enum RecordingExport {
         try RecordingVault.open(sealed).write(to: audio, options: [.completeFileProtectionUnlessOpen])
         urls.append(audio)
 
-        if let transcript = recording.transcript, !transcript.isEmpty {
+        if let transcript = try recording.transcript(), !transcript.isEmpty {
             let text = folder.appendingPathComponent("frodi-\(stamp).txt")
             try Data(transcript.utf8).write(to: text, options: [.completeFileProtectionUnlessOpen])
             urls.append(text)
