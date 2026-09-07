@@ -19,7 +19,7 @@ struct PrivacyTests {
         #expect(value?.isEmpty == false)
     }
 
-    /// Opptak må overleve at skjermen låses, ellers stopper diktafonen i bilen.
+    /// Opptak må overleve at skjermen låses, ellers stopper opptaket i bilen.
     @Test("Bakgrunnslyd er slått på")
     func backgroundAudioEnabled() {
         let modes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") as? [String]

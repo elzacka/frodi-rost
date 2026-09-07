@@ -1,6 +1,6 @@
 # Fróði
 
-Norsk diktafon for iPhone. Tar opp lyd og gjør det om til tekst, på enheten.
+Tar opp lyd på iPhone og gjør det om til norsk tekst. Alt skjer på enheten.
 
 ## Hva appen gjør
 
