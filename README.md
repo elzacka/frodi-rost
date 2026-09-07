@@ -41,9 +41,9 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
 
 ## Mer
 
-| Dokument | Innhold |
-|---|---|
+| Dokument                       | Innhold                                                            |
+| ------------------------------ | ------------------------------------------------------------------ |
 | [PERSONVERN.md](PERSONVERN.md) | Hva som lagres, hvilke tillatelser appen ber om, rettighetene dine |
-| [SECURITY.md](SECURITY.md) | Trusselbilde, hvordan data beskyttes, hvordan melde en sårbarhet |
-| [TREDJEPART.md](TREDJEPART.md) | Modell, kode og skrifter appen bygger på, med lisenser |
-| [CHANGELOG.md](CHANGELOG.md) | Hva som er endret |
+| [SECURITY.md](SECURITY.md)     | Trusselmodell, hvordan data beskyttes, hvordan melde en sårbarhet  |
+| [TREDJEPART.md](TREDJEPART.md) | Modell, kode og skrifter appen bygger på, med lisenser             |
+| [CHANGELOG.md](CHANGELOG.md)   | Hva som er endret                                                  |
