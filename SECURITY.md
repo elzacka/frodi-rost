@@ -111,6 +111,3 @@ time. It should be removed when WhisperKit annotates its own types.
 - **No certificate pinning, no transport hardening.** There is no transport.
 - **No screenshot or screen-recording blocking.** It would not stop a determined
   reader and would break legitimate use.
-- **No approval for classified information.** Platform approvals such as BSI
-  Indigo cover a supervised, MDM-managed device with a VPN gateway and only
-  Apple's own apps. A third-party App Store app is outside their scope.
