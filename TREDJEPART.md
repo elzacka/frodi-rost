@@ -1,8 +1,10 @@
 # Tredjepartslisenser
 
-Fróði bruker fritt tilgjengelig programvare, modeller og skrifter. Ingenting
-koster penger, verken å bruke eller å kjøre. Men Apache 2.0 krever at
-opphavet oppgis, og denne filen er den attribusjonen.
+Apache 2.0 krever at opphavet oppgis. Denne filen er den attribusjonen, og
+eneste sted i dokumentasjonen som omtaler lisenser.
+
+Alt under er fritt å bruke, også kommersielt, med de forbeholdene som står
+nederst.
 
 Sist gjennomgått 7. september 2026.
 
@@ -16,9 +18,6 @@ Sist gjennomgått 7. september 2026.
 
 nb-whisper bygger på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra
 Språkbanken og Nasjonalbibliotekets samling.
-
-Modellen kjører på enheten. Den koster ingenting per bruk, sender ingen
-forespørsler, og har verken kvote eller nøkkel.
 
 ## Kode
 
@@ -40,10 +39,11 @@ forespørsler, og har verken kvote eller nøkkel.
 | Inter | Rasmus Andersson | SIL Open Font License 1.1 |
 | Norse | Joël Carrouché | Joel Carrouche Free Font License 1.3 |
 
-**Norse har en begrensning som gjelder dette repoet.** Lisensen tillater uttrykkelig
-å bygge fonten inn i en app, også kommersielt. Men den forbyr videredistribusjon
-uten skriftlig samtykke, og sier eksplisitt at fonten ikke kan gjøres tilgjengelig
-for nedlasting fra en nettside.
+## Forbehold: Norse kan ikke videredistribueres
+
+Lisensen tillater uttrykkelig å bygge fonten inn i en app, også kommersielt. Men
+den forbyr videredistribusjon uten skriftlig samtykke, og sier eksplisitt at
+fonten ikke kan gjøres tilgjengelig for nedlasting fra en nettside.
 
 Fontfilene ligger i dag i `Frodi/Resources/Fonts/` og er sporet i git. Blir dette
 repoet offentlig, er det videredistribusjon. Tre veier ut: hold repoet privat, ta
