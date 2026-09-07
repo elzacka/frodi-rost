@@ -55,21 +55,30 @@ struct RecordingListView: View {
     }
 
     private var header: some View {
-        Text("fróði")
-            .font(.Frodi.display)
-            .foregroundStyle(Color.Frodi.textPrimary)
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, Space.s4)
-            .padding(.top, Space.s2)
-            .padding(.bottom, Space.s3)
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .fill(Color.Frodi.border)
-                    .frame(height: 1)
-            }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("Fróði, diktafon")
-            .accessibilityAddTraits(.isHeader)
+        VStack(spacing: Space.s1) {
+            Text("fróði")
+                .font(.Frodi.display)
+                .foregroundStyle(Color.Frodi.textPrimary)
+
+            // Inter, ikke Skranji. Pyntefonten er tung å lese i småformat,
+            // og eyebrow-stilen i designsystemet er laget for nettopp dette.
+            Text("STT")
+                .font(.Frodi.eyebrow)
+                .eyebrowTracking()
+                .foregroundStyle(Color.Frodi.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, Space.s4)
+        .padding(.top, Space.s2)
+        .padding(.bottom, Space.s3)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(Color.Frodi.border)
+                .frame(height: 1)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Fróði, tale til tekst")
+        .accessibilityAddTraits(.isHeader)
     }
 
     /// Databasen lot seg ikke åpne, så appen kjører på minnet.
