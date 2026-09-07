@@ -1,6 +1,6 @@
 # Personvern i Fróði
 
-Sist oppdatert 7. september 2026.
+Sist oppdatert 07.09.26.
 
 Fróði har ingen nettverkskode. Ingenting kan sendes noe sted.
 

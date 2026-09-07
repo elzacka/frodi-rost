@@ -2,7 +2,7 @@
 
 Apache 2.0 krever at opphavet oppgis. Dette er den attribusjonen.
 
-Sist gjennomgått 7. september 2026.
+Sist gjennomgått 07.09.26.
 
 ## Modell
 

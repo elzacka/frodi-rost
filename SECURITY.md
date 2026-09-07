@@ -2,7 +2,7 @@
 
 Fróði records audio and transcribes it on the device. Nothing is transmitted.
 
-Last reviewed 7 September 2026.
+Last reviewed 07.09.26.
 
 ## Reporting a vulnerability
 
