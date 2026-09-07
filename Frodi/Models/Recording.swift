@@ -14,7 +14,7 @@ final class Recording {
     var transcript: String?
     var transcriptionFailed: Bool = false
 
-    /// Ble opptaket startet med handlingsknappen? Vises som en pille i listen.
+    /// Ble opptaket startet med handlingsknappen? Lagres, men vises ikke i listen.
     var startedWithActionButton: Bool = false
 
     /// Hvorfor teksten mangler. Uten denne sier appen «fant ingen tale» også når

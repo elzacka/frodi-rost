@@ -21,16 +21,6 @@ struct RecordingDetailView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: Space.s4) {
-                    Text("OPPTAK")
-                        .font(.Frodi.eyebrow)
-                        .eyebrowTracking()
-                        .foregroundStyle(Color.Frodi.textSecondary)
-
-                    Text(Duration.seconds(recording.duration).formatted(.time(pattern: .minuteSecond)))
-                        .font(.Frodi.caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Color.Frodi.textSecondary)
-
                     if recording.hasTranscript {
                         Text(recording.transcript ?? "")
                             .font(.Frodi.body)
@@ -65,7 +55,7 @@ struct RecordingDetailView: View {
                 .padding(Space.s4)
             }
         }
-        .navigationTitle(recording.createdAt.formatted(.dateTime.day().month(.abbreviated).hour().minute()))
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Color.Frodi.background, for: .navigationBar)
         .toolbar {
@@ -89,5 +79,12 @@ struct RecordingDetailView: View {
         } message: {
             Text(exportError ?? "").font(.Frodi.body)
         }
+    }
+
+    /// Dato, tidspunkt og lengde står i tittelen, så selve kortet er bare teksten.
+    private var title: String {
+        let stamp = recording.createdAt.formatted(.dateTime.day().month(.abbreviated).hour().minute())
+        let length = Duration.seconds(recording.duration).formatted(.time(pattern: .minuteSecond))
+        return "\(stamp) | \(length)"
     }
 }

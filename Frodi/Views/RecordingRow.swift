@@ -8,15 +8,13 @@ struct RecordingRow: View {
             VStack(alignment: .leading, spacing: Space.s1) {
                 Text(title)
                     .font(.Frodi.bodyMedium)
+                    .monospacedDigit()
                     .foregroundStyle(Color.Frodi.textPrimary)
 
-                Text(meta)
-                    .font(.Frodi.meta)
-                    .foregroundStyle(Color.Frodi.textSecondary)
-
-                if recording.startedWithActionButton {
-                    ActionButtonChip()
-                        .padding(.top, Space.s1)
+                if let status {
+                    Text(status)
+                        .font(.Frodi.meta)
+                        .foregroundStyle(Color.Frodi.textSecondary)
                 }
             }
 
@@ -33,37 +31,34 @@ struct RecordingRow: View {
                 .strokeBorder(Color.Frodi.border, lineWidth: 1)
         )
         .accessibilityElement(children: .combine)
+        .accessibilityLabel(spokenLabel)
     }
 
+    /// Dato, tidspunkt og lengde på én linje, delt med en loddrett strek.
     private var title: String {
+        "\(stamp) | \(length)"
+    }
+
+    /// Bare det som ikke står i tittelen: hvorfor teksten mangler.
+    private var status: String? {
+        if recording.hasTranscript { return nil }
+        return recording.transcriptionFailed
+            ? TranscriptionError.shortText(for: recording.failureCode)
+            : "venter på transkribering"
+    }
+
+    /// VoiceOver leser ikke en loddrett strek som en pause, så den får en egen setning.
+    private var spokenLabel: String {
+        let spoken = "\(stamp), \(length)"
+        guard let status else { return spoken }
+        return "\(spoken), \(status)"
+    }
+
+    private var stamp: String {
         recording.createdAt.formatted(.dateTime.day().month(.abbreviated).hour().minute())
     }
 
-    private var meta: String {
-        let length = Duration.seconds(recording.duration).formatted(.time(pattern: .minuteSecond))
-        if recording.hasTranscript { return length }
-        return recording.transcriptionFailed
-            ? "\(length) · \(TranscriptionError.shortText(for: recording.failureCode))"
-            : "\(length) · venter på transkribering"
-    }
-}
-
-/// Liten pille som forteller at opptaket ble startet med handlingsknappen.
-struct ActionButtonChip: View {
-    var body: some View {
-        HStack(spacing: Space.s1 + 2) {
-            Circle()
-                .fill(Color.Frodi.accentRecord)
-                .frame(width: 6, height: 6)
-
-            Text("Startet med handlingsknappen")
-                .font(.Frodi.meta)
-                .foregroundStyle(Color.Frodi.textSecondary)
-        }
-        .padding(.leading, Space.s2 + 2)
-        .padding(.trailing, Space.s3 + 2)
-        .padding(.vertical, Space.s1 + 2)
-        .background(Color.Frodi.surface, in: Capsule())
-        .overlay(Capsule().strokeBorder(Color.Frodi.border, lineWidth: 1))
+    private var length: String {
+        Duration.seconds(recording.duration).formatted(.time(pattern: .minuteSecond))
     }
 }
