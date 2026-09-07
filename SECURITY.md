@@ -12,11 +12,11 @@ assessment within 7 days. Do not open public GitHub issues.
 
 ## What happens in each situation
 
-| Situation | Result |
+| Scenario | Result |
 |---|---|
 | Phone lost or stolen, locked | Audio and transcripts unreadable |
 | Backup copied, or restored to another phone | Unreadable. The key is device-bound |
-| Another app reads the app container | Ciphertext only |
+| Another app reads the app container | Finds encrypted data it cannot decrypt |
 | Network interception | Nothing to intercept. The app has no networking code |
 | Screen recording or mirroring while a transcript is open | Text hidden until capture stops |
 | Screenshot | Captured. iOS offers no supported way to prevent one |
