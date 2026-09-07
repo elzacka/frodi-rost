@@ -16,8 +16,8 @@ på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra Språkbanken og
 bibliotekets egen samling. Derfor setter den punktum og store bokstaver av seg
 selv, og skriver dialekt om til bokmål.
 
-Modellen ligger i appen og kjører på telefonens brikke. Ingen kvote, ingen
-nøkkel, ingen forespørsler.
+Modellen følger med appen og kjører lokalt. Den koster ingenting å bruke, og
+appen kontakter ingen tjeneste for å transkribere.
 
 | Kilde | Lenke |
 |---|---|
