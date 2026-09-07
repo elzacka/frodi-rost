@@ -69,7 +69,6 @@ enum Space {
 enum Radius {
     static let control: CGFloat = 12
     static let card: CGFloat = 16
-    static let pill: CGFloat = 24
 }
 
 // MARK: - Opptaksknapp
