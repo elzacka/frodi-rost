@@ -31,14 +31,13 @@ extension Color {
 
 extension Font {
     enum Frodi {
-        /// Norse Bold. Logo og appnavn. Samme skrift som i app-ikonet.
-        static let display = custom("Norse-Bold", size: 30, relativeTo: .largeTitle)
+        /// Skranji Bold. Logo og appnavn. Samme skrift som i app-ikonet.
+        static let display = custom("Skranji-Bold", size: 26, relativeTo: .largeTitle)
         /// Inter 600. Skjermtitler.
         ///
-        /// Norse er en pyntefont med bare majuskler, og blir tynn og tung å lese
-        /// i løpende grensesnitt. Den er derfor holdt til logoen, der den hører
-        /// hjemme. Titler som «Ingen opptak ennå» må kunne leses raskt, også med
-        /// stor tekst og i bil, og WCAG 2.2 AA gjelder.
+        /// Skranji er en pyntefont og holdes til logoen. Titler som «Ingen
+        /// opptak ennå» må kunne leses raskt, også med stor tekst og i bil,
+        /// og WCAG 2.2 AA gjelder.
         static let title = custom("Inter-SemiBold", size: 20, relativeTo: .title2)
         /// Inter 500, sporet. Små etiketter over en seksjon.
         static let eyebrow = custom("Inter-Medium", size: 11, relativeTo: .caption2)
