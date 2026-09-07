@@ -104,7 +104,7 @@ struct RecordingDetailView: View {
 
     /// Dato, tidspunkt og lengde står i tittelen, så selve kortet er bare teksten.
     private var title: String {
-        let stamp = recording.createdAt.formatted(.dateTime.day().month(.abbreviated).hour().minute())
+        let stamp = recording.createdAt.recordingStamp
         let length = Duration.seconds(recording.duration).formatted(.time(pattern: .minuteSecond))
         return "\(stamp) | \(length)"
     }

@@ -55,7 +55,7 @@ struct RecordingRow: View {
     }
 
     private var stamp: String {
-        recording.createdAt.formatted(.dateTime.day().month(.abbreviated).hour().minute())
+        recording.createdAt.recordingStamp
     }
 
     private var length: String {
