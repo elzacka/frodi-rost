@@ -60,9 +60,9 @@ struct RecordingListView: View {
                 .font(.Frodi.display)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            // TTT for tale til tekst. Inter, ikke Skranji: pyntefonten er tung
-            // å lese i småformat, og eyebrow-stilen er laget for nettopp dette.
-            Text("TTT")
+            // Skrevet ut, ikke forkortet. Inter, ikke Skranji: pyntefonten er
+            // tung å lese i småformat, og eyebrow-stilen er laget for dette.
+            Text("tale til tekst")
                 .font(.Frodi.eyebrow)
                 .eyebrowTracking()
                 .foregroundStyle(Color.Frodi.textSecondary)

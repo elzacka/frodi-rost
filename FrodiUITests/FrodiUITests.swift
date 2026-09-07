@@ -10,7 +10,7 @@ final class FrodiUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(
-            app.staticTexts["Fróði, diktafon"].waitForExistence(timeout: 5),
+            app.staticTexts["Fróði, tale til tekst"].waitForExistence(timeout: 5),
             "Logohodet mangler"
         )
         XCTAssertTrue(
