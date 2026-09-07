@@ -18,6 +18,10 @@ Packages/
 # IDE
 .vscode/
 
+# Knytter repoet til Apple-utviklerkontoen. Trengs lokalt for arkivering,
+# men hører ikke hjemme i et offentlig repo.
+ExportOptions.plist
+
 # Developer context
 .obsidian/
 .claude/
