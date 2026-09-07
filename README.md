@@ -4,7 +4,7 @@ Norsk diktafon for iPhone. Tar opp lyd og gjør det om til tekst, på enheten.
 
 ## Hva appen gjør
 
-- Tar opp lyd med ett trykk, også med skjermen av
+- Tar opp lyd, også med skjermen av
 - Handlingsknappen starter og stopper opptak
 - Skriver ut norsk bokmål, med tegnsetting og store bokstaver
 - Lar deg hente ut lyd og tekst
@@ -14,7 +14,7 @@ Norsk diktafon for iPhone. Tar opp lyd og gjør det om til tekst, på enheten.
 - iPhone med iOS 26.5 eller nyere
 - Handlingsknappen krever iPhone 15 Pro eller nyere
 
-## Utvikling
+## Bygg
 
 ```bash
 brew install xcodegen
@@ -23,10 +23,12 @@ xcodegen generate
 open Frodi.xcodeproj
 ```
 
-Modellen ligger ikke i git. Hopper du over `fetch-model.sh`, bygger appen
-likevel, men faller tilbake til iOS' egen diktatmodell.
+Modellen ligger ikke i git. Uten den faller appen tilbake til iOS' egen
+diktatmodell, som er svakere på norsk.
 
 Prosjektfilen genereres fra `project.yml`. Rediger aldri `.xcodeproj` direkte.
+
+## Test
 
 Appen har sin egen simulator. Deles en bootet simulator med en annen sesjon,
 feiler UI-testene med `Application failed preflight checks`.
@@ -41,9 +43,9 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
 
 ## Mer
 
-| Dokument                       | Innhold                                                            |
-| ------------------------------ | ------------------------------------------------------------------ |
-| [PERSONVERN.md](PERSONVERN.md) | Hva som lagres, hvilke tillatelser appen ber om, rettighetene dine |
-| [SECURITY.md](SECURITY.md)     | Trusselmodell, hvordan data beskyttes, hvordan melde en sårbarhet  |
-| [TREDJEPART.md](TREDJEPART.md) | Modell, kode og skrifter appen bygger på, med lisenser             |
-| [CHANGELOG.md](CHANGELOG.md)   | Hva som er endret                                                  |
+| Dokument | Innhold |
+|---|---|
+| [PERSONVERN.md](PERSONVERN.md) | Hva som lagres, tillatelser, rettighetene dine |
+| [SECURITY.md](SECURITY.md) | Hva som beskyttes mot hva, og hvordan melde sårbarhet |
+| [TREDJEPART.md](TREDJEPART.md) | Modell, kode og skrifter, med lisenser |
+| [CHANGELOG.md](CHANGELOG.md) | Hva som er endret |
