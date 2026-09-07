@@ -12,9 +12,6 @@ Sist gjennomgått 7. september 2026.
 | CoreML-konvertering | `Barrymanalow/nb-whisper-coreml` | Apache 2.0 |
 | Tokenizer | OpenAI, `whisper-small` | Apache 2.0 |
 
-nb-whisper bygger på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra
-Språkbanken og Nasjonalbibliotekets samling.
-
 ## Kode
 
 | Pakke | Opphav | Lisens |

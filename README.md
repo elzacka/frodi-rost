@@ -9,6 +9,23 @@ Norsk diktafon for iPhone. Tar opp lyd og gjør det om til tekst, på enheten.
 - Skriver ut norsk bokmål, med tegnsetting og store bokstaver
 - Lar deg hente ut lyd og tekst
 
+## Modell
+
+Tale til tekst gjøres av **nb-whisper-small** fra Nasjonalbiblioteket. Den bygger
+på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra Språkbanken og
+bibliotekets egen samling. Derfor setter den punktum og store bokstaver av seg
+selv, og skriver dialekt om til bokmål.
+
+Modellen ligger i appen og kjører på telefonens brikke. Ingen kvote, ingen
+nøkkel, ingen forespørsler.
+
+| Kilde | Lenke |
+|---|---|
+| Modellen | [NbAiLab/nb-whisper-small](https://huggingface.co/NbAiLab/nb-whisper-small) |
+| CoreML-versjonen appen bruker | [Barrymanalow/nb-whisper-coreml](https://huggingface.co/Barrymanalow/nb-whisper-coreml) |
+| Alle modellene fra NB | [huggingface.co/NbAiLab](https://huggingface.co/NbAiLab) |
+| Om laben | [ai.nb.no](https://ai.nb.no/) |
+
 ## Krav
 
 - iPhone med iOS 26.5 eller nyere
