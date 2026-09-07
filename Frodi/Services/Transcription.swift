@@ -15,6 +15,7 @@ enum Transcription {
 
     @MainActor
     static func run(for recording: Recording, context: ModelContext) async {
+        recording.isTranscribing = true
         do {
             let text = try await AudioStorage.withDecrypted(fileName: recording.fileName) { url in
                 try await transcriber(for: url)
@@ -29,6 +30,7 @@ enum Transcription {
             recording.transcriptionFailed = true
             recording.failureCode = "other"
         }
+        recording.isTranscribing = false
         try? context.save()
     }
 

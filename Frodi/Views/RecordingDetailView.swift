@@ -83,7 +83,16 @@ struct RecordingDetailView: View {
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .textSelection(.enabled)
                     .hiddenWhileScreenCaptured()
-            } else {
+            } else if recording.isTranscribing {
+                HStack(spacing: Space.s3) {
+                    ProgressView()
+                    Text("Transkriberer …")
+                        .font(.Frodi.body)
+                        .foregroundStyle(Color.Frodi.textSecondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Space.s5)
+            } else if recording.transcriptionFailed {
                 Text(TranscriptionError.explanation(for: recording.failureCode))
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textSecondary)
@@ -100,6 +109,12 @@ struct RecordingDetailView: View {
                     .padding(.vertical, Space.s2)
                     .background(Color.Frodi.accentRecord, in: Capsule())
                 }
+            } else {
+                // Ingen transkribering startet ennå, og ingen har feilet.
+                Text(TranscriptionError.explanation(for: nil))
+                    .font(.Frodi.body)
+                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

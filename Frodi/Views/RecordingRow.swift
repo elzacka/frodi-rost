@@ -12,9 +12,15 @@ struct RecordingRow: View {
                     .foregroundStyle(Color.Frodi.textPrimary)
 
                 if let status {
-                    Text(status)
-                        .font(.Frodi.meta)
-                        .foregroundStyle(Color.Frodi.textSecondary)
+                    HStack(spacing: Space.s1) {
+                        if recording.isTranscribing {
+                            ProgressView()
+                        }
+
+                        Text(status)
+                            .font(.Frodi.meta)
+                            .foregroundStyle(Color.Frodi.textSecondary)
+                    }
                 }
             }
 
@@ -42,6 +48,7 @@ struct RecordingRow: View {
     /// Bare det som ikke står i tittelen: hvorfor teksten mangler.
     private var status: String? {
         if recording.hasTranscript { return nil }
+        if recording.isTranscribing { return "transkriberer" }
         return recording.transcriptionFailed
             ? TranscriptionError.shortText(for: recording.failureCode)
             : "venter på transkribering"

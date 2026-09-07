@@ -20,6 +20,13 @@ final class Recording {
 
     var transcriptionFailed: Bool = false
 
+    /// Settes ved start og nullstilles ved slutt av `Transcription.run`, som
+    /// er det eneste stedet som lagrer mens flagget er sant. Krasjer appen
+    /// midt i et forsøk uten at noe annet har lagret i mellomtiden, leser
+    /// neste oppstart flagget som `false` fra disk, og `transcribePending()`
+    /// tar opptaket på nytt uten at det står fast som «transkriberer».
+    var isTranscribing: Bool = false
+
     /// Hvorfor teksten mangler. Uten denne sier appen «fant ingen tale» også når
     /// årsaken er at språkmodellen ikke finnes, og det er en usann beskjed.
     var failureCode: String?

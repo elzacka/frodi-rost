@@ -140,7 +140,7 @@ struct RecordingListView: View {
                     }
                     .buttonStyle(.plain)
                     .contextMenu {
-                        if !recording.hasTranscript {
+                        if !recording.hasTranscript, !recording.isTranscribing {
                             Button("Prøv teksten på nytt") {
                                 Task { await transcribe(recording) }
                             }
