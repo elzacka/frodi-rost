@@ -60,9 +60,11 @@ struct RecordingListView: View {
                 .font(.Frodi.display)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            // Skrevet ut, ikke forkortet. Inter, ikke Skranji: pyntefonten er
-            // tung å lese i småformat, og eyebrow-stilen er laget for dette.
-            Text("tale til tekst")
+            // Andre halvdel av appnavnet, ikke en undertittel. Inter, ikke
+            // Skranji: pyntefonten er tung å lese i småformat, og
+            // eyebrow-stilen er laget for dette. Sammen leser hodet «fróði
+            // røst», som er navnet på appen.
+            Text("røst")
                 .font(.Frodi.eyebrow)
                 .eyebrowTracking()
                 .foregroundStyle(Color.Frodi.textSecondary)
@@ -77,7 +79,9 @@ struct RecordingListView: View {
                 .frame(height: 1)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Fróði, tale til tekst")
+        // Navnet uttalt, ikke ordmerket. Små bokstaver er en grafisk form,
+        // ikke måten navnet sies på.
+        .accessibilityLabel("Fróði røst")
         .accessibilityAddTraits(.isHeader)
     }
 

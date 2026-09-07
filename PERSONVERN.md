@@ -1,8 +1,8 @@
-# Personvern i Fróði
+# Personvern i Fróði røst
 
 Sist oppdatert 07.09.26.
 
-Fróði har ingen nettverkskode. Ingenting kan sendes noe sted.
+Fróði røst har ingen nettverkskode. Ingenting kan sendes noe sted.
 
 ## Hva som lagres
 
