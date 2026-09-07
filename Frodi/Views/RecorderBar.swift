@@ -6,44 +6,31 @@ struct RecorderBar: View {
     private var recorder: AudioRecorder { controller.recorder }
 
     var body: some View {
-        VStack(spacing: Space.s4) {
-            // Timeren holder plassen sin også i hvile, ellers hopper knappen
-            // nedover i det opptaket starter.
-            Text(recorder.isRecording ? elapsed : " ")
-                .font(.Frodi.timer)
-                .monospacedDigit()
-                .foregroundStyle(Color.Frodi.textPrimary)
-                .contentTransition(.numericText())
-                .accessibilityHidden(!recorder.isRecording)
+        VStack(spacing: Space.s3) {
+            // Timeren står ved siden av knappen, ikke over den. Over knappen ble
+            // feltet så høyt at listen med opptak forsvant bak det.
+            HStack(spacing: Space.s4) {
+                timer
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-            Button(action: toggle) {
-                ZStack {
-                    Circle()
-                        .strokeBorder(ringColor, lineWidth: RecordButton.ring)
-                        .frame(width: RecordButton.diameter, height: RecordButton.diameter)
+                recordButton
 
-                    Circle()
-                        .fill(innerColor)
-                        .frame(width: RecordButton.inner, height: RecordButton.inner)
-
-                    Image(systemName: recorder.isRecording ? "stop.fill" : "mic.fill")
-                        .font(.system(size: 26, weight: .medium))
-                        .foregroundStyle(iconColor)
-                }
+                // Speiler timeren, slik at knappen står midt på skjermen.
+                timer
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .hidden()
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(recorder.isRecording ? "Stopp opptak" : "Start opptak")
-            .accessibilityAddTraits(.isButton)
 
             if case .denied = recorder.state {
                 Text("Fróði trenger tilgang til mikrofonen. Du kan gi den i Innstillinger.")
                     .font(.Frodi.caption)
                     .foregroundStyle(Color.Frodi.textSecondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, Space.s6)
+                    .padding(.horizontal, Space.s4)
             }
         }
-        .padding(.vertical, Space.s5)
+        .padding(.horizontal, Space.s5)
+        .padding(.vertical, Space.s4)
         .frame(maxWidth: .infinity)
         .background(Color.Frodi.background)
         .overlay(alignment: .top) {
@@ -51,6 +38,39 @@ struct RecorderBar: View {
                 .fill(Color.Frodi.border)
                 .frame(height: 1)
         }
+    }
+
+    /// Holder plassen sin også i hvile, ellers flytter knappen seg i det opptaket starter.
+    private var timer: some View {
+        Text(recorder.isRecording ? elapsed : " ")
+            .font(.Frodi.timer)
+            .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .foregroundStyle(Color.Frodi.textPrimary)
+            .contentTransition(.numericText())
+            .accessibilityHidden(!recorder.isRecording)
+    }
+
+    private var recordButton: some View {
+        Button(action: toggle) {
+            ZStack {
+                Circle()
+                    .strokeBorder(ringColor, lineWidth: RecordButton.ring)
+                    .frame(width: RecordButton.diameter, height: RecordButton.diameter)
+
+                Circle()
+                    .fill(innerColor)
+                    .frame(width: RecordButton.inner, height: RecordButton.inner)
+
+                Image(systemName: recorder.isRecording ? "stop.fill" : "mic.fill")
+                    .font(.system(size: RecordButton.icon, weight: .medium))
+                    .foregroundStyle(iconColor)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(recorder.isRecording ? "Stopp opptak" : "Start opptak")
+        .accessibilityAddTraits(.isButton)
     }
 
     private var elapsed: String {

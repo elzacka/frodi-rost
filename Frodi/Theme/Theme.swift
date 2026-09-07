@@ -76,9 +76,10 @@ enum Radius {
 // MARK: - Opptaksknapp
 
 enum RecordButton {
-    static let diameter: CGFloat = 100
-    static let inner: CGFloat = 74
+    static let diameter: CGFloat = 76
+    static let inner: CGFloat = 56
     static let ring: CGFloat = 3
+    static let icon: CGFloat = 22
 }
 
 // MARK: - Sporing

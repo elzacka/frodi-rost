@@ -11,25 +11,23 @@ struct RecordingListView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color.Frodi.background.ignoresSafeArea()
+            VStack(spacing: 0) {
+                header
 
-                VStack(spacing: 0) {
-                    header
+                SpeechModelBanner(model: speechModel)
+                    .padding(.horizontal, Space.s4)
+                    .padding(.bottom, recordings.isEmpty ? 0 : Space.s4)
 
-                    SpeechModelBanner(model: speechModel)
-                        .padding(.horizontal, Space.s4)
-                        .padding(.bottom, recordings.isEmpty ? 0 : Space.s4)
-
-                    if recordings.isEmpty {
-                        Spacer()
-                        emptyState
-                        Spacer()
-                    } else {
-                        list
-                    }
+                if recordings.isEmpty {
+                    Spacer()
+                    emptyState
+                    Spacer()
+                } else {
+                    list
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.Frodi.background.ignoresSafeArea())
             .navigationBarHidden(true)
             .safeAreaInset(edge: .bottom) {
                 RecorderBar(controller: controller)
@@ -48,23 +46,21 @@ struct RecordingListView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: Space.s1) {
-            Text("DIKTAFON")
-                .font(.Frodi.eyebrow)
-                .eyebrowTracking()
-                .foregroundStyle(Color.Frodi.textSecondary)
-
-            Text("Fróði")
-                .font(.Frodi.display)
-                .foregroundStyle(Color.Frodi.textPrimary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, Space.s5)
-        .padding(.top, Space.s3)
-        .padding(.bottom, Space.s5)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Fróði, diktafon")
-        .accessibilityAddTraits(.isHeader)
+        Text("Fróði")
+            .font(.Frodi.display)
+            .foregroundStyle(Color.Frodi.textPrimary)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, Space.s4)
+            .padding(.top, Space.s2)
+            .padding(.bottom, Space.s3)
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(Color.Frodi.border)
+                    .frame(height: 1)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Fróði, diktafon")
+            .accessibilityAddTraits(.isHeader)
     }
 
     private var emptyState: some View {
@@ -108,6 +104,8 @@ struct RecordingListView: View {
                 }
             }
             .padding(.horizontal, Space.s4)
+            .padding(.top, Space.s2)
+            .padding(.bottom, Space.s3)
         }
         .scrollContentBackground(.hidden)
     }
