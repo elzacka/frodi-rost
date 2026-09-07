@@ -26,11 +26,19 @@ enum RecordingExport {
 
         if let transcript = try recording.transcript(), !transcript.isEmpty {
             let text = folder.appendingPathComponent("frodi-\(stamp).txt")
-            try Data(transcript.utf8).write(to: text, options: [.completeFileProtectionUnlessOpen])
+            try utf8WithBOM(transcript).write(to: text, options: [.completeFileProtectionUnlessOpen])
             urls.append(text)
         }
 
         return urls
+    }
+
+    /// Skriver teksten som UTF-8 med byte order mark.
+    ///
+    /// Uten BOM gjetter mange lesere at en `.txt` er Latin-1, og da blir «så»
+    /// til «sÃ¥». Filen er UTF-8 uansett; de tre bytene forteller leseren det.
+    static func utf8WithBOM(_ text: String) -> Data {
+        Data([0xEF, 0xBB, 0xBF]) + Data(text.utf8)
     }
 
     /// Rydder bort klarteksten etter at delingen er ferdig.

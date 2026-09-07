@@ -108,3 +108,34 @@ struct TranscriptSealingTests {
         #expect(stored.range(of: Data("Opptaket".utf8)) == nil)
     }
 }
+
+@Suite("Eksport")
+struct ExportEncodingTests {
+    /// Uten BOM gjetter mange lesere at en .txt er Latin-1, og «så» blir «sÃ¥».
+    @Test("Tekstfilen starter med UTF-8 BOM")
+    func textFileHasByteOrderMark() {
+        let data = RecordingExport.utf8WithBOM("Så starter vi et opptak til.")
+        #expect(data.prefix(3) == Data([0xEF, 0xBB, 0xBF]))
+    }
+
+    @Test("Norske tegn overlever, og kan leses tilbake")
+    func norwegianCharactersSurvive() throws {
+        let text = "Så, æ, ø og å. Fróði skriver ð og ó."
+        let data = RecordingExport.utf8WithBOM(text)
+
+        let decoded = try #require(String(data: data.dropFirst(3), encoding: .utf8))
+        #expect(decoded == text)
+    }
+
+    /// Feilen som ble meldt: teksten lest som Latin-1 gir «sÃ¥».
+    /// Blir den lest som UTF-8, skal det ikke skje.
+    @Test("Teksten er ikke Latin-1")
+    func isNotLatin1() throws {
+        let data = RecordingExport.utf8WithBOM("Så")
+        let asLatin1 = try #require(String(data: data.dropFirst(3), encoding: .isoLatin1))
+        #expect(asLatin1 == "SÃ¥", "bekrefter at feiltolkning gir mojibake")
+
+        let asUTF8 = try #require(String(data: data.dropFirst(3), encoding: .utf8))
+        #expect(asUTF8 == "Så")
+    }
+}
