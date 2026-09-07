@@ -56,7 +56,10 @@ struct RecordingDetailView: View {
         } message: {
             Text(exportError ?? "").font(.Frodi.body)
         }
-        .task(id: recording.persistentModelID) {
+        // Nøkkelen er selve chifferteksten, ikke opptaket. Blir transkriberingen
+        // ferdig mens du står her, endrer den seg, og teksten låses opp på nytt.
+        // Med opptakets id kjørte dette bare én gang, og feltet ble stående tomt.
+        .task(id: recording.sealedTranscript) {
             // Teksten låses opp først når den skal vises.
             transcript = (try? recording.transcript()) ?? ""
         }
@@ -68,7 +71,13 @@ struct RecordingDetailView: View {
 
     private var transcriptCard: some View {
         VStack(alignment: .leading, spacing: Space.s4) {
-            if recording.hasTranscript {
+            if recording.hasTranscript, transcript.isEmpty {
+                // Teksten finnes, men er ikke låst opp ennå. Uten dette
+                // blinker kortet tomt i det transkriberingen blir ferdig.
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Space.s5)
+            } else if recording.hasTranscript {
                 Text(transcript)
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textPrimary)
