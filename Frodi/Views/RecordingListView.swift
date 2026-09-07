@@ -14,9 +14,11 @@ struct RecordingListView: View {
             VStack(spacing: 0) {
                 header
 
-                SpeechModelBanner(model: speechModel)
-                    .padding(.horizontal, Space.s4)
-                    .padding(.bottom, recordings.isEmpty ? 0 : Space.s4)
+                if !Transcription.usesBundledModel {
+                    SpeechModelBanner(model: speechModel)
+                        .padding(.horizontal, Space.s4)
+                        .padding(.bottom, recordings.isEmpty ? 0 : Space.s4)
+                }
 
                 if recordings.isEmpty {
                     Spacer()
@@ -39,7 +41,8 @@ struct RecordingListView: View {
             }
         }
         .task {
-            await speechModel.refresh()
+            // Med nb-whisper i bygget finnes ingen systemmodell å vente på.
+            if !Transcription.usesBundledModel { await speechModel.refresh() }
             // Opptak som ventet på modellen får teksten sin nå.
             await transcribePending()
         }
@@ -113,7 +116,7 @@ struct RecordingListView: View {
     /// Transkriberer alt som mangler tekst. Kalles ved oppstart, slik at opptak
     /// tatt før språkmodellen var på plass ikke blir stående uten tekst.
     private func transcribePending() async {
-        guard speechModel.isReady else { return }
+        guard Transcription.usesBundledModel || speechModel.isReady else { return }
         for recording in recordings where !recording.hasTranscript {
             await transcribe(recording, surfaceErrors: false)
         }

@@ -3,8 +3,12 @@ import Foundation
 import Speech
 
 /// Porten mot tale til tekst. Alt som gjør om lyd til tekst går gjennom denne,
-/// slik at nb-whisper kan erstatte Apples motor uten at resten av appen merker det.
-protocol Transcriber: Sendable {
+/// slik at motoren kan byttes uten at resten av appen merker det.
+///
+/// Bundet til hovedaktøren fordi WhisperKit ikke er `Sendable` og derfor ikke
+/// kan krysse en aktørgrense. Selve arbeidet gjør motorene på egne tråder.
+@MainActor
+protocol Transcriber {
     func transcribe(fileURL: URL) async throws -> String
 }
 

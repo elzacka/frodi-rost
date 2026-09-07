@@ -25,3 +25,6 @@ dev_only/
 
 # One line importing dev_only/CLAUDE.md, which is not published.
 CLAUDE.md
+
+# CoreML-modellen. Nesten en halv gigabyte, hentes av Scripts/fetch-model.sh
+Frodi/Resources/Model/

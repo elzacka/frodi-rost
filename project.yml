@@ -19,6 +19,10 @@ settings:
     SWIFT_STRICT_CONCURRENCY: complete
     SWIFT_APPROACHABLE_CONCURRENCY: true
     ENABLE_USER_SCRIPT_SANDBOXING: true
+packages:
+  WhisperKit:
+    url: https://github.com/argmaxinc/whisperkit
+    from: "0.9.0"
 targets:
   Frodi:
     type: application
@@ -27,6 +31,19 @@ targets:
       - path: Frodi
         excludes:
           - "**/.DS_Store"
+          # Modellen legges til som mappereferanse under resources. Uten denne
+          # ekskluderingen fanger sources den opp i tillegg, og de to
+          # config.json-filene kolliderer i app-pakken.
+          - "Resources/Model"
+      # Mappereferanse, ikke enkeltfiler. Beholder katalogstrukturen, som
+      # WhisperKit krever for tokenizeren, og hindrer at de to config.json-
+      # filene kolliderer i bunnen av app-pakken.
+      - path: Frodi/Resources/Model
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - package: WhisperKit
+        product: WhisperKit
     resources:
       - path: Frodi/Resources/Assets.xcassets
       - path: Frodi/Resources/Fonts
