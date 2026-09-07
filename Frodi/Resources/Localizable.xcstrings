@@ -4,6 +4,9 @@
     "fróði" : {
 
     },
+    "Fróði får ikke åpnet databasen på telefonen. Du kan ta opp og hente ut som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette det." : {
+
+    },
     "Fróði trenger tilgang til mikrofonen. Du kan gi den i Innstillinger." : {
 
     },
@@ -17,6 +20,9 @@
 
     },
     "Norsk tale til tekst mangler" : {
+
+    },
+    "Opptakene lagres ikke" : {
 
     },
     "Teksten er skjult mens skjermen tas opp." : {
