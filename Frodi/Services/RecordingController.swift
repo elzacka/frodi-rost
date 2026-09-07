@@ -36,11 +36,15 @@ final class RecordingController {
             stopAndSave()
             return false
         }
+        AudioPlayer.shared.stop()
         return await recorder.start()
     }
 
     func start() async {
         guard !recorder.isRecording else { return }
+        // Avspilling og opptak deler lydøkta. Spiller vi av når opptaket
+        // starter, tar mikrofonen opp høyttaleren.
+        AudioPlayer.shared.stop()
         await recorder.start()
     }
 

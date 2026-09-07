@@ -19,6 +19,8 @@ Formatet følger [Keep a Changelog](https://keepachangelog.com/no/1.1.0/).
   og viser ikke lenger Apples melding om at taledata sendes til dem
 
 ### Lagt til
+- Avspilling av opptak, med spill av og pause, hopp femten sekunder hver
+  vei, og en slider som viser og setter posisjonen
 - Norsk tale til tekst, bekreftet på enhet
 - Handlingsknappen starter og stopper opptak
 - Banner som sier fra når den norske språkmodellen mangler, med nedlasting

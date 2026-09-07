@@ -82,6 +82,18 @@ enum RecordButton {
     static let icon: CGFloat = 22
 }
 
+// MARK: - Avspillingskontroller
+
+/// Designsystem v0.1 beskriver ingen spiller. Målene er avledet: spilleknappen
+/// har samme diameter som den indre sirkelen i opptaksknappen, og hoppknappene
+/// er 44 pt, som er minste treffflate.
+enum PlayerControl {
+    static let play: CGFloat = 56
+    static let playIcon: CGFloat = 22
+    static let skip: CGFloat = 44
+    static let skipIcon: CGFloat = 20
+}
+
 // MARK: - Sporing
 
 extension Text {
