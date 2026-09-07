@@ -27,7 +27,7 @@ struct ToggleRecordingIntent: AppIntent {
         if systemContext.currentMode == .background {
             try await continueInForeground(alwaysConfirm: false)
         }
-        await controller.start(fromActionButton: true)
+        await controller.start()
         return .result()
     }
 }

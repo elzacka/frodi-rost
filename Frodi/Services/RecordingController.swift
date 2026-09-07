@@ -18,7 +18,6 @@ final class RecordingController {
     private(set) var storageFailed = false
 
     private var container: ModelContainer?
-    private var startedWithActionButton = false
 
     private init() {}
 
@@ -32,18 +31,16 @@ final class RecordingController {
     /// Starter hvis stille, stopper hvis den går. Dette er det handlingsknappen kaller.
     /// Returnerer true hvis et opptak nå pågår.
     @discardableResult
-    func toggle(fromActionButton: Bool = false) async -> Bool {
+    func toggle() async -> Bool {
         if recorder.isRecording {
             stopAndSave()
             return false
         }
-        startedWithActionButton = fromActionButton
         return await recorder.start()
     }
 
-    func start(fromActionButton: Bool = false) async {
+    func start() async {
         guard !recorder.isRecording else { return }
-        startedWithActionButton = fromActionButton
         await recorder.start()
     }
 
@@ -51,8 +48,6 @@ final class RecordingController {
         guard let result = recorder.stop() else { return }
 
         let recording = Recording(duration: result.duration, fileName: result.fileName)
-        recording.startedWithActionButton = startedWithActionButton
-        startedWithActionButton = false
 
         guard let context = container?.mainContext else { return }
         context.insert(recording)
