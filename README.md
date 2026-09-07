@@ -1,4 +1,4 @@
-# Fróði
+# Fróði røst
 
 Tar opp lyd på iPhone og gjør det om til norsk tekst. Alt skjer på enheten.
 
