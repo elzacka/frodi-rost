@@ -65,10 +65,9 @@ data types. The only accessed-API declaration is file timestamps (C617.1).
 
 Microphone only.
 
-`NSSpeechRecognitionUsageDescription` is absent, and a test fails if it returns.
-The app previously used `SFSpeechRecognizer`, whose authorization dialog states
-that speech data is sent to Apple. That text is system-owned and cannot be
-changed. Transcription now runs in-process against a bundled CoreML model.
+Transcription runs in-process against a bundled CoreML model. It uses no iOS
+speech service, so `NSSpeechRecognitionUsageDescription` is absent. A test fails
+if the key appears.
 
 ## Dependencies
 
