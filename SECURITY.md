@@ -10,7 +10,7 @@ Email **hei@tazk.no**, subject `[SECURITY] Frodi iOS - <description>`.
 Include reproduction steps and impact. Acknowledgement within 48 hours,
 assessment within 7 days. Do not open public GitHub issues.
 
-## What happens in each situation
+## What happens in each scenario
 
 | Scenario | Result |
 |---|---|
