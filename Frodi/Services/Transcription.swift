@@ -19,8 +19,10 @@ enum Transcription {
         recording.transcriptionFailed = false
         recording.failureCode = nil
         do {
-            recording.transcript = try await SystemTranscriber(locale: model.locale)
-                .transcribe(fileURL: recording.fileURL)
+            // Lyden dekrypteres bare så lenge transkriberingen varer.
+            recording.transcript = try await AudioStorage.withDecrypted(fileName: recording.fileName) { url in
+                try await SystemTranscriber(locale: model.locale).transcribe(fileURL: url)
+            }
         } catch let error as TranscriptionError {
             recording.transcriptionFailed = true
             recording.failureCode = error.code

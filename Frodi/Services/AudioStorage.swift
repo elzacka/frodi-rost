@@ -40,6 +40,25 @@ enum AudioStorage {
         excludeFromBackup(url)
     }
 
+    /// Kjører en jobb med opptaket midlertidig dekryptert.
+    ///
+    /// Klarteksten lever bare så lenge jobben varer, i mappen for
+    /// midlertidige filer, og slettes uansett hvordan jobben ender.
+    static func withDecrypted<T>(
+        fileName: String,
+        _ body: (URL) async throws -> T
+    ) async throws -> T {
+        let sealed = try Data(contentsOf: directory.appendingPathComponent(fileName))
+        let plaintext = try RecordingVault.open(sealed)
+
+        let temporary = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString + ".m4a")
+        try plaintext.write(to: temporary, options: [.completeFileProtectionUnlessOpen])
+        defer { try? FileManager.default.removeItem(at: temporary) }
+
+        return try await body(temporary)
+    }
+
     static func delete(fileName: String) {
         try? FileManager.default.removeItem(at: directory.appendingPathComponent(fileName))
     }

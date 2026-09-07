@@ -4,6 +4,17 @@ struct RecordingDetailView: View {
     let recording: Recording
     let onRetry: () async -> Void
 
+    @State private var exportURLs: [URL] = []
+    @State private var exportError: String?
+
+    private func exportRecording() async {
+        do {
+            exportURLs = try await RecordingExport.prepare(recording)
+        } catch {
+            exportError = error.localizedDescription
+        }
+    }
+
     var body: some View {
         ZStack {
             Color.Frodi.background.ignoresSafeArea()
@@ -57,5 +68,26 @@ struct RecordingDetailView: View {
         .navigationTitle(recording.createdAt.formatted(.dateTime.day().month(.abbreviated).hour().minute()))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Color.Frodi.background, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    Task { await exportRecording() }
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                }
+                .accessibilityLabel("Hent ut opptaket")
+            }
+        }
+        .sheet(isPresented: .constant(!exportURLs.isEmpty)) {
+            ShareSheet(urls: exportURLs) {
+                RecordingExport.cleanUp(exportURLs)
+                exportURLs = []
+            }
+        }
+        .alert("Kunne ikke hente ut", isPresented: .constant(exportError != nil)) {
+            Button("Greit") { exportError = nil }
+        } message: {
+            Text(exportError ?? "").font(.Frodi.body)
+        }
     }
 }

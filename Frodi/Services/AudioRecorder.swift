@@ -83,9 +83,22 @@ final class AudioRecorder {
             return nil
         }
 
-        // Filen er lukket nå, og kan strammes til.
-        AudioStorage.protectFinished(recorder.url)
-        return (recorder.url.lastPathComponent, length)
+        // Filen er lukket nå. Den forsegles med en nøkkel som bare finnes i
+        // denne telefonens Secure Enclave, og klarteksten slettes.
+        do {
+            let sealed = try RecordingVault.seal(fileAt: recorder.url)
+            let name = recorder.url.lastPathComponent + ".enc"
+            let target = AudioStorage.directory.appendingPathComponent(name)
+            try sealed.write(to: target, options: [.completeFileProtection])
+            try? FileManager.default.removeItem(at: recorder.url)
+            AudioStorage.protectFinished(target)
+            return (name, length)
+        } catch {
+            // Klarer vi ikke å kryptere, beholder vi ikke klarteksten liggende.
+            try? FileManager.default.removeItem(at: recorder.url)
+            state = .failed(String(localized: "Opptaket kunne ikke låses. Det er slettet."))
+            return nil
+        }
     }
 
     private func startTicker() {
