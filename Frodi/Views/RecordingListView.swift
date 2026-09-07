@@ -14,6 +14,12 @@ struct RecordingListView: View {
             VStack(spacing: 0) {
                 header
 
+                if controller.storageFailed {
+                    storageWarning
+                        .padding(.horizontal, Space.s4)
+                        .padding(.bottom, recordings.isEmpty ? 0 : Space.s4)
+                }
+
                 if !Transcription.usesBundledModel {
                     SpeechModelBanner(model: speechModel)
                         .padding(.horizontal, Space.s4)
@@ -64,6 +70,34 @@ struct RecordingListView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Fróði, diktafon")
             .accessibilityAddTraits(.isHeader)
+    }
+
+    /// Databasen lot seg ikke åpne, så appen kjører på minnet.
+    ///
+    /// Uten denne beskjeden ville opptakene forsvunnet ved omstart uten at noe
+    /// tydet på hvorfor. En stille feil er verre enn en synlig.
+    private var storageWarning: some View {
+        VStack(alignment: .leading, spacing: Space.s2) {
+            Text("Opptakene lagres ikke")
+                .font(.Frodi.bodyMedium)
+                .foregroundStyle(Color.Frodi.textPrimary)
+
+            Text("Fróði får ikke åpnet databasen på telefonen. Du kan ta opp og hente ut som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette det.")
+                .font(.Frodi.caption)
+                .foregroundStyle(Color.Frodi.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(Space.s4)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.card)
+                .fill(Color.Frodi.surface)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Radius.card)
+                        .strokeBorder(Color.Frodi.recordingActive, lineWidth: 1)
+                )
+        )
+        .accessibilityElement(children: .combine)
     }
 
     private var emptyState: some View {
