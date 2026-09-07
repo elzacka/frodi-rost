@@ -1,22 +1,13 @@
 # Fróði
 
-Norsk diktafon for iPhone. Tar opp lyd og gjør det om til tekst — alt på
-telefonen, uten nett.
+Norsk diktafon for iPhone. Tar opp lyd og gjør det om til tekst, på enheten.
 
 ## Hva appen gjør
 
 - Tar opp lyd med ett trykk, også med skjermen av
-- Kan startes med handlingsknappen på iPhone, uten å åpne appen først
-- Gjør opptaket om til norsk tekst på enheten
-- Lagrer opptak og tekst lokalt
-
-## Personvern
-
-Fróði sender ingenting. Appen har ingen nettverkskode, ingen sporing og ingen
-tredjepartsbiblioteker. Opptakene og teksten blir liggende på telefonen din, og
-er beskyttet så lenge telefonen er låst.
-
-Se [PERSONVERN.md](PERSONVERN.md).
+- Handlingsknappen starter og stopper opptak
+- Skriver ut norsk bokmål, med tegnsetting og store bokstaver
+- Lar deg hente ut lyd og tekst
 
 ## Krav
 
@@ -27,12 +18,32 @@ Se [PERSONVERN.md](PERSONVERN.md).
 
 ```bash
 brew install xcodegen
+./Scripts/fetch-model.sh   # ca. 487 MB, kjøres én gang
 xcodegen generate
 open Frodi.xcodeproj
 ```
 
+Modellen ligger ikke i git. Hopper du over `fetch-model.sh`, bygger appen
+likevel, men faller tilbake til iOS' egen diktatmodell.
+
 Prosjektfilen genereres fra `project.yml`. Rediger aldri `.xcodeproj` direkte.
 
-## Status
+Appen har sin egen simulator. Deles en bootet simulator med en annen sesjon,
+feiler UI-testene med `Application failed preflight checks`.
 
-Tidlig versjon. Én funksjon: opptak med tale til tekst.
+```bash
+xcrun simctl create "Frodi-Test" \
+  com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro \
+  com.apple.CoreSimulator.SimRuntime.iOS-26-5
+xcodebuild -project Frodi.xcodeproj -scheme Frodi \
+  -destination 'platform=iOS Simulator,name=Frodi-Test' test
+```
+
+## Mer
+
+| Dokument | Innhold |
+|---|---|
+| [PERSONVERN.md](PERSONVERN.md) | Hva som lagres, hvilke tillatelser appen ber om, rettighetene dine |
+| [SECURITY.md](SECURITY.md) | Trusselbilde, hvordan data beskyttes, hvordan melde en sårbarhet |
+| [TREDJEPART.md](TREDJEPART.md) | Modell, kode og skrifter appen bygger på, med lisenser |
+| [CHANGELOG.md](CHANGELOG.md) | Hva som er endret |
