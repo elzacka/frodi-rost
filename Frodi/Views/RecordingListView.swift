@@ -49,7 +49,7 @@ struct RecordingListView: View {
     }
 
     private var header: some View {
-        Text("Fróði")
+        Text("fróði")
             .font(.Frodi.display)
             .foregroundStyle(Color.Frodi.textPrimary)
             .frame(maxWidth: .infinity)
