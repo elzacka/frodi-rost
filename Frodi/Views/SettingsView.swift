@@ -35,8 +35,12 @@ struct SettingsView: View {
             .toolbarBackground(Color.Frodi.background, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
+                    // Ingen egen font. Navigasjonslinjen er systemets, og
+                    // tittelen ved siden av står i systemfonten uansett hva vi
+                    // ber om. Inter bare på knappen ville gitt to skrifter i
+                    // samme linje. Logohodet finnes nettopp fordi vi ikke ville
+                    // ha systemfonten på merkevaren — her er den riktig.
                     Button("Ferdig") { dismiss() }
-                        .font(.Frodi.bodyMedium)
                 }
             }
         }
@@ -153,14 +157,10 @@ struct SettingsView: View {
         )
     }
 
-    /// Brødteksten står i text-primary, ikke text-secondary som i
-    /// designsystemets innstillingskort. Text-secondary måler 3,92:1 mot
-    /// surface, og WCAG 2.2 AA krever 4,5:1 for vanlig tekst. Dette er skjermen
-    /// som forklarer personvernet, så den må kunne leses.
     private func paragraph(_ text: String) -> some View {
         Text(text)
             .font(.Frodi.caption)
-            .foregroundStyle(Color.Frodi.textPrimary)
+            .foregroundStyle(Color.Frodi.textSecondary)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -217,7 +217,7 @@ struct LicensesView: View {
                 VStack(spacing: Space.s4) {
                     Text("Apache 2.0 krever at opphavet oppgis. Dette er den attribusjonen.")
                         .font(.Frodi.caption)
-                        .foregroundStyle(Color.Frodi.textPrimary)
+                        .foregroundStyle(Color.Frodi.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -248,11 +248,9 @@ struct LicensesView: View {
                         .font(.Frodi.bodyMedium)
                         .foregroundStyle(Color.Frodi.textPrimary)
 
-                    // Skillet mellom navn og opphav ligger i størrelse og vekt,
-                    // ikke i farge. Attribusjonen er det som må kunne leses her.
                     Text("\(component.origin) · \(component.license)")
-                        .font(.Frodi.caption)
-                        .foregroundStyle(Color.Frodi.textPrimary)
+                        .font(.Frodi.meta)
+                        .foregroundStyle(Color.Frodi.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityElement(children: .combine)
