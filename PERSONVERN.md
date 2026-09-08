@@ -10,7 +10,7 @@ sende til, og ingen tjeneste å spørre.
 | Hva | Hvor | Hvor lenge |
 |---|---|---|
 | Lydopptak | På telefonen, kryptert | Til du sletter det |
-| Tekst fra opptaket | Samme sted, kryptert | Til du sletter det |
+| Tekst fra opptaket | Samme sted, kryptert | Til du sletter den |
 
 Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
 
@@ -18,26 +18,26 @@ Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
 
 Mikrofon. Det er alt.
 
-Appen ber ikke om tilgang til talegjenkjenning. Teksten lages av en modell som
-ligger i appen. Se [SECURITY.md](SECURITY.md).
+Appen ber ikke om tilgang til talegjenkjenning. En modell inne i appen lager
+teksten. Se [SECURITY.md](SECURITY.md).
 
 ## Opptakene er låst til denne telefonen
 
-Nøkkelen finnes bare inne i din telefon. Et opptak kan ikke leses av en annen
+Nøkkelen finnes bare inne i telefonen din. Et opptak kan ikke leses av en annen
 enhet – heller ikke av deg på en ny telefon, og heller ikke fra en
 sikkerhetskopi.
 
-Skal du bytte telefon: hent ut opptakene først.
+Skal du bytte telefon: Hent ut opptakene først.
 
 ## Rettighetene dine
 
 | Rettighet | Slik gjør du det |
 |---|---|
 | Innsyn | Åpne opptaket i appen |
-| Hente ut | Trykk delingsikonet. Du får `.m4a` og `.txt` |
-| Sletting | Hold på opptaket i listen, velg «Slett» |
+| Hente ut | Trykk på delingsikonet. Du får `.m4a` og `.txt` |
+| Sletting | Hold fingeren på opptaket i listen, og velg «Slett» |
 
-Sletter du appen, slettes alt. Det skjer med én gang, og du kan ikke angre.
+Sletter du appen, forsvinner alt. Det skjer med én gang, og du kan ikke angre.
 
 ## Kontakt
 

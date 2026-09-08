@@ -8,13 +8,13 @@ Første versjon.
 
 ### Lagt til
 
-- Lydopptak som fortsetter med skjermen av
+- Ta opp lyd, også når skjermen er av
 - Handlingsknappen starter og stopper opptak. Ett trykk starter, neste stopper
-- Norsk tale til tekst med nb-whisper fra Nasjonalbiblioteket, kjørt i appen.
-  Tegnsetting og store bokstaver kommer av seg selv, og dialekt skrives om til
-  bokmål
-- Spill av opptaket, med pause, hopp femten sekunder hver vei og en slider som
-  viser og setter posisjonen
+- Gjør norsk tale om til tekst med nb-whisper fra Nasjonalbiblioteket, som
+  kjører i appen. Modellen setter tegn og store bokstaver selv, og skriver
+  dialekt om til bokmål
+- Spill av opptaket, med pause, hopp på femten sekunder hver vei og en
+  skyveknapp som viser og setter posisjonen
 - Hent ut lyd som `.m4a` og tekst som `.txt`
 - Krypter opptak og tekst med en nøkkel som aldri forlater telefonen
 - App-ikon og logo i Skranji

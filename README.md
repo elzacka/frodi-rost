@@ -1,30 +1,30 @@
 # Fróði røst
 
-Tar opp lyd på iPhone og gjør det om til norsk tekst. Alt skjer på enheten.
+Tar opp lyd på iPhone og gjør den om til norsk tekst. Alt skjer på telefonen.
 
 ## Hva appen gjør
 
-- Tar opp lyd, også med skjermen av
+- Tar opp lyd, også når skjermen er av
 - Handlingsknappen starter og stopper opptak
-- Skriver ut norsk bokmål, med tegnsetting og store bokstaver
+- Skriver teksten på norsk bokmål, med tegnsetting og store bokstaver
 - Lar deg hente ut lyd og tekst
 
 ## Modell
 
 **nb-whisper-small** fra Nasjonalbiblioteket gjør tale om til tekst. Modellen
-bygger på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra
-Språkbanken og bibliotekets egen samling. Derfor setter den punktum og store
-bokstaver av seg selv, og skriver dialekt om til bokmål.
+bygger på OpenAIs Whisper og er videretrent på 66 000 timer norsk tale fra
+Språkbanken og bibliotekets egen samling. Derfor setter den tegn og store
+bokstaver selv, og skriver dialekt om til bokmål.
 
-Modellen følger med appen og kjører lokalt. Den koster ingenting å bruke, og
-appen kontakter ingen tjeneste for å transkribere.
+Modellen følger med appen og kjører på telefonen. Den koster ingenting å
+bruke, og appen kontakter ingen tjeneste for å lage teksten.
 
 | Kilde | Lenke |
 |---|---|
 | Modellen | [NbAiLab/nb-whisper-small](https://huggingface.co/NbAiLab/nb-whisper-small) |
 | CoreML-versjonen appen bruker | [Barrymanalow/nb-whisper-coreml](https://huggingface.co/Barrymanalow/nb-whisper-coreml) |
 | Alle modellene fra NB | [huggingface.co/NbAiLab](https://huggingface.co/NbAiLab) |
-| Om laben | [ai.nb.no](https://ai.nb.no/) |
+| Om AI-laben | [ai.nb.no](https://ai.nb.no/) |
 
 ## Krav
 
@@ -35,7 +35,7 @@ appen kontakter ingen tjeneste for å transkribere.
 
 ```bash
 brew install xcodegen
-./Scripts/fetch-model.sh   # ca. 487 MB, kjøres én gang
+./Scripts/fetch-model.sh   # ca. 487 MB, kjør én gang
 xcodegen generate
 open Frodi.xcodeproj
 ```
@@ -43,12 +43,13 @@ open Frodi.xcodeproj
 Modellen ligger ikke i git. Uten den faller appen tilbake til iOS' egen
 diktatmodell, som er svakere på norsk.
 
-Prosjektfilen genereres fra `project.yml`. Rediger aldri `.xcodeproj` direkte.
+Xcodegen genererer prosjektfilen fra `project.yml`. Rediger aldri
+`.xcodeproj` direkte.
 
 ## Test
 
-Appen har sin egen simulator. Deles en bootet simulator med en annen sesjon,
-feiler UI-testene med `Application failed preflight checks`.
+Appen har sin egen simulator. Deler du en startet simulator med en annen
+sesjon, feiler UI-testene med `Application failed preflight checks`.
 
 ```bash
 xcrun simctl create "Frodi-Test" \
