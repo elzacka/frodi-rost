@@ -81,10 +81,15 @@ struct RecorderBar: View {
         recorder.state == .denied ? Color.Frodi.border : Color.Frodi.accentRecord
     }
 
+    /// Avslått tilgang gir en tom knapp, ikke en fylt grå.
+    ///
+    /// Fyllet var border-fargen. Da border ble mørk nok til å være en synlig
+    /// kant, ble den fylte knappen mørkere enn den aktive og leste som slått
+    /// på. En kontur sier «ingenting her» uten å rope.
     private var innerColor: Color {
         switch recorder.state {
         case .recording: Color.Frodi.recordingActive
-        case .denied: Color.Frodi.border
+        case .denied: Color.Frodi.surface
         default: Color.Frodi.accentRecord
         }
     }

@@ -46,16 +46,24 @@ struct ContrastTests {
         )
     }
 
-    /// Ikoner og flater som bærer betydning uten tekst. Opptaksknappen fylles
-    /// med `recording-active` mens den tar opp, og ikonet oppå er surface.
+    /// Ikoner, kanter og flater som bærer betydning uten tekst.
     ///
-    /// `accent-record` mot background står ikke her. Den er 2,02:1, og det er
-    /// ikke flaten som sier at knappen er en knapp – det gjør mikrofonikonet
-    /// oppå, som er 5,47:1. Tallet er notert i dev_only/CLAUDE.md som et åpent
-    /// designspørsmål, ikke gjemt bort her.
+    /// Aksenten står her fordi `.tint` farger tilbakeknappen, uthentingsikonet
+    /// og skyveknappen i avspilleren – ikoner uten tekst ved siden av seg.
+    /// Kanten står her fordi den er grensen rundt kort og rader, og
+    /// skillelinjene i hodet og over opptaksfeltet.
+    ///
+    /// Ett par står med vilje utenfor: opptaksknappens skifte fra accent-record
+    /// til recording-active er 1,50:1. Fargen er ikke det eneste signalet.
+    /// Ikonet bytter fra `mic.fill` til `stop.fill`, timeren starter, og
+    /// VoiceOver-etiketten endrer seg. Se dev_only/CLAUDE.md.
     @Test("Grafiske element når 3:1", arguments: [
         ("RecordingActive", "Background"),
-        ("Surface", "RecordingActive")
+        ("Surface", "RecordingActive"),
+        ("AccentRecord", "Background"),
+        ("AccentRecord", "Surface"),
+        ("BorderNeutral", "Background"),
+        ("BorderNeutral", "Surface")
     ])
     func graphicsMeetAA(pair: (foreground: String, background: String)) throws {
         let measured = try Self.ratio(pair.foreground, on: pair.background)
