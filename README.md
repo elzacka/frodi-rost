@@ -1,6 +1,6 @@
 # Fróði røst
 
-Tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
+Tar opp lyd på iPhone og gjør den om til norsk tekst. Alt skjer på enheten.
 
 ## Hva appen gjør
 
