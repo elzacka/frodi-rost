@@ -1,11 +1,16 @@
 import AppIntents
+import AVFoundation
 
 /// Intenten handlingsknappen kjører. Ett trykk starter, neste trykk stopper.
 ///
-/// `supportedModes` lar den kjøre i bakgrunnen når den bare skal stoppe et
-/// opptak som alt går. Det er dette som gjør at du kan stoppe med skjermen
-/// låst, uten å låse opp. Skal den starte, trenger den mikrofonen, og da
-/// flytter iOS den til forgrunnen av seg selv.
+/// `supportedModes` lar den kjøre i bakgrunnen. Både start og stopp forsøkes
+/// der først, fordi å åpne appen er det som tvinger fram Face ID eller kode
+/// når skjermen er låst. I bil ligger telefonen gjerne flatt på ladeplaten og
+/// ser ikke ansiktet ditt, så opplåsingen er ikke bare et ekstra trykk — den
+/// kan ikke fullføres mens du kjører.
+///
+/// Gir ikke iOS oss mikrofonen i bakgrunnen, er forgrunnen eneste vei, og da
+/// må telefonen låses opp. Forsøket koster ingenting når det feiler.
 struct ToggleRecordingIntent: AppIntent {
     static let title: LocalizedStringResource = "Start eller stopp opptak"
     static let description = IntentDescription("Starter et opptak i Fróði, eller stopper det som går.")
@@ -21,7 +26,15 @@ struct ToggleRecordingIntent: AppIntent {
             return .result()
         }
 
-        // Å starte krever mikrofonen. Den får vi bare i forgrunnen.
+        // Uten mikrofontillatelse er det ingen vits i å prøve i bakgrunnen:
+        // spørsmålet kan bare stilles i forgrunnen, og et forsøk her ville
+        // bare fått nei uten at du ble spurt.
+        if AVAudioApplication.shared.recordPermission == .granted,
+           await controller.start() {
+            return .result()
+        }
+
+        // Da må appen fram, og iOS krever opplåsing.
         // alwaysConfirm er false fordi du alt har bedt om dette ved å trykke
         // på knappen. Et bekreftelsessteg til ville vært i veien i bil.
         if systemContext.currentMode == .background {

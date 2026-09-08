@@ -40,12 +40,15 @@ final class RecordingController {
         return await recorder.start()
     }
 
-    func start() async {
-        guard !recorder.isRecording else { return }
+    /// Starter opptak. Returnerer false hvis mikrofonen ikke lot seg ta i bruk.
+    /// Handlingsknappen bruker svaret til å avgjøre om den må åpne appen.
+    @discardableResult
+    func start() async -> Bool {
+        guard !recorder.isRecording else { return true }
         // Avspilling og opptak deler lydøkta. Spiller vi av når opptaket
         // starter, tar mikrofonen opp høyttaleren.
         AudioPlayer.shared.stop()
-        await recorder.start()
+        return await recorder.start()
     }
 
     func stopAndSave() {
