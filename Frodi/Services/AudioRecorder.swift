@@ -84,7 +84,7 @@ final class AudioRecorder {
         }
 
         // Filen er lukket nå. Den forsegles med en nøkkel som bare finnes i
-        // denne telefonens Secure Enclave, og klarteksten slettes.
+        // denne enhetens Secure Enclave, og klarteksten slettes.
         do {
             let sealed = try RecordingVault.seal(fileAt: recorder.url)
             let name = recorder.url.lastPathComponent + ".enc"

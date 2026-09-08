@@ -5,12 +5,12 @@ import AVFoundation
 ///
 /// `supportedModes` lar den kjøre i bakgrunnen. Både start og stopp forsøkes
 /// der først, fordi å åpne appen er det som tvinger fram Face ID eller kode
-/// når skjermen er låst. I bil ligger telefonen gjerne flatt på ladeplaten og
+/// når skjermen er låst. I bil ligger enheten gjerne flatt på ladeplaten og
 /// ser ikke ansiktet ditt, så opplåsingen er ikke bare et ekstra trykk – den
 /// kan ikke fullføres mens du kjører.
 ///
 /// Gir ikke iOS oss mikrofonen i bakgrunnen, er forgrunnen eneste vei, og da
-/// må telefonen låses opp. Forsøket koster ingenting når det feiler.
+/// må enheten låses opp. Forsøket koster ingenting når det feiler.
 struct ToggleRecordingIntent: AppIntent {
     static let title: LocalizedStringResource = "Start eller stopp opptak"
     static let description = IntentDescription("Starter et opptak i Fróði, eller stopper det som går.")

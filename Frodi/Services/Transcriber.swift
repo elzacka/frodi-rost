@@ -72,7 +72,7 @@ enum TranscriptionError: LocalizedError {
 /// Apples SpeechAnalyzer, innført i iOS 26.
 ///
 /// Hele analysen skjer på enheten, uten serverfallback. Lyden forlater aldri
-/// telefonen, og rammeverket krever ingen tillatelse til talegjenkjenning for
+/// enheten, og rammeverket krever ingen tillatelse til talegjenkjenning for
 /// filanalyse. Det er derfor appen slipper Apples dialog om at taledata sendes
 /// til dem – den hørte til det gamle SFSpeechRecognizer.
 ///

@@ -74,9 +74,9 @@ targets:
           UIColorName: LaunchBackground
         # Opptak må overleve at skjermen låses. Uten dette stopper iOS
         # opptaket i det appen går i bakgrunnen, som er nettopp det som
-        # skjer når du legger fra deg telefonen i bilen.
+        # skjer når du legger fra deg enheten i bilen.
         UIBackgroundModes: [audio]
-        NSMicrophoneUsageDescription: "Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på telefonen."
+        NSMicrophoneUsageDescription: "Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på enheten."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         ITSAppUsesNonExemptEncryption: false

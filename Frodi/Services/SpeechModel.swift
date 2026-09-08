@@ -5,7 +5,7 @@ import Speech
 /// Fróði transkriberer norsk bokmål og ingenting annet.
 ///
 /// Språket er bevisst hardkodet, ikke hentet fra `Locale.current`. Står
-/// telefonen på engelsk, skal appen fortsatt lage norsk bokmål.
+/// enheten på engelsk, skal appen fortsatt lage norsk bokmål.
 ///
 /// `nb` er bokmål. `nn` er nynorsk og skal aldri brukes her.
 enum AppLocale {

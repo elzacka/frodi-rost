@@ -23,7 +23,7 @@ struct DateFormatTests {
         #expect(try date("2026-01-05T09:07:00+01:00").recordingStamp == "05.01.26, 09:07")
     }
 
-    /// 24-timers klokke uansett hva telefonen står på. Et opptak klokka 13
+    /// 24-timers klokke uansett hva enheten står på. Et opptak klokka 13
     /// og ett klokka 01 skal ikke se like ut.
     @Test("24-timers klokke")
     func usesTwentyFourHourClock() throws {

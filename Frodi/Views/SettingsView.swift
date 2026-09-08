@@ -55,16 +55,16 @@ struct SettingsView: View {
 
     private var about: some View {
         card("Om Fróði") {
-            paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på telefonen.")
-            paragraph("Trykk på mikrofonen nederst i listen, eller bruk handlingsknappen på siden av telefonen: ett trykk starter opptaket, neste stopper det. Opptaket fortsetter selv om skjermen er av.")
+            paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.")
+            paragraph("Trykk på mikrofonen nederst i listen, eller bruk handlingsknappen på siden av enheten: ett trykk starter opptaket, neste stopper det. Opptaket fortsetter selv om skjermen er av.")
         }
     }
 
     private var privacy: some View {
         card("Personvern") {
             paragraph("Appen har ingen nettverkskode. Verken lyden eller teksten blir sendt noe sted.")
-            paragraph("Opptak og tekst krypteres med en nøkkel som ligger i denne telefonen og aldri forlater den. Derfor kan ingen annen enhet lese opptakene – heller ikke du selv på en ny telefon, og heller ikke fra en sikkerhetskopi.")
-            paragraph("Skal du bytte telefon, må du hente ut opptakene først. Sletter du appen, forsvinner alt med én gang.")
+            paragraph("Opptak og tekst krypteres med en nøkkel som ligger i denne enheten og aldri forlater den. Derfor kan ingen annen enhet lese opptakene – heller ikke du selv på en ny, og heller ikke fra en sikkerhetskopi.")
+            paragraph("Skal du bytte enhet, må du hente ut opptakene først. Sletter du appen, forsvinner alt med én gang.")
         }
     }
 
@@ -74,7 +74,7 @@ struct SettingsView: View {
             case .granted:
                 paragraph("Fróði har tilgang til mikrofonen. Det er den eneste tilgangen appen ber om.")
             case .denied:
-                paragraph("Fróði har ikke tilgang til mikrofonen og kan ikke ta opp. Du gir tilgang i Innstillinger på telefonen.")
+                paragraph("Fróði har ikke tilgang til mikrofonen og kan ikke ta opp. Du gir tilgang i Innstillinger på enheten.")
                 pillButton("Åpne Innstillinger") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
                 }
@@ -91,7 +91,7 @@ struct SettingsView: View {
                 paragraph("Derfor setter den tegn og store bokstaver selv, og skriver dialekt om til bokmål. Du trenger ikke si «punktum» og «komma».")
             } else {
                 paragraph("Modellen fra Nasjonalbiblioteket er ikke med i dette bygget. Fróði bruker diktatmodellen fra iOS i stedet.")
-                paragraph("Den kjører også på telefonen, men er svakere på norsk: du må si «punktum» og «komma» selv, og dialekt blir ofte feil.")
+                paragraph("Den kjører også på enheten, men er svakere på norsk: du må si «punktum» og «komma» selv, og dialekt blir ofte feil.")
             }
         }
     }

@@ -10,9 +10,9 @@ struct LocaleTests {
         #expect(AppLocale.isBokmal(AppLocale.norwegian))
     }
 
-    /// Språket skal ikke følge telefonens innstilling. Står den på engelsk,
+    /// Språket skal ikke følge enhetens innstilling. Står den på engelsk,
     /// skal Fróði fortsatt lage norsk tekst.
-    @Test("Språket følger ikke telefonens innstilling")
+    @Test("Språket følger ikke enhetens innstilling")
     func doesNotFollowSystemLocale() {
         #expect(AppLocale.norwegian != Locale.current || Locale.current.identifier(.bcp47) == "nb-NO")
         #expect(AppLocale.norwegian.identifier(.bcp47) == "nb-NO")

@@ -26,7 +26,7 @@ enum AudioStorage {
     ///
     /// `completeUnlessOpen` lar en fil som allerede er åpen bli skrevet videre
     /// etter at skjermen låses. Med `complete` ville opptaket stoppet i det
-    /// telefonen låste seg – altså nøyaktig i bilen, som er hele poenget.
+    /// enheten låste seg – altså nøyaktig i bilen, som er hele poenget.
     static func protectWhileRecording(_ url: URL) {
         setProtection(.completeUnlessOpen, on: url)
     }
@@ -34,7 +34,7 @@ enum AudioStorage {
     /// Beskyttelse etter at opptaket er ferdig.
     ///
     /// Nå er filen lukket, og da er `complete` riktig: innholdet kan ikke leses
-    /// mens telefonen er låst, heller ikke av noe som har fysisk tilgang.
+    /// mens enheten er låst, heller ikke av noe som har fysisk tilgang.
     static func protectFinished(_ url: URL) {
         setProtection(.complete, on: url)
         excludeFromBackup(url)
@@ -75,7 +75,7 @@ enum AudioStorage {
     /// Apple kaller dette veiledning til systemet, ikke en garanti, og flagget
     /// kan bli nullstilt av filoperasjoner. Vi setter det derfor på nytt hver
     /// gang en fil er ferdig. Vil du ha en garanti, må innholdet krypteres med
-    /// en nøkkel som ikke finnes utenfor denne telefonen.
+    /// en nøkkel som ikke finnes utenfor denne enheten.
     private static func excludeFromBackup(_ url: URL) {
         var target = url
         var values = URLResourceValues()

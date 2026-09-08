@@ -2,7 +2,7 @@
   "sourceLanguage": "nb",
   "strings": {
     "fróði": {},
-    "Fróði får ikke åpnet databasen på telefonen. Du kan ta opp og hente ut som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette det.": {},
+    "Fróði får ikke åpnet databasen på enheten. Du kan ta opp og hente ut som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette det.": {},
     "Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger.": {},
     "Ingen opptak ennå": {},
     "iOS har ingen norsk språkmodell for tale til tekst på denne enheten. Opptakene dine lagres som vanlig, men uten tekst.": {},

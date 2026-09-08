@@ -12,7 +12,7 @@ extension WhisperKit: @retroactive @unchecked Sendable {}
 
 /// nb-whisper fra Nasjonalbiblioteket, kjørt inne i appen.
 ///
-/// Forskjellen fra Apples motor er ikke om lyden forlater telefonen – det gjør
+/// Forskjellen fra Apples motor er ikke om lyden forlater enheten – det gjør
 /// den ikke i noen av tilfellene – men hvor den behandles. Apples modell kjører
 /// i en systemprosess utenfor appens container. Denne kjører inne i den.
 ///
@@ -52,7 +52,7 @@ final class WhisperTranscriber: Transcriber {
         guard let whisper else { throw TranscriptionError.modelMissing }
 
         let options = DecodingOptions(
-            // Bokmål, alltid. Aldri utledet fra lyden eller fra telefonen.
+            // Bokmål, alltid. Aldri utledet fra lyden eller fra enheten.
             language: "no",
             temperature: 0,
             usePrefillPrompt: true,

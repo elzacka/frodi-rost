@@ -27,7 +27,7 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på telefonen.</string>
+	<string>Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på enheten.</string>
 	<key>UIAccessibilityPerformEscapeEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>

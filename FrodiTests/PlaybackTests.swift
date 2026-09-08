@@ -73,7 +73,7 @@ struct PlaybackTests {
         }
     }
 
-    /// Nøkkelen ligger i Secure Enclave på denne telefonen. En kopi fra en annen
+    /// Nøkkelen ligger i Secure Enclave på denne enheten. En kopi fra en annen
     /// enhet skal si fra, ikke krasje.
     @Test("Et opptak som ikke lar seg låse opp gir en beskjed")
     func unopenableRecordingFails() async throws {

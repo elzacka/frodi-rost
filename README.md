@@ -1,6 +1,6 @@
 # Fróði røst
 
-Tar opp lyd på iPhone og gjør den om til norsk tekst. Alt skjer på telefonen.
+Tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 
 ## Hva appen gjør
 
@@ -16,7 +16,7 @@ bygger på OpenAIs Whisper og er videretrent på 66 000 timer norsk tale fra
 Språkbanken og bibliotekets egen samling. Derfor setter den tegn og store
 bokstaver selv, og skriver dialekt om til bokmål.
 
-Modellen følger med appen og kjører på telefonen. Den koster ingenting å
+Modellen følger med appen og kjører på enheten. Den koster ingenting å
 bruke, og appen kontakter ingen tjeneste for å lage teksten.
 
 | Kilde | Lenke |

@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import Frodi
 
-/// Appens løfte er at ingenting forlater telefonen. Disse testene vokter det
+/// Appens løfte er at ingenting forlater enheten. Disse testene vokter det
 /// løftet i koden, ikke i dokumentasjonen.
 @Suite("Isolasjon")
 struct IsolationTests {

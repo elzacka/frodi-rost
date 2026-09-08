@@ -2,7 +2,7 @@ import CryptoKit
 import Foundation
 import Security
 
-/// Krypterer opptak med en nøkkel som aldri forlater denne telefonen.
+/// Krypterer opptak med en nøkkel som aldri forlater denne enheten.
 ///
 /// Hvorfor dette i tillegg til iOS' egen filbeskyttelse: Apple beskriver
 /// `isExcludedFromBackup` som veiledning til systemet, ikke en garanti. Slipper
@@ -14,14 +14,14 @@ import Security
 /// - Hvert opptak får sin egen tilfeldige AES-256-nøkkel.
 /// - Lyden forsegles med AES-GCM, og AES-nøkkelen pakkes inn av Enclave-nøkkelen.
 ///
-/// Prisen er at opptakene ikke kan leses av en annen telefon. Derfor finnes
+/// Prisen er at opptakene ikke kan leses av en annen enhet. Derfor finnes
 /// eksport: se `RecordingExport`.
 enum RecordingVault {
     // Prefikset er `no.`, mens bundle-ID-en er `com.Tazk.Frodi`. Det er ikke
     // en feil som skal rettes: merkelappen er adressen til nøkkelen i Secure
     // Enclave, ikke en identifikator iOS bryr seg om. Endrer vi den, finner
     // appen ikke igjen nøkkelen, og alle opptak som allerede ligger forseglet
-    // på telefonen blir uleselige. Den er privat og vises ingen steder.
+    // på enheten blir uleselige. Den er privat og vises ingen steder.
     private static let keyTag = "no.Tazk.Frodi.vault.v1".data(using: .utf8)!
 
     enum VaultError: LocalizedError {

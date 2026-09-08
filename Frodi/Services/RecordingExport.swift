@@ -7,7 +7,7 @@ import Foundation
 /// i mappen for midlertidige filer og ryddes bort etter deling.
 ///
 /// Delingen går gjennom iOS' egen delingsmeny, som lar deg velge Filer på
-/// telefonen eller AirDrop. Begge er lokale. Fróði laster ingenting opp selv,
+/// enheten eller AirDrop. Begge er lokale. Fróði laster ingenting opp selv,
 /// og har ingen nettverkskode å gjøre det med.
 enum RecordingExport {
     /// Skriver lyd og tekst til midlertidige filer klare for deling.
