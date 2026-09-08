@@ -18,4 +18,20 @@ final class FrodiUITests: XCTestCase {
             "Opptaksknappen mangler"
         )
     }
+
+    /// Innstillingene er appens eneste sted for personvern, tillatelser og
+    /// attribusjon. Apache 2.0 krever at lisenslisten faktisk er å finne i appen.
+    @MainActor
+    func test_settings_opensAndReachesLicenses() {
+        let app = XCUIApplication()
+        app.launch()
+
+        XCTAssertTrue(app.buttons["Innstillinger"].waitForExistence(timeout: 5), "Tannhjulet mangler")
+        app.buttons["Innstillinger"].tap()
+
+        XCTAssertTrue(app.buttons["Lisenser"].waitForExistence(timeout: 5), "Innstillingsarket åpnet ikke")
+        app.buttons["Lisenser"].tap()
+
+        XCTAssertTrue(app.staticTexts["WhisperKit"].waitForExistence(timeout: 5), "Lisenslisten mangler")
+    }
 }

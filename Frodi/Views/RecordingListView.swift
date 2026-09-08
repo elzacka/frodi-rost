@@ -8,6 +8,7 @@ struct RecordingListView: View {
     @State private var controller = RecordingController.shared
     @State private var speechModel = SpeechModel()
     @State private var errorMessage: String?
+    @State private var showSettings = false
 
     var body: some View {
         NavigationStack {
@@ -45,6 +46,9 @@ struct RecordingListView: View {
             } message: {
                 Text(errorMessage ?? "").font(.Frodi.body)
             }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
+            }
         }
         .task {
             // Med nb-whisper i bygget finnes ingen systemmodell å vente på.
@@ -55,6 +59,25 @@ struct RecordingListView: View {
     }
 
     private var header: some View {
+        wordmark
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, Space.s4)
+            .padding(.top, Space.s2)
+            .padding(.bottom, Space.s3)
+            // Overlegg, ikke en rad: ordmerket skal stå midt på skjermen,
+            // ikke midt i plassen som blir igjen ved siden av tannhjulet.
+            .overlay(alignment: .trailing) {
+                settingsButton
+                    .padding(.trailing, Space.s1)
+            }
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(Color.Frodi.border)
+                    .frame(height: 1)
+            }
+    }
+
+    private var wordmark: some View {
         VStack(spacing: Space.s1) {
             Text("fróði")
                 .font(.Frodi.display)
@@ -69,20 +92,25 @@ struct RecordingListView: View {
                 .eyebrowTracking()
                 .foregroundStyle(Color.Frodi.textSecondary)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, Space.s4)
-        .padding(.top, Space.s2)
-        .padding(.bottom, Space.s3)
-        .overlay(alignment: .bottom) {
-            Rectangle()
-                .fill(Color.Frodi.border)
-                .frame(height: 1)
-        }
         .accessibilityElement(children: .combine)
         // Navnet uttalt, ikke ordmerket. Små bokstaver er en grafisk form,
         // ikke måten navnet sies på.
         .accessibilityLabel("Fróði røst")
         .accessibilityAddTraits(.isHeader)
+    }
+
+    private var settingsButton: some View {
+        Button {
+            showSettings = true
+        } label: {
+            Image(systemName: "gearshape")
+                .font(.system(size: HeaderButton.icon, weight: .medium))
+                .foregroundStyle(Color.Frodi.textSecondary)
+                .frame(width: HeaderButton.touch, height: HeaderButton.touch)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Innstillinger")
     }
 
     /// Databasen lot seg ikke åpne, så appen kjører på minnet.

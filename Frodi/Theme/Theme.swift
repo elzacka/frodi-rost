@@ -80,6 +80,16 @@ enum RecordButton {
     static let icon: CGFloat = 22
 }
 
+// MARK: - Knapp i logohodet
+
+/// Tannhjulet til høyre i logohodet. Designsystemet gir ingen mål, så ikonet
+/// står i samme størrelse som i systemets navigasjonslinje, og treffflaten er
+/// satt til minstemålet på 44 pt.
+enum HeaderButton {
+    static let icon: CGFloat = 18
+    static let touch: CGFloat = 44
+}
+
 // MARK: - Avspillingskontroller
 
 /// Designsystemet beskriver ingen spiller. Målene er avledet: spilleknappen
