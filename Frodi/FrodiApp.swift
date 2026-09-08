@@ -26,7 +26,7 @@ struct FrodiApp: App {
     var body: some Scene {
         WindowGroup {
             RecordingListView()
-                // Designsystemet definerer kun lys modus i v0.1.
+                // Designsystemet definerer kun lys modus.
                 .preferredColorScheme(.light)
                 .tint(Color.Frodi.accentRecord)
         }

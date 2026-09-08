@@ -3,7 +3,7 @@ import SwiftUI
 /// Designsystemet i kode. Verdiene her er de eneste som skal brukes —
 /// ingen egendefinerte farger, avstander eller radiuser ute i viewene.
 ///
-/// Kilde: dev_only/designsystem/frodi-designsystem-v0.1.html
+/// Kilde: dev_only/designsystem/frodi-designsystem-v1.0.html
 
 // MARK: - Farger
 
@@ -82,7 +82,7 @@ enum RecordButton {
 
 // MARK: - Avspillingskontroller
 
-/// Designsystem v0.1 beskriver ingen spiller. Målene er avledet: spilleknappen
+/// Designsystemet beskriver ingen spiller. Målene er avledet: spilleknappen
 /// har samme diameter som den indre sirkelen i opptaksknappen, og hoppknappene
 /// er 44 pt, som er minste treffflate.
 enum PlayerControl {

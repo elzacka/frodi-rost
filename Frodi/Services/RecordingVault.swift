@@ -17,6 +17,11 @@ import Security
 /// Prisen er at opptakene ikke kan leses av en annen telefon. Derfor finnes
 /// eksport: se `RecordingExport`.
 enum RecordingVault {
+    // Prefikset er `no.`, mens bundle-ID-en er `com.Tazk.Frodi`. Det er ikke
+    // en feil som skal rettes: merkelappen er adressen til nøkkelen i Secure
+    // Enclave, ikke en identifikator iOS bryr seg om. Endrer vi den, finner
+    // appen ikke igjen nøkkelen, og alle opptak som allerede ligger forseglet
+    // på telefonen blir uleselige. Den er privat og vises ingen steder.
     private static let keyTag = "no.Tazk.Frodi.vault.v1".data(using: .utf8)!
 
     enum VaultError: LocalizedError {
