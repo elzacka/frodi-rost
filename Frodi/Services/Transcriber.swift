@@ -47,7 +47,7 @@ enum TranscriptionError: LocalizedError {
         case "localeUnsupported": String(localized: "norsk mangler i iOS")
         case "modelMissing": String(localized: "språkmodell mangler")
         case "empty": String(localized: "ingen tale")
-        case "other": String(localized: "teksten feilet")
+        case "other": String(localized: "noe gikk galt")
         default: String(localized: "ingen tekst")
         }
     }
@@ -58,13 +58,13 @@ enum TranscriptionError: LocalizedError {
         case "localeUnsupported":
             String(localized: "iOS har ingen norsk språkmodell for tale til tekst på denne enheten, så opptaket kan ikke gjøres om til tekst ennå.")
         case "modelMissing":
-            String(localized: "Språkmodellen er ikke lastet ned. Last den ned på forsiden, så prøver Fróði på nytt.")
+            String(localized: "Språkmodellen er ikke lastet ned. Last den ned i listen over opptak, så prøver Fróði på nytt.")
         case "empty":
             String(localized: "Fant ingen tale i dette opptaket.")
         case "other":
-            String(localized: "Teksten kunne ikke lages denne gangen.")
+            String(localized: "Fróði fikk ikke laget teksten denne gangen.")
         default:
-            String(localized: "Venter på transkribering.")
+            String(localized: "Venter på teksten.")
         }
     }
 }
@@ -74,7 +74,7 @@ enum TranscriptionError: LocalizedError {
 /// Hele analysen skjer på enheten, uten serverfallback. Lyden forlater aldri
 /// telefonen, og rammeverket krever ingen tillatelse til talegjenkjenning for
 /// filanalyse. Det er derfor appen slipper Apples dialog om at taledata sendes
-/// til dem — den hørte til det gamle SFSpeechRecognizer.
+/// til dem – den hørte til det gamle SFSpeechRecognizer.
 ///
 /// Språkmodellen eies av systemet, ikke av appen. Den teller ikke mot
 /// appstørrelsen og ligger utenfor appens minne.

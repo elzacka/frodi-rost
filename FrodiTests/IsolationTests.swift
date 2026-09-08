@@ -11,7 +11,7 @@ struct IsolationTests {
     @Test("Ingen unntak fra transportsikkerhet")
     func noAppTransportSecurityExceptions() {
         let ats = Bundle.main.object(forInfoDictionaryKey: "NSAppTransportSecurity")
-        #expect(ats == nil, "NSAppTransportSecurity er lagt inn — appen skal ikke snakke med nett i det hele tatt")
+        #expect(ats == nil, "NSAppTransportSecurity er lagt inn – appen skal ikke snakke med nett i det hele tatt")
     }
 
     /// `audio` er den eneste bakgrunnsmodusen appen skal ha. `fetch` eller

@@ -96,7 +96,7 @@ final class AudioRecorder {
         } catch {
             // Klarer vi ikke å kryptere, beholder vi ikke klarteksten liggende.
             try? FileManager.default.removeItem(at: recorder.url)
-            state = .failed(String(localized: "Opptaket kunne ikke låses. Det er slettet."))
+            state = .failed(String(localized: "Fróði fikk ikke låst opptaket, og slettet det."))
             return nil
         }
     }

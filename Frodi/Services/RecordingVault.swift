@@ -6,7 +6,7 @@ import Security
 ///
 /// Hvorfor dette i tillegg til iOS' egen filbeskyttelse: Apple beskriver
 /// `isExcludedFromBackup` som veiledning til systemet, ikke en garanti. Slipper
-/// en kopi likevel ut, er den uleselig uten nøkkelen — og nøkkelen finnes bare
+/// en kopi likevel ut, er den uleselig uten nøkkelen – og nøkkelen finnes bare
 /// inne i Secure Enclave på denne enheten.
 ///
 /// Oppbygging:
@@ -36,7 +36,7 @@ enum RecordingVault {
             case .keyCreationFailed(let message):
                 message
             case .decryptionFailed:
-                String(localized: "Opptaket kunne ikke låses opp. Det ble kryptert på en annen enhet.")
+                String(localized: "Fróði får ikke låst opp opptaket. Det ble kryptert på en annen enhet.")
             }
         }
     }

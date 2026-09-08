@@ -26,7 +26,7 @@ final class AudioPlayer {
     private(set) var currentTime: TimeInterval = 0
     private(set) var duration: TimeInterval = 0
 
-    /// Hvilket opptak som ligger klart. Filnavn, ikke sti — samme grunn som i `Recording`.
+    /// Hvilket opptak som ligger klart. Filnavn, ikke sti – samme grunn som i `Recording`.
     private(set) var fileName: String?
 
     private var player: AVAudioPlayer?

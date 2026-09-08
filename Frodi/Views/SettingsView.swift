@@ -39,7 +39,7 @@ struct SettingsView: View {
                     // tittelen ved siden av står i systemfonten uansett hva vi
                     // ber om. Inter bare på knappen ville gitt to skrifter i
                     // samme linje. Logohodet finnes nettopp fordi vi ikke ville
-                    // ha systemfonten på merkevaren — her er den riktig.
+                    // ha systemfonten på merkevaren – her er den riktig.
                     Button("Ferdig") { dismiss() }
                 }
             }

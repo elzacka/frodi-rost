@@ -26,7 +26,7 @@ enum AudioStorage {
     ///
     /// `completeUnlessOpen` lar en fil som allerede er åpen bli skrevet videre
     /// etter at skjermen låses. Med `complete` ville opptaket stoppet i det
-    /// telefonen låste seg — altså nøyaktig i bilen, som er hele poenget.
+    /// telefonen låste seg – altså nøyaktig i bilen, som er hele poenget.
     static func protectWhileRecording(_ url: URL) {
         setProtection(.completeUnlessOpen, on: url)
     }

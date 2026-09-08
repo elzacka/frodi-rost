@@ -33,12 +33,12 @@ enum SpeechEngine: Equatable {
             return (.dictation, match)
         }
         // Ingen match vi vil ha. Vi tar heller ingen tekst enn tekst på feil
-        // språk — nynorsk eller et nabospråk ville vært verre enn ingenting.
+        // språk – nynorsk eller et nabospråk ville vært verre enn ingenting.
         return nil
     }
 
     /// Plukker bokmål ut av en liste. Foretrekker nb-NO, godtar nb og no.
-    /// Intern og ikke privat fordi den er testet — det var her feilen lå.
+    /// Intern og ikke privat fordi den er testet – det var her feilen lå.
     static func bokmal(in locales: [Locale]) -> Locale? {
         let bokmalOnly = locales.filter(AppLocale.isBokmal)
         return bokmalOnly.first { $0.identifier(.bcp47).lowercased() == "nb-no" }

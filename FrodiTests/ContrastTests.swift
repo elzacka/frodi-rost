@@ -50,7 +50,7 @@ struct ContrastTests {
     /// med `recording-active` mens den tar opp, og ikonet oppå er surface.
     ///
     /// `accent-record` mot background står ikke her. Den er 2,02:1, og det er
-    /// ikke flaten som sier at knappen er en knapp — det gjør mikrofonikonet
+    /// ikke flaten som sier at knappen er en knapp – det gjør mikrofonikonet
     /// oppå, som er 5,47:1. Tallet er notert i dev_only/CLAUDE.md som et åpent
     /// designspørsmål, ikke gjemt bort her.
     @Test("Grafiske element når 3:1", arguments: [

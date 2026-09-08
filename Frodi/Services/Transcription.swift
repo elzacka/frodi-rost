@@ -4,7 +4,7 @@ import SwiftData
 /// Ett sted som gjør opptak om til tekst, slik at både grensesnittet og
 /// handlingsknappen behandler feil likt.
 ///
-/// Motoren velges her. Er nb-whisper med i bygget, brukes den — da skjer alt
+/// Motoren velges her. Er nb-whisper med i bygget, brukes den – da skjer alt
 /// inne i appens egen container. Mangler den, faller vi tilbake til Apples
 /// modell, som også kjører på enheten, men i en systemprosess utenfor appen.
 enum Transcription {

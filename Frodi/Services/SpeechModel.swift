@@ -21,7 +21,7 @@ enum AppLocale {
 /// Holder styr på språkmodellen for tale til tekst.
 ///
 /// Modellen eies av systemet og lastes ned én gang. Det er den eneste gangen
-/// noe her trenger nett, og det er systemet som henter den — ikke appen.
+/// noe her trenger nett, og det er systemet som henter den – ikke appen.
 /// Opptakene dine sendes aldri noe sted.
 @MainActor
 @Observable

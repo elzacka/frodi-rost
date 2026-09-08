@@ -12,8 +12,8 @@ extension WhisperKit: @retroactive @unchecked Sendable {}
 
 /// nb-whisper fra Nasjonalbiblioteket, kjørt inne i appen.
 ///
-/// Forskjellen fra Apples motor er ikke om lyden forlater telefonen — det gjør
-/// den ikke i noen av tilfellene — men hvor den behandles. Apples modell kjører
+/// Forskjellen fra Apples motor er ikke om lyden forlater telefonen – det gjør
+/// den ikke i noen av tilfellene – men hvor den behandles. Apples modell kjører
 /// i en systemprosess utenfor appens container. Denne kjører inne i den.
 ///
 /// Modellen og tokenizeren ligger i app-pakken. `WhisperKit` ville ellers hentet

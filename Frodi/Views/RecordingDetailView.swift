@@ -24,7 +24,7 @@ struct RecordingDetailView: View {
             ScrollView {
                 VStack(spacing: Space.s4) {
                     // Lyden står øverst. Teksten er en avskrift av den, og
-                    // avskriften er ikke alltid riktig — da vil du høre originalen.
+                    // avskriften er ikke alltid riktig – da vil du høre originalen.
                     PlaybackControls(recording: recording, player: player)
 
                     transcriptCard

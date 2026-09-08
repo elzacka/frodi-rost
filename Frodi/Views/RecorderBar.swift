@@ -22,7 +22,7 @@ struct RecorderBar: View {
             }
 
             if case .denied = recorder.state {
-                Text("Fróði trenger tilgang til mikrofonen. Du kan gi den i Innstillinger.")
+                Text("Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger.")
                     .font(.Frodi.caption)
                     .foregroundStyle(Color.Frodi.textSecondary)
                     .multilineTextAlignment(.center)
