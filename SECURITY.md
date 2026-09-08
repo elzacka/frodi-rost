@@ -51,12 +51,18 @@ carries the guarantee.
 
 ## No network
 
-The app contains no `URLSession`, no sockets, no telemetry. Tests fail if an ATS
+The app makes no network requests and sends no telemetry. Tests fail if an ATS
 exception appears, if a background mode other than `audio` is declared, or if the
 privacy manifest declares collected data.
 
 The speech model is bundled. WhisperKit is configured with `download: false` and
 explicit local paths, so a missing file fails rather than fetching.
+
+**One honest qualification.** WhisperKit depends on `swift-transformers`, whose
+`Hub` target contains an HTTP client. That code is linked into the binary even
+though nothing here calls it — the model and tokenizer are read from the bundle.
+The precise claim is "this app makes no network requests", not "this binary
+contains no networking code". The second would be stronger and is not true.
 
 `PrivacyInfo.xcprivacy` declares no tracking, no tracking domains, no collected
 data types. The only accessed-API declaration is file timestamps (C617.1).

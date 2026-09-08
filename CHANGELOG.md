@@ -13,8 +13,8 @@ Første versjon.
 - Norsk tale til tekst med nb-whisper fra Nasjonalbiblioteket, kjørt i appen.
   Tegnsetting og store bokstaver kommer av seg selv, og dialekt skrives om til
   bokmål
-- Avspilling med pause, hopp femten sekunder hver vei, og en slider som viser
-  og setter posisjonen
-- Uthenting av lyd som `.m4a` og tekst som `.txt`
-- Kryptering av opptak og tekst med en nøkkel som aldri forlater telefonen
+- Spill av opptaket, med pause, hopp femten sekunder hver vei og en slider som
+  viser og setter posisjonen
+- Hent ut lyd som `.m4a` og tekst som `.txt`
+- Krypter opptak og tekst med en nøkkel som aldri forlater telefonen
 - App-ikon og logo i Skranji

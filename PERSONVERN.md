@@ -1,8 +1,9 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 07.09.26.
+Sist oppdatert 7. september 2026.
 
-Fróði røst har ingen nettverkskode. Ingenting kan sendes noe sted.
+Fróði røst sender ingenting og henter ingenting. Appen har ingen adresse å
+sende til, og ingen tjeneste å spørre.
 
 ## Hva som lagres
 
@@ -23,7 +24,7 @@ ligger i appen. Se [SECURITY.md](SECURITY.md).
 ## Opptakene er låst til denne telefonen
 
 Nøkkelen finnes bare inne i din telefon. Et opptak kan ikke leses av en annen
-enhet — heller ikke av deg på en ny telefon, og heller ikke fra en
+enhet – heller ikke av deg på en ny telefon, og heller ikke fra en
 sikkerhetskopi.
 
 Skal du bytte telefon: hent ut opptakene først.
@@ -33,10 +34,10 @@ Skal du bytte telefon: hent ut opptakene først.
 | Rettighet | Slik gjør du det |
 |---|---|
 | Innsyn | Åpne opptaket i appen |
-| Dataportabilitet | Trykk delingsikonet. Du får `.m4a` og `.txt` |
+| Hente ut | Trykk delingsikonet. Du får `.m4a` og `.txt` |
 | Sletting | Hold på opptaket i listen, velg «Slett» |
 
-Sletter du appen, slettes alt. Sletting skjer med én gang. Ingen angrefrist.
+Sletter du appen, slettes alt. Det skjer med én gang, og du kan ikke angre.
 
 ## Kontakt
 

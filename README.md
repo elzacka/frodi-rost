@@ -11,10 +11,10 @@ Tar opp lyd på iPhone og gjør det om til norsk tekst. Alt skjer på enheten.
 
 ## Modell
 
-Tale til tekst gjøres av **nb-whisper-small** fra Nasjonalbiblioteket. Den bygger
-på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra Språkbanken og
-bibliotekets egen samling. Derfor setter den punktum og store bokstaver av seg
-selv, og skriver dialekt om til bokmål.
+**nb-whisper-small** fra Nasjonalbiblioteket gjør tale om til tekst. Modellen
+bygger på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra
+Språkbanken og bibliotekets egen samling. Derfor setter den punktum og store
+bokstaver av seg selv, og skriver dialekt om til bokmål.
 
 Modellen følger med appen og kjører lokalt. Den koster ingenting å bruke, og
 appen kontakter ingen tjeneste for å transkribere.
