@@ -6,7 +6,7 @@ Last reviewed 07.09.26.
 
 ## Reporting a vulnerability
 
-Email **hei@tazk.no**, subject `[SECURITY] Frodi røst - <description>`.
+Email **hei@tazk.no**, subject `[SECURITY] Fróði røst - <description>`.
 Include reproduction steps and impact. Acknowledgement within 48 hours,
 assessment within 7 days. Do not open public GitHub issues.
 
