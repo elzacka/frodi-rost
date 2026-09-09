@@ -65,6 +65,5 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
 |---|---|
 | [PERSONVERN.md](PERSONVERN.md) | Hva som lagres, tillatelser, rettighetene dine |
 | [SECURITY.md](SECURITY.md) | Hva som beskyttes mot hva, og hvordan melde sårbarhet |
-| [Sikkerheten-Forklart.md](Sikkerheten-Forklart.md) | Hvordan opptakene beskyttes, forklart på norsk |
 | [TREDJEPART.md](TREDJEPART.md) | Modell, kode og skrifter, med lisenser |
 | [CHANGELOG.md](CHANGELOG.md) | Hva som er endret |
