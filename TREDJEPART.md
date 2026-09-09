@@ -1,6 +1,6 @@
 # Tredjepartslisenser
 
-Apache 2.0 krever at opphavet oppgis. Dette er den attribusjonen.
+Lisensene under krever at opphavet oppgis. Dette er den attribusjonen.
 
 Sist gjennomgått 7. september 2026.
 

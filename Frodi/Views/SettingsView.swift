@@ -54,16 +54,17 @@ struct SettingsView: View {
     // MARK: - Kort
 
     private var about: some View {
-        card("Om Fróði") {
+        card("Om Fróði røst") {
             paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.")
-            paragraph("Trykk på mikrofonen nederst i listen, eller bruk handlingsknappen på siden av enheten: ett trykk starter opptaket, neste stopper det. Opptaket fortsetter selv om skjermen er av.")
+            paragraph("Trykk på mikrofonen nederst i listen, eller bruk handlingsknappen på siden av enheten. Ett trykk starter opptaket, neste stopper det. Opptaket fortsetter selv om skjermen er av.")
+            paragraph("Navnet er norrønt: Fróði betyr «den kunnskapsrike», og røst er stemme.")
         }
     }
 
     private var privacy: some View {
         card("Personvern") {
-            paragraph("Appen har ingen nettverkskode. Verken lyden eller teksten blir sendt noe sted.")
-            paragraph("Opptak og tekst krypteres med en nøkkel som ligger i denne enheten og aldri forlater den. Derfor kan ingen annen enhet lese opptakene – heller ikke du selv på en ny, og heller ikke fra en sikkerhetskopi.")
+            paragraph("Fróði sender ingenting og henter ingenting. Verken lyden eller teksten forlater enheten.")
+            paragraph("Opptak og tekst krypteres med en nøkkel som lages i enheten og aldri forlater den. Ingen annen enhet kan lese dem, og de følger ikke med i en sikkerhetskopi.")
             paragraph("Skal du bytte enhet, må du hente ut opptakene først. Sletter du appen, forsvinner alt med én gang.")
         }
     }
@@ -87,8 +88,8 @@ struct SettingsView: View {
     private var speechModel: some View {
         card("Språkmodell") {
             if Transcription.usesBundledModel {
-                paragraph("nb-whisper-small fra Nasjonalbiblioteket gjør tale om til tekst. Modellen er trent på 66 000 timer norsk tale, følger med appen og kjører inne i den.")
-                paragraph("Derfor setter den tegn og store bokstaver selv, og skriver dialekt om til bokmål. Du trenger ikke si «punktum» og «komma».")
+                paragraph("nb-whisper-small fra Nasjonalbiblioteket gjør tale om til tekst. Modellen følger med appen og kjører inne i den.")
+                paragraph("Den er trent på 66\u{00A0}000 timer norsk tale. Derfor setter den tegn og store bokstaver selv, og skriver dialekt om til bokmål. Du trenger ikke si «punktum» og «komma».")
             } else {
                 paragraph("Modellen fra Nasjonalbiblioteket er ikke med i dette bygget. Fróði bruker diktatmodellen fra iOS i stedet.")
                 paragraph("Den kjører også på enheten, men er svakere på norsk: du må si «punktum» og «komma» selv, og dialekt blir ofte feil.")
@@ -215,7 +216,7 @@ struct LicensesView: View {
 
             ScrollView {
                 VStack(spacing: Space.s4) {
-                    Text("Apache 2.0 krever at opphavet oppgis. Dette er den attribusjonen.")
+                    Text("Lisensene under krever at opphavet oppgis. Dette er den attribusjonen.")
                         .font(.Frodi.caption)
                         .foregroundStyle(Color.Frodi.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
