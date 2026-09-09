@@ -139,3 +139,50 @@ struct ExportEncodingTests {
         #expect(asUTF8 == "Så")
     }
 }
+
+/// Et langt opptak går gjennom de samme stegene som et kort, men på tall som
+/// er store nok til at en avkortning ville vist seg: lydfilen leses inn hel,
+/// dekrypteres hel og skrives hel, og det samme gjelder teksten.
+@Suite("Uttrekk av lange opptak", .serialized)
+struct LongExportTests {
+    /// 30 MB forseglet lyd svarer til rundt en time med opptak, som ligger på
+    /// omtrent 64 kbit/s.
+    private static let audioBytes = 30 * 1024 * 1024
+
+    private func sealedRecording(audio: Data, transcript: String) throws -> Recording {
+        let name = "\(UUID().uuidString).m4a.enc"
+        try RecordingVault.seal(audio).write(to: AudioStorage.directory.appendingPathComponent(name))
+
+        let recording = Recording(duration: 3600, fileName: name)
+        try recording.setTranscript(transcript)
+        return recording
+    }
+
+    @Test("Hele lydfilen og hele teksten kommer med")
+    func longRecordingSurvivesExport() async throws {
+        // Et mønster, ikke nuller: en avkortet eller forskjøvet fil skal ikke
+        // kunne se riktig ut ved en tilfeldighet.
+        let block = Data((0..<4096).map { UInt8($0 % 251) })
+        var audio = Data(capacity: Self.audioBytes)
+        while audio.count < Self.audioBytes { audio.append(block) }
+
+        // Rundt 20 000 ord, som er mer enn en time med tale.
+        let transcript = Array(repeating: "Så kjørte vi videre mot Kristiansand i øsende regn.", count: 2_000)
+            .joined(separator: " ")
+
+        let recording = try sealedRecording(audio: audio, transcript: transcript)
+        defer { AudioStorage.delete(fileName: recording.fileName) }
+
+        let urls = try await RecordingExport.prepare(recording)
+        defer { RecordingExport.cleanUp(urls) }
+
+        #expect(urls.count == 2)
+
+        let exportedAudio = try Data(contentsOf: try #require(urls.first { $0.pathExtension == "m4a" }))
+        #expect(exportedAudio == audio)
+
+        let exportedText = try Data(contentsOf: try #require(urls.first { $0.pathExtension == "txt" }))
+        #expect(exportedText == RecordingExport.utf8WithBOM(transcript))
+        #expect(String(data: exportedText.dropFirst(3), encoding: .utf8) == transcript)
+    }
+}

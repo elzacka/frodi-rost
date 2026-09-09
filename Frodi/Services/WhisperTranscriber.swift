@@ -57,7 +57,20 @@ final class WhisperTranscriber: Transcriber {
             temperature: 0,
             usePrefillPrompt: true,
             skipSpecialTokens: true,
-            withoutTimestamps: true
+            withoutTimestamps: true,
+            // Uten denne blir bare det første halvminuttet med.
+            //
+            // Whisper hører 30 sekunder om gangen. Uten oppdeling kjører
+            // WhisperKit alle vinduene gjennom den samme dekoderen, og fra og
+            // med vindu nummer to kommer det ingen ting ut. Målt 9. september
+            // 2026 på et opptak på 3 minutter og 3 sekunder: 86 av 516 ord.
+            // Med .vad blir hvert stykke sin egen kjøring, og da kom 512 ord.
+            //
+            // Oppdelingen leter etter en pause å klippe på. Finner den ingen –
+            // motorstøy i bil, for eksempel – klipper den på 30 sekunder i
+            // stedet. Det er nettopp det som gjør at teksten blir komplett, så
+            // et opptak uten pauser i taper ingen ting på det.
+            chunkingStrategy: .vad
         )
 
         do {

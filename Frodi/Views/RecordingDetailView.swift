@@ -6,6 +6,7 @@ struct RecordingDetailView: View {
 
     @State private var player = AudioPlayer.shared
     @State private var transcript: String = ""
+    @State private var showsTranscript = false
     @State private var exportURLs: [URL] = []
     @State private var exportError: String?
 
@@ -78,11 +79,15 @@ struct RecordingDetailView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, Space.s5)
             } else if recording.hasTranscript {
-                Text(transcript)
-                    .font(.Frodi.body)
-                    .foregroundStyle(Color.Frodi.textPrimary)
-                    .textSelection(.enabled)
-                    .hiddenWhileScreenCaptured()
+                transcriptToggle
+
+                if showsTranscript {
+                    Text(transcript)
+                        .font(.Frodi.body)
+                        .foregroundStyle(Color.Frodi.textPrimary)
+                        .textSelection(.enabled)
+                        .hiddenWhileScreenCaptured()
+                }
             } else if recording.isTranscribing {
                 HStack(spacing: Space.s3) {
                     ProgressView()
@@ -124,6 +129,49 @@ struct RecordingDetailView: View {
             RoundedRectangle(cornerRadius: Radius.card)
                 .strokeBorder(Color.Frodi.border, lineWidth: 1)
         )
+    }
+
+    /// Teksten er slått sammen når du kommer inn på siden.
+    ///
+    /// Et opptak på ti minutter blir flere skjermhøyder med tekst, og da må du
+    /// bla langt for å komme tilbake til spilleren. Ordtellingen står i raden,
+    /// så du ser at hele opptaket kom med uten å åpne teksten.
+    ///
+    /// Uttrekket henter teksten fra opptaket selv og bryr seg ikke om raden
+    /// står åpen eller lukket.
+    private var transcriptToggle: some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.2)) { showsTranscript.toggle() }
+        } label: {
+            HStack(spacing: Space.s2) {
+                Text("Tekst")
+                    .font(.Frodi.eyebrow)
+                    .eyebrowTracking()
+                    .textCase(.uppercase)
+                    .foregroundStyle(Color.Frodi.textSecondary)
+
+                Text(wordCount)
+                    .font(.Frodi.meta)
+                    .foregroundStyle(Color.Frodi.textSecondary)
+
+                Spacer()
+
+                Image(systemName: showsTranscript ? "chevron.up" : "chevron.down")
+                    .font(.Frodi.caption)
+                    .foregroundStyle(Color.Frodi.textSecondary)
+            }
+            .frame(minHeight: Disclosure.row)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Tekst, \(wordCount)")
+        .accessibilityHint(showsTranscript ? "Skjuler teksten" : "Viser teksten")
+    }
+
+    /// «312 ord». Tallet er også svaret på om hele opptaket kom med.
+    private var wordCount: String {
+        let words = transcript.split(whereSeparator: \.isWhitespace).count
+        return "\(words.formatted(.number.locale(AppLocale.norwegian))) ord"
     }
 
     /// Dato, tidspunkt og lengde står i tittelen, så selve kortet er bare teksten.

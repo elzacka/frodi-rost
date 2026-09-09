@@ -102,6 +102,14 @@ enum PlayerControl {
     static let skipIcon: CGFloat = 20
 }
 
+// MARK: - Sammenslått innhold
+
+/// Designsystemet beskriver ingen expander. Raden som slår teksten ut og inn
+/// er 44 pt høy, som er minste treffflate.
+enum Disclosure {
+    static let row: CGFloat = 44
+}
+
 // MARK: - Sporing
 
 extension Text {

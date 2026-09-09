@@ -11,20 +11,45 @@ import Foundation
 /// og har ingen nettverkskode å gjøre det med.
 enum RecordingExport {
     /// Skriver lyd og tekst til midlertidige filer klare for deling.
+    ///
+    /// Opptaket er et SwiftData-objekt og kan ikke sendes videre til en annen
+    /// tråd. Vi henter derfor ut verdiene her og sender bare dem.
     static func prepare(_ recording: Recording) async throws -> [URL] {
+        try await write(
+            fileName: recording.fileName,
+            createdAt: recording.createdAt,
+            transcript: try recording.transcript()
+        )
+    }
+
+    /// Å lese, dekryptere og skrive en hel lydfil tar tid som vokser med
+    /// lengden på opptaket. En time med lyd er rundt 30 MB, og alle tre
+    /// stegene tar hele filen om gangen.
+    ///
+    /// `@concurrent` holder det unna hovedtråden. Uten den havner det der:
+    /// `SWIFT_APPROACHABLE_CONCURRENCY` gjør at en `nonisolated async`
+    /// funksjon arver aktøren til den som kaller, og her kaller viewet.
+    /// Målt 9. september 2026 – da sto grensesnittet stille til
+    /// delingsmenyen kom opp.
+    @concurrent
+    private static func write(
+        fileName: String,
+        createdAt: Date,
+        transcript: String?
+    ) async throws -> [URL] {
         var urls: [URL] = []
 
-        let stamp = Self.stamp(recording.createdAt)
+        let stamp = Self.stamp(createdAt)
         let folder = FileManager.default.temporaryDirectory
             .appendingPathComponent("Eksport-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 
-        let sealed = try Data(contentsOf: recording.fileURL)
+        let sealed = try Data(contentsOf: AudioStorage.directory.appendingPathComponent(fileName))
         let audio = folder.appendingPathComponent("frodi-\(stamp).m4a")
         try RecordingVault.open(sealed).write(to: audio, options: [.completeFileProtectionUnlessOpen])
         urls.append(audio)
 
-        if let transcript = try recording.transcript(), !transcript.isEmpty {
+        if let transcript, !transcript.isEmpty {
             let text = folder.appendingPathComponent("frodi-\(stamp).txt")
             try utf8WithBOM(transcript).write(to: text, options: [.completeFileProtectionUnlessOpen])
             urls.append(text)

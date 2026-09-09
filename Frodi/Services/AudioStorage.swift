@@ -48,15 +48,31 @@ enum AudioStorage {
         fileName: String,
         _ body: (URL) async throws -> T
     ) async throws -> T {
+        let temporary = try await decryptToTemporary(fileName: fileName)
+        defer { try? FileManager.default.removeItem(at: temporary) }
+
+        return try await body(temporary)
+    }
+
+    /// Låser opp lydfilen og legger klarteksten i en midlertidig fil.
+    ///
+    /// `@concurrent` holder lesingen, dekrypteringen og skrivingen unna
+    /// hovedtråden. Uten den havner de der: `SWIFT_APPROACHABLE_CONCURRENCY`
+    /// gjør at en `nonisolated async` funksjon arver aktøren til den som
+    /// kaller, og `Transcription.run` kaller fra hovedaktøren. Alle tre
+    /// stegene tar hele filen om gangen, og en time med lyd er rundt 30 MB.
+    ///
+    /// `body` blir stående igjen hos den som kaller. Motoren er låst til
+    /// hovedaktøren, og skal fortsatt kalles derfra.
+    @concurrent
+    private static func decryptToTemporary(fileName: String) async throws -> URL {
         let sealed = try Data(contentsOf: directory.appendingPathComponent(fileName))
         let plaintext = try RecordingVault.open(sealed)
 
         let temporary = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString + ".m4a")
         try plaintext.write(to: temporary, options: [.completeFileProtectionUnlessOpen])
-        defer { try? FileManager.default.removeItem(at: temporary) }
-
-        return try await body(temporary)
+        return temporary
     }
 
     static func delete(fileName: String) {
