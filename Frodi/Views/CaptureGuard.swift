@@ -17,8 +17,7 @@ struct CaptureGuard: ViewModifier {
         Group {
             if isCaptured {
                 VStack(spacing: Space.s3) {
-                    Image(systemName: "eye.slash")
-                        .font(.title2)
+                    IconView(.hidden, size: IconSize.notice)
                         .foregroundStyle(Color.Frodi.textSecondary)
 
                     Text("Teksten er skjult mens skjermen tas opp.")

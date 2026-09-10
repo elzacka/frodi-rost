@@ -41,7 +41,7 @@ struct RecordingDetailView: View {
                 Button {
                     Task { await exportRecording() }
                 } label: {
-                    Image(systemName: "square.and.arrow.up")
+                    IconView(.share, size: IconSize.toolbar)
                 }
                 .accessibilityLabel("Hent ut opptaket")
             }
@@ -156,8 +156,7 @@ struct RecordingDetailView: View {
 
                 Spacer()
 
-                Image(systemName: showsTranscript ? "chevron.up" : "chevron.down")
-                    .font(.Frodi.caption)
+                IconView(showsTranscript ? .chevronUp : .chevronDown, size: IconSize.inline)
                     .foregroundStyle(Color.Frodi.textSecondary)
             }
             .frame(minHeight: Disclosure.row)

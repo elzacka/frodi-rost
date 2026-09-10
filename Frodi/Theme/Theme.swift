@@ -90,6 +90,22 @@ enum HeaderButton {
     static let touch: CGFloat = 44
 }
 
+// MARK: - Ikoner
+
+/// Størrelser på ikoner, i punkt.
+///
+/// Heroicons tegnes i et rutenett på 24 × 24 og skaleres hit. Målene står her
+/// av samme grunn som resten av designsystemet: et tall på stedet blir aldri
+/// endret sammen med de andre.
+enum IconSize {
+    /// Sjevroner i rader og kort, på linje med bildeteksten ved siden av.
+    static let inline: CGFloat = 13
+    /// Knapper i navigasjonslinjen.
+    static let toolbar: CGFloat = 20
+    /// Ikon som står alene over en beskjed.
+    static let notice: CGFloat = 22
+}
+
 // MARK: - Avspillingskontroller
 
 /// Designsystemet beskriver ingen spiller. Målene er avledet: spilleknappen
@@ -99,7 +115,9 @@ enum PlayerControl {
     static let play: CGFloat = 56
     static let playIcon: CGFloat = 22
     static let skip: CGFloat = 44
-    static let skipIcon: CGFloat = 20
+    // Pilen deler knappen med tallet under seg, og ble 18 for at de to skal få
+    // plass innenfor de 44 punktene uten å presses mot kanten.
+    static let skipIcon: CGFloat = 18
 }
 
 // MARK: - Sammenslått innhold

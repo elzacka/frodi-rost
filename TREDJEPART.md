@@ -2,7 +2,7 @@
 
 Lisensene under krever at opphavet oppgis. Dette er den attribusjonen.
 
-Sist gjennomgått 7. september 2026.
+Sist gjennomgått 10. september 2026.
 
 ## Modell
 
@@ -24,6 +24,12 @@ Sist gjennomgått 7. september 2026.
 | swift-crypto | Apple | Apache 2.0 |
 | swift-asn1 | Apple | Apache 2.0 |
 | yyjson | Yao Yuan | MIT |
+
+## Ikoner
+
+| Hva | Opphav | Lisens |
+|---|---|---|
+| Heroicons | Tailwind Labs | MIT |
 
 ## Skrifter
 

@@ -84,7 +84,7 @@ struct PlaybackControls: View {
         HStack(spacing: Space.s6) {
             skipButton(
                 -Self.skipSeconds,
-                symbol: "gobackward.15",
+                icon: .skipBack,
                 label: "Hopp 15 sekunder tilbake"
             )
 
@@ -92,7 +92,7 @@ struct PlaybackControls: View {
 
             skipButton(
                 Self.skipSeconds,
-                symbol: "goforward.15",
+                icon: .skipForward,
                 label: "Hopp 15 sekunder fram"
             )
         }
@@ -107,8 +107,7 @@ struct PlaybackControls: View {
                     .fill(Color.Frodi.accentRecord)
                     .frame(width: PlayerControl.play, height: PlayerControl.play)
 
-                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.system(size: PlayerControl.playIcon, weight: .medium))
+                IconView(player.isPlaying ? .pause : .play, size: PlayerControl.playIcon)
                     .foregroundStyle(Color.Frodi.accentRecordOn)
                     // Trekanten har tyngdepunktet til venstre for midten og ser
                     // skjev ut i en sirkel uten denne. Optisk retting, ikke avstand.
@@ -121,14 +120,24 @@ struct PlaybackControls: View {
         .accessibilityAddTraits(.isButton)
     }
 
-    private func skipButton(_ offset: TimeInterval, symbol: String, label: String) -> some View {
+    /// Pilen sier retning, tallet under sier hvor langt.
+    ///
+    /// SF-symbolet hadde 15-tallet inne i buen. Heroicons har ingen pil med et
+    /// tall i, og to like piler uten tall ville ikke sagt hvor mye et trykk
+    /// hopper. Tallet står derfor under, og det leses av det samme stedet som
+    /// hoppet regnes fra, så de ikke kan komme i utakt.
+    private func skipButton(_ offset: TimeInterval, icon: Icon, label: String) -> some View {
         Button {
             player.skip(offset)
         } label: {
-            Image(systemName: symbol)
-                .font(.system(size: PlayerControl.skipIcon, weight: .medium))
-                .foregroundStyle(Color.Frodi.textPrimary)
-                .frame(width: PlayerControl.skip, height: PlayerControl.skip)
+            VStack(spacing: Space.s1 / 2) {
+                IconView(icon, size: PlayerControl.skipIcon)
+                Text(verbatim: "\(Int(Self.skipSeconds))")
+                    .font(.Frodi.meta)
+                    .monospacedDigit()
+            }
+            .foregroundStyle(Color.Frodi.textPrimary)
+            .frame(width: PlayerControl.skip, height: PlayerControl.skip)
         }
         .buttonStyle(.plain)
         .disabled(!player.isLoaded)

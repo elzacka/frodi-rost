@@ -45,7 +45,7 @@ struct AboutView: View {
                     // arket bare lukkes. Ikonet har heller ingen skrift, så
                     // spørsmålet om Inter ved siden av systemtittelen faller
                     // bort. VoiceOver trenger navnet knappen ikke skriver.
-                    Button { dismiss() } label: { Image(systemName: "xmark") }
+                    Button { dismiss() } label: { IconView(.close, size: IconSize.toolbar) }
                         .accessibilityLabel("Lukk")
                 }
             }
@@ -70,7 +70,7 @@ struct AboutView: View {
 
     private var privacy: some View {
         card("Personvern") {
-            paragraph("Fróði sender ingenting og henter ingenting. Verken lyden eller teksten forlater enheten.")
+            paragraph("Fróði sender ingenting og henter ingenting. Verken opptaket eller teksten forlater enheten.")
             paragraph("Opptak og tekst krypteres med en nøkkel som lages i enheten og aldri forlater den. Ingen annen enhet kan lese dem, og de følger ikke med i en sikkerhetskopi.")
             paragraph("Skal du bytte enhet, må du hente ut opptakene først. Sletter du appen, forsvinner alt med én gang.")
         }
@@ -148,8 +148,7 @@ struct AboutView: View {
 
                 if opensScreen {
                     Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.Frodi.caption)
+                    IconView(.chevronRight, size: IconSize.inline)
                         .foregroundStyle(Color.Frodi.textSecondary)
                 }
             }
@@ -212,6 +211,10 @@ struct LicensesView: View {
         Component(name: "yyjson", origin: "Yao Yuan", license: "MIT")
     ]
 
+    private let icons = [
+        Component(name: "Heroicons", origin: "Tailwind Labs", license: "MIT")
+    ]
+
     private let fonts = [
         Component(name: "Inter", origin: "Rasmus Andersson", license: "SIL Open Font License 1.1"),
         Component(name: "Skranji", origin: "Font Diner", license: "SIL Open Font License 1.1")
@@ -231,6 +234,7 @@ struct LicensesView: View {
 
                     group("Modell", model)
                     group("Kode", code)
+                    group("Ikoner", icons)
                     group("Skrifter", fonts)
                 }
                 .padding(Space.s4)

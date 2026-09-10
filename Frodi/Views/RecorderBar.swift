@@ -93,8 +93,7 @@ struct RecorderBar: View {
                     .fill(innerColor)
                     .frame(width: RecordButton.inner, height: RecordButton.inner)
 
-                Image(systemName: recorder.isRecording ? "stop.fill" : "mic.fill")
-                    .font(.system(size: RecordButton.icon, weight: .medium))
+                IconView(recorder.isRecording ? .stop : .microphone, size: RecordButton.icon)
                     .foregroundStyle(iconColor)
             }
         }

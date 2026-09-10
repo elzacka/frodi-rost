@@ -103,8 +103,7 @@ struct RecordingListView: View {
         Button {
             showAbout = true
         } label: {
-            Image(systemName: "info.circle")
-                .font(.system(size: HeaderButton.icon, weight: .medium))
+            IconView(.information, size: HeaderButton.icon)
                 .foregroundStyle(Color.Frodi.textSecondary)
                 .frame(width: HeaderButton.touch, height: HeaderButton.touch)
                 .contentShape(Rectangle())

@@ -26,8 +26,7 @@ struct RecordingRow: View {
 
             Spacer(minLength: Space.s2)
 
-            Image(systemName: "chevron.right")
-                .font(.system(size: 13, weight: .medium))
+            IconView(.chevronRight, size: IconSize.inline)
                 .foregroundStyle(Color.Frodi.textSecondary)
         }
         .padding(Space.s3)
