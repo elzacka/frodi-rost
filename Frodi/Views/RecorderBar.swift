@@ -55,7 +55,7 @@ struct RecorderBar: View {
             .accessibilityHidden(!recorder.isRecording)
     }
 
-    /// Hva som er igjen av grensen, og hva grensen er før du har begynt.
+    /// Hva som er igjen av grensen mens opptaket går.
     ///
     /// Den står til høyre for knappen, der speilingen av timeren sto før.
     /// Plassen var alt satt av, og to tall på hver sin side av knappen leses
@@ -63,24 +63,23 @@ struct RecorderBar: View {
     ///
     /// Minustegnet er det samme som avspilleren bruker om gjenværende tid, og
     /// er det som skiller de to tallene fra hverandre uten en etikett.
+    ///
+    /// I hvile står feltet tomt. Grensen hører hjemme i informasjonen om appen,
+    /// ikke over opptaksknappen: den som ikke har begynt å snakke, trenger ikke
+    /// vite taket ennå, og et tall der ville bare vært støy ved siden av
+    /// knappen. Som timeren holder feltet likevel plassen sin, ellers flytter
+    /// knappen seg i det opptaket starter.
     private var remaining: some View {
-        Group {
-            if recorder.isRecording {
-                Text(verbatim: "−" + clock(recorder.remaining))
-                    .font(.Frodi.bodyMedium)
-                    .monospacedDigit()
-                    .contentTransition(.numericText())
-                    .accessibilityLabel("Tid igjen av opptaket")
-                    .accessibilityValue(spoken(recorder.remaining))
-            } else {
-                Text("inntil \(RecordingLimit.minutes) min")
-                    .font(.Frodi.caption)
-                    .accessibilityLabel("Et opptak kan vare i inntil \(RecordingLimit.minutes) minutter")
-            }
-        }
-        .lineLimit(1)
-        .minimumScaleFactor(0.7)
-        .foregroundStyle(Color.Frodi.textSecondary)
+        Text(recorder.isRecording ? "−" + clock(recorder.remaining) : " ")
+            .font(.Frodi.bodyMedium)
+            .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .foregroundStyle(Color.Frodi.textSecondary)
+            .contentTransition(.numericText())
+            .accessibilityLabel("Tid igjen av opptaket")
+            .accessibilityValue(spoken(recorder.remaining))
+            .accessibilityHidden(!recorder.isRecording)
     }
 
     private var recordButton: some View {
