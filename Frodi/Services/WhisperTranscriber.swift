@@ -51,7 +51,104 @@ final class WhisperTranscriber: Transcriber {
         try await load()
         guard let whisper else { throw TranscriptionError.modelMissing }
 
-        let options = DecodingOptions(
+        do {
+            let results = try await whisper.transcribe(
+                audioPath: fileURL.path,
+                decodeOptions: Self.options(chunked: true)
+            )
+
+            // Lydsamplene hentes bare hvis et stykke faktisk kom tomt tilbake.
+            // De koster minne, og på et vanlig opptak trengs de aldri.
+            var audio: [Float]?
+            var pieces: [String] = []
+
+            for result in results {
+                let text = result.text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+                guard text.isEmpty,
+                      let start = result.segments.first?.start,
+                      let end = result.segments.last?.end,
+                      Double(end - start) >= Self.shortestRetry
+                else {
+                    pieces.append(text)
+                    continue
+                }
+
+                if audio == nil { audio = try? await Self.samples(at: fileURL.path) }
+                guard let audio else { continue }
+                pieces.append(await retry(in: audio, from: Double(start), to: Double(end)))
+            }
+
+            let text = pieces
+                .filter { !$0.isEmpty }
+                .joined(separator: " ")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard !text.isEmpty else { throw TranscriptionError.empty }
+            return text
+        } catch let error as TranscriptionError {
+            throw error
+        } catch {
+            throw TranscriptionError.underlying(error.localizedDescription)
+        }
+    }
+
+    /// Prøver et stykke på nytt ved å dele det i to.
+    ///
+    /// Modellen svarer av og til med bare sluttmerket på et vindu som er fullt
+    /// av tale. Da kommer stykket tomt tilbake, og teksten fikk før et hull
+    /// ingen kunne se – opptaket var like langt, men det siste som ble sagt var
+    /// borte. Ingen innstilling på dekoderen retter det: målt 10. september 2026
+    /// ga både høyere temperatur, `usePrefillPrompt: false` og `suppressBlank`
+    /// nøyaktig samme tomme svar på de samme 15 sekundene.
+    ///
+    /// To halvdeler er noe annet enn ett helt vindu, og det er nok: den samme
+    /// lyden ga full tekst da den ble delt. Vi deler videre så lenge en halvdel
+    /// fortsatt er stum og lang nok til at det kan være tale i den.
+    private func retry(in audio: [Float], from start: Double, to end: Double) async -> String {
+        guard let whisper, end - start >= Self.shortestRetry else { return "" }
+
+        let middle = (start + end) / 2
+        var pieces: [String] = []
+
+        for (from, to) in [(start, middle), (middle, end)] {
+            let first = max(Int(from * Double(WhisperKit.sampleRate)), 0)
+            let last = min(Int(to * Double(WhisperKit.sampleRate)), audio.count)
+            guard first < last else { continue }
+
+            let part = Array(audio[first..<last])
+            let results = try? await whisper.transcribe(
+                audioArray: part,
+                decodeOptions: Self.options(chunked: false)
+            )
+            let text = (results ?? [])
+                .map(\.text)
+                .joined(separator: " ")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
+            pieces.append(text.isEmpty ? await retry(in: audio, from: from, to: to) : text)
+        }
+
+        return pieces.filter { !$0.isEmpty }.joined(separator: " ")
+    }
+
+    /// Kortere enn dette deler vi ikke opp. Et stykke som er stumt og kort er
+    /// stillhet, ikke tale vi har mistet.
+    private static let shortestRetry: Double = 4
+
+    /// Leser lydfilen som samples, unna hovedtråden.
+    ///
+    /// `@concurrent` av samme grunn som i `AudioStorage`: en `nonisolated async`
+    /// funksjon arver aktøren til den som kaller, og her er det hovedaktøren.
+    /// En time med lyd er rundt 57 MB som `Float`, og det arbeidet hører ikke
+    /// hjemme på hovedtråden.
+    @concurrent
+    private nonisolated static func samples(at path: String) async throws -> [Float] {
+        try AudioProcessor.loadAudioAsFloatArray(fromPath: path)
+    }
+
+    private static func options(chunked: Bool) -> DecodingOptions {
+        DecodingOptions(
             // Bokmål, alltid. Aldri utledet fra lyden eller fra enheten.
             language: "no",
             temperature: 0,
@@ -70,23 +167,11 @@ final class WhisperTranscriber: Transcriber {
             // motorstøy i bil, for eksempel – klipper den på 30 sekunder i
             // stedet. Det er nettopp det som gjør at teksten blir komplett, så
             // et opptak uten pauser i taper ingen ting på det.
-            chunkingStrategy: .vad
+            //
+            // Et stykke som prøves på nytt er alt delt opp, og skal ikke deles
+            // en gang til.
+            chunkingStrategy: chunked ? .vad : nil
         )
-
-        do {
-            let results = try await whisper.transcribe(audioPath: fileURL.path, decodeOptions: options)
-            let text = results
-                .map(\.text)
-                .joined(separator: " ")
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-
-            guard !text.isEmpty else { throw TranscriptionError.empty }
-            return text
-        } catch let error as TranscriptionError {
-            throw error
-        } catch {
-            throw TranscriptionError.underlying(error.localizedDescription)
-        }
     }
 
     /// Er modellen faktisk med i denne bygget?
