@@ -8,7 +8,7 @@ struct RecordingListView: View {
     @State private var controller = RecordingController.shared
     @State private var speechModel = SpeechModel()
     @State private var errorMessage: String?
-    @State private var showSettings = false
+    @State private var showAbout = false
 
     var body: some View {
         NavigationStack {
@@ -46,8 +46,8 @@ struct RecordingListView: View {
             } message: {
                 Text(errorMessage ?? "").font(.Frodi.body)
             }
-            .sheet(isPresented: $showSettings) {
-                SettingsView()
+            .sheet(isPresented: $showAbout) {
+                AboutView()
             }
         }
         .task {
@@ -67,7 +67,7 @@ struct RecordingListView: View {
             // Overlegg, ikke en rad: ordmerket skal stå midt på skjermen,
             // ikke midt i plassen som blir igjen ved siden av tannhjulet.
             .overlay(alignment: .trailing) {
-                settingsButton
+                aboutButton
                     .padding(.trailing, Space.s1)
             }
             .overlay(alignment: .bottom) {
@@ -99,18 +99,18 @@ struct RecordingListView: View {
         .accessibilityAddTraits(.isHeader)
     }
 
-    private var settingsButton: some View {
+    private var aboutButton: some View {
         Button {
-            showSettings = true
+            showAbout = true
         } label: {
-            Image(systemName: "gearshape")
+            Image(systemName: "info.circle")
                 .font(.system(size: HeaderButton.icon, weight: .medium))
                 .foregroundStyle(Color.Frodi.textSecondary)
                 .frame(width: HeaderButton.touch, height: HeaderButton.touch)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Innstillinger")
+        .accessibilityLabel("Om appen")
     }
 
     /// Databasen lot seg ikke åpne, så appen kjører på minnet.

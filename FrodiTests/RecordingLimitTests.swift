@@ -7,11 +7,10 @@ import Testing
 /// med av seg selv – ikke bli stående igjen som tall i en setning.
 @Suite("Grensen for opptak")
 struct RecordingLimitTests {
-    @Test("Minutter, ord og tegn regnes ut fra lengden")
+    @Test("Minutter og ord regnes ut fra lengden")
     func derivedFromDuration() {
         #expect(RecordingLimit.minutes == Int(RecordingLimit.duration / 60))
         #expect(RecordingLimit.words == RecordingLimit.minutes * 170)
-        #expect(RecordingLimit.characters == RecordingLimit.words * 6)
     }
 
     @Test("Grensen er lang nok til å være verdt å ha, og kort nok til å gå gjennom")

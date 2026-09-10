@@ -1,12 +1,18 @@
 import AVFoundation
 import SwiftUI
 
-/// Innstillinger og informasjon om appen, åpnet som ark fra tannhjulet i logohodet.
+/// Om appen: hva den gjør, hva den ikke gjør, og hva den bygger på. Åpnes som
+/// ark fra i-en i logohodet.
 ///
 /// Skissen la Om fróði, Personvern og Versjonsinfo i en meny på en startskjerm.
 /// Den startskjermen finnes ikke lenger, så innholdet ligger her. Arket, ikke en
 /// ny side, fordi du skal tilbake til listen der du slapp.
-struct SettingsView: View {
+///
+/// Arket het «Innstillinger» til 10. september 2026, og var feil navn: her
+/// stilles ingen ting inn. Det eneste kortet som gjør noe, sender deg til
+/// Innstillinger i iOS – appens egne valg finnes ikke, fordi appen ikke har
+/// noen. Tittelen sier nå det arket er.
+struct AboutView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
@@ -30,7 +36,7 @@ struct SettingsView: View {
                     .padding(Space.s4)
                 }
             }
-            .navigationTitle("Innstillinger")
+            .navigationTitle("Om")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Color.Frodi.background, for: .navigationBar)
             .toolbar {
@@ -57,8 +63,7 @@ struct SettingsView: View {
         card("Om Fróði røst") {
             paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.")
             paragraph("Trykk på mikrofonen nederst i listen, eller bruk handlingsknappen på siden av enheten. Ett trykk starter opptaket, neste stopper det. Opptaket fortsetter selv om skjermen er av.")
-            paragraph("Et opptak kan vare i inntil \(RecordingLimit.minutes) minutter. Snakker du fort, blir det rundt \(RecordingLimit.formatted(RecordingLimit.words)) ord, eller omtrent \(RecordingLimit.formatted(RecordingLimit.characters)) tegn.")
-            paragraph("Grensen er der fordi språkmodellen bruker mer minne jo lengre opptaket er. Fróði stopper selv når tiden er ute, og feltet nederst teller ned mens du snakker. Du kan ta opp så mange ganger du vil.")
+            paragraph("Et opptak kan vare i inntil \(RecordingLimit.minutes) minutter. Snakker du fort, blir det rundt \(RecordingLimit.formatted(RecordingLimit.words)) ord.")
             paragraph("Navnet er norrønt: Fróði betyr «den kunnskapsrike», og røst er stemme.")
         }
     }

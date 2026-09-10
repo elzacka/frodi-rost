@@ -9,7 +9,7 @@ import Foundation
 /// men transkripsjonen etterpå – og da er teksten tapt uten at noen sa fra.
 ///
 /// Ti minutter er det lengste som er målt helt gjennom. Tallet står her alene,
-/// og alt annet regnes ut fra det: setningen i innstillingene, nedtellingen i
+/// og alt annet regnes ut fra det: setningen i Om-arket, nedtellingen i
 /// opptaksfeltet og stoppen i `AudioRecorder`. Skal grensen endres, er det
 /// denne linjen som endres.
 ///
@@ -27,9 +27,6 @@ enum RecordingLimit {
     /// 1 683 på 10. Det er fort snakket, og tallet er derfor et tak og ikke et
     /// anslag. Sier du mindre i minuttet, får du mindre tekst.
     static var words: Int { minutes * 170 }
-
-    /// Et norsk ord er i snitt rundt fem tegn, pluss mellomrommet etter.
-    static var characters: Int { words * 6 }
 
     /// Tall skrevet på norsk, med hardt mellomrom som tusenskille.
     ///
