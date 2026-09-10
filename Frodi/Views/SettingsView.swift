@@ -57,6 +57,8 @@ struct SettingsView: View {
         card("Om Fróði røst") {
             paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.")
             paragraph("Trykk på mikrofonen nederst i listen, eller bruk handlingsknappen på siden av enheten. Ett trykk starter opptaket, neste stopper det. Opptaket fortsetter selv om skjermen er av.")
+            paragraph("Et opptak kan vare i inntil \(RecordingLimit.minutes) minutter. Snakker du fort, blir det rundt \(RecordingLimit.formatted(RecordingLimit.words)) ord, eller omtrent \(RecordingLimit.formatted(RecordingLimit.characters)) tegn.")
+            paragraph("Grensen er der fordi språkmodellen bruker mer minne jo lengre opptaket er. Fróði stopper selv når tiden er ute, og feltet nederst teller ned mens du snakker. Du kan ta opp så mange ganger du vil.")
             paragraph("Navnet er norrønt: Fróði betyr «den kunnskapsrike», og røst er stemme.")
         }
     }

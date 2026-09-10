@@ -7,18 +7,19 @@ struct RecorderBar: View {
 
     var body: some View {
         VStack(spacing: Space.s3) {
-            // Timeren står ved siden av knappen, ikke over den. Over knappen ble
-            // feltet så høyt at listen med opptak forsvant bak det.
+            // Tallene står ved siden av knappen, ikke over den. Over knappen
+            // ble feltet så høyt at listen med opptak forsvant bak det.
+            //
+            // Begge sidene tar like mye plass, så knappen står midt på skjermen
+            // uansett hvor brede tallene er.
             HStack(spacing: Space.s4) {
                 timer
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 recordButton
 
-                // Speiler timeren, slik at knappen står midt på skjermen.
-                timer
+                remaining
                     .frame(maxWidth: .infinity, alignment: .trailing)
-                    .hidden()
             }
 
             if case .denied = recorder.state {
@@ -49,7 +50,37 @@ struct RecorderBar: View {
             .minimumScaleFactor(0.7)
             .foregroundStyle(Color.Frodi.textPrimary)
             .contentTransition(.numericText())
+            .accessibilityLabel("Tid gått")
+            .accessibilityValue(spoken(recorder.duration))
             .accessibilityHidden(!recorder.isRecording)
+    }
+
+    /// Hva som er igjen av grensen, og hva grensen er før du har begynt.
+    ///
+    /// Den står til høyre for knappen, der speilingen av timeren sto før.
+    /// Plassen var alt satt av, og to tall på hver sin side av knappen leses
+    /// som det de er: det som har gått, og det som står igjen.
+    ///
+    /// Minustegnet er det samme som avspilleren bruker om gjenværende tid, og
+    /// er det som skiller de to tallene fra hverandre uten en etikett.
+    private var remaining: some View {
+        Group {
+            if recorder.isRecording {
+                Text(verbatim: "−" + clock(recorder.remaining))
+                    .font(.Frodi.bodyMedium)
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+                    .accessibilityLabel("Tid igjen av opptaket")
+                    .accessibilityValue(spoken(recorder.remaining))
+            } else {
+                Text("inntil \(RecordingLimit.minutes) min")
+                    .font(.Frodi.caption)
+                    .accessibilityLabel("Et opptak kan vare i inntil \(RecordingLimit.minutes) minutter")
+            }
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+        .foregroundStyle(Color.Frodi.textSecondary)
     }
 
     private var recordButton: some View {
@@ -74,7 +105,17 @@ struct RecorderBar: View {
     }
 
     private var elapsed: String {
-        Duration.seconds(recorder.duration).formatted(.time(pattern: .minuteSecond))
+        clock(recorder.duration)
+    }
+
+    private func clock(_ seconds: TimeInterval) -> String {
+        Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond))
+    }
+
+    /// «2 minutter, 5 sekunder» – tallet skrevet ut, slik avspilleren gjør det.
+    private func spoken(_ seconds: TimeInterval) -> String {
+        let units = Duration.UnitsFormatStyle(allowedUnits: [.minutes, .seconds], width: .wide)
+        return Duration.seconds(seconds).formatted(units)
     }
 
     private var ringColor: Color {

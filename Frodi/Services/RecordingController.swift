@@ -19,7 +19,11 @@ final class RecordingController {
 
     private var container: ModelContainer?
 
-    private init() {}
+    private init() {
+        // Opptakeren teller selv, og sier fra når grensen er nådd. Lagringen
+        // er den samme som når du trykker stopp.
+        recorder.onLimitReached = { [weak self] in self?.stopAndSave() }
+    }
 
     var isRecording: Bool { recorder.isRecording }
 

@@ -19,6 +19,17 @@ final class AudioRecorder {
 
     var isRecording: Bool { state == .recording }
 
+    /// Hvor mye av grensen som står igjen. Nedtellingen i opptaksfeltet leser
+    /// denne, slik at brukeren ser slutten komme i stedet for å bli tatt av den.
+    var remaining: TimeInterval { max(RecordingLimit.duration - duration, 0) }
+
+    /// Kalles når opptaket har nådd grensen og må lagres.
+    ///
+    /// Opptakeren lagrer ikke selv – det gjør `RecordingController`, og bare
+    /// den vet om databasen. Derfor en lukking hit i stedet for at opptakeren
+    /// får vite om lagringen.
+    var onLimitReached: (() -> Void)?
+
     /// Starter opptak. Returnerer false hvis mikrofonen ikke er tilgjengelig.
     @discardableResult
     func start() async -> Bool {
@@ -107,6 +118,19 @@ final class AudioRecorder {
                 try? await Task.sleep(for: .milliseconds(200))
                 guard let self, let recorder = self.recorder else { return }
                 self.duration = recorder.currentTime
+
+                // Opptaket stopper seg selv på grensen. Nedtellingen har vist
+                // den komme, så dette er ingen overraskelse.
+                //
+                // Stoppen må skje her, mens opptaket fortsatt går: `stop()`
+                // leser lengden av `recorder.currentTime`, og den er null så
+                // snart opptaket er stanset. Lot vi i stedet AVAudioRecorder
+                // stoppe selv med `record(forDuration:)`, ville lengden blitt
+                // null, og opptaket kastet som for kort.
+                if self.duration >= RecordingLimit.duration {
+                    self.onLimitReached?()
+                    return
+                }
             }
         }
     }
