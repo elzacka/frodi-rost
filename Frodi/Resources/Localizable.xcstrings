@@ -1,18 +1,58 @@
 {
-  "sourceLanguage": "nb",
-  "strings": {
-    "fróði": {},
-    "Fróði får ikke åpnet databasen på enheten. Du kan ta opp og hente ut som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette det.": {},
-    "Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger.": {},
-    "Ingen opptak ennå": {},
-    "iOS har ingen norsk språkmodell for tale til tekst på denne enheten. Opptakene dine lagres som vanlig, men uten tekst.": {},
-    "Laster ned språkmodellen …": {},
-    "Norsk tale til tekst mangler": {},
-    "Opptakene lagres ikke": {},
-    "røst": {},
-    "Teksten er skjult mens skjermen tas opp.": {},
-    "Transkriberer …": {},
-    "Trykk på mikrofonen, eller bruk handlingsknappen når du er på farten.": {}
+  "sourceLanguage" : "nb",
+  "strings" : {
+    "%@ · %@" : {
+      "localizations" : {
+        "nb" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "fróði" : {
+
+    },
+    "Fróði får ikke åpnet databasen på enheten. Du kan ta opp og hente ut som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette feilen." : {
+
+    },
+    "Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger." : {
+
+    },
+    "Ingen opptak ennå" : {
+
+    },
+    "iOS har ingen norsk språkmodell for tale til tekst på denne enheten. Opptakene dine lagres som vanlig, men uten tekst." : {
+
+    },
+    "Laster ned språkmodellen …" : {
+
+    },
+    "Lisensene under krever at opphavet oppgis. Dette er den attribusjonen." : {
+
+    },
+    "Norsk tale til tekst mangler" : {
+
+    },
+    "Opptakene lagres ikke" : {
+
+    },
+    "røst" : {
+
+    },
+    "Tekst" : {
+
+    },
+    "Teksten er skjult mens skjermen tas opp." : {
+
+    },
+    "Transkriberer …" : {
+
+    },
+    "Trykk på mikrofonen, eller bruk handlingsknappen når du er på farten." : {
+
+    }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

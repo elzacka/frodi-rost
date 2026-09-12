@@ -62,16 +62,16 @@ struct AboutView: View {
     private var about: some View {
         card("Om Fróði røst") {
             paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.")
-            paragraph("Trykk på mikrofonen nederst i listen, eller bruk handlingsknappen på siden av enheten. Ett trykk starter opptaket, neste stopper det. Opptaket fortsetter selv om skjermen er av.")
+            paragraph("Trykk på mikrofonen nederst i listen, eller bruk den fysiske handlingsknappen på venstre side. Opptaket fortsetter selv om skjermen er av.")
             paragraph("Et opptak kan vare i inntil \(RecordingLimit.minutes) minutter. Snakker du fort, blir det rundt \(RecordingLimit.formatted(RecordingLimit.words)) ord.")
-            paragraph("Navnet er norrønt: Fróði betyr «den kunnskapsrike», og røst er stemme.")
+            paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
         }
     }
 
     private var privacy: some View {
         card("Personvern") {
-            paragraph("Fróði sender ingenting og henter ingenting. Verken opptaket eller teksten forlater enheten.")
-            paragraph("Opptak og tekst krypteres med en nøkkel som lages i enheten og aldri forlater den. Ingen annen enhet kan lese dem, og de følger ikke med i en sikkerhetskopi.")
+            paragraph("Alt skjer på enheten. Ingen datatrafikk ut eller inn.")
+            paragraph("Opptak og tekst krypteres med en nøkkel som lages i enheten. Ingen annen enhet kan lese dem, og de følger ikke med i en sikkerhetskopi.")
             paragraph("Skal du bytte enhet, må du hente ut opptakene først. Sletter du appen, forsvinner alt med én gang.")
         }
     }
