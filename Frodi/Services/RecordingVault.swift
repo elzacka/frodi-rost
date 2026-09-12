@@ -1,6 +1,7 @@
 import CryptoKit
 import Foundation
 import Security
+import os
 
 /// Encrypts recordings with a key that never leaves this device.
 ///
@@ -24,9 +25,20 @@ enum RecordingVault {
     // It is private and shown nowhere.
     private static let keyTag = "no.Tazk.Frodi.vault.v1".data(using: .utf8)!
 
+    /// The public half of the Enclave key, as X9.63 bytes, once it has been read.
+    ///
+    /// Sealing needs only the public key, and the public key is not secret. The
+    /// private key, by contrast, is `WhenUnlocked`: the keychain refuses to hand it
+    /// out while the screen is locked. A transcription can outlast the screen, and
+    /// its text is sealed the moment it finishes, so the seal must not depend on
+    /// the lock state. It does not: every path that seals has opened something
+    /// first in the same process, and that is when the public key is kept.
+    private static let publicKeyBytes = OSAllocatedUnfairLock<Data?>(initialState: nil)
+
     enum VaultError: LocalizedError {
         case enclaveUnavailable
         case keyCreationFailed(String)
+        case keyUnavailable(OSStatus)
         case decryptionFailed
 
         var errorDescription: String? {
@@ -35,6 +47,8 @@ enum RecordingVault {
                 String(localized: "Denne enheten har ingen Secure Enclave.")
             case .keyCreationFailed(let message):
                 message
+            case .keyUnavailable:
+                String(localized: "Fróði får ikke tak i nøkkelen. Lås opp enheten og prøv igjen.")
             case .decryptionFailed:
                 String(localized: "Fróði får ikke låst opp opptaket. Det ble kryptert på en annen enhet.")
             }
@@ -90,10 +104,7 @@ enum RecordingVault {
 
     // MARK: - Key in the Secure Enclave
     private static func wrap(_ key: SymmetricKey) throws -> Data {
-        let privateKey = try enclaveKey()
-        guard let publicKey = SecKeyCopyPublicKey(privateKey) else {
-            throw VaultError.keyCreationFailed("Fant ingen offentlig nøkkel.")
-        }
+        let publicKey = try self.publicKey()
         let raw = key.withUnsafeBytes { Data($0) }
         var error: Unmanaged<CFError>?
         guard let wrapped = SecKeyCreateEncryptedData(
@@ -115,13 +126,45 @@ enum RecordingVault {
         return SymmetricKey(data: raw as Data)
     }
 
+    /// The public key: from memory if it has been seen in this process, otherwise
+    /// derived from the private key, which needs the device to be unlocked.
+    private static func publicKey() throws -> SecKey {
+        if let bytes = publicKeyBytes.withLock({ $0 }) {
+            var error: Unmanaged<CFError>?
+            let attributes: [String: Any] = [
+                kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom,
+                kSecAttrKeyClass as String: kSecAttrKeyClassPublic
+            ]
+            guard let key = SecKeyCreateWithData(bytes as CFData, attributes as CFDictionary, &error) else {
+                throw VaultError.keyCreationFailed(describe(error))
+            }
+            return key
+        }
+
+        guard let key = SecKeyCopyPublicKey(try enclaveKey()) else {
+            throw VaultError.keyCreationFailed("Fant ingen offentlig nøkkel.")
+        }
+        var error: Unmanaged<CFError>?
+        guard let bytes = SecKeyCopyExternalRepresentation(key, &error) else {
+            throw VaultError.keyCreationFailed(describe(error))
+        }
+        let data = bytes as Data
+        publicKeyBytes.withLock { $0 = data }
+        return key
+    }
+
     /// Fetches the key, or creates it the first time.
+    ///
+    /// Only a key that does not exist is created. Any other refusal from the
+    /// keychain, such as the device being locked, is an error: creating a second
+    /// key under the same tag would leave everything sealed under the first one
+    /// unreadable for good.
     private static func enclaveKey() throws -> SecKey {
-        if let existing = loadKey() { return existing }
+        if let existing = try loadKey() { return existing }
         return try createKey()
     }
 
-    private static func loadKey() -> SecKey? {
+    private static func loadKey() throws -> SecKey? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassKey,
             kSecAttrApplicationTag as String: keyTag,
@@ -129,19 +172,29 @@ enum RecordingVault {
             kSecReturnRef as String: true
         ]
         var item: CFTypeRef?
-        guard SecItemCopyMatching(query as CFDictionary, &item) == errSecSuccess else { return nil }
-        guard let result = item else { return nil }
-        return (result as! SecKey)
+        switch SecItemCopyMatching(query as CFDictionary, &item) {
+        case errSecSuccess:
+            guard let result = item else { return nil }
+            return (result as! SecKey)
+        case errSecItemNotFound:
+            return nil
+        case let status:
+            throw VaultError.keyUnavailable(status)
+        }
     }
 
     private static func createKey() throws -> SecKey {
-        // afterFirstUnlockThisDeviceOnly, not whenUnlocked: the recording can be
-        // stopped with the Action Button while the screen is locked, and the key has to
-        // be available then. ThisDeviceOnly keeps it out of backups.
+        // whenUnlockedThisDeviceOnly: the private key is used only to open, and
+        // every path that opens runs on an unlocked device, because the audio it
+        // starts from is `.complete`. Sealing needs only the public key, which is
+        // kept in memory once seen, so a seal does not need the keychain at all.
+        // Until 13 September 2026 this was afterFirstUnlock, which let the key be
+        // used on a locked device that had been unlocked once since boot. That is
+        // the state a seized device is in. ThisDeviceOnly keeps it out of backups.
         var accessError: Unmanaged<CFError>?
         guard let access = SecAccessControlCreateWithFlags(
             nil,
-            kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+            kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
             .privateKeyUsage,
             &accessError
         ) else {
