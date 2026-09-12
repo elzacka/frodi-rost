@@ -11,17 +11,25 @@ import SwiftUI
 /// API, and it lasts over time. While it is on, a recording running in the
 /// background can capture the text without you thinking about it. So we hide
 /// it instead.
+///
+/// The app switcher is the third case. When the app leaves the foreground, iOS
+/// photographs the screen for the switcher and keeps the picture in the app's
+/// container, where nothing of ours encrypts it. So the text is also hidden
+/// whenever the scene is not active, which is before that picture is taken.
 struct CaptureGuard: ViewModifier {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var isCaptured = false
+
+    private var isHidden: Bool { isCaptured || scenePhase != .active }
 
     func body(content: Content) -> some View {
         Group {
-            if isCaptured {
+            if isHidden {
                 VStack(spacing: Space.s3) {
                     IconView(.hidden, size: IconSize.notice)
                         .foregroundStyle(Color.Frodi.textSecondary)
 
-                    Text("Teksten er skjult mens skjermen tas opp.")
+                    Text(isCaptured ? "Teksten er skjult mens skjermen tas opp." : "Teksten er skjult.")
                         .font(.Frodi.caption)
                         .foregroundStyle(Color.Frodi.textSecondary)
                         .multilineTextAlignment(.center)
