@@ -245,12 +245,6 @@ struct LicensesView: View {
 
             ScrollView {
                 VStack(spacing: Space.s4) {
-                    Text("Lisensene under krever at opphavet oppgis. Dette er den attribusjonen.")
-                        .font(.Frodi.caption)
-                        .foregroundStyle(Color.Frodi.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
                     group("Modell", model)
                     group("Kode", code)
                     group("Ikoner", icons)
