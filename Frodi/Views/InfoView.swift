@@ -28,7 +28,6 @@ struct InfoView: View {
                     VStack(spacing: Space.s4) {
                         about
                         privacy
-                        microphoneAccess
                         speechModel
                         licenses
                         version
@@ -61,17 +60,18 @@ struct InfoView: View {
 
     private var about: some View {
         card("Fróði røst") {
+            paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
             paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.")
             paragraph("Trykk på opptaksknappen nederst, eller hold inne handlingsknappen på venstre side. Hold inne én gang for å starte, én gang til for å stoppe.")
             paragraph("Før du kan bruke handlingsknappen, må du sette den opp: Gå til Innstillinger > Handlingsknapp, sveip til Snarvei, trykk på «Velg en snarvei» og velg «Start eller stopp opptak» under Fróði røst.")
             paragraph("Et opptak kan vare i inntil \(RecordingLimit.minutes) minutter. Snakker du fort, blir det rundt \(RecordingLimit.formatted(RecordingLimit.words)) ord.")
-            paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
         }
     }
 
     private var privacy: some View {
         card("Personvern") {
             paragraph("Alt skjer på enheten. Ingen datatrafikk ut eller inn.")
+            microphoneAccess
             paragraph("Opptak og tekst krypteres med en nøkkel som lages i enheten (Secure Enclave). Ingen annen enhet kan lese dem, og de følger ikke med i en sikkerhetskopi.")
             paragraph("Skal du bytte enhet, må du hente ut opptakene først. Sletter du appen, forsvinner alt med én gang.")
             link("Mer om personvern", to: Self.privacyPolicy)
@@ -79,19 +79,20 @@ struct InfoView: View {
         }
     }
 
+    /// Mikrofonen er den eneste tilgangen appen ber om, så den hører hjemme under
+    /// Personvern. Leses på nytt hver gang appen blir aktiv.
+    @ViewBuilder
     private var microphoneAccess: some View {
-        card("Mikrofon") {
-            switch microphone {
-            case .granted:
-                paragraph("Fróði har tilgang til mikrofonen. Det er den eneste tilgangen appen ber om.")
-            case .denied:
-                paragraph("Fróði har ikke tilgang til mikrofonen og kan ikke ta opp. Du gir tilgang i Innstillinger på enheten.")
-                pillButton("Åpne Innstillinger") {
-                    if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
-                }
-            default:
-                paragraph("Fróði spør om tilgang til mikrofonen første gang du tar opp. Det er den eneste tilgangen appen ber om.")
+        switch microphone {
+        case .granted:
+            paragraph("Fróði har tilgang til mikrofonen. Det er den eneste tilgangen appen ber om.")
+        case .denied:
+            paragraph("Fróði har ikke tilgang til mikrofonen og kan ikke ta opp. Du gir tilgang i Innstillinger på enheten.")
+            pillButton("Åpne Innstillinger") {
+                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
             }
+        default:
+            paragraph("Fróði spør om tilgang til mikrofonen første gang du tar opp. Det er den eneste tilgangen appen ber om.")
         }
     }
 
