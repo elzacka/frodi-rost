@@ -146,7 +146,7 @@ struct RecordingListView: View {
                 .font(.Frodi.title)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            Text("Trykk på mikrofonen, eller bruk handlingsknappen når du er på farten.")
+            Text("Trykk på opptaksknappen, eller hold inne handlingsknappen på venstre side. Trykk på Info-knappen for veiledning.")
                 .font(.Frodi.caption)
                 .foregroundStyle(Color.Frodi.textSecondary)
                 .multilineTextAlignment(.center)

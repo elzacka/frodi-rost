@@ -1,7 +1,8 @@
 import AppIntents
 import AVFoundation
 
-/// Intenten handlingsknappen kjører. Ett trykk starter, neste trykk stopper.
+/// Intenten handlingsknappen kjører. Knappen holdes inne, ikke trykkes: første
+/// hold starter, neste stopper.
 ///
 /// `supportedModes` lar den kjøre i bakgrunnen. Både start og stopp forsøkes
 /// der først, fordi å åpne appen er det som tvinger fram Face ID eller kode
