@@ -16,9 +16,9 @@ og er en kunnskapsassistent som svarer på det du spør om.
 
 ## Modell
 
-**nb-whisper-small** fra Nasjonalbiblioteket gjør tale om til tekst. Modellen
+**nb-whisper-small** fra Nasjonalbiblioteket (NB) gjør tale om til tekst. Modellen
 bygger på OpenAIs Whisper og er videretrent på 66 000 timer norsk tale fra
-Språkbanken og bibliotekets egen samling. Derfor setter den tegn og store
+Språkbanken og NBs egen samling. Derfor setter den tegn og store
 bokstaver selv, og skriver dialekt om til bokmål.
 
 Modellen følger med appen og kjører på enheten. Den koster ingenting å
