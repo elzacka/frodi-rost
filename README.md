@@ -2,6 +2,11 @@
 
 Tar opp lyd på iPhone og gjør den om til norsk tekst. Alt skjer på enheten.
 
+«Fróði» er norrønt for «den kunnskapsrike». «Røst» er stemme.
+
+Fróði er en serie med to apper. Den andre heter [«Fróði vit»](https://github.com/elzacka/frodi-vit)
+og er en kunnskapsassistent som svarer på det du spør om.
+
 ## Hva appen gjør
 
 - Tar opp lyd, også når skjermen er av
