@@ -12,7 +12,7 @@ import SwiftUI
 /// stilles ingen ting inn. Det eneste kortet som gjør noe, sender deg til
 /// Innstillinger i iOS – appens egne valg finnes ikke, fordi appen ikke har
 /// noen. Tittelen sier nå det arket er.
-struct InfoView: View {
+struct AboutView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
@@ -71,8 +71,10 @@ struct InfoView: View {
     private var privacy: some View {
         card("Personvern") {
             paragraph("Alt skjer på enheten. Ingen datatrafikk ut eller inn.")
-            paragraph("Opptak og tekst krypteres med en nøkkel som lages i enheten. Ingen annen enhet kan lese dem, og de følger ikke med i en sikkerhetskopi.")
+            paragraph("Opptak og tekst krypteres med en nøkkel som lages i enheten (Secure Enclave). Ingen annen enhet kan lese dem, og de følger ikke med i en sikkerhetskopi.")
             paragraph("Skal du bytte enhet, må du hente ut opptakene først. Sletter du appen, forsvinner alt med én gang.")
+            link("Mer om personvern", to: Self.privacyPolicy)
+            link("Mer om sikkerhet", to: Self.securityPolicy)
         }
     }
 
@@ -124,6 +126,11 @@ struct InfoView: View {
         }
     }
 
+    // Lenkene åpner i Safari. Appen henter ingenting selv; det er nettleseren
+    // som går på nett, og bare når du trykker.
+    private static let privacyPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/PERSONVERN.md")!
+    private static let securityPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/SECURITY.md")!
+
     private static var versionNumber: String {
         let info = Bundle.main.infoDictionary
         let marketing = info?["CFBundleShortVersionString"] as? String ?? "–"
@@ -169,6 +176,16 @@ struct InfoView: View {
             .font(.Frodi.caption)
             .foregroundStyle(Color.Frodi.textSecondary)
             .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Lenke ut av appen, i samme størrelse som brødteksten. Understreket og i
+    /// text-primary, så den skiller seg fra teksten rundt på mer enn farge.
+    private func link(_ title: String, to url: URL) -> some View {
+        Link(title, destination: url)
+            .font(.Frodi.caption)
+            .underline()
+            .tint(Color.Frodi.textPrimary)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 

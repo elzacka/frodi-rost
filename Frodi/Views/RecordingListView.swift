@@ -47,7 +47,7 @@ struct RecordingListView: View {
                 Text(errorMessage ?? "").font(.Frodi.body)
             }
             .sheet(isPresented: $showAbout) {
-                InfoView()
+                AboutView()
             }
         }
         .task {
