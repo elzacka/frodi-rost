@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Forteller ærlig hva som mangler før tale til tekst virker, og lar deg fikse det.
+/// Says honestly what is missing before speech to text works, and lets you fix it.
 struct SpeechModelBanner: View {
     let model: SpeechModel
 

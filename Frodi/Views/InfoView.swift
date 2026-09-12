@@ -1,17 +1,17 @@
 import AVFoundation
 import SwiftUI
 
-/// Info-siden: hva appen gjør, hva den ikke gjør, og hva den bygger på. Åpnes som
-/// ark fra i-en i logohodet.
+/// The Info page: what the app does, what it does not do, and what it builds on.
+/// Opens as a sheet from the i in the logo header.
 ///
-/// Skissen la Om fróði, Personvern og Versjonsinfo i en meny på en startskjerm.
-/// Den startskjermen finnes ikke lenger, så innholdet ligger her. Arket, ikke en
-/// ny side, fordi du skal tilbake til listen der du slapp.
+/// The sketch put Om fróði, Personvern and Versjonsinfo in a menu on a start
+/// screen. That start screen no longer exists, so the content lives here. A sheet,
+/// not a new page, because you should return to the list where you left it.
 ///
-/// Arket het «Innstillinger» til 10. september 2026, og var feil navn: her
-/// stilles ingen ting inn. Det eneste kortet som gjør noe, sender deg til
-/// Innstillinger i iOS – appens egne valg finnes ikke, fordi appen ikke har
-/// noen. Tittelen sier nå det arket er.
+/// The sheet was called «Innstillinger» until 10 September 2026, and that was the
+/// wrong name: nothing here is set. The one paragraph that does anything sends you
+/// to Settings in iOS; the app has no options of its own. The title now says what
+/// the page is.
 struct InfoView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -40,24 +40,22 @@ struct InfoView: View {
             .toolbarBackground(Color.Frodi.background, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    // Kryss, ikke «Ferdig»: her er det ingenting å bekrefte,
-                    // arket bare lukkes. Ikonet har heller ingen skrift, så
-                    // spørsmålet om Inter ved siden av systemtittelen faller
-                    // bort. VoiceOver trenger navnet knappen ikke skriver.
+                    // A cross, not «Ferdig»: there is nothing to confirm here, the sheet just
+                    // closes. The icon also carries no type, so the question of Inter beside the
+                    // system title goes away. VoiceOver needs the name the button does not write.
                     Button { dismiss() } label: { IconView(.close, size: IconSize.toolbar) }
                         .accessibilityLabel("Lukk")
                 }
             }
         }
-        // Går du til Innstillinger for å gi tilgang til mikrofonen, skal kortet
-        // si det riktige når du kommer tilbake.
+        // If you go to Settings to grant microphone access, the card should say the
+        // right thing when you come back.
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { microphone = AVAudioApplication.shared.recordPermission }
         }
     }
 
-    // MARK: - Kort
-
+    // MARK: - Cards
     private var about: some View {
         card("Fróði røst") {
             paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
@@ -79,8 +77,8 @@ struct InfoView: View {
         }
     }
 
-    /// Mikrofonen er den eneste tilgangen appen ber om, så den hører hjemme under
-    /// Personvern. Leses på nytt hver gang appen blir aktiv.
+    /// The microphone is the only permission the app asks for, so it belongs under
+    /// Personvern. Re-read every time the app becomes active.
     @ViewBuilder
     private var microphoneAccess: some View {
         switch microphone {
@@ -128,8 +126,8 @@ struct InfoView: View {
         }
     }
 
-    // Lenkene åpner i Safari. Appen henter ingenting selv; det er nettleseren
-    // som går på nett, og bare når du trykker.
+    // The links open in Safari. The app fetches nothing itself; it is the browser
+    // that goes online, and only when you tap.
     private static let privacyPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/PERSONVERN.md")!
     private static let securityPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/SECURITY.md")!
 
@@ -140,10 +138,9 @@ struct InfoView: View {
         return "\(marketing) (\(build))"
     }
 
-    // MARK: - Byggeklosser
-
-    /// Innstillingskortet fra designsystemet: eyebrow-etikett i versaler over
-    /// brødtekst i caption, på surface med 1px kant.
+    // MARK: - Building blocks
+    /// The settings card from the design system: eyebrow label in capitals over
+    /// body text in caption, on surface with a 1 px border.
     @ViewBuilder
     private func card(_ label: String, opensScreen: Bool = false, @ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: Space.s3) {
@@ -181,8 +178,8 @@ struct InfoView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// Lenke ut av appen, i samme størrelse som brødteksten. Understreket og i
-    /// text-primary, så den skiller seg fra teksten rundt på mer enn farge.
+    /// A link out of the app, at the same size as the body text. Underlined and in
+    /// text-primary, so it differs from the text around it by more than colour.
     private func link(_ title: String, to url: URL) -> some View {
         Link(title, destination: url)
             .font(.Frodi.caption)
@@ -201,9 +198,9 @@ struct InfoView: View {
     }
 }
 
-/// Attribusjonen Apache 2.0 krever, i appen og ikke bare i repoet.
+/// The attribution Apache 2.0 requires, in the app and not only in the repo.
 ///
-/// Samme innhold som TREDJEPART.md. Endres den ene, endres den andre.
+/// Same content as TREDJEPART.md. Change one, change the other.
 struct LicensesView: View {
     private struct Component: Identifiable {
         let name: String

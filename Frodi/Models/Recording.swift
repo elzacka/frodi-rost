@@ -6,29 +6,30 @@ final class Recording {
     var createdAt: Date = Date()
     var duration: TimeInterval = 0
 
-    /// Bare filnavnet, aldri hele stien. Sandkassen til appen får ny sti ved
-    /// oppdatering og reinstallasjon, så en lagret absolutt sti peker på ingenting
-    /// etter neste versjon.
+    /// Only the file name, never the full path. The app's sandbox gets a new path on
+    /// update and reinstall, so a stored absolute path points at nothing after the
+    /// next version.
     var fileName: String = ""
 
-    /// Teksten forsegles på samme måte som lyden.
+    /// The text is sealed the same way as the audio.
     ///
-    /// En transkripsjon er ofte mer eksponerende enn lydfilen. Den er søkbar,
-    /// lesbar på et blikk, og kan kopieres uten å spilles av. Å beskytte lyden
-    /// og la teksten ligge i klartekst ville vært å låse døren og la vinduet stå.
+    /// A transcript is often more exposing than the audio file. It is searchable,
+    /// readable at a glance, and can be copied without being played. Protecting the
+    /// audio and leaving the text in the clear would be locking the door and leaving
+    /// the window open.
     var sealedTranscript: Data?
 
     var transcriptionFailed: Bool = false
 
-    /// Settes ved start og nullstilles ved slutt av `Transcription.run`, som
-    /// er det eneste stedet som lagrer mens flagget er sant. Krasjer appen
-    /// midt i et forsøk uten at noe annet har lagret i mellomtiden, leser
-    /// neste oppstart flagget som `false` fra disk, og `transcribePending()`
-    /// tar opptaket på nytt uten at det står fast som «transkriberer».
+    /// Set at the start and cleared at the end of `Transcription.run`, which is the
+    /// only place that saves while the flag is true. If the app crashes in the middle
+    /// of an attempt without anything else having saved in between, the next launch
+    /// reads the flag as `false` from disk, and `transcribePending()` picks the
+    /// recording up again without it being stuck as «transkriberer».
     var isTranscribing: Bool = false
 
-    /// Hvorfor teksten mangler. Uten denne sier appen «fant ingen tale» også når
-    /// årsaken er at språkmodellen ikke finnes, og det er en usann beskjed.
+    /// Why the text is missing. Without this the app says «fant ingen tale» even when
+    /// the reason is that the speech model does not exist, and that is a false message.
     var failureCode: String?
 
     init(createdAt: Date = Date(), duration: TimeInterval, fileName: String) {
@@ -43,7 +44,7 @@ final class Recording {
 
     var hasTranscript: Bool { sealedTranscript != nil }
 
-    /// Låser opp teksten. Kalles bare når den faktisk skal vises eller hentes ut.
+    /// Unlocks the text. Called only when it is actually going to be shown or exported.
     func transcript() throws -> String? {
         guard let sealedTranscript else { return nil }
         return try RecordingVault.openText(sealedTranscript)

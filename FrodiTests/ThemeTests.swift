@@ -4,8 +4,8 @@ import UIKit
 
 @Suite("Designsystem")
 struct ThemeTests {
-    /// En font som ikke blir registrert faller stille tilbake til systemfonten.
-    /// Da ser appen nesten riktig ut, og feilen oppdages aldri.
+    /// A font that is not registered silently falls back to the system font. The
+    /// app then looks almost right, and the fault is never noticed.
     @Test("Alle bundlede fonter lar seg laste", arguments: [
         "Inter-Regular", "Inter-Medium", "Inter-SemiBold", "Skranji-Bold"
     ])
@@ -21,7 +21,7 @@ struct ThemeTests {
         #expect(UIColor(named: name) != nil, "Fant ikke fargen \(name)")
     }
 
-    /// accent-knowledge er reservert til kunnskapsdelen og skal ikke være i bruk ennå.
+    /// accent-knowledge is reserved for the knowledge feature and must not be in use yet.
     @Test("Reservert aksentfarge er ikke tatt i bruk")
     func reservedAccentIsAbsent() {
         #expect(UIColor(named: "AccentKnowledge") == nil)

@@ -3,27 +3,27 @@ import SwiftData
 import Testing
 @testable import Frodi
 
-/// Appens løfte er at ingenting forlater enheten. Disse testene vokter det
-/// løftet i koden, ikke i dokumentasjonen.
+/// The app's promise is that nothing leaves the device. These tests guard that
+/// promise in the code, not in the documentation.
 @Suite("Isolasjon")
 struct IsolationTests {
-    /// Ingen nettverksnøkler i Info.plist betyr ingen unntak fra ATS, og
-    /// ingen bakgrunnsmodus som kan brukes til å hente eller sende data.
+    /// No network keys in Info.plist means no ATS exceptions, and no background
+    /// mode that could be used to fetch or send data.
     @Test("Ingen unntak fra transportsikkerhet")
     func noAppTransportSecurityExceptions() {
         let ats = Bundle.main.object(forInfoDictionaryKey: "NSAppTransportSecurity")
         #expect(ats == nil, "NSAppTransportSecurity er lagt inn – appen skal ikke snakke med nett i det hele tatt")
     }
 
-    /// `audio` er den eneste bakgrunnsmodusen appen skal ha. `fetch` eller
-    /// `processing` ville åpnet for arbeid som kan nå nettet.
+    /// `audio` is the only background mode the app should have. `fetch` or
+    /// `processing` would open the door to work that can reach the network.
     @Test("Bare lyd kjører i bakgrunnen")
     func onlyAudioRunsInBackground() {
         let modes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") as? [String] ?? []
         #expect(modes == ["audio"], "Uventede bakgrunnsmoduser: \(modes)")
     }
 
-    /// Personvernmanifestet skal si at appen ikke samler inn noe og ikke sporer.
+    /// The privacy manifest must say the app collects nothing and does not track.
     @Test("Personvernmanifestet erklærer ingen innsamling")
     func privacyManifestDeclaresNothing() throws {
         let url = try #require(Bundle.main.url(forResource: "PrivacyInfo", withExtension: "xcprivacy"))
@@ -36,7 +36,7 @@ struct IsolationTests {
         #expect((plist["NSPrivacyTrackingDomains"] as? [Any])?.isEmpty == true)
     }
 
-    /// Opptaksmappen skal ikke havne i iCloud-sikkerhetskopien.
+    /// The recordings folder must not end up in the iCloud backup.
     @Test("Opptaksmappen er holdt utenfor sikkerhetskopi")
     func recordingsAreExcludedFromBackup() throws {
         let dir = AudioStorage.directory
@@ -44,8 +44,7 @@ struct IsolationTests {
         #expect(values.isExcludedFromBackup == true)
     }
 
-    /// Databasen skal heller ikke. Innholdet er forseglet, men datoer og
-    /// lengder er ikke det.
+    /// Nor must the database. Its content is sealed, but dates and lengths are not.
     @Test("Databasen er holdt utenfor sikkerhetskopi")
     func storeIsExcludedFromBackup() throws {
         let url = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString + ".store")

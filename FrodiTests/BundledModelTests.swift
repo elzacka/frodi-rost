@@ -2,9 +2,9 @@ import Foundation
 import Testing
 @testable import Frodi
 
-/// Modellen ligger som mappereferanse. Flates den ut, kolliderer de to
-/// config.json-filene, og WhisperKit finner ikke tokenizeren. Disse testene
-/// fanger nettopp den regresjonen.
+/// The model sits as a folder reference. Flatten it and the two config.json
+/// files collide, and WhisperKit cannot find the tokenizer. These tests catch
+/// exactly that regression.
 @Suite("Modell i pakken")
 struct BundledModelTests {
     private var modelIsPresent: Bool { WhisperTranscriber.modelFolder != nil }
@@ -25,7 +25,7 @@ struct BundledModelTests {
         }
     }
 
-    /// WhisperKit slår opp tokenizeren på nøyaktig denne stien.
+    /// WhisperKit looks the tokenizer up at exactly this path.
     @Test("Tokenizeren ligger på stien WhisperKit forventer")
     func tokenizerLayoutIsExact() throws {
         let tokenizer = try #require(WhisperTranscriber.tokenizerFolder)

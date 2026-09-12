@@ -23,7 +23,7 @@ struct VaultTests {
         #expect(opened == original)
     }
 
-    /// Det forseglede innholdet skal ikke inneholde klarteksten.
+    /// The sealed content must not contain the plaintext.
     @Test("Klarteksten finnes ikke i det forseglede")
     func plaintextIsNotPresent() throws {
         let secret = Data("hemmelig setning som ikke skal lekke".utf8)
@@ -35,8 +35,8 @@ struct VaultTests {
         #expect(sealed.count > secret.count)
     }
 
-    /// Hvert opptak får sin egen datanøkkel, så to like filer skal ikke gi
-    /// like chiffer. Ellers lekker vi at innholdet er identisk.
+    /// Every recording gets its own data key, so two identical files must not give
+    /// identical ciphertext. Otherwise we leak that the content is the same.
     @Test("Lik inndata gir ulikt chiffer")
     func sealingIsNotDeterministic() throws {
         let payload = Data("samme innhold".utf8)
@@ -73,7 +73,7 @@ struct TranscriptSealingTests {
         #expect(try RecordingVault.openText(sealed) == text)
     }
 
-    /// Æ, ø og å må overleve turen gjennom UTF-8 og AES-GCM.
+    /// Æ, ø and å must survive the trip through UTF-8 and AES-GCM.
     @Test("Norske tegn overlever forseglingen")
     func norwegianCharactersSurvive() throws {
         let text = "Ærlig talt: øvingen på Sørlandet gikk rått. Fróði skrev ð og ó."
@@ -81,7 +81,7 @@ struct TranscriptSealingTests {
         #expect(try RecordingVault.openText(sealed) == text)
     }
 
-    /// Poenget med hele øvelsen: teksten skal ikke kunne leses ut av lagringen.
+    /// The point of the whole exercise: the text must not be readable out of storage.
     @Test("Teksten finnes ikke i klartekst i det forseglede")
     func textIsNotReadable() throws {
         let secret = "hemmelig setning som ikke skal kunne leses"
@@ -103,7 +103,7 @@ struct TranscriptSealingTests {
 
         #expect(recording.hasTranscript)
         #expect(try recording.transcript() == "Opptaket ble lagret lokalt.")
-        // Og det som faktisk ligger på disk skal ikke være lesbart.
+        // And what actually sits on disk must not be readable.
         let stored = try #require(recording.sealedTranscript)
         #expect(stored.range(of: Data("Opptaket".utf8)) == nil)
     }
@@ -111,7 +111,7 @@ struct TranscriptSealingTests {
 
 @Suite("Eksport")
 struct ExportEncodingTests {
-    /// Uten BOM gjetter mange lesere at en .txt er Latin-1, og «så» blir «sÃ¥».
+    /// Without a BOM many readers guess that a .txt is Latin-1, and «så» becomes «sÃ¥».
     @Test("Tekstfilen starter med UTF-8 BOM")
     func textFileHasByteOrderMark() {
         let data = RecordingExport.utf8WithBOM("Så starter vi et opptak til.")
@@ -127,8 +127,8 @@ struct ExportEncodingTests {
         #expect(decoded == text)
     }
 
-    /// Feilen som ble meldt: teksten lest som Latin-1 gir «sÃ¥».
-    /// Blir den lest som UTF-8, skal det ikke skje.
+    /// The reported bug: the text read as Latin-1 gives «sÃ¥».
+    /// Read as UTF-8, that must not happen.
     @Test("Teksten er ikke Latin-1")
     func isNotLatin1() throws {
         let data = RecordingExport.utf8WithBOM("Så")
@@ -140,13 +140,13 @@ struct ExportEncodingTests {
     }
 }
 
-/// Et langt opptak går gjennom de samme stegene som et kort, men på tall som
-/// er store nok til at en avkortning ville vist seg: lydfilen leses inn hel,
-/// dekrypteres hel og skrives hel, og det samme gjelder teksten.
+/// A long recording goes through the same steps as a short one, but at numbers
+/// large enough that a truncation would show: the audio file is read whole,
+/// decrypted whole and written whole, and the same goes for the text.
 @Suite("Uttrekk av lange opptak", .serialized)
 struct LongExportTests {
-    /// 30 MB forseglet lyd svarer til rundt en time med opptak, som ligger på
-    /// omtrent 64 kbit/s.
+    /// 30 MB of sealed audio corresponds to about an hour of recording, which sits
+    /// at roughly 64 kbit/s.
     private static let audioBytes = 30 * 1024 * 1024
 
     private func sealedRecording(audio: Data, transcript: String) throws -> Recording {
@@ -160,13 +160,13 @@ struct LongExportTests {
 
     @Test("Hele lydfilen og hele teksten kommer med")
     func longRecordingSurvivesExport() async throws {
-        // Et mønster, ikke nuller: en avkortet eller forskjøvet fil skal ikke
-        // kunne se riktig ut ved en tilfeldighet.
+        // A pattern, not zeros: a truncated or shifted file must not be able to look
+        // right by chance.
         let block = Data((0..<4096).map { UInt8($0 % 251) })
         var audio = Data(capacity: Self.audioBytes)
         while audio.count < Self.audioBytes { audio.append(block) }
 
-        // Rundt 20 000 ord, som er mer enn en time med tale.
+        // Around 20 000 words, which is more than an hour of speech.
         let transcript = Array(repeating: "Så kjørte vi videre mot Kristiansand i øsende regn.", count: 2_000)
             .joined(separator: " ")
 

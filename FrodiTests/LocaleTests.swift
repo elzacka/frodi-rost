@@ -10,8 +10,8 @@ struct LocaleTests {
         #expect(AppLocale.isBokmal(AppLocale.norwegian))
     }
 
-    /// Språket skal ikke følge enhetens innstilling. Står den på engelsk,
-    /// skal Fróði fortsatt lage norsk tekst.
+    /// The language must not follow the device setting. Set to English, Fróði must
+    /// still produce Norwegian text.
     @Test("Språket følger ikke enhetens innstilling")
     func doesNotFollowSystemLocale() {
         #expect(AppLocale.norwegian != Locale.current || Locale.current.identifier(.bcp47) == "nb-NO")
@@ -33,7 +33,7 @@ struct LocaleTests {
 
 @Suite("Valg av språkmodell")
 struct SpeechEngineTests {
-    /// Dette er den ekte listen fra en iPhone 17 Pro på iOS 26.6.1, forkortet.
+    /// This is the real list from an iPhone 17 Pro on iOS 26.6.1, shortened.
     private let dictationLocales = ["ar-SA", "da-DK", "de-DE", "en-US", "fi-FI",
                                     "nb-NO", "nl-NL", "sv-SE", "zh-TW"]
         .map(Locale.init(identifier:))
@@ -53,8 +53,8 @@ struct SpeechEngineTests {
         #expect(SpeechEngine.bokmal(in: transcriberLocales) == nil)
     }
 
-    /// Svensk og dansk ligner, men er ikke norsk. Velger vi feil her, får
-    /// brukeren tekst på nabospråket uten å bli fortalt det.
+    /// Swedish and Danish are similar but not Norwegian. Pick wrong here and the
+    /// user gets text in the neighbouring language without being told.
     @Test("Plukker ikke svensk eller dansk")
     func doesNotPickNeighbourLanguages() {
         let nordicOnly = ["da-DK", "sv-SE", "fi-FI"].map(Locale.init(identifier:))

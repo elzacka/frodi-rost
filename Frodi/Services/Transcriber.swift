@@ -2,11 +2,11 @@ import AVFoundation
 import Foundation
 import Speech
 
-/// Porten mot tale til tekst. Alt som gjør om lyd til tekst går gjennom denne,
-/// slik at motoren kan byttes uten at resten av appen merker det.
+/// The gateway to speech to text. Everything that turns audio into text goes
+/// through this, so the engine can be swapped without the rest of the app noticing.
 ///
-/// Bundet til hovedaktøren fordi WhisperKit ikke er `Sendable` og derfor ikke
-/// kan krysse en aktørgrense. Selve arbeidet gjør motorene på egne tråder.
+/// Bound to the main actor because WhisperKit is not `Sendable` and therefore
+/// cannot cross an actor boundary. The engines do the actual work on their own threads.
 @MainActor
 protocol Transcriber {
     func transcribe(fileURL: URL) async throws -> String
@@ -31,7 +31,7 @@ enum TranscriptionError: LocalizedError {
         }
     }
 
-    /// Lagres på opptaket slik at listen og detaljene kan si den ekte årsaken.
+    /// Stored on the recording so the list and the detail view can state the real cause.
     var code: String {
         switch self {
         case .localeUnsupported: "localeUnsupported"
@@ -41,7 +41,7 @@ enum TranscriptionError: LocalizedError {
         }
     }
 
-    /// Kort tekst til listeraden.
+    /// Short text for the list row.
     static func shortText(for code: String?) -> String {
         switch code {
         case "localeUnsupported": String(localized: "norsk mangler i iOS")
@@ -52,7 +52,7 @@ enum TranscriptionError: LocalizedError {
         }
     }
 
-    /// Lengre forklaring til detaljskjermen.
+    /// Longer explanation for the detail screen.
     static func explanation(for code: String?) -> String {
         switch code {
         case "localeUnsupported":
@@ -69,15 +69,15 @@ enum TranscriptionError: LocalizedError {
     }
 }
 
-/// Apples SpeechAnalyzer, innført i iOS 26.
+/// Apple's SpeechAnalyzer, introduced in iOS 26.
 ///
-/// Hele analysen skjer på enheten, uten serverfallback. Lyden forlater aldri
-/// enheten, og rammeverket krever ingen tillatelse til talegjenkjenning for
-/// filanalyse. Det er derfor appen slipper Apples dialog om at taledata sendes
-/// til dem – den hørte til det gamle SFSpeechRecognizer.
+/// The whole analysis happens on the device, with no server fallback. The audio
+/// never leaves the device, and the framework needs no speech-recognition
+/// authorization for file analysis. That is why the app is spared Apple's dialog
+/// saying speech data is sent to them; it belonged to the old SFSpeechRecognizer.
 ///
-/// Språkmodellen eies av systemet, ikke av appen. Den teller ikke mot
-/// appstørrelsen og ligger utenfor appens minne.
+/// The language model is owned by the system, not the app. It does not count
+/// toward the app size and lives outside the app's memory.
 struct SystemTranscriber: Transcriber {
     let locale: Locale
 
@@ -96,8 +96,8 @@ struct SystemTranscriber: Transcriber {
             let file = try AVAudioFile(forReading: fileURL)
             let analyzer = SpeechAnalyzer(modules: [module])
 
-            // Leseren må startes før analysen, ellers går de første resultatene
-            // tapt. De to modulene har hver sin resultattype, derfor to grener.
+            // The reader must be started before the analysis, or the first results are
+            // lost. The two modules have different result types, hence two branches.
             async let collected: String = {
                 switch module {
                 case let transcriber as SpeechTranscriber:

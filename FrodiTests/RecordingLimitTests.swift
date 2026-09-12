@@ -2,9 +2,9 @@ import Foundation
 import Testing
 @testable import Frodi
 
-/// Grensen står i teksten brukeren leser, så tallene der må følge konstanten.
-/// Endrer noen `RecordingLimit.duration`, skal både minutter, ord og tegn følge
-/// med av seg selv – ikke bli stående igjen som tall i en setning.
+/// The limit is in the text the user reads, so the numbers there must follow the
+/// constant. If someone changes `RecordingLimit.duration`, minutes, words and
+/// characters must all follow by themselves, not stay behind as numbers in a sentence.
 @Suite("Grensen for opptak")
 struct RecordingLimitTests {
     @Test("Minutter og ord regnes ut fra lengden")
@@ -15,7 +15,7 @@ struct RecordingLimitTests {
 
     @Test("Grensen er lang nok til å være verdt å ha, og kort nok til å gå gjennom")
     func withinMeasuredCeiling() {
-        // Ti minutter er målt helt gjennom på simulator, femten ble drept.
+        // Ten minutes is measured all the way through on the simulator; fifteen was killed.
         #expect(RecordingLimit.minutes >= 1)
         #expect(RecordingLimit.duration <= 10 * 60)
     }

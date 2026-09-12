@@ -1,16 +1,16 @@
 import SwiftUI
 
-/// Avspilling av ett opptak: spill av og pause, hopp femten sekunder hver vei,
-/// og en slider som både viser og setter posisjonen.
+/// Playback of one recording: play and pause, skip fifteen seconds either way,
+/// and a slider that both shows and sets the position.
 struct PlaybackControls: View {
     let recording: Recording
     let player: AudioPlayer
 
-    /// Hvor langt hoppknappene flytter seg. Oppførsel, ikke et designtoken.
+    /// How far the skip buttons move. Behaviour, not a design token.
     private static let skipSeconds: TimeInterval = 15
 
-    /// Holder fingerens posisjon mens du drar. Uten den rykker knappen tilbake
-    /// hver gang tikkeren oppdaterer avspillingstiden.
+    /// Holds the finger's position while you drag. Without it the knob jumps back
+    /// every time the ticker updates the playback time.
     @State private var scrub: TimeInterval?
 
     var body: some View {
@@ -37,8 +37,7 @@ struct PlaybackControls: View {
         .onDisappear { player.stop() }
     }
 
-    // MARK: - Posisjon
-
+    // MARK: - Position
     private var position: some View {
         VStack(spacing: Space.s1) {
             Slider(value: sliderValue, in: 0...sliderRange) { editing in
@@ -51,8 +50,8 @@ struct PlaybackControls: View {
             .accessibilityLabel("Posisjon i opptaket")
             .accessibilityValue(spokenPosition)
 
-            // VoiceOver leser posisjonen fra slideren over, så de to tallene
-            // her ville bare blitt sagt to ganger til.
+            // VoiceOver reads the position from the slider above, so the two numbers
+            // here would only be said twice more.
             HStack(spacing: Space.s2) {
                 Text(clock(displayTime))
                 Spacer(minLength: Space.s2)
@@ -69,7 +68,7 @@ struct PlaybackControls: View {
         Binding(get: { displayTime }, set: { scrub = $0 })
     }
 
-    /// En slider med området 0...0 er udefinert, så et tomt opptak får et sekund.
+    /// A slider with the range 0...0 is undefined, so an empty recording gets one second.
     private var sliderRange: TimeInterval {
         max(player.duration, 1)
     }
@@ -78,8 +77,7 @@ struct PlaybackControls: View {
         scrub ?? player.currentTime
     }
 
-    // MARK: - Knapper
-
+    // MARK: - Buttons
     private var buttons: some View {
         HStack(spacing: Space.s6) {
             skipButton(
@@ -109,8 +107,8 @@ struct PlaybackControls: View {
 
                 IconView(player.isPlaying ? .pause : .play, size: PlayerControl.playIcon)
                     .foregroundStyle(Color.Frodi.accentRecordOn)
-                    // Trekanten har tyngdepunktet til venstre for midten og ser
-                    // skjev ut i en sirkel uten denne. Optisk retting, ikke avstand.
+                    // The triangle's centre of mass sits left of centre and looks off in a circle
+                    // without this. Optical correction, not spacing.
                     .offset(x: player.isPlaying ? 0 : 2)
             }
         }
@@ -120,12 +118,12 @@ struct PlaybackControls: View {
         .accessibilityAddTraits(.isButton)
     }
 
-    /// Pilen sier retning, tallet under sier hvor langt.
+    /// The arrow says the direction, the number below says how far.
     ///
-    /// SF-symbolet hadde 15-tallet inne i buen. Heroicons har ingen pil med et
-    /// tall i, og to like piler uten tall ville ikke sagt hvor mye et trykk
-    /// hopper. Tallet står derfor under, og det leses av det samme stedet som
-    /// hoppet regnes fra, så de ikke kan komme i utakt.
+    /// The SF Symbol had the 15 inside the arc. Heroicons has no arrow with a number
+    /// in it, and two identical arrows without one would not say how much a press
+    /// jumps. So the number sits below, read from the same place the jump is
+    /// computed from, so they cannot disagree.
     private func skipButton(_ offset: TimeInterval, icon: Icon, label: String) -> some View {
         Button {
             player.skip(offset)
@@ -145,8 +143,7 @@ struct PlaybackControls: View {
         .accessibilityAddTraits(.isButton)
     }
 
-    // MARK: - Tekst
-
+    // MARK: - Text
     private func clock(_ seconds: TimeInterval) -> String {
         Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond))
     }

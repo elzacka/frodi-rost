@@ -1,11 +1,11 @@
 import Foundation
 import SwiftData
 
-/// Hvor lydfilene ligger, og hvordan de beskyttes.
+/// Where the audio files live, and how they are protected.
 ///
-/// To ting styres herfra, og de trekker i hver sin retning:
-/// opptaket må kunne skrives mens skjermen er låst, og den ferdige filen skal
-/// ikke kunne leses mens skjermen er låst.
+/// Two things are governed from here, and they pull in opposite directions:
+/// the recording must be writable while the screen is locked, and the finished
+/// file must not be readable while the screen is locked.
 enum AudioStorage {
     static var directory: URL {
         let base = URL.documentsDirectory.appendingPathComponent("Opptak", isDirectory: true)
@@ -16,35 +16,34 @@ enum AudioStorage {
                 attributes: [.protectionKey: FileProtectionType.completeUnlessOpen]
             )
         }
-        // Settes hver gang, ikke bare ved opprettelse. Flagget kan bli
-        // nullstilt av filoperasjoner, og en mappe laget av en tidligere
-        // versjon har det ikke i det hele tatt.
+        // Set every time, not only on creation. The flag can be reset by file
+        // operations, and a folder made by an earlier version does not have it at all.
         excludeFromBackup(base)
         return base
     }
 
-    /// Beskyttelse mens opptaket går.
+    /// Protection while the recording runs.
     ///
-    /// `completeUnlessOpen` lar en fil som allerede er åpen bli skrevet videre
-    /// etter at skjermen låses. Med `complete` ville opptaket stoppet i det
-    /// enheten låste seg – altså nøyaktig i bilen, som er hele poenget.
+    /// `completeUnlessOpen` lets a file that is already open keep being written
+    /// after the screen locks. With `complete` the recording would have stopped the
+    /// moment the device locked, which is exactly in the car, the whole point.
     static func protectWhileRecording(_ url: URL) {
         setProtection(.completeUnlessOpen, on: url)
     }
 
-    /// Beskyttelse etter at opptaket er ferdig.
+    /// Protection once the recording is finished.
     ///
-    /// Nå er filen lukket, og da er `complete` riktig: innholdet kan ikke leses
-    /// mens enheten er låst, heller ikke av noe som har fysisk tilgang.
+    /// Now the file is closed, and `complete` is right: the content cannot be read
+    /// while the device is locked, not even by something with physical access.
     static func protectFinished(_ url: URL) {
         setProtection(.complete, on: url)
         excludeFromBackup(url)
     }
 
-    /// Kjører en jobb med opptaket midlertidig dekryptert.
+    /// Runs a job with the recording temporarily decrypted.
     ///
-    /// Klarteksten lever bare så lenge jobben varer, i mappen for
-    /// midlertidige filer, og slettes uansett hvordan jobben ender.
+    /// The plaintext lives only as long as the job, in the temporary directory, and
+    /// is deleted however the job ends.
     static func withDecrypted<T>(
         fileName: String,
         _ body: (URL) async throws -> T
@@ -55,16 +54,16 @@ enum AudioStorage {
         return try await body(temporary)
     }
 
-    /// Låser opp lydfilen og legger klarteksten i en midlertidig fil.
+    /// Unlocks the audio file and puts the plaintext in a temporary file.
     ///
-    /// `@concurrent` holder lesingen, dekrypteringen og skrivingen unna
-    /// hovedtråden. Uten den havner de der: `SWIFT_APPROACHABLE_CONCURRENCY`
-    /// gjør at en `nonisolated async` funksjon arver aktøren til den som
-    /// kaller, og `Transcription.run` kaller fra hovedaktøren. Alle tre
-    /// stegene tar hele filen om gangen, og en time med lyd er rundt 30 MB.
+    /// `@concurrent` keeps the reading, decrypting and writing off the main thread.
+    /// Without it they land there: `SWIFT_APPROACHABLE_CONCURRENCY` makes a
+    /// `nonisolated async` function inherit the caller's actor, and
+    /// `Transcription.run` calls from the main actor. All three steps take the whole
+    /// file at once, and an hour of audio is about 30 MB.
     ///
-    /// `body` blir stående igjen hos den som kaller. Motoren er låst til
-    /// hovedaktøren, og skal fortsatt kalles derfra.
+    /// `body` stays with the caller. The engine is bound to the main actor and must
+    /// still be called from there.
     @concurrent
     private static func decryptToTemporary(fileName: String) async throws -> URL {
         let sealed = try Data(contentsOf: directory.appendingPathComponent(fileName))
@@ -76,13 +75,12 @@ enum AudioStorage {
         return temporary
     }
 
-    /// Holder databasen utenfor iCloud-sikkerhetskopien.
+    /// Keeps the database out of the iCloud backup.
     ///
-    /// Teksten i den er forseglet, så det som ellers ville fulgt med er
-    /// metadata: datoer, lengder og filnavn. Lite, men ingenting av det har
-    /// noe i en sikkerhetskopi å gjøre. Settes ved hver oppstart, av samme
-    /// grunn som for opptaksmappen. SQLite skriver til tre filer, og alle
-    /// tre må med.
+    /// The text in it is sealed, so what would otherwise travel is metadata: dates,
+    /// lengths and file names. Little, but none of it belongs in a backup. Set at
+    /// every launch, for the same reason as the recordings folder. SQLite writes to
+    /// three files, and all three must be covered.
     static func excludeFromBackup(store container: ModelContainer) {
         for configuration in container.configurations {
             let url = configuration.url
@@ -106,12 +104,12 @@ enum AudioStorage {
         )
     }
 
-    /// Holder opptakene utenfor iCloud-sikkerhetskopien.
+    /// Keeps the recordings out of the iCloud backup.
     ///
-    /// Apple kaller dette veiledning til systemet, ikke en garanti, og flagget
-    /// kan bli nullstilt av filoperasjoner. Vi setter det derfor på nytt hver
-    /// gang en fil er ferdig. Vil du ha en garanti, må innholdet krypteres med
-    /// en nøkkel som ikke finnes utenfor denne enheten.
+    /// Apple calls this guidance to the system, not a guarantee, and the flag can be
+    /// reset by file operations. So we set it again every time a file is finished.
+    /// For a guarantee, the content has to be encrypted with a key that does not
+    /// exist outside this device.
     private static func excludeFromBackup(_ url: URL) {
         var target = url
         var values = URLResourceValues()

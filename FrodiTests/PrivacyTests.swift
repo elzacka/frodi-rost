@@ -4,9 +4,9 @@ import Testing
 
 @Suite("Personvern")
 struct PrivacyTests {
-    /// SFSpeechRecognizer tvinger fram en dialog der Apples egen tekst sier at
-    /// taledata sendes til dem. Den motsier hele poenget med appen. Kommer denne
-    /// nøkkelen tilbake, er noen på vei tilbake til det gamle rammeverket.
+    /// SFSpeechRecognizer forces a dialog in which Apple's own text says speech data
+    /// is sent to them. It contradicts the whole point of the app. If this key comes
+    /// back, someone is on their way back to the old framework.
     @Test("Appen ber ikke om tilgang til talegjenkjenning")
     func doesNotRequestSpeechRecognition() {
         let value = Bundle.main.object(forInfoDictionaryKey: "NSSpeechRecognitionUsageDescription")
@@ -19,7 +19,7 @@ struct PrivacyTests {
         #expect(value?.isEmpty == false)
     }
 
-    /// Opptak må overleve at skjermen låses, ellers stopper opptaket i bilen.
+    /// Recording must survive the screen locking, or it stops in the car.
     @Test("Bakgrunnslyd er slått på")
     func backgroundAudioEnabled() {
         let modes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") as? [String]

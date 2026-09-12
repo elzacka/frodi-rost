@@ -7,11 +7,11 @@ struct RecorderBar: View {
 
     var body: some View {
         VStack(spacing: Space.s3) {
-            // Tallene står ved siden av knappen, ikke over den. Over knappen
-            // ble feltet så høyt at listen med opptak forsvant bak det.
+            // The numbers sit beside the button, not above it. Above the button the bar
+            // grew so tall that the list of recordings disappeared behind it.
             //
-            // Begge sidene tar like mye plass, så knappen står midt på skjermen
-            // uansett hvor brede tallene er.
+            // Both sides take the same space, so the button stays centred no matter how
+            // wide the numbers are.
             HStack(spacing: Space.s4) {
                 timer
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -41,7 +41,7 @@ struct RecorderBar: View {
         }
     }
 
-    /// Holder plassen sin også i hvile, ellers flytter knappen seg i det opptaket starter.
+    /// Holds its space while idle too, or the button moves the moment recording starts.
     private var timer: some View {
         Text(recorder.isRecording ? elapsed : " ")
             .font(.Frodi.timer)
@@ -55,20 +55,20 @@ struct RecorderBar: View {
             .accessibilityHidden(!recorder.isRecording)
     }
 
-    /// Hva som er igjen av grensen mens opptaket går.
+    /// What is left of the limit while recording runs.
     ///
-    /// Den står til høyre for knappen, der speilingen av timeren sto før.
-    /// Plassen var alt satt av, og to tall på hver sin side av knappen leses
-    /// som det de er: det som har gått, og det som står igjen.
+    /// It sits to the right of the button, where the mirrored timer used to be.
+    /// The space was already reserved, and two numbers on either side of the button
+    /// read as what they are: what has passed, and what remains.
     ///
-    /// Minustegnet er det samme som avspilleren bruker om gjenværende tid, og
-    /// er det som skiller de to tallene fra hverandre uten en etikett.
+    /// The minus sign is the one the player uses for remaining time, and is what
+    /// tells the two numbers apart without a label.
     ///
-    /// I hvile står feltet tomt. Grensen hører hjemme i informasjonen om appen,
-    /// ikke over opptaksknappen: den som ikke har begynt å snakke, trenger ikke
-    /// vite taket ennå, og et tall der ville bare vært støy ved siden av
-    /// knappen. Som timeren holder feltet likevel plassen sin, ellers flytter
-    /// knappen seg i det opptaket starter.
+    /// When idle the field is empty. The limit belongs with the information about
+    /// the app, not above the record button: someone who has not started talking
+    /// does not need the ceiling yet, and a number there would just be noise beside
+    /// the button. Like the timer, the field still holds its space, or the button
+    /// moves the moment recording starts.
     private var remaining: some View {
         Text(recorder.isRecording ? "−" + clock(recorder.remaining) : " ")
             .font(.Frodi.bodyMedium)
@@ -110,7 +110,7 @@ struct RecorderBar: View {
         Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond))
     }
 
-    /// «2 minutter, 5 sekunder» – tallet skrevet ut, slik avspilleren gjør det.
+    /// «2 minutter, 5 sekunder»: the number spelled out, the way the player does it.
     private func spoken(_ seconds: TimeInterval) -> String {
         let units = Duration.UnitsFormatStyle(allowedUnits: [.minutes, .seconds], width: .wide)
         return Duration.seconds(seconds).formatted(units)
@@ -120,11 +120,11 @@ struct RecorderBar: View {
         recorder.state == .denied ? Color.Frodi.border : Color.Frodi.accentRecord
     }
 
-    /// Avslått tilgang gir en tom knapp, ikke en fylt grå.
+    /// Denied access gives an outlined button, not a filled grey one.
     ///
-    /// Fyllet var border-fargen. Da border ble mørk nok til å være en synlig
-    /// kant, ble den fylte knappen mørkere enn den aktive og leste som slått
-    /// på. En kontur sier «ingenting her» uten å rope.
+    /// The fill was the border colour. Once border became dark enough to be a
+    /// visible edge, the filled button was darker than the live one and read as
+    /// switched on. An outline says «nothing here» without shouting.
     private var innerColor: Color {
         switch recorder.state {
         case .recording: Color.Frodi.recordingActive

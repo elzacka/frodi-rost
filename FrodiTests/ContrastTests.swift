@@ -2,15 +2,15 @@ import Testing
 import UIKit
 @testable import Frodi
 
-/// WCAG 2.2 AA er et krav, ikke et mål: 4,5:1 for vanlig tekst, 3:1 for ikoner
-/// og andre grafiske element.
+/// WCAG 2.2 AA is a requirement, not a goal: 4.5:1 for ordinary text, 3:1 for
+/// icons and other graphical elements.
 ///
-/// Testen finnes fordi feilen var der i et halvt år uten å bli sett.
-/// `TextSecondary` lå på 3,92:1 mot surface, som ser riktig ut på skjermen og
-/// er umulig å oppdage med øyet. Bare et regnestykke fanger den.
+/// The test exists because the fault sat there for half a year without being
+/// seen. `TextSecondary` was at 3.92:1 against surface, which looks right on
+/// screen and is impossible to spot by eye. Only arithmetic catches it.
 @Suite("Kontrast")
 struct ContrastTests {
-    /// Relativ luminans slik WCAG definerer den.
+    /// Relative luminance as WCAG defines it.
     private static func luminance(_ color: UIColor) -> Double {
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
         color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
@@ -30,7 +30,7 @@ struct ContrastTests {
         return (max(a, b) + 0.05) / (min(a, b) + 0.05)
     }
 
-    /// Alt som er tekst i appen, på begge flatene tekst kan ligge på.
+    /// Everything that is text in the app, on both surfaces text can sit on.
     @Test("Tekst når 4,5:1", arguments: [
         ("TextPrimary", "Background"),
         ("TextPrimary", "Surface"),
@@ -46,17 +46,17 @@ struct ContrastTests {
         )
     }
 
-    /// Ikoner, kanter og flater som bærer betydning uten tekst.
+    /// Icons, borders and surfaces that carry meaning without text.
     ///
-    /// Aksenten står her fordi `.tint` farger tilbakeknappen, uthentingsikonet
-    /// og skyveknappen i avspilleren – ikoner uten tekst ved siden av seg.
-    /// Kanten står her fordi den er grensen rundt kort og rader, og
-    /// skillelinjene i hodet og over opptaksfeltet.
+    /// The accent is here because `.tint` colours the back button, the export icon
+    /// and the player slider: icons with no text beside them. The border is here
+    /// because it is the edge around cards and rows, and the dividers in the header
+    /// and above the recorder bar.
     ///
-    /// Ett par står med vilje utenfor: opptaksknappens skifte fra accent-record
-    /// til recording-active er 1,50:1. Fargen er ikke det eneste signalet.
-    /// Ikonet bytter fra `mic.fill` til `stop.fill`, timeren starter, og
-    /// VoiceOver-etiketten endrer seg. Se dev_only/CLAUDE.md.
+    /// One pair is deliberately left out: the record button's change from
+    /// accent-record to recording-active is 1.50:1. Colour is not the only signal.
+    /// The icon switches from `mic.fill` to `stop.fill`, the timer starts, and the
+    /// VoiceOver label changes. See dev_only/CLAUDE.md.
     @Test("Grafiske element når 3:1", arguments: [
         ("RecordingActive", "Background"),
         ("Surface", "RecordingActive"),

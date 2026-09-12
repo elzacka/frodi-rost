@@ -51,9 +51,9 @@ struct RecordingListView: View {
             }
         }
         .task {
-            // Med nb-whisper i bygget finnes ingen systemmodell å vente på.
+            // With nb-whisper in the build there is no system model to wait for.
             if !Transcription.usesBundledModel { await speechModel.refresh() }
-            // Opptak som ventet på modellen får teksten sin nå.
+            // Recordings that were waiting for the model get their text now.
             await transcribePending()
         }
     }
@@ -64,8 +64,8 @@ struct RecordingListView: View {
             .padding(.horizontal, Space.s4)
             .padding(.top, Space.s2)
             .padding(.bottom, Space.s3)
-            // Overlegg, ikke en rad: ordmerket skal stå midt på skjermen,
-            // ikke midt i plassen som blir igjen ved siden av tannhjulet.
+            // An overlay, not a row: the wordmark should sit in the middle of the screen,
+            // not in the middle of the space left beside the info button.
             .overlay(alignment: .trailing) {
                 aboutButton
                     .padding(.trailing, Space.s1)
@@ -83,18 +83,18 @@ struct RecordingListView: View {
                 .font(.Frodi.display)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            // Andre halvdel av appnavnet, ikke en undertittel. Inter, ikke
-            // Skranji: pyntefonten er tung å lese i småformat, og
-            // eyebrow-stilen er laget for dette. Sammen leser hodet «fróði
-            // røst», som er navnet på appen.
+            // The second half of the app name, not a subtitle. Inter, not Skranji: the
+            // display face is hard to read at small sizes, and the eyebrow style is made
+            // for this. Together the header reads «fróði røst», which is the name of the
+            // app.
             Text("røst")
                 .font(.Frodi.eyebrow)
                 .eyebrowTracking()
                 .foregroundStyle(Color.Frodi.textSecondary)
         }
         .accessibilityElement(children: .combine)
-        // Navnet uttalt, ikke ordmerket. Små bokstaver er en grafisk form,
-        // ikke måten navnet sies på.
+        // The name as spoken, not the wordmark. Lowercase is a graphic form, not
+        // how the name is said.
         .accessibilityLabel("Fróði røst")
         .accessibilityAddTraits(.isHeader)
     }
@@ -112,10 +112,10 @@ struct RecordingListView: View {
         .accessibilityLabel("Info om appen")
     }
 
-    /// Databasen lot seg ikke åpne, så appen kjører på minnet.
+    /// The database could not be opened, so the app runs on memory.
     ///
-    /// Uten denne beskjeden ville opptakene forsvunnet ved omstart uten at noe
-    /// tydet på hvorfor. En stille feil er verre enn en synlig.
+    /// Without this message the recordings would vanish on restart with nothing to
+    /// say why. A silent failure is worse than a visible one.
     private var storageWarning: some View {
         VStack(alignment: .leading, spacing: Space.s2) {
             Text("Opptakene lagres ikke")
@@ -187,8 +187,8 @@ struct RecordingListView: View {
         .scrollContentBackground(.hidden)
     }
 
-    /// Transkriberer alt som mangler tekst. Kalles ved oppstart, slik at opptak
-    /// tatt før språkmodellen var på plass ikke blir stående uten tekst.
+    /// Transcribes everything that lacks text. Called at launch, so recordings made
+    /// before the speech model was in place are not left without text.
     private func transcribePending() async {
         guard Transcription.usesBundledModel || speechModel.isReady else { return }
         for recording in recordings where !recording.hasTranscript {

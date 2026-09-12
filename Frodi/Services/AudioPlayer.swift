@@ -1,17 +1,17 @@
 import AVFoundation
 import Observation
 
-/// Spiller av et opptak.
+/// Plays a recording.
 ///
-/// Lyden dekrypteres til minnet, aldri til disk. `AudioStorage.withDecrypted`
-/// legger klarteksten i en midlertidig fil, som er riktig for eksport og for
-/// transkribering, men ville latt hele opptaket ligge ulåst på disken så lenge
-/// avspillingen varer. `AVAudioPlayer(data:)` slipper det helt.
+/// The audio is decrypted into memory, never to disk. `AudioStorage.withDecrypted`
+/// puts the plaintext in a temporary file, which is right for export and for
+/// transcription, but would leave the whole recording unlocked on disk for as
+/// long as playback lasts. `AVAudioPlayer(data:)` avoids that entirely.
 @MainActor
 @Observable
 final class AudioPlayer {
-    /// Delt, fordi mikrofonen og høyttaleren deler samme lydøkt. Et opptak som
-    /// startes med handlingsknappen må kunne stanse avspillingen først.
+    /// Shared, because the microphone and the speaker share one audio session. A
+    /// recording started with the Action Button must be able to stop playback first.
     static let shared = AudioPlayer()
 
     enum State: Equatable {
@@ -26,7 +26,7 @@ final class AudioPlayer {
     private(set) var currentTime: TimeInterval = 0
     private(set) var duration: TimeInterval = 0
 
-    /// Hvilket opptak som ligger klart. Filnavn, ikke sti – samme grunn som i `Recording`.
+    /// Which recording is loaded. File name, not path, for the same reason as in `Recording`.
     private(set) var fileName: String?
 
     private var player: AVAudioPlayer?
@@ -38,10 +38,9 @@ final class AudioPlayer {
 
     var isLoaded: Bool { state == .ready || state == .playing }
 
-    // MARK: - Last inn
-
-    /// Låser opp opptaket og gjør det klart til avspilling. Gjør ingenting hvis
-    /// det alt ligger klart.
+    // MARK: - Load
+    /// Unlocks the recording and readies it for playback. Does nothing if it is
+    /// already loaded.
     func prepare(_ recording: Recording) async {
         guard fileName != recording.fileName else { return }
         stop()
@@ -51,8 +50,8 @@ final class AudioPlayer {
         let url = recording.fileURL
 
         do {
-            // Dekrypteringen går utenom hovedaktøren. Et langt opptak er noen
-            // titalls megabyte, og grensesnittet skal ikke stå stille imens.
+            // The decryption bypasses the main actor. A long recording is tens of
+            // megabytes, and the interface must not freeze meanwhile.
             let audio = try await Task.detached(priority: .userInitiated) {
                 try RecordingVault.open(try Data(contentsOf: url))
             }.value
@@ -68,8 +67,7 @@ final class AudioPlayer {
         }
     }
 
-    // MARK: - Kontroller
-
+    // MARK: - Controls
     func togglePlayback() {
         guard let player else { return }
         if player.isPlaying { pause() } else { play() }
@@ -83,7 +81,7 @@ final class AudioPlayer {
         state = .ready
     }
 
-    /// Flytter avspillingen. Verdier utenfor opptaket klippes til endene.
+    /// Moves playback. Values outside the recording are clamped to the ends.
     func seek(to time: TimeInterval) {
         guard let player else { return }
         let clamped = min(max(time, 0), player.duration)
@@ -96,8 +94,8 @@ final class AudioPlayer {
         seek(to: player.currentTime + offset)
     }
 
-    /// Slipper både lyden og lydøkta. Kalles når detaljsiden lukkes, og før et
-    /// nytt opptak starter.
+    /// Releases both the audio and the audio session. Called when the detail page
+    /// closes, and before a new recording starts.
     func stop() {
         stopTicker()
         player?.stop()
@@ -109,14 +107,13 @@ final class AudioPlayer {
         deactivateSession()
     }
 
-    // MARK: - Innmat
-
+    // MARK: - Body
     private func play() {
         guard let player else { return }
 
         do {
-            // spokenAudio gir tale bedre behandling enn default. playback, ikke
-            // playAndRecord: avspilling skal ikke be om mikrofonen.
+            // spokenAudio treats speech better than default. playback, not
+            // playAndRecord: playback must not ask for the microphone.
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .spokenAudio)
             try session.setActive(true)
@@ -154,8 +151,8 @@ final class AudioPlayer {
         ticker = nil
     }
 
-    /// Opptaket er spilt ferdig. `AVAudioPlayer` har en delegat for dette, men
-    /// den kalles utenfor hovedaktøren; tikkeren vet det samme 100 ms senere.
+    /// The recording has finished playing. `AVAudioPlayer` has a delegate for this,
+    /// but it is called off the main actor; the ticker knows the same 100 ms later.
     private func finish() {
         stopTicker()
         player?.currentTime = 0

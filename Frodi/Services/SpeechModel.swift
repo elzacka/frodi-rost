@@ -2,35 +2,35 @@ import Foundation
 import Observation
 import Speech
 
-/// Fróði transkriberer norsk bokmål og ingenting annet.
+/// Fróði transcribes Norwegian Bokmål and nothing else.
 ///
-/// Språket er bevisst hardkodet, ikke hentet fra `Locale.current`. Står
-/// enheten på engelsk, skal appen fortsatt lage norsk bokmål.
+/// The language is deliberately hardcoded, not taken from `Locale.current`. If the
+/// device is set to English, the app must still produce Norwegian Bokmål.
 ///
-/// `nb` er bokmål. `nn` er nynorsk og skal aldri brukes her.
+/// `nb` is Bokmål. `nn` is Nynorsk and must never be used here.
 enum AppLocale {
     static let norwegian = Locale(identifier: "nb-NO")
 
-    /// Er dette bokmål? `nb` og det eldre `no` godtas, `nn` aldri.
+    /// Is this Bokmål? `nb` and the older `no` are accepted, `nn` never.
     static func isBokmal(_ locale: Locale) -> Bool {
         guard let code = locale.language.languageCode?.identifier.lowercased() else { return false }
         return code == "nb" || code == "no"
     }
 }
 
-/// Holder styr på språkmodellen for tale til tekst.
+/// Keeps track of the speech-to-text language model.
 ///
-/// Modellen eies av systemet og lastes ned én gang. Det er den eneste gangen
-/// noe her trenger nett, og det er systemet som henter den – ikke appen.
-/// Opptakene dine sendes aldri noe sted.
+/// The model is owned by the system and downloaded once. That is the only time
+/// anything here needs the network, and it is the system that fetches it, not the
+/// app. Your recordings are never sent anywhere.
 @MainActor
 @Observable
 final class SpeechModel {
     enum State: Equatable {
         case unknown
-        /// iOS har ingen norsk modell i noen av modulene.
+        /// iOS has no Norwegian model in either module.
         case unsupported
-        /// Støttet, men ikke lastet ned.
+        /// Supported, but not downloaded.
         case needsDownload
         case downloading
         case ready
@@ -44,7 +44,7 @@ final class SpeechModel {
 
     var isReady: Bool { state == .ready }
 
-    /// Sjekker hva systemet har. Trygg å kalle flere ganger.
+    /// Checks what the system has. Safe to call repeatedly.
     func refresh() async {
         guard let resolved = await SpeechEngine.resolve() else {
             engine = nil
@@ -64,7 +64,7 @@ final class SpeechModel {
         }
     }
 
-    /// Laster ned den norske språkmodellen. Krever nett, men bare denne ene gangen.
+    /// Downloads the Norwegian language model. Needs the network, but only this once.
     func download() async {
         guard let resolved = await SpeechEngine.resolve() else {
             engine = nil
@@ -76,8 +76,8 @@ final class SpeechModel {
         let module = resolved.engine.module(locale: resolved.locale)
 
         do {
-            // Reservasjon holder modellen installert. Uten den kan systemet
-            // frigi den igjen når det trenger plass, og appen står uten tekst.
+            // A reservation keeps the model installed. Without it the system can reclaim it
+            // when it needs space, and the app is left without text.
             _ = try? await AssetInventory.reserve(locale: resolved.locale)
 
             if let request = try await AssetInventory.assetInstallationRequest(supporting: [module]) {
@@ -89,7 +89,7 @@ final class SpeechModel {
         }
     }
 
-    /// Til feilsøking på enhet: hva støtter de to modulene i rammeverket?
+    /// For debugging on a device: what do the two modules in the framework support?
     func diagnostics() async -> (transcriber: [String], dictation: [String]) {
         let transcriber = await SpeechTranscriber.supportedLocales.map { $0.identifier(.bcp47) }.sorted()
         let dictation = await DictationTranscriber.supportedLocales.map { $0.identifier(.bcp47) }.sorted()

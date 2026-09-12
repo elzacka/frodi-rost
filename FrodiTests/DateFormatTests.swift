@@ -17,14 +17,14 @@ struct DateFormatTests {
         #expect(stamp == "07.09.26, 00:53")
     }
 
-    /// Dagen skal ha ledende null, ellers hopper kolonnen i listen.
+    /// The day must have a leading zero, or the column in the list jumps.
     @Test("Ledende null på dag og måned")
     func padsSingleDigits() throws {
         #expect(try date("2026-01-05T09:07:00+01:00").recordingStamp == "05.01.26, 09:07")
     }
 
-    /// 24-timers klokke uansett hva enheten står på. Et opptak klokka 13
-    /// og ett klokka 01 skal ikke se like ut.
+    /// 24-hour clock whatever the device is set to. A recording at 13:00 and one
+    /// at 01:00 must not look alike.
     @Test("24-timers klokke")
     func usesTwentyFourHourClock() throws {
         #expect(try date("2026-09-07T13:05:00+02:00").recordingStamp == "07.09.26, 13:05")

@@ -31,13 +31,13 @@ targets:
       - path: Frodi
         excludes:
           - "**/.DS_Store"
-          # Modellen legges til som mappereferanse under resources. Uten denne
-          # ekskluderingen fanger sources den opp i tillegg, og de to
-          # config.json-filene kolliderer i app-pakken.
+          # The model is added as a folder reference under resources. Without this
+          # exclusion, sources picks it up as well, and the two config.json files
+          # collide in the app bundle.
           - "Resources/Model"
-      # Mappereferanse, ikke enkeltfiler. Beholder katalogstrukturen, som
-      # WhisperKit krever for tokenizeren, og hindrer at de to config.json-
-      # filene kolliderer i bunnen av app-pakken.
+      # A folder reference, not individual files. Keeps the directory structure,
+      # which WhisperKit requires for the tokenizer, and prevents the two
+      # config.json files from colliding at the root of the app bundle.
       - path: Frodi/Resources/Model
         type: folder
         buildPhase: resources
@@ -72,9 +72,9 @@ targets:
           - Skranji-Bold.ttf
         UILaunchScreen:
           UIColorName: LaunchBackground
-        # Opptak må overleve at skjermen låses. Uten dette stopper iOS
-        # opptaket i det appen går i bakgrunnen, som er nettopp det som
-        # skjer når du legger fra deg enheten i bilen.
+        # Recording must survive the screen locking. Without this iOS stops the
+        # recording the moment the app goes to the background, which is exactly what
+        # happens when you put the device down in the car.
         UIBackgroundModes: [audio]
         NSMicrophoneUsageDescription: "Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på enheten."
         UISupportedInterfaceOrientations:

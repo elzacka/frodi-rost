@@ -1,19 +1,19 @@
 import Foundation
 
-/// Henter ut et opptak for videre behandling.
+/// Exports a recording for further use.
 ///
-/// Eksport er en bevisst handling, ikke en åpen dør. Filene ligger kryptert til
-/// vanlig, og låses opp bare i det øyeblikket du ber om det. Klarteksten legges
-/// i mappen for midlertidige filer og ryddes bort etter deling.
+/// Export is a deliberate action, not an open door. The files are encrypted at
+/// rest and unlocked only at the moment you ask. The plaintext goes into the
+/// temporary directory and is cleaned up after sharing.
 ///
-/// Delingen går gjennom iOS' egen delingsmeny, som lar deg velge Filer på
-/// enheten eller AirDrop. Begge er lokale. Fróði laster ingenting opp selv,
-/// og har ingen nettverkskode å gjøre det med.
+/// Sharing goes through iOS' own share sheet, which lets you pick Files on the
+/// device or AirDrop. Both are local. Fróði uploads nothing itself, and has no
+/// network code to do it with.
 enum RecordingExport {
-    /// Skriver lyd og tekst til midlertidige filer klare for deling.
+    /// Writes audio and text to temporary files ready for sharing.
     ///
-    /// Opptaket er et SwiftData-objekt og kan ikke sendes videre til en annen
-    /// tråd. Vi henter derfor ut verdiene her og sender bare dem.
+    /// The recording is a SwiftData object and cannot be passed to another thread.
+    /// So we pull the values out here and pass only those.
     static func prepare(_ recording: Recording) async throws -> [URL] {
         try await write(
             fileName: recording.fileName,
@@ -22,15 +22,14 @@ enum RecordingExport {
         )
     }
 
-    /// Å lese, dekryptere og skrive en hel lydfil tar tid som vokser med
-    /// lengden på opptaket. En time med lyd er rundt 30 MB, og alle tre
-    /// stegene tar hele filen om gangen.
+    /// Reading, decrypting and writing a whole audio file takes time that grows
+    /// with the length of the recording. An hour of audio is about 30 MB, and all
+    /// three steps take the whole file at once.
     ///
-    /// `@concurrent` holder det unna hovedtråden. Uten den havner det der:
-    /// `SWIFT_APPROACHABLE_CONCURRENCY` gjør at en `nonisolated async`
-    /// funksjon arver aktøren til den som kaller, og her kaller viewet.
-    /// Målt 9. september 2026 – da sto grensesnittet stille til
-    /// delingsmenyen kom opp.
+    /// `@concurrent` keeps it off the main thread. Without it, it lands there:
+    /// `SWIFT_APPROACHABLE_CONCURRENCY` makes a `nonisolated async` function inherit
+    /// the caller's actor, and here the view calls. Measured 9 September 2026: the
+    /// interface froze until the share sheet came up.
     @concurrent
     private static func write(
         fileName: String,
@@ -58,15 +57,15 @@ enum RecordingExport {
         return urls
     }
 
-    /// Skriver teksten som UTF-8 med byte order mark.
+    /// Writes the text as UTF-8 with a byte order mark.
     ///
-    /// Uten BOM gjetter mange lesere at en `.txt` er Latin-1, og da blir «så»
-    /// til «sÃ¥». Filen er UTF-8 uansett; de tre bytene forteller leseren det.
+    /// Without the BOM many readers guess that a `.txt` is Latin-1, and «så» becomes
+    /// «sÃ¥». The file is UTF-8 either way; the three bytes tell the reader so.
     static func utf8WithBOM(_ text: String) -> Data {
         Data([0xEF, 0xBB, 0xBF]) + Data(text.utf8)
     }
 
-    /// Rydder bort klarteksten etter at delingen er ferdig.
+    /// Cleans up the plaintext once sharing is done.
     static func cleanUp(_ urls: [URL]) {
         for url in urls {
             try? FileManager.default.removeItem(at: url.deletingLastPathComponent())

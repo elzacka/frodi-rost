@@ -2,8 +2,8 @@ import Testing
 import UIKit
 @testable import Frodi
 
-/// Et ikon som mangler i asset-katalogen tegner ingen ting. Knappen blir da
-/// stående tom, og den feilen ser ingen før den står i en app-butikk.
+/// An icon missing from the asset catalogue draws nothing. The button is then
+/// left empty, and nobody sees that fault before it is in an app store.
 @Suite("Ikoner")
 struct IconTests {
     @Test("Alle ikoner finnes i asset-katalogen", arguments: Icon.allCases)

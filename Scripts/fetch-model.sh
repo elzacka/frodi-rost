@@ -1,18 +1,18 @@
 #!/bin/bash
-# Henter nb-whisper-small som CoreML, og Whisper-tokenizeren.
+# Fetches nb-whisper-small as CoreML, and the Whisper tokenizer.
 #
-# Modellen ligger ikke i git — den er nesten en halv gigabyte. Kjør dette
-# skriptet én gang etter kloning, før du bygger.
+# The model is not in git; it is nearly half a gigabyte. Run this script once
+# after cloning, before you build.
 #
-# Kilder:
-#   modell:     https://huggingface.co/Barrymanalow/nb-whisper-coreml (apache-2.0)
-#   tokenizer:  https://huggingface.co/openai/whisper-small (apache-2.0)
+# Sources:
+# model:      https://huggingface.co/Barrymanalow/nb-whisper-coreml (apache-2.0)
+# tokenizer:  https://huggingface.co/openai/whisper-small (apache-2.0)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DEST="$ROOT/Frodi/Resources/Model"
 MODEL="$DEST/nb-whisper-small"
-# WhisperKit krever nøyaktig denne strukturen under tokenizer-mappen.
+# WhisperKit requires exactly this structure under the tokenizer folder.
 TOKENIZER="$DEST/tokenizer/models/openai/whisper-small"
 
 mkdir -p "$MODEL" "$TOKENIZER"

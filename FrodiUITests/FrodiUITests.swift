@@ -1,9 +1,9 @@
 import XCTest
 
 final class FrodiUITests: XCTestCase {
-    /// Røyktest. Sjekker det som alltid er der, uansett om appen har opptak
-    /// fra før. Den forrige versjonen så etter tomtilstanden og feilet så snart
-    /// simulatoren hadde et opptak liggende fra en tidligere kjøring.
+    /// Smoke test. Checks what is always there, whether or not the app already has
+    /// recordings. The previous version looked for the empty state and failed as
+    /// soon as the simulator had a recording left over from an earlier run.
     @MainActor
     func test_launch_showsHeaderAndRecordButton() {
         let app = XCUIApplication()
@@ -19,8 +19,8 @@ final class FrodiUITests: XCTestCase {
         )
     }
 
-    /// Info-siden er appens eneste sted for personvern, tillatelser og
-    /// attribusjon. Apache 2.0 krever at lisenslisten faktisk er å finne i appen.
+    /// The Info page is the app's only place for privacy, permissions and
+    /// attribution. Apache 2.0 requires the licence list to actually be in the app.
     @MainActor
     func test_about_opensAndReachesLicenses() {
         let app = XCUIApplication()

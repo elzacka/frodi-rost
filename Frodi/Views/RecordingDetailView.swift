@@ -24,8 +24,8 @@ struct RecordingDetailView: View {
 
             ScrollView {
                 VStack(spacing: Space.s4) {
-                    // Lyden står øverst. Teksten er en avskrift av den, og
-                    // avskriften er ikke alltid riktig – da vil du høre originalen.
+                    // The audio comes first. The text is a transcript of it, and the transcript
+                    // is not always right; then you want to hear the original.
                     PlaybackControls(recording: recording, player: player)
 
                     transcriptCard
@@ -57,15 +57,15 @@ struct RecordingDetailView: View {
         } message: {
             Text(exportError ?? "").font(.Frodi.body)
         }
-        // Nøkkelen er selve chifferteksten, ikke opptaket. Blir transkriberingen
-        // ferdig mens du står her, endrer den seg, og teksten låses opp på nytt.
-        // Med opptakets id kjørte dette bare én gang, og feltet ble stående tomt.
+        // The key is the ciphertext itself, not the recording. If the transcription
+        // finishes while you are here, it changes, and the text is unlocked again.
+        // With the recording's id this ran only once, and the field stayed empty.
         .task(id: recording.sealedTranscript) {
-            // Teksten låses opp først når den skal vises.
+            // The text is unlocked only when it is about to be shown.
             transcript = (try? recording.transcript()) ?? ""
         }
         .onDisappear {
-            // Ingen grunn til å la klarteksten ligge i minnet etterpå.
+            // No reason to leave the plaintext in memory afterwards.
             transcript = ""
         }
     }
@@ -73,8 +73,8 @@ struct RecordingDetailView: View {
     private var transcriptCard: some View {
         VStack(alignment: .leading, spacing: Space.s4) {
             if recording.hasTranscript, transcript.isEmpty {
-                // Teksten finnes, men er ikke låst opp ennå. Uten dette
-                // blinker kortet tomt i det transkriberingen blir ferdig.
+                // The text exists but is not unlocked yet. Without this the card flashes
+                // empty the moment the transcription finishes.
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, Space.s5)
@@ -103,7 +103,7 @@ struct RecordingDetailView: View {
                     .foregroundStyle(Color.Frodi.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                // Et nytt forsøk hjelper ikke når iOS mangler språket.
+                // A retry does not help when iOS lacks the language.
                 if recording.failureCode != "localeUnsupported" {
                     Button("Prøv på nytt") {
                         Task { await onRetry() }
@@ -115,7 +115,7 @@ struct RecordingDetailView: View {
                     .background(Color.Frodi.accentRecord, in: Capsule())
                 }
             } else {
-                // Ingen transkribering startet ennå, og ingen har feilet.
+                // No transcription started yet, and none has failed.
                 Text(TranscriptionError.explanation(for: nil))
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textSecondary)
@@ -131,14 +131,14 @@ struct RecordingDetailView: View {
         )
     }
 
-    /// Teksten er slått sammen når du kommer inn på siden.
+    /// The text is collapsed when you enter the page.
     ///
-    /// Et opptak på ti minutter blir flere skjermhøyder med tekst, og da må du
-    /// bla langt for å komme tilbake til spilleren. Ordtellingen står i raden,
-    /// så du ser at hele opptaket kom med uten å åpne teksten.
+    /// A ten-minute recording is several screens of text, and then you scroll a
+    /// long way to get back to the player. The word count is in the row, so you
+    /// can see the whole recording came through without opening the text.
     ///
-    /// Uttrekket henter teksten fra opptaket selv og bryr seg ikke om raden
-    /// står åpen eller lukket.
+    /// Export takes the text from the recording itself and does not care whether
+    /// the row is open or closed.
     private var transcriptToggle: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.2)) { showsTranscript.toggle() }
@@ -167,13 +167,13 @@ struct RecordingDetailView: View {
         .accessibilityHint(showsTranscript ? "Skjuler teksten" : "Viser teksten")
     }
 
-    /// «312 ord». Tallet er også svaret på om hele opptaket kom med.
+    /// «312 ord». The number is also the answer to whether the whole recording came through.
     private var wordCount: String {
         let words = transcript.split(whereSeparator: \.isWhitespace).count
         return "\(words.formatted(.number.locale(AppLocale.norwegian))) ord"
     }
 
-    /// Dato, tidspunkt og lengde står i tittelen, så selve kortet er bare teksten.
+    /// Date, time and length are in the title, so the card itself is just the text.
     private var title: String {
         let stamp = recording.createdAt.recordingStamp
         let length = Duration.seconds(recording.duration).formatted(.time(pattern: .minuteSecond))

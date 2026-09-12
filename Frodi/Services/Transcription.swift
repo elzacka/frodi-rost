@@ -1,14 +1,15 @@
 import Foundation
 import SwiftData
 
-/// Ett sted som gjør opptak om til tekst, slik at både grensesnittet og
-/// handlingsknappen behandler feil likt.
+/// One place that turns recordings into text, so the interface and the Action
+/// Button handle errors the same way.
 ///
-/// Motoren velges her. Er nb-whisper med i bygget, brukes den – da skjer alt
-/// inne i appens egen container. Mangler den, faller vi tilbake til Apples
-/// modell, som også kjører på enheten, men i en systemprosess utenfor appen.
+/// The engine is chosen here. If nb-whisper is in the build it is used, and
+/// everything then happens inside the app's own container. If it is missing we
+/// fall back to Apple's model, which also runs on the device, but in a system
+/// process outside the app.
 enum Transcription {
-    /// Holdes i live mellom opptak. Modellen bruker flere sekunder på å lastes.
+    /// Kept alive between recordings. The model takes several seconds to load.
     private static let whisper = WhisperTranscriber()
 
     static var usesBundledModel: Bool { WhisperTranscriber.isBundled }

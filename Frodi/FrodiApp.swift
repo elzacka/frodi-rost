@@ -6,9 +6,9 @@ struct FrodiApp: App {
     private let container: ModelContainer
 
     init() {
-        // Feiler disken, faller vi tilbake til minnet slik at appen fortsatt tar
-        // opp. Brukeren får beskjed om at opptakene ikke overlever omstart, i
-        // stedet for at appen kræsjer ved oppstart.
+        // If the disk fails, fall back to memory so the app still records. The user
+        // is told that recordings will not survive a restart, instead of the app
+        // crashing at launch.
         var failed = false
         var resolved: ModelContainer
         do {
@@ -17,7 +17,7 @@ struct FrodiApp: App {
         } catch {
             failed = true
             let memoryOnly = ModelConfiguration(isStoredInMemoryOnly: true)
-            // Klarer vi ikke engang dette, er det ingenting igjen å redde.
+            // If even this fails, there is nothing left to save.
             resolved = try! ModelContainer(for: Recording.self, configurations: memoryOnly)
         }
         container = resolved
@@ -27,7 +27,7 @@ struct FrodiApp: App {
     var body: some Scene {
         WindowGroup {
             RecordingListView()
-                // Designsystemet definerer kun lys modus.
+                // The design system defines light mode only.
                 .preferredColorScheme(.light)
                 .tint(Color.Frodi.accentRecord)
         }

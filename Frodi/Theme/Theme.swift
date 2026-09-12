@@ -1,12 +1,11 @@
 import SwiftUI
 
-/// Designsystemet i kode. Verdiene her er de eneste som skal brukes –
-/// ingen egendefinerte farger, avstander eller radiuser ute i viewene.
+/// The design system in code. The values here are the only ones to use: no
+/// custom colours, spacings or radii out in the views.
 ///
-/// Kilde: dev_only/designsystem/frodi-designsystem.html
+/// Source: dev_only/designsystem/frodi-designsystem.html
 
-// MARK: - Farger
-
+// MARK: - Colours
 extension Color {
     enum Frodi {
         static let background = Color("Background")
@@ -15,33 +14,32 @@ extension Color {
         static let textSecondary = Color("TextSecondary")
         static let border = Color("BorderNeutral")
 
-        /// Brukes kun til opptaksrelaterte elementer.
+        /// Used only for recording-related elements.
         static let accentRecord = Color("AccentRecord")
-        /// Tekst og ikoner oppå `accentRecord`. Aldri ren svart eller hvit.
+        /// Text and icons on top of `accentRecord`. Never pure black or white.
         static let accentRecordOn = Color("AccentRecordOn")
-        /// Aktivt opptak pågår.
+        /// A recording is in progress.
         static let recordingActive = Color("RecordingActive")
 
-        // accent-knowledge (#2E9C82) er reservert til kunnskapsdelen og
-        // finnes derfor ikke her ennå. Legg den inn når den delen bygges.
+        // accent-knowledge (#2E9C82) is reserved for the knowledge feature and is
+        // therefore not here yet. Add it when that feature is built.
     }
 }
 
-// MARK: - Typografi
-
+// MARK: - Typography
 extension Font {
     enum Frodi {
-        /// Skranji Bold. Logo og appnavn. Samme skrift som i app-ikonet.
+        /// Skranji Bold. Logo and app name. The same face as in the app icon.
         static let display = custom("Skranji-Bold", size: 26, relativeTo: .largeTitle)
-        /// Inter 600. Skjermtitler.
+        /// Inter 600. Screen titles.
         ///
-        /// Skranji er en pyntefont og holdes til logoen. Titler som «Ingen
-        /// opptak ennå» må kunne leses raskt, også med stor tekst og i bil,
-        /// og WCAG 2.2 AA gjelder.
+        /// Skranji is a display face and is kept to the logo. Titles such as «Ingen
+        /// opptak ennå» must be readable quickly, also with large text and in a car,
+        /// and WCAG 2.2 AA applies.
         static let title = custom("Inter-SemiBold", size: 20, relativeTo: .title2)
-        /// Inter 500, sporet. Små etiketter over en seksjon.
+        /// Inter 500, tracked. Small labels above a section.
         static let eyebrow = custom("Inter-Medium", size: 11, relativeTo: .caption2)
-        /// Inter 500. Timeren under opptak. Skal kunne leses på avstand i bil.
+        /// Inter 500. The timer while recording. Must be readable at a distance in a car.
         static let timer = custom("Inter-Medium", size: 32, relativeTo: .largeTitle)
         static let body = custom("Inter-Regular", size: 15, relativeTo: .body)
         static let bodyMedium = custom("Inter-Medium", size: 15, relativeTo: .body)
@@ -50,9 +48,8 @@ extension Font {
     }
 }
 
-// MARK: - Avstand
-
-/// 8px-grid. Ingen egendefinerte tall utenfor denne skalaen.
+// MARK: - Spacing
+/// 8 px grid. No custom numbers outside this scale.
 enum Space {
     static let s1: CGFloat = 4
     static let s2: CGFloat = 8
@@ -64,15 +61,13 @@ enum Space {
     static let s8: CGFloat = 40
 }
 
-// MARK: - Hjørneradius
-
+// MARK: - Corner radius
 enum Radius {
     static let control: CGFloat = 12
     static let card: CGFloat = 16
 }
 
-// MARK: - Opptaksknapp
-
+// MARK: - Record button
 enum RecordButton {
     static let diameter: CGFloat = 76
     static let inner: CGFloat = 56
@@ -80,58 +75,53 @@ enum RecordButton {
     static let icon: CGFloat = 22
 }
 
-// MARK: - Knapp i logohodet
-
-/// Tannhjulet til høyre i logohodet. Designsystemet gir ingen mål, så ikonet
-/// står i samme størrelse som i systemets navigasjonslinje, og treffflaten er
-/// satt til minstemålet på 44 pt.
+// MARK: - Header button
+/// The info button at the right of the logo header. The design system gives no
+/// measure, so the icon is the size of the one in the system navigation bar, and
+/// the hit area is set to the 44 pt minimum.
 enum HeaderButton {
     static let icon: CGFloat = 18
     static let touch: CGFloat = 44
 }
 
-// MARK: - Ikoner
-
-/// Størrelser på ikoner, i punkt.
+// MARK: - Icons
+/// Icon sizes, in points.
 ///
-/// Heroicons tegnes i et rutenett på 24 × 24 og skaleres hit. Målene står her
-/// av samme grunn som resten av designsystemet: et tall på stedet blir aldri
-/// endret sammen med de andre.
+/// Heroicons are drawn on a 24 × 24 grid and scaled to these. The measures live
+/// here for the same reason as the rest of the design system: a number at the
+/// call site never gets changed along with the others.
 enum IconSize {
-    /// Sjevroner i rader og kort, på linje med bildeteksten ved siden av.
+    /// Chevrons in rows and cards, in line with the caption beside them.
     static let inline: CGFloat = 13
-    /// Knapper i navigasjonslinjen.
+    /// Buttons in the navigation bar.
     static let toolbar: CGFloat = 20
-    /// Ikon som står alene over en beskjed.
+    /// An icon standing alone above a message.
     static let notice: CGFloat = 22
 }
 
-// MARK: - Avspillingskontroller
-
-/// Designsystemet beskriver ingen spiller. Målene er avledet: spilleknappen
-/// har samme diameter som den indre sirkelen i opptaksknappen, og hoppknappene
-/// er 44 pt, som er minste treffflate.
+// MARK: - Playback controls
+/// The design system describes no player. The measures are derived: the play
+/// button has the same diameter as the inner circle of the record button, and the
+/// skip buttons are 44 pt, the minimum hit area.
 enum PlayerControl {
     static let play: CGFloat = 56
     static let playIcon: CGFloat = 22
     static let skip: CGFloat = 44
-    // Pilen deler knappen med tallet under seg, og ble 18 for at de to skal få
-    // plass innenfor de 44 punktene uten å presses mot kanten.
+    // The arrow shares the button with the number below it, and went to 18 so the
+    // two fit inside the 44 points without being pushed against the edge.
     static let skipIcon: CGFloat = 18
 }
 
-// MARK: - Sammenslått innhold
-
-/// Designsystemet beskriver ingen expander. Raden som slår teksten ut og inn
-/// er 44 pt høy, som er minste treffflate.
+// MARK: - Collapsed content
+/// The design system describes no expander. The row that folds the text out and
+/// in is 44 pt tall, the minimum hit area.
 enum Disclosure {
     static let row: CGFloat = 44
 }
 
-// MARK: - Sporing
-
+// MARK: - Tracking
 extension Text {
-    /// Eyebrow-etiketter er sporet 0.06em i designsystemet.
+    /// Eyebrow labels are tracked 0.06 em in the design system.
     func eyebrowTracking() -> some View {
         tracking(11 * 0.06)
     }

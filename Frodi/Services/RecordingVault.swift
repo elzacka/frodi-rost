@@ -2,26 +2,26 @@ import CryptoKit
 import Foundation
 import Security
 
-/// Krypterer opptak med en nøkkel som aldri forlater denne enheten.
+/// Encrypts recordings with a key that never leaves this device.
 ///
-/// Hvorfor dette i tillegg til iOS' egen filbeskyttelse: Apple beskriver
-/// `isExcludedFromBackup` som veiledning til systemet, ikke en garanti. Slipper
-/// en kopi likevel ut, er den uleselig uten nøkkelen – og nøkkelen finnes bare
-/// inne i Secure Enclave på denne enheten.
+/// Why this on top of iOS' own file protection: Apple describes
+/// `isExcludedFromBackup` as guidance to the system, not a guarantee. If a copy
+/// gets out anyway, it is unreadable without the key, and the key exists only
+/// inside the Secure Enclave on this device.
 ///
-/// Oppbygging:
-/// - En P-256-nøkkel lages i Secure Enclave og forlater den aldri.
-/// - Hvert opptak får sin egen tilfeldige AES-256-nøkkel.
-/// - Lyden forsegles med AES-GCM, og AES-nøkkelen pakkes inn av Enclave-nøkkelen.
+/// Structure:
+/// - A P-256 key is created in the Secure Enclave and never leaves it.
+/// - Every recording gets its own random AES-256 key.
+/// - The audio is sealed with AES-GCM, and the AES key is wrapped by the Enclave key.
 ///
-/// Prisen er at opptakene ikke kan leses av en annen enhet. Derfor finnes
-/// eksport: se `RecordingExport`.
+/// The price is that recordings cannot be read by another device. That is what
+/// export is for: see `RecordingExport`.
 enum RecordingVault {
-    // Prefikset er `no.`, mens bundle-ID-en er `com.Tazk.Frodi`. Det er ikke
-    // en feil som skal rettes: merkelappen er adressen til nøkkelen i Secure
-    // Enclave, ikke en identifikator iOS bryr seg om. Endrer vi den, finner
-    // appen ikke igjen nøkkelen, og alle opptak som allerede ligger forseglet
-    // på enheten blir uleselige. Den er privat og vises ingen steder.
+    // The prefix is `no.` while the bundle ID is `com.Tazk.Frodi`. That is not a
+    // mistake to fix: the tag is the address of the key in the Secure Enclave, not
+    // an identifier iOS cares about. Change it and the app cannot find the key
+    // again, and every recording already sealed on the device becomes unreadable.
+    // It is private and shown nowhere.
     private static let keyTag = "no.Tazk.Frodi.vault.v1".data(using: .utf8)!
 
     enum VaultError: LocalizedError {
@@ -41,14 +41,13 @@ enum RecordingVault {
         }
     }
 
-    // MARK: - Kryptering
-
+    // MARK: - Encryption
     static func seal(fileAt url: URL) throws -> Data {
         try seal(try Data(contentsOf: url))
     }
 
-    /// Forsegler tekst. Brukes til transkripsjoner, som ofte er mer
-    /// eksponerende enn lydfilen: teksten er søkbar og lesbar på et blikk.
+    /// Seals text. Used for transcripts, which are often more exposing than the
+    /// audio file: the text is searchable and readable at a glance.
     static func seal(_ text: String) throws -> Data {
         try seal(Data(text.utf8))
     }
@@ -67,7 +66,7 @@ enum RecordingVault {
         guard let combined = sealed.combined else { throw VaultError.decryptionFailed }
         let wrappedKey = try wrap(dataKey)
 
-        // Format: 2 byte lengde på innpakket nøkkel, nøkkelen, deretter chiffer.
+        // Format: 2 bytes of wrapped-key length, the key, then the ciphertext.
         var out = Data()
         var length = UInt16(wrappedKey.count).bigEndian
         withUnsafeBytes(of: &length) { out.append(contentsOf: $0) }
@@ -89,8 +88,7 @@ enum RecordingVault {
         return try AES.GCM.open(box, using: dataKey)
     }
 
-    // MARK: - Nøkkel i Secure Enclave
-
+    // MARK: - Key in the Secure Enclave
     private static func wrap(_ key: SymmetricKey) throws -> Data {
         let privateKey = try enclaveKey()
         guard let publicKey = SecKeyCopyPublicKey(privateKey) else {
@@ -117,7 +115,7 @@ enum RecordingVault {
         return SymmetricKey(data: raw as Data)
     }
 
-    /// Henter nøkkelen, eller lager den første gang.
+    /// Fetches the key, or creates it the first time.
     private static func enclaveKey() throws -> SecKey {
         if let existing = loadKey() { return existing }
         return try createKey()
@@ -137,9 +135,9 @@ enum RecordingVault {
     }
 
     private static func createKey() throws -> SecKey {
-        // afterFirstUnlockThisDeviceOnly, ikke whenUnlocked: opptaket kan
-        // stoppes med handlingsknappen mens skjermen er låst, og da må nøkkelen
-        // være tilgjengelig. ThisDeviceOnly holder den utenfor sikkerhetskopier.
+        // afterFirstUnlockThisDeviceOnly, not whenUnlocked: the recording can be
+        // stopped with the Action Button while the screen is locked, and the key has to
+        // be available then. ThisDeviceOnly keeps it out of backups.
         var accessError: Unmanaged<CFError>?
         guard let access = SecAccessControlCreateWithFlags(
             nil,
@@ -160,8 +158,8 @@ enum RecordingVault {
             ]
         ]
 
-        // Simulatoren har ingen Secure Enclave. Da lages nøkkelen i nøkkelringen
-        // i stedet, slik at tester og utvikling virker. På enhet er den i Enclave.
+        // The simulator has no Secure Enclave. The key is then created in the keychain
+        // instead, so tests and development work. On a device it is in the Enclave.
         #if !targetEnvironment(simulator)
         attributes[kSecAttrTokenID as String] = kSecAttrTokenIDSecureEnclave
         #endif

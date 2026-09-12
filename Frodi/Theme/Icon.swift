@@ -1,19 +1,19 @@
 import SwiftUI
 
-/// Ikonene i appen, hentet fra Heroicons.
+/// The icons in the app, taken from Heroicons.
 ///
-/// Heroicons er tegnet av Tailwind Labs og er MIT-lisensiert. Filene ligger i
-/// asset-katalogen som SVG med vektordata beholdt, så de er skarpe i alle
-/// størrelser. `template` gjør at fargen kommer fra `foregroundStyle`, slik at
-/// et ikon følger tekstfargene i designsystemet i stedet for å ha sin egen.
+/// Heroicons is drawn by Tailwind Labs and MIT licensed. The files live in the
+/// asset catalogue as SVG with vector data preserved, so they are sharp at every
+/// size. `template` makes the colour come from `foregroundStyle`, so an icon
+/// follows the design system's text colours instead of having its own.
 ///
-/// Hvorfor ikke SF Symbols: de er Apples, og appen skal se ut som seg selv.
-/// Prisen er at ikonene ikke lenger følger skriftstørrelsen automatisk – men
-/// det gjorde de heller ikke før, siden hvert kall alt satte en fast størrelse.
+/// Why not SF Symbols: they are Apple's, and the app should look like itself.
+/// The price is that the icons no longer follow the text size automatically, but
+/// they did not before either, since every call already set a fixed size.
 ///
-/// To utgaver er i bruk. Strek til alt som er ramme og navigasjon, fylt til
-/// knappene som ligger på en farget flate, der en strek ville forsvunnet.
-/// Det er slik Heroicons selv er ment å brukes.
+/// Two variants are in use. Outline for everything that is frame and navigation,
+/// solid for the buttons that sit on a coloured surface, where an outline would
+/// vanish. That is how Heroicons itself is meant to be used.
 enum Icon: String, CaseIterable {
     case information = "information-circle"
     case close = "x-mark"
@@ -31,11 +31,11 @@ enum Icon: String, CaseIterable {
     case pause = "pause-solid"
 }
 
-/// Et ikon i gitt størrelse, farget som teksten rundt.
+/// An icon at a given size, coloured like the text around it.
 ///
-/// Størrelsen oppgis i punkt og kommer fra målene i `Theme`, aldri som et tall
-/// på stedet. Ikonet er kvadratisk: Heroicons tegnes i et rutenett på 24 × 24,
-/// og en firkantet ramme holder dem på linje med hverandre.
+/// The size is given in points and comes from the measures in `Theme`, never as a
+/// number at the call site. The icon is square: Heroicons are drawn on a 24 × 24
+/// grid, and a square frame keeps them aligned with each other.
 struct IconView: View {
     private let icon: Icon
     private let size: CGFloat

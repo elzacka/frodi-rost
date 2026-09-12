@@ -1,37 +1,38 @@
 import Foundation
 
-/// Hvor langt et opptak kan være, og hvor mye tekst det blir.
+/// How long a recording can be, and how much text it becomes.
 ///
-/// Grensen finnes fordi minnet setter den. nb-whisper vokser med lengden på
-/// opptaket, rundt 60 MB per minutt lyd oppå de 400 MB modellen selv tar. Målt
-/// på simulator 9. september 2026 gikk ti minutter gjennom på 1 130 MB, mens
-/// femten minutter ble drept. Uten en grense er det ikke opptaket som stopper,
-/// men transkripsjonen etterpå – og da er teksten tapt uten at noen sa fra.
+/// The limit exists because memory sets it. nb-whisper grows with the length of
+/// the recording, about 60 MB per minute of audio on top of the 400 MB the model
+/// itself takes. Measured on the simulator on 9 September 2026, ten minutes went
+/// through at 1 130 MB while fifteen minutes was killed. Without a limit it is not
+/// the recording that stops but the transcription afterwards, and then the text
+/// is lost without anyone saying so.
 ///
-/// Ti minutter er det lengste som er målt helt gjennom. Tallet står her alene,
-/// og alt annet regnes ut fra det: setningen på Info-siden, nedtellingen i
-/// opptaksfeltet og stoppen i `AudioRecorder`. Skal grensen endres, er det
-/// denne linjen som endres.
+/// Ten minutes is the longest length measured all the way through. The number
+/// lives here alone, and everything else is computed from it: the sentence on the
+/// Info page, the countdown in the recorder bar and the stop in `AudioRecorder`.
+/// To change the limit, change this line.
 ///
-/// **Taket er ikke målt på enhet.** Nevral motor har en annen minneprofil enn
-/// simulatoren, og en enhet med 4 GB har mindre å gå på enn Mac-en. Blir opptak
-/// drept på enhet, er det dette tallet som skal ned.
+/// **The ceiling has not been measured on a device.** The Neural Engine has a
+/// different memory profile from the simulator, and a 4 GB device has less headroom
+/// than the Mac. If recordings get killed on a device, this is the number to lower.
 enum RecordingLimit {
     static let duration: TimeInterval = 10 * 60
 
     static var minutes: Int { Int(duration / 60) }
 
-    /// Ord er enheten appen alt teller i: detaljvisningen sier «114 ord».
+    /// Words are the unit the app already counts in: the detail view says «114 ord».
     ///
-    /// 170 ord i minuttet er målt, ikke antatt – 512 ord på 3 minutter og
-    /// 1 683 på 10. Det er fort snakket, og tallet er derfor et tak og ikke et
-    /// anslag. Sier du mindre i minuttet, får du mindre tekst.
+    /// 170 words a minute is measured, not assumed: 512 words in 3 minutes and
+    /// 1 683 in 10. That is fast speech, so the number is a ceiling, not an
+    /// estimate. Say less per minute and you get less text.
     static var words: Int { minutes * 170 }
 
-    /// Tall skrevet på norsk, med hardt mellomrom som tusenskille.
+    /// A number written in Norwegian, with a hard space as the thousands separator.
     ///
-    /// Språket er låst til bokmål her av samme grunn som i `AppLocale`: en
-    /// enhet satt til engelsk skal fortsatt vise norsk tekst.
+    /// The locale is pinned to Bokmål here for the same reason as in `AppLocale`: a
+    /// device set to English must still show Norwegian text.
     static func formatted(_ number: Int) -> String {
         number.formatted(.number.locale(AppLocale.norwegian))
     }

@@ -1,17 +1,18 @@
 import AppIntents
 import AVFoundation
 
-/// Intenten handlingsknappen kjører. Knappen holdes inne, ikke trykkes: første
-/// hold starter, neste stopper.
+/// The intent the Action Button runs. The button is held, not tapped: the first
+/// hold starts, the next stops.
 ///
-/// `supportedModes` lar den kjøre i bakgrunnen. Både start og stopp forsøkes
-/// der først, fordi å åpne appen er det som tvinger fram Face ID eller kode
-/// når skjermen er låst. I bil ligger enheten gjerne flatt på ladeplaten og
-/// ser ikke ansiktet ditt, så opplåsingen er ikke bare et ekstra trykk – den
-/// kan ikke fullføres mens du kjører.
+/// `supportedModes` lets it run in the background. Both start and stop are tried
+/// there first, because opening the app is what forces Face ID or the passcode
+/// when the screen is locked. In a car the device typically lies flat on the
+/// charging pad and cannot see your face, so the unlock is not just an extra tap;
+/// it cannot be completed while you drive.
 ///
-/// Gir ikke iOS oss mikrofonen i bakgrunnen, er forgrunnen eneste vei, og da
-/// må enheten låses opp. Forsøket koster ingenting når det feiler.
+/// If iOS does not give us the microphone in the background, the foreground is
+/// the only way, and then the device has to be unlocked. The attempt costs
+/// nothing when it fails.
 struct ToggleRecordingIntent: AppIntent {
     static let title: LocalizedStringResource = "Start eller stopp opptak"
     static let description = IntentDescription("Starter et opptak i Fróði, eller stopper det som går.")
@@ -21,23 +22,23 @@ struct ToggleRecordingIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         let controller = RecordingController.shared
 
-        // Å stoppe krever ingenting av grensesnittet, og går fint i bakgrunnen.
+        // Stopping needs nothing from the interface, and works fine in the background.
         if controller.isRecording {
             controller.stopAndSave()
             return .result()
         }
 
-        // Uten mikrofontillatelse er det ingen vits i å prøve i bakgrunnen:
-        // spørsmålet kan bare stilles i forgrunnen, og et forsøk her ville
-        // bare fått nei uten at du ble spurt.
+        // Without microphone permission there is no point trying in the background:
+        // the question can only be asked in the foreground, and an attempt here would
+        // just get a no without you being asked.
         if AVAudioApplication.shared.recordPermission == .granted,
            await controller.start() {
             return .result()
         }
 
-        // Da må appen fram, og iOS krever opplåsing.
-        // alwaysConfirm er false fordi du alt har bedt om dette ved å trykke
-        // på knappen. Et bekreftelsessteg til ville vært i veien i bil.
+        // Then the app has to come forward, and iOS requires an unlock.
+        // alwaysConfirm is false because you already asked for this by pressing the
+        // button. Another confirmation step would be in the way in a car.
         if systemContext.currentMode == .background {
             try await continueInForeground(alwaysConfirm: false)
         }

@@ -39,12 +39,12 @@ struct RecordingRow: View {
         .accessibilityLabel(spokenLabel)
     }
 
-    /// Dato, tidspunkt og lengde på én linje, delt med en loddrett strek.
+    /// Date, time and length on one line, separated by a vertical bar.
     private var title: String {
         "\(stamp) | \(length)"
     }
 
-    /// Bare det som ikke står i tittelen: hvorfor teksten mangler.
+    /// Only what the title does not say: why the text is missing.
     private var status: String? {
         if recording.hasTranscript { return nil }
         if recording.isTranscribing { return "transkriberer" }
@@ -53,7 +53,7 @@ struct RecordingRow: View {
             : "venter på transkribering"
     }
 
-    /// VoiceOver leser ikke en loddrett strek som en pause, så den får en egen setning.
+    /// VoiceOver does not read a vertical bar as a pause, so it gets its own sentence.
     private var spokenLabel: String {
         let spoken = "\(stamp), \(length)"
         guard let status else { return spoken }

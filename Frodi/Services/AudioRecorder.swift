@@ -19,18 +19,18 @@ final class AudioRecorder {
 
     var isRecording: Bool { state == .recording }
 
-    /// Hvor mye av grensen som står igjen. Nedtellingen i opptaksfeltet leser
-    /// denne, slik at brukeren ser slutten komme i stedet for å bli tatt av den.
+    /// How much of the limit is left. The countdown in the recorder bar reads this,
+    /// so the user sees the end coming instead of being caught by it.
     var remaining: TimeInterval { max(RecordingLimit.duration - duration, 0) }
 
-    /// Kalles når opptaket har nådd grensen og må lagres.
+    /// Called when the recording has reached the limit and must be saved.
     ///
-    /// Opptakeren lagrer ikke selv – det gjør `RecordingController`, og bare
-    /// den vet om databasen. Derfor en lukking hit i stedet for at opptakeren
-    /// får vite om lagringen.
+    /// The recorder does not save; `RecordingController` does, and only it knows
+    /// about the database. Hence a closure here rather than the recorder learning
+    /// about saving.
     var onLimitReached: (() -> Void)?
 
-    /// Starter opptak. Returnerer false hvis mikrofonen ikke er tilgjengelig.
+    /// Starts recording. Returns false if the microphone is not available.
     @discardableResult
     func start() async -> Bool {
         guard state != .recording else { return true }
@@ -42,8 +42,8 @@ final class AudioRecorder {
 
         do {
             let session = AVAudioSession.sharedInstance()
-            // spokenAudio gir bedre behandling av tale enn default, og
-            // playAndRecord lar oss spille av uten å bytte kategori etterpå.
+            // spokenAudio treats speech better than default, and playAndRecord lets us
+            // play back without switching category afterwards.
             try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.defaultToSpeaker, .allowBluetoothHFP])
             try session.setActive(true)
 
@@ -75,7 +75,7 @@ final class AudioRecorder {
         }
     }
 
-    /// Stopper opptaket og gir tilbake filnavn og lengde.
+    /// Stops the recording and returns the file name and length.
     func stop() -> (fileName: String, duration: TimeInterval)? {
         guard let recorder, state == .recording else { return nil }
 
@@ -88,14 +88,14 @@ final class AudioRecorder {
 
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
 
-        // Et opptak uten lyd i er ikke verdt en rad i listen.
+        // A recording with no audio in it is not worth a row in the list.
         guard length >= 0.5 else {
             AudioStorage.delete(fileName: recorder.url.lastPathComponent)
             return nil
         }
 
-        // Filen er lukket nå. Den forsegles med en nøkkel som bare finnes i
-        // denne enhetens Secure Enclave, og klarteksten slettes.
+        // The file is closed now. It is sealed with a key that exists only in this
+        // device's Secure Enclave, and the plaintext is deleted.
         do {
             let sealed = try RecordingVault.seal(fileAt: recorder.url)
             let name = recorder.url.lastPathComponent + ".enc"
@@ -105,7 +105,7 @@ final class AudioRecorder {
             AudioStorage.protectFinished(target)
             return (name, length)
         } catch {
-            // Klarer vi ikke å kryptere, beholder vi ikke klarteksten liggende.
+            // If we cannot encrypt, we do not leave the plaintext lying around.
             try? FileManager.default.removeItem(at: recorder.url)
             state = .failed(String(localized: "Fróði fikk ikke låst opptaket, og slettet det."))
             return nil
@@ -119,14 +119,14 @@ final class AudioRecorder {
                 guard let self, let recorder = self.recorder else { return }
                 self.duration = recorder.currentTime
 
-                // Opptaket stopper seg selv på grensen. Nedtellingen har vist
-                // den komme, så dette er ingen overraskelse.
+                // The recording stops itself at the limit. The countdown has shown it
+                // coming, so this is no surprise.
                 //
-                // Stoppen må skje her, mens opptaket fortsatt går: `stop()`
-                // leser lengden av `recorder.currentTime`, og den er null så
-                // snart opptaket er stanset. Lot vi i stedet AVAudioRecorder
-                // stoppe selv med `record(forDuration:)`, ville lengden blitt
-                // null, og opptaket kastet som for kort.
+                // The stop must happen here, while the recording is still running: `stop()`
+                // reads the length from `recorder.currentTime`, and that is zero as soon as
+                // the recording has stopped. Had we let AVAudioRecorder stop itself with
+                // `record(forDuration:)`, the length would have been zero and the recording
+                // discarded as too short.
                 if self.duration >= RecordingLimit.duration {
                     self.onLimitReached?()
                     return

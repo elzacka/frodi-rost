@@ -1,11 +1,11 @@
 import Foundation
 
 extension Date {
-    /// Datoen slik den vises på et opptak: 07.09.26, 00:53
+    /// The date as shown on a recording: 07.09.26, 00:53
     ///
-    /// Ett sted, slik at listen og detaljvisningen ikke kan komme i utakt.
-    /// Året er med fordi opptak blir liggende, og «7. sep.» sier ingenting om
-    /// hvilket år det var når mappen har vokst.
+    /// One place, so the list and the detail view cannot drift apart. The year is
+    /// included because recordings stay around, and «7. sep.» says nothing about
+    /// which year it was once the folder has grown.
     var recordingStamp: String {
         Self.stampFormatter.string(from: self)
     }

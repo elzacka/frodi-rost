@@ -1,36 +1,36 @@
 import Foundation
 import WhisperKit
 
-/// WhisperKit 0.18 er ikke merket for Swift 6, så kompilatoren må få vite at
-/// typen kan krysse en isolasjonsgrense.
+/// WhisperKit 0.18 is not annotated for Swift 6, so the compiler has to be told
+/// that the type can cross an isolation boundary.
 ///
-/// Dette er en påstand fra oss, ikke noe kompilatoren kan bevise. Grunnlaget:
-/// WhisperKit styrer sin egen samtidighet internt, og i denne appen kommer alle
-/// kall fra hovedaktøren via `Transcription`, ett opptak om gangen. Fjern denne
-/// linjen så snart WhisperKit annoterer typen sin selv.
+/// This is an assertion on our part, not something the compiler can prove. The
+/// basis: WhisperKit manages its own concurrency internally, and in this app
+/// every call arrives from the main actor via `Transcription`, one recording at
+/// a time. Remove this line as soon as WhisperKit annotates its own type.
 extension WhisperKit: @retroactive @unchecked Sendable {}
 
-/// nb-whisper fra Nasjonalbiblioteket, kjørt inne i appen.
+/// nb-whisper from the National Library, run inside the app.
 ///
-/// Forskjellen fra Apples motor er ikke om lyden forlater enheten – det gjør
-/// den ikke i noen av tilfellene – men hvor den behandles. Apples modell kjører
-/// i en systemprosess utenfor appens container. Denne kjører inne i den.
+/// The difference from Apple's engine is not whether the audio leaves the device,
+/// which it does in neither case, but where it is processed. Apple's model runs
+/// in a system process outside the app's container. This one runs inside it.
 ///
-/// Modellen og tokenizeren ligger i app-pakken. `WhisperKit` ville ellers hentet
-/// dem fra Hugging Face ved første kjøring, og da hadde appen hatt nettverk.
-/// Begge stiene oppgis derfor eksplisitt.
-/// Låst til hovedaktøren fordi `WhisperKit` ikke er `Sendable`. Den kan derfor
-/// ikke krysse en aktørgrense uten at Swift 6 flagger det. Selve arbeidet gjør
-/// WhisperKit på egne tråder, så dette blokkerer ikke grensesnittet.
+/// The model and the tokenizer live in the app bundle. `WhisperKit` would
+/// otherwise fetch them from Hugging Face on first run, and the app would have
+/// had network access. Both paths are therefore given explicitly.
+/// Bound to the main actor because `WhisperKit` is not `Sendable`. It therefore
+/// cannot cross an actor boundary without Swift 6 flagging it. WhisperKit does
+/// the actual work on its own threads, so this does not block the interface.
 @MainActor
 final class WhisperTranscriber: Transcriber {
     private var whisper: WhisperKit?
 
-    /// Laster modellen hvis den ikke alt er lastet.
+    /// Loads the model if it is not already loaded.
     ///
-    /// Den returnerer ingenting med vilje: `WhisperKit` er ikke `Sendable`, og
-    /// å gi den ut av en isolert metode er nettopp det Swift 6 stopper. Den blir
-    /// derfor liggende her, og alt arbeid skjer i denne klassen.
+    /// It deliberately returns nothing: `WhisperKit` is not `Sendable`, and handing
+    /// it out of an isolated method is exactly what Swift 6 stops. So it stays
+    /// here, and all the work happens in this class.
     private func load() async throws {
         guard whisper == nil else { return }
 
@@ -41,7 +41,7 @@ final class WhisperTranscriber: Transcriber {
         let config = WhisperKitConfig(
             modelFolder: model.path,
             tokenizerFolder: tokenizer,
-            // Ingen nedlasting, ingen forespørsel ut. Mangler noe, skal det feile.
+            // No download, no outgoing request. If something is missing, it must fail.
             download: false
         )
         whisper = try await WhisperKit(config)
@@ -57,8 +57,8 @@ final class WhisperTranscriber: Transcriber {
                 decodeOptions: Self.options(chunked: true)
             )
 
-            // Lydsamplene hentes bare hvis et stykke faktisk kom tomt tilbake.
-            // De koster minne, og på et vanlig opptak trengs de aldri.
+            // The audio samples are fetched only if a piece actually came back empty.
+            // They cost memory, and on an ordinary recording they are never needed.
             var audio: [Float]?
             var pieces: [String] = []
 
@@ -93,18 +93,18 @@ final class WhisperTranscriber: Transcriber {
         }
     }
 
-    /// Prøver et stykke på nytt ved å dele det i to.
+    /// Retries a piece by splitting it in two.
     ///
-    /// Modellen svarer av og til med bare sluttmerket på et vindu som er fullt
-    /// av tale. Da kommer stykket tomt tilbake, og teksten fikk før et hull
-    /// ingen kunne se – opptaket var like langt, men det siste som ble sagt var
-    /// borte. Ingen innstilling på dekoderen retter det: målt 10. september 2026
-    /// ga både høyere temperatur, `usePrefillPrompt: false` og `suppressBlank`
-    /// nøyaktig samme tomme svar på de samme 15 sekundene.
+    /// The model sometimes answers a window full of speech with only the end marker.
+    /// The piece then comes back empty, and the text used to get a hole nobody could
+    /// see: the recording was as long as before, but the last thing said was gone.
+    /// No decoder setting fixes it: measured on 10 September 2026, higher
+    /// temperature, `usePrefillPrompt: false` and `suppressBlank` all gave exactly
+    /// the same empty answer on the same 15 seconds.
     ///
-    /// To halvdeler er noe annet enn ett helt vindu, og det er nok: den samme
-    /// lyden ga full tekst da den ble delt. Vi deler videre så lenge en halvdel
-    /// fortsatt er stum og lang nok til at det kan være tale i den.
+    /// Two halves are a different input than one whole window, and that is enough:
+    /// the same audio gave full text once it was split. We keep splitting as long as
+    /// a half is still silent and long enough for there to be speech in it.
     private func retry(in audio: [Float], from start: Double, to end: Double) async -> String {
         guard let whisper, end - start >= Self.shortestRetry else { return "" }
 
@@ -132,16 +132,16 @@ final class WhisperTranscriber: Transcriber {
         return pieces.filter { !$0.isEmpty }.joined(separator: " ")
     }
 
-    /// Kortere enn dette deler vi ikke opp. Et stykke som er stumt og kort er
-    /// stillhet, ikke tale vi har mistet.
+    /// Shorter than this we do not split. A piece that is silent and short is
+    /// silence, not speech we have lost.
     private static let shortestRetry: Double = 4
 
-    /// Leser lydfilen som samples, unna hovedtråden.
+    /// Reads the audio file as samples, off the main thread.
     ///
-    /// `@concurrent` av samme grunn som i `AudioStorage`: en `nonisolated async`
-    /// funksjon arver aktøren til den som kaller, og her er det hovedaktøren.
-    /// En time med lyd er rundt 57 MB som `Float`, og det arbeidet hører ikke
-    /// hjemme på hovedtråden.
+    /// `@concurrent` for the same reason as in `AudioStorage`: a `nonisolated async`
+    /// function inherits the caller's actor, and here that is the main actor. An
+    /// hour of audio is about 57 MB as `Float`, and that work does not belong on
+    /// the main thread.
     @concurrent
     private nonisolated static func samples(at path: String) async throws -> [Float] {
         try AudioProcessor.loadAudioAsFloatArray(fromPath: path)
@@ -149,38 +149,35 @@ final class WhisperTranscriber: Transcriber {
 
     private static func options(chunked: Bool) -> DecodingOptions {
         DecodingOptions(
-            // Bokmål, alltid. Aldri utledet fra lyden eller fra enheten.
+            // Bokmål, always. Never derived from the audio or from the device.
             language: "no",
             temperature: 0,
             usePrefillPrompt: true,
             skipSpecialTokens: true,
             withoutTimestamps: true,
-            // Uten denne blir bare det første halvminuttet med.
+            // Without this only the first half minute comes through.
             //
-            // Whisper hører 30 sekunder om gangen. Uten oppdeling kjører
-            // WhisperKit alle vinduene gjennom den samme dekoderen, og fra og
-            // med vindu nummer to kommer det ingen ting ut. Målt 9. september
-            // 2026 på et opptak på 3 minutter og 3 sekunder: 86 av 516 ord.
-            // Med .vad blir hvert stykke sin egen kjøring, og da kom 512 ord.
+            // Whisper hears 30 seconds at a time. Without chunking, WhisperKit runs every
+            // window through the same decoder, and from window two onward nothing comes
+            // out. Measured 9 September 2026 on a recording of 3 minutes 3 seconds: 86 of
+            // 516 words. With .vad every chunk is its own run, and 512 words came out.
             //
-            // Oppdelingen leter etter en pause å klippe på. Finner den ingen –
-            // motorstøy i bil, for eksempel – klipper den på 30 sekunder i
-            // stedet. Det er nettopp det som gjør at teksten blir komplett, så
-            // et opptak uten pauser i taper ingen ting på det.
+            // The chunker looks for a pause to cut on. If it finds none, engine noise in
+            // a car for instance, it cuts at 30 seconds instead. That is exactly what makes
+            // the text complete, so a recording without pauses loses nothing by it.
             //
-            // Et stykke som prøves på nytt er alt delt opp, og skal ikke deles
-            // en gang til.
+            // A piece being retried is already split, and must not be split again.
             chunkingStrategy: chunked ? .vad : nil
         )
     }
 
-    /// Er modellen faktisk med i denne bygget?
+    /// Is the model actually in this build?
     nonisolated static var isBundled: Bool {
         modelFolder != nil && tokenizerFolder != nil
     }
 
-    /// Modellen ligger i en mappereferanse, ikke flatt i pakken, så
-    /// underkatalogen må oppgis.
+    /// The model sits in a folder reference, not flat in the bundle, so the
+    /// subdirectory must be given.
     nonisolated static var modelFolder: URL? {
         Bundle.main.url(forResource: "nb-whisper-small", withExtension: nil, subdirectory: "Model")
     }

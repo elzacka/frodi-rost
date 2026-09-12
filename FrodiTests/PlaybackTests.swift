@@ -3,12 +3,12 @@ import Foundation
 import Testing
 @testable import Frodi
 
-/// Serialisert fordi alle testene deler `AudioPlayer.shared`, som er delt av
-/// samme grunn i appen: det finnes bare én lydøkt.
+/// Serialized because every test shares `AudioPlayer.shared`, which is shared
+/// for the same reason in the app: there is only one audio session.
 @Suite("Avspilling", .serialized)
 @MainActor
 struct PlaybackTests {
-    /// Legger et ekte, forseglet opptak i opptaksmappen og rydder det bort etter.
+    /// Puts a real, sealed recording in the recordings folder and cleans it up after.
     private func withSealedRecording(
         seconds: Double = 1,
         _ body: (Recording) async throws -> Void
@@ -73,8 +73,8 @@ struct PlaybackTests {
         }
     }
 
-    /// Nøkkelen ligger i Secure Enclave på denne enheten. En kopi fra en annen
-    /// enhet skal si fra, ikke krasje.
+    /// The key lives in the Secure Enclave on this device. A copy from another
+    /// device must report it, not crash.
     @Test("Et opptak som ikke lar seg låse opp gir en beskjed")
     func unopenableRecordingFails() async throws {
         let name = UUID().uuidString + ".m4a.enc"
