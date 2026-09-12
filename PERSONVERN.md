@@ -23,6 +23,12 @@ Teksten skjules når skjermen tas opp eller speiles, og når du bytter app. Da
 havner den ikke i bildet iOS tar til appveksleren. Et vanlig skjermbilde kan
 appen ikke stoppe.
 
+## Kopiering
+
+Trykker du på «Kopier», blir teksten på denne enheten. Den følger ikke med til
+Mac eller iPad gjennom Universell utklippstavle, og den forsvinner fra
+utklippstavlen etter fem minutter.
+
 ## Tillatelser
 
 Mikrofon. Det er alt.
@@ -36,7 +42,8 @@ Nøkkelen finnes bare inne i enheten din. Et opptak kan ikke leses av en annen
 enhet – heller ikke av deg selv på en ny, og heller ikke fra en
 sikkerhetskopi.
 
-Skal du bytte enhet: Hent ut opptakene først.
+Mister du enheten, er opptakene borte for godt. Skal du bytte enhet: Hent ut
+opptakene først.
 
 ## Rettighetene dine
 

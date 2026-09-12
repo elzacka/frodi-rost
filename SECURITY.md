@@ -2,19 +2,39 @@
 
 Fróði røst records audio and transcribes it on the device. Nothing is transmitted.
 
-Last reviewed 12.09.26.
+Last reviewed 13 September 2026.
 
 ## Reporting a vulnerability
 
 Email **hei@tazk.no**, subject `[SECURITY] Fróði røst - <description>`.
 Include reproduction steps and impact. Acknowledgement within 48 hours,
-assessment within 7 days. Do not open public GitHub issues.
+assessment within 7 days. Do not open public GitHub issues. No PGP key is
+published.
+
+## Supported versions
+
+| Build | In scope |
+|---|---|
+| The latest TestFlight build | Yes |
+| Earlier builds | Only if the finding still reproduces on the latest |
+
+Nothing is on the App Store yet.
+
+## Threat model
+
+The app assumes a passcode is set and iOS is not compromised.
+
+| | Adversary |
+|---|---|
+| Defended against | A locked device in someone else's hands, including forensic extraction of its storage after first unlock. A copy of a backup. Another app on the device. Anyone watching the screen over the air, or the app switcher, while a transcript is open |
+| Not defended against | A compromised OS, or an exploit chain on an unlocked device. An unlocked device in someone else's hands. A screenshot. Whatever happens to a file after export |
 
 ## What happens in each scenario
 
 | Scenario | Result |
 |---|---|
-| Device lost or stolen, locked | Audio unreadable: the files are `NSFileProtectionComplete`. Transcripts are ciphertext in the database, whose own protection class is weaker; what keeps them unreadable is that the wrapping key is in the Secure Enclave under `AfterFirstUnlock` access control. Dates, durations and file names in the database are not encrypted |
+| Device lost or stolen, locked | Audio unreadable: the files are `NSFileProtectionComplete`. Transcripts are ciphertext in the database, whose own protection class is weaker; the key that opens them is `WhenUnlocked`, so the Secure Enclave refuses to unwrap while the device is locked, also for code running on the device with the app's keychain access. Dates, durations and file names in the database are not encrypted |
+| Device lost, wiped or replaced | Every recording and transcript is gone. The key exists only in that device's Secure Enclave and is in no backup. Export is the only way to keep a recording |
 | Recording stopped while the device is locked | Saved as plaintext under `NSFileProtectionCompleteUnlessOpen`, which cannot be reopened until the device is unlocked. Sealed and transcribed at the next unlock or launch. Never deleted |
 | Backup copied, or restored to another device | Unreadable. The key is device-bound |
 | Another app reads the app container | Finds encrypted data it cannot decrypt |
@@ -23,6 +43,8 @@ assessment within 7 days. Do not open public GitHub issues.
 | Screen recording or mirroring while a transcript is open | Text hidden until capture stops |
 | App switcher, or any other time the app is not in front | Text hidden before iOS takes the snapshot |
 | Screenshot | Captured. iOS offers no supported way to prevent one |
+| Transcript copied with «Kopier» | Stays on this device. The pasteboard item is marked local-only, so Universal Clipboard does not carry it to a Mac or iPad, and it expires after five minutes |
+| Recording exported | Every guarantee here ends. The files belong to the app you hand them to, with that app's storage, backup and sync behaviour |
 | Device unlocked, app open, in someone else's hands | Readable, as with any app |
 
 ## What is in use
@@ -34,7 +56,7 @@ The sections below explain the choices.
 |---|---|---|
 | Isolation | iOS app sandbox. No app group, no shared container | System |
 | Encryption at rest | AES-GCM, one random 256-bit key per recording and per transcript | `RecordingVault` |
-| Key wrapping | P-256 key created in the Secure Enclave, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly` | `RecordingVault` |
+| Key wrapping | P-256 key created in the Secure Enclave, `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`. The public key is kept in memory once read, so sealing does not touch the keychain | `RecordingVault` |
 | File protection, recording in progress and awaiting seal | `NSFileProtectionCompleteUnlessOpen` | `AudioStorage` |
 | File protection, sealed recording | `NSFileProtectionComplete` | `AudioStorage` |
 | File protection, temporary plaintext | `NSFileProtectionCompleteUnlessOpen`, in one folder, removed in a `defer` and emptied at launch | `AudioStorage`, `RecordingExport`, `RecordingController` |
@@ -46,22 +68,33 @@ The sections below explain the choices.
 | Logging | WhisperKit runs with `verbose: false` and `logLevel: .none`. The app itself writes nothing to the unified log | `WhisperTranscriber` |
 | Privacy manifest | No tracking, no tracking domains, no collected data. One accessed API: file timestamps, C617.1 | `PrivacyInfo.xcprivacy`, `IsolationTests` |
 | Screen capture | Transcript hidden while `UIScreen.isCaptured` is true, and while the scene is not active | `CaptureGuard` |
+| Pasteboard | The transcript cannot be selected. One button copies it, with `localOnly` and a five minute expiry. A test fails if selection returns or the pasteboard is written from anywhere else | `RecordingDetailView`, `IsolationTests` |
 | Export | Decrypted on demand to the temporary directory, handed to the system share sheet, removed when the sheet closes | `RecordingExport`, `ShareSheet` |
 | Export compliance | `ITSAppUsesNonExemptEncryption` is `false`. The only cryptography is Apple's CryptoKit and the Secure Enclave | `project.yml` |
 | Compiler | `SWIFT_STRICT_CONCURRENCY: complete`, `SWIFT_VERSION: 6`, `ENABLE_USER_SCRIPT_SANDBOXING: true` | `project.yml` |
 | Build integrity | WhisperKit pinned to an exact version, `Package.resolved` committed, model files fetched at a fixed revision and checked against a committed checksum list | `project.yml`, `Scripts/fetch-model.sh`, `Scripts/model-checksums.txt` |
-| Attack surface kept closed | No URL schemes, no document types, no `NSUserActivity` (Handoff), no Spotlight indexing, no extensions, no app group. One App Intent, `ToggleRecordingIntent`, which any Shortcut or automation can run without confirmation once microphone access is granted; that is what the Action Button uses, and it is deliberate | `Info.plist`, `ToggleRecordingIntent` |
+| Attack surface kept closed | No URL schemes, no document types, no `NSUserActivity` (Handoff), no Spotlight indexing, no extensions, no app group. One App Intent, `ToggleRecordingIntent`, which any Shortcut or automation can run without confirmation once microphone access is granted; that is what the Action Button uses, and it is deliberate. The compensating control is the system's: iOS shows the orange microphone indicator whenever the app holds the microphone, in the foreground or not, so a recording started by an automation is visible whenever the screen is on | `Info.plist`, `ToggleRecordingIntent` |
 
 ## Encryption
 
 Each recording and transcript is sealed with AES-GCM under a per-item 256-bit key.
 That key is wrapped by a P-256 key created inside the Secure Enclave. The private
-key cannot be extracted.
+key cannot be extracted. That stops the key from being copied; it does not stop
+code running on this device in the app's context from asking the Enclave to use
+it. What limits that is the access class.
 
-Access control is `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`.
+Access control is `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`.
 
-- **AfterFirstUnlock**, not WhenUnlocked: the transcript's key must be usable
-  without the screen being unlocked at that moment.
+- **WhenUnlocked**, not AfterFirstUnlock: the private key is used only to open,
+  and every path that opens runs on an unlocked device, because it starts from a
+  `.complete` audio file or from a screen the user is looking at. Sealing needs
+  only the public key, which the app keeps in memory once it has read it, so a
+  transcription that finishes after the screen has locked still seals its text.
+  AfterFirstUnlock was the class until 13 September 2026. It would have let the
+  key unwrap on a locked device that had been unlocked once since boot, which is
+  the state a seized device is usually in. A key created by a build before
+  0.1.0 (5) keeps that class: the class is fixed at creation, and the app does
+  not rotate keys.
 - **ThisDeviceOnly**: the key is excluded from backups and device migration.
 
 **Sealing waits for the device to be unlocked.** The Action Button can stop a
@@ -75,6 +108,10 @@ earlier version tried to seal at once and deleted the recording when that failed
 Plaintext exists only while a job runs: during transcription, during export, and
 while a detail screen is open. It is removed afterwards, and anything a crash
 leaves behind is removed at the next launch.
+
+In memory, the text exists while the detail screen shows it and is cleared when
+the screen closes; the export holds it until the files are written. Nothing pins
+or wipes memory beyond that, and iOS offers no supported way to.
 
 ## File protection
 
@@ -147,8 +184,19 @@ repositories serve on the day.
   commit ids on Hugging Face, and every file is checked against
   `Scripts/model-checksums.txt` before the script reports success. A mismatch
   fails the script. The model is a third-party CoreML conversion of
-  nb-whisper-small, not a file published by the National Library; the checksums
-  pin the conversion that was reviewed.
+  nb-whisper-small, not a file published by the National Library. The checksums
+  guarantee that every clone builds the files measured on 7 September 2026, not
+  that those files are benign: a CoreML weights file cannot be read for intent.
+  Since the model never touches the network, what could be wrong inside it is
+  transcription quality and bias, not exfiltration.
+
+## Where the guarantees end
+
+| Boundary | What follows |
+|---|---|
+| Export | The files are decrypted for the app you choose in the share sheet, and from then on they are that app's. Files and AirDrop keep them on the device; Mail, Messages and iCloud Drive do not. The app has no say after the hand-over |
+| Device lost, wiped or replaced | Permanent loss of every recording and transcript. This is the cost of a key that exists nowhere else, and it is deliberate. PERSONVERN.md tells the user to export before changing device |
+| An unlocked device | Everything is readable, as in any app. There is no lock of the app's own; see below |
 
 ## Deliberate omissions
 

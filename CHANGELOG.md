@@ -28,5 +28,9 @@ Første versjon.
 - Teksten skjules også når du bytter app, så den ikke havner i bildet iOS tar
   til appveksleren
 - Midlertidige filer fra en avbrutt transkribering ryddes ved neste oppstart
+- Nøkkelen som låser opp opptak og tekst, kan bare brukes mens enheten er låst
+  opp
+- «Kopier»-knappen i tekstkortet erstatter markering av teksten. Det du
+  kopierer, blir på enheten og forsvinner fra utklippstavlen etter fem minutter
 - Modellen og kodepakkene er låst til faste versjoner, og skriptet som henter
   modellen sjekker hver fil mot en liste med sjekksummer
