@@ -31,7 +31,7 @@ Oppdatert: 10. september 2026.
 
 ## Fonter
 
-| Skrift | Opphav | Lisens |
+| Font | Opphav | Lisens |
 |---|---|---|
-| Inter | Rasmus Andersson | SIL Open Font License 1.1 |
 | Skranji | Font Diner | SIL Open Font License 1.1 |
+| Inter | Rasmus Andersson | SIL Open Font License 1.1 |
