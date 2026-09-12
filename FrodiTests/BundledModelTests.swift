@@ -25,13 +25,18 @@ struct BundledModelTests {
         }
     }
 
-    /// WhisperKit looks the tokenizer up at exactly this path.
+    /// WhisperKit looks the tokenizer up at exactly this path, and needs both
+    /// files. Missing either, it would fetch them from Hugging Face; the app's own
+    /// check is what stops that, so the check must see the same files.
     @Test("Tokenizeren ligger på stien WhisperKit forventer")
     func tokenizerLayoutIsExact() throws {
         let tokenizer = try #require(WhisperTranscriber.tokenizerFolder)
-        let file = tokenizer
-            .appendingPathComponent("models/openai/whisper-small/tokenizer.json")
-        #expect(FileManager.default.fileExists(atPath: file.path))
+        let folder = tokenizer.appendingPathComponent("models/openai/whisper-small")
+        for name in ["tokenizer.json", "tokenizer_config.json"] {
+            #expect(FileManager.default.fileExists(atPath: folder.appendingPathComponent(name).path), "\(name) mangler")
+        }
+        #expect(WhisperTranscriber.tokenizerFiles == ["tokenizer.json", "tokenizer_config.json"])
+        #expect(WhisperTranscriber.tokenizerIsComplete)
     }
 
     @Test("Appen bruker den innebygde modellen, ikke Apples")

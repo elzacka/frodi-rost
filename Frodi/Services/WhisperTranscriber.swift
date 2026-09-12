@@ -34,14 +34,21 @@ final class WhisperTranscriber: Transcriber {
     private func load() async throws {
         guard whisper == nil else { return }
 
-        guard let model = Self.modelFolder, let tokenizer = Self.tokenizerFolder else {
+        guard let model = Self.modelFolder, let tokenizer = Self.tokenizerFolder, Self.tokenizerIsComplete else {
             throw TranscriptionError.modelMissing
         }
 
         let config = WhisperKitConfig(
             modelFolder: model.path,
             tokenizerFolder: tokenizer,
+            // WhisperKit writes to the unified log as public text: time windows,
+            // segment counts, timings, and at debug level the text itself. Nothing
+            // about a recording belongs there, so all of it is off.
+            verbose: false,
+            logLevel: .none,
             // No download, no outgoing request. If something is missing, it must fail.
+            // The flag covers the model only; the tokenizer is covered by the guard
+            // above, see `tokenizerIsComplete`.
             download: false
         )
         whisper = try await WhisperKit(config)
@@ -173,7 +180,26 @@ final class WhisperTranscriber: Transcriber {
 
     /// Is the model actually in this build?
     nonisolated static var isBundled: Bool {
-        modelFolder != nil && tokenizerFolder != nil
+        modelFolder != nil && tokenizerIsComplete
+    }
+
+    /// The two files WhisperKit reads a tokenizer from, on the path it expects.
+    nonisolated static let tokenizerFiles = ["tokenizer.json", "tokenizer_config.json"]
+
+    /// Whether both tokenizer files are in the bundle.
+    ///
+    /// `download: false` governs the model folder only. When the tokenizer cannot
+    /// be read locally, WhisperKit 0.18 falls back to fetching it from Hugging
+    /// Face without consulting that flag. So the app checks for the files itself,
+    /// before WhisperKit is ever created, and a build missing one of them uses
+    /// Apple's engine rather than the network.
+    nonisolated static var tokenizerIsComplete: Bool {
+        guard let folder = tokenizerFolder?.appendingPathComponent("models/openai/whisper-small") else {
+            return false
+        }
+        return tokenizerFiles.allSatisfy {
+            FileManager.default.fileExists(atPath: folder.appendingPathComponent($0).path)
+        }
     }
 
     /// The model sits in a folder reference, not flat in the bundle, so the
