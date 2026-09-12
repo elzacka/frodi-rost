@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 import UIKit
 @testable import Frodi
@@ -19,6 +20,29 @@ struct ThemeTests {
     ])
     func colorsExist(name: String) {
         #expect(UIColor(named: name) != nil, "Fant ikke fargen \(name)")
+    }
+
+    /// `Font.custom(_:size:)` without `relativeTo:` freezes the text at one size and
+    /// ignores Dynamic Type. Every custom font in the app must scale.
+    @Test("Ingen skrift er frosset utenfor Dynamic Type")
+    func fontsScaleWithDynamicType() throws {
+        let sources = URL(filePath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "Frodi")
+        let enumerator = try #require(FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil))
+
+        var found = 0
+        for case let url as URL in enumerator where url.pathExtension == "swift" {
+            let code = try String(contentsOf: url, encoding: .utf8)
+            for line in code.split(separator: "\n") {
+                let statement = line.trimmingCharacters(in: .whitespaces)
+                guard !statement.hasPrefix("//"), statement.contains("custom("), statement.contains("size:") else { continue }
+                #expect(statement.contains("relativeTo:"), "\(url.lastPathComponent): \(statement)")
+                found += 1
+            }
+        }
+        #expect(found >= 8, "Fant bare \(found) skriftstiler; stien til kildekoden er feil")
     }
 
     /// accent-knowledge is reserved for the knowledge feature and must not be in use yet.

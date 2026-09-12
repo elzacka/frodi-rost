@@ -5,13 +5,14 @@ import Testing
 /// The model sits as a folder reference. Flatten it and the two config.json
 /// files collide, and WhisperKit cannot find the tokenizer. These tests catch
 /// exactly that regression.
-@Suite("Modell i pakken")
+///
+/// The model is optional: a clone that skipped `Scripts/fetch-model.sh` builds
+/// and runs on Apple's engine, and the README says so. The suite therefore skips
+/// without the model instead of turning four tests red.
+@Suite("Modell i pakken", .enabled(if: WhisperTranscriber.modelFolder != nil, "Modellen er ikke i dette bygget. Kjør Scripts/fetch-model.sh"))
 struct BundledModelTests {
-    private var modelIsPresent: Bool { WhisperTranscriber.modelFolder != nil }
-
     @Test("Modell og tokenizer peker begge et sted")
-    func bothFoldersResolve() throws {
-        try #require(modelIsPresent, "Modellen er ikke i dette bygget. Kjør Scripts/fetch-model.sh")
+    func bothFoldersResolve() {
         #expect(WhisperTranscriber.tokenizerFolder != nil)
         #expect(WhisperTranscriber.isBundled)
     }
@@ -40,8 +41,7 @@ struct BundledModelTests {
     }
 
     @Test("Appen bruker den innebygde modellen, ikke Apples")
-    func bundledModelIsPreferred() throws {
-        try #require(modelIsPresent)
+    func bundledModelIsPreferred() {
         #expect(Transcription.usesBundledModel)
     }
 }
