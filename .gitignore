@@ -36,7 +36,8 @@ ExportOptions.plist
 .claude/
 dev_only/
 
-# One line importing dev_only/CLAUDE.md, which is not published.
+# Assistant instructions for this repo. What a contributor needs from it is
+# published in CONTRIBUTING.md; the rest imports dev_only/, which is not.
 CLAUDE.md
 
 # CoreML-modellen. Nesten en halv gigabyte, hentes av Scripts/fetch-model.sh

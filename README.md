@@ -7,12 +7,27 @@ Tar opp lyd på iPhone og gjør den om til norsk tekst. Alt skjer på enheten.
 Fróði er en serie med to apper. Den andre heter [«Fróði vit»](https://github.com/elzacka/frodi-vit)
 og er en kunnskapsassistent som svarer på det du spør om.
 
+## Status
+
+Appen er på TestFlight, ikke i App Store. Den blir bare tilgjengelig i Norge,
+og grensesnittet er på norsk bokmål. Engelsk grensesnitt er ikke planlagt.
+
 ## Hva appen gjør
 
 - Tar opp lyd, også når skjermen er av
 - Handlingsknappen starter og stopper opptak
 - Skriver teksten på norsk bokmål, med tegnsetting og store bokstaver
 - Lar deg hente ut lyd og tekst
+- Tar opp i inntil ti minutter om gangen. Grensen og målingene bak den står
+  i `Frodi/Services/RecordingLimit.swift`
+
+## Hva appen ikke gjør
+
+- Ingen samtale, ingen kunnskapsbase, ingen tekst til tale. Samtalen finner
+  du i Fróði vit
+- Ingen sky, ingen konto, ingen nettverkstrafikk. Ikke engang en nedlasting
+  av modellen, for den følger med appen
+- Ingen iPad, ingen Mac, ingen liggende visning. Bare iPhone, stående
 
 ## Modell
 
@@ -33,8 +48,16 @@ bruke, og appen kontakter ingen tjeneste for å lage teksten.
 
 ## Krav
 
+For å bruke appen:
+
 - iPhone med iOS 26.5 eller nyere
 - Handlingsknappen krever iPhone 15 Pro eller nyere
+
+For å bygge den:
+
+- Xcode 26.6 med iOS 26.5 SDK
+- xcodegen, `brew install xcodegen`
+- Rundt 500 MB ledig plass til modellen
 
 ## Bygg
 
@@ -45,8 +68,16 @@ xcodegen generate
 open Frodi.xcodeproj
 ```
 
+Fra terminalen, mot appens egen simulator (se under Test):
+
+```bash
+xcodebuild -project Frodi.xcodeproj -scheme Frodi \
+  -destination 'platform=iOS Simulator,name=Frodi-Test' build
+```
+
 Modellen ligger ikke i git. Uten den faller appen tilbake til iOS' egen
-diktatmodell, som er svakere på norsk.
+diktatmodell, som er svakere på norsk. Info-siden i appen sier hvilken
+modell som kjører.
 
 Skriptet henter modellen fra en fast versjon og sjekker hver fil mot
 `Scripts/model-checksums.txt`. Stemmer ikke summene, stopper det. WhisperKit er
@@ -73,11 +104,45 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
   -destination 'platform=iOS Simulator,name=Frodi-Test' test
 ```
 
+Uten modellen hopper testene i «Modell i pakken» over. Resten kjører.
+
+## Arkitektur
+
+Ett opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
+
+| Steg | Fil |
+|---|---|
+| Handlingsknappen kjører intenten, i bakgrunnen når iOS lar den | `Intents/ToggleRecordingIntent.swift` |
+| Intenten og opptaksknappen går gjennom én kontroller, som også eier databasen | `Services/RecordingController.swift` |
+| Lyden tas opp, med nedtelling mot grensen | `Services/AudioRecorder.swift`, `Services/RecordingLimit.swift` |
+| Filen ligger i sandkassen med filvern, utenfor sikkerhetskopien | `Services/AudioStorage.swift` |
+| Opptaket forsegles med en nøkkel fra Secure Enclave | `Services/RecordingVault.swift` |
+| Teksten lages, med nb-whisper i appen eller med diktatmodellen i iOS | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift`, `Services/SpeechEngine.swift` |
+| Teksten forsegles på samme måte som lyden | `Services/RecordingVault.swift` |
+| Teksten vises bak et vern som skjuler den ved skjermopptak og appbytte | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift` |
+| Hent ut dekrypterer filene til en midlertidig mappe og gir dem til delingsarket | `Services/RecordingExport.swift`, `Views/ShareSheet.swift` |
+
+Visningene når aldri talemotoren direkte. Alt går gjennom protokollen
+`Transcriber`, og `Transcription.usesBundledModel` avgjør hvilken motor som
+kjører.
+
+## Lisens
+
+Koden er MIT, se [LICENSE](LICENSE). Modellen, pakkene, ikonene og fontene
+har egne lisenser, se [TREDJEPART.md](TREDJEPART.md).
+
+## Bidrag
+
+Dette er et personlig prosjekt. Meld feil og forslag som issues på GitHub.
+Vil du sende en pull request, les [CONTRIBUTING.md](CONTRIBUTING.md) først.
+
 ## Mer
 
 | Dokument | Innhold |
 |---|---|
-| [PERSONVERN.md](PERSONVERN.md) | Hva som lagres, tillatelser, rettighetene dine |
+| [PERSONVERN.md](PERSONVERN.md) | Hva som lagres, tillatelser, rettighetene dine, hvem som står bak |
 | [SECURITY.md](SECURITY.md) | Hva som beskyttes mot hva, og hvordan melde sårbarhet |
-| [TREDJEPART.md](TREDJEPART.md) | Modell, kode og fonter, med lisenser |
-| [CHANGELOG.md](CHANGELOG.md) | Hva som er endret |
+| [TILGJENGELIGHET.md](TILGJENGELIGHET.md) | Kontrast, Dynamic Type, VoiceOver, og hva som er målt |
+| [TREDJEPART.md](TREDJEPART.md) | Modell, kode, ikoner og fonter, med versjoner og lisenser |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Navn, språk, designsystem og reglene for endringer |
+| [CHANGELOG.md](CHANGELOG.md) | Hva som er endret, build for build |

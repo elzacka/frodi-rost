@@ -18,7 +18,8 @@ published.
 | The latest TestFlight build | Yes |
 | Earlier builds | Only if the finding still reproduces on the latest |
 
-Nothing is on the App Store yet.
+Nothing is on the App Store yet. Every uploaded build is listed in
+[CHANGELOG.md](CHANGELOG.md), with what changed in it.
 
 ## Threat model
 
@@ -71,7 +72,7 @@ The sections below explain the choices.
 | Pasteboard | The transcript cannot be selected. One button copies it, with `localOnly` and a five minute expiry. A test fails if selection returns or the pasteboard is written from anywhere else | `RecordingDetailView`, `IsolationTests` |
 | Export | Decrypted on demand to the temporary directory, handed to the system share sheet, removed when the sheet closes | `RecordingExport`, `ShareSheet` |
 | Export compliance | `ITSAppUsesNonExemptEncryption` is `false`. The only cryptography is Apple's CryptoKit and the Secure Enclave | `project.yml` |
-| Compiler | `SWIFT_STRICT_CONCURRENCY: complete`, `SWIFT_VERSION: 6`, `ENABLE_USER_SCRIPT_SANDBOXING: true` | `project.yml` |
+| Compiler | `SWIFT_STRICT_CONCURRENCY: complete`, `SWIFT_APPROACHABLE_CONCURRENCY: true`, `SWIFT_VERSION: 6`, `ENABLE_USER_SCRIPT_SANDBOXING: true` | `project.yml` |
 | Build integrity | WhisperKit pinned to an exact version, `Package.resolved` committed, model files fetched at a fixed revision and checked against a committed checksum list | `project.yml`, `Scripts/fetch-model.sh`, `Scripts/model-checksums.txt` |
 | Attack surface kept closed | No URL schemes, no document types, no `NSUserActivity` (Handoff), no Spotlight indexing, no extensions, no app group. One App Intent, `ToggleRecordingIntent`, which any Shortcut or automation can run without confirmation once microphone access is granted; that is what the Action Button uses, and it is deliberate. The compensating control is the system's: iOS shows the orange microphone indicator whenever the app holds the microphone, in the foreground or not, so a recording started by an automation is visible whenever the screen is on | `Info.plist`, `ToggleRecordingIntent` |
 
@@ -164,8 +165,10 @@ both cases, and a test fails if the key appears.
 
 ## Dependencies
 
-WhisperKit and seven transitive packages. All permissively licensed, listed in
-[TREDJEPART.md](TREDJEPART.md). None performs network access as configured.
+WhisperKit and seven transitive packages. All permissively licensed, listed
+with versions and links in [TREDJEPART.md](TREDJEPART.md), which a test keeps
+level with `Package.resolved` and the app's own licence list. None performs
+network access as configured.
 
 WhisperKit 0.18 is not annotated for Swift 6 and is given a retroactive unchecked
 `Sendable` conformance. That is an assertion, not a compiler-verified fact. It
