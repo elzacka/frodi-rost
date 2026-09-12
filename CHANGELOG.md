@@ -9,7 +9,7 @@ Første versjon.
 ### Lagt til
 
 - Ta opp lyd, også når skjermen er av
-- Handlingsknappen starter og stopper opptak. Ett trykk starter, neste stopper
+- Den fysiske handlingsknappen på venstre side starter og stopper opptak
 - Gjør norsk tale om til tekst med nb-whisper fra Nasjonalbiblioteket, som
   kjører i appen. Modellen setter tegn og store bokstaver selv, og skriver
   dialekt om til bokmål
