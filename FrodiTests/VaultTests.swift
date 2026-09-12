@@ -99,6 +99,30 @@ struct FileSealingTests {
         #expect(try AudioStorage.plaintext(fileName: sealed) == original)
     }
 
+    /// The finished file is class A: unreadable while the device is locked.
+    ///
+    /// Device only. The simulator has no data protection and answers `nil` for the
+    /// attribute, so there the test would fail without meaning anything.
+    @Test("Et forseglet opptak har fullstendig filvern", .enabled(if: !isSimulator))
+    func sealedFileIsCompletelyProtected() async throws {
+        let name = try plaintextRecording(Data("innhold".utf8))
+        let sealed = try await AudioStorage.seal(fileName: name)
+        defer { AudioStorage.delete(fileName: sealed) }
+
+        let attributes = try FileManager.default.attributesOfItem(
+            atPath: AudioStorage.directory.appendingPathComponent(sealed).path
+        )
+        #expect(attributes[.protectionKey] as? FileProtectionType == .complete)
+    }
+
+    private static var isSimulator: Bool {
+        #if targetEnvironment(simulator)
+        true
+        #else
+        false
+        #endif
+    }
+
     /// A recording that is not sealed yet is read as it is, so the list can play
     /// and export it in the short window before the seal.
     @Test("Et uforseglet opptak leses som det er")

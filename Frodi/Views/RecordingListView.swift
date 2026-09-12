@@ -189,9 +189,13 @@ struct RecordingListView: View {
 
     /// Transcribes everything that lacks text. Called at launch, so recordings made
     /// before the speech model was in place are not left without text.
+    ///
+    /// A recording the model already found no speech in is left alone. The same
+    /// audio gives the same answer, and a whisper run per silent recording at
+    /// every launch adds up. «Prøv teksten på nytt» in the row still works.
     private func transcribePending() async {
         guard Transcription.usesBundledModel || speechModel.isReady else { return }
-        for recording in recordings where !recording.hasTranscript {
+        for recording in recordings where !recording.hasTranscript && recording.failureCode != "empty" {
             await transcribe(recording, surfaceErrors: false)
         }
     }
