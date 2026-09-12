@@ -1,8 +1,6 @@
 # Tredjepartslisenser
 
-Lisensene under krever at opphavet oppgis. Dette er den attribusjonen.
-
-Sist gjennomgått 10. september 2026.
+Oppdatert: 10. september 2026.
 
 ## Modell
 
