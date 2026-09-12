@@ -1,7 +1,7 @@
 import AVFoundation
 import SwiftUI
 
-/// Om appen: hva den gjør, hva den ikke gjør, og hva den bygger på. Åpnes som
+/// Info om appen: hva den gjør, hva den ikke gjør, og hva den bygger på. Åpnes som
 /// ark fra i-en i logohodet.
 ///
 /// Skissen la Om fróði, Personvern og Versjonsinfo i en meny på en startskjerm.
@@ -12,7 +12,7 @@ import SwiftUI
 /// stilles ingen ting inn. Det eneste kortet som gjør noe, sender deg til
 /// Innstillinger i iOS – appens egne valg finnes ikke, fordi appen ikke har
 /// noen. Tittelen sier nå det arket er.
-struct AboutView: View {
+struct InfoView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
@@ -36,7 +36,7 @@ struct AboutView: View {
                     .padding(Space.s4)
                 }
             }
-            .navigationTitle("Om")
+            .navigationTitle("Info")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Color.Frodi.background, for: .navigationBar)
             .toolbar {
@@ -62,7 +62,7 @@ struct AboutView: View {
     private var about: some View {
         card("Om Fróði røst") {
             paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.")
-            paragraph("Trykk på mikrofonen nederst i listen, eller bruk den fysiske handlingsknappen på venstre side. Opptaket fortsetter selv om skjermen er av.")
+            paragraph("Trykk på opptaksknappen nederst i listen, eller bruk den fysiske handlingsknappen på venstre side (trykk Info-knappen for veiledning).")
             paragraph("Et opptak kan vare i inntil \(RecordingLimit.minutes) minutter. Snakker du fort, blir det rundt \(RecordingLimit.formatted(RecordingLimit.words)) ord.")
             paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
         }

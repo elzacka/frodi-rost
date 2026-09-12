@@ -47,7 +47,7 @@ struct RecordingListView: View {
                 Text(errorMessage ?? "").font(.Frodi.body)
             }
             .sheet(isPresented: $showAbout) {
-                AboutView()
+                InfoView()
             }
         }
         .task {
@@ -109,7 +109,7 @@ struct RecordingListView: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Om appen")
+        .accessibilityLabel("Info om appen")
     }
 
     /// Databasen lot seg ikke åpne, så appen kjører på minnet.

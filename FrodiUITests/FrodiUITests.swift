@@ -19,17 +19,17 @@ final class FrodiUITests: XCTestCase {
         )
     }
 
-    /// Om-arket er appens eneste sted for personvern, tillatelser og
+    /// Info-arket er appens eneste sted for personvern, tillatelser og
     /// attribusjon. Apache 2.0 krever at lisenslisten faktisk er å finne i appen.
     @MainActor
     func test_about_opensAndReachesLicenses() {
         let app = XCUIApplication()
         app.launch()
 
-        XCTAssertTrue(app.buttons["Om appen"].waitForExistence(timeout: 5), "Knappen i logohodet mangler")
-        app.buttons["Om appen"].tap()
+        XCTAssertTrue(app.buttons["Info om appen"].waitForExistence(timeout: 5), "Knappen i logohodet mangler")
+        app.buttons["Info om appen"].tap()
 
-        XCTAssertTrue(app.buttons["Lisenser"].waitForExistence(timeout: 5), "Om-arket åpnet ikke")
+        XCTAssertTrue(app.buttons["Lisenser"].waitForExistence(timeout: 5), "Info-arket åpnet ikke")
         app.buttons["Lisenser"].tap()
 
         XCTAssertTrue(app.staticTexts["WhisperKit"].waitForExistence(timeout: 5), "Lisenslisten mangler")

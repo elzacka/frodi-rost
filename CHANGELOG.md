@@ -18,5 +18,5 @@ Første versjon.
 - Hent ut lyd som `.m4a` og tekst som `.txt`
 - Krypter opptak og tekst med en nøkkel som aldri forlater enheten
 - App-ikon og logo i Skranji
-- Om-arket bak info-knappen i logohodet: hva appen gjør, personvern,
+- Info-arket bak info-knappen i logohodet: hva appen gjør, personvern,
   mikrofontilgang, hvilken språkmodell som kjører, lisenser og versjon
