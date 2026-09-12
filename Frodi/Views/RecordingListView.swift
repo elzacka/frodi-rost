@@ -8,7 +8,7 @@ struct RecordingListView: View {
     @State private var controller = RecordingController.shared
     @State private var speechModel = SpeechModel()
     @State private var errorMessage: String?
-    @State private var showAbout = false
+    @State private var showInfo = false
 
     var body: some View {
         NavigationStack {
@@ -46,8 +46,8 @@ struct RecordingListView: View {
             } message: {
                 Text(errorMessage ?? "").font(.Frodi.body)
             }
-            .sheet(isPresented: $showAbout) {
-                AboutView()
+            .sheet(isPresented: $showInfo) {
+                InfoView()
             }
         }
         .task {
@@ -101,7 +101,7 @@ struct RecordingListView: View {
 
     private var aboutButton: some View {
         Button {
-            showAbout = true
+            showInfo = true
         } label: {
             IconView(.information, size: HeaderButton.icon)
                 .foregroundStyle(Color.Frodi.textSecondary)

@@ -1,7 +1,7 @@
 import AVFoundation
 import SwiftUI
 
-/// Info om appen: hva den gjør, hva den ikke gjør, og hva den bygger på. Åpnes som
+/// Info-siden: hva appen gjør, hva den ikke gjør, og hva den bygger på. Åpnes som
 /// ark fra i-en i logohodet.
 ///
 /// Skissen la Om fróði, Personvern og Versjonsinfo i en meny på en startskjerm.
@@ -12,7 +12,7 @@ import SwiftUI
 /// stilles ingen ting inn. Det eneste kortet som gjør noe, sender deg til
 /// Innstillinger i iOS – appens egne valg finnes ikke, fordi appen ikke har
 /// noen. Tittelen sier nå det arket er.
-struct AboutView: View {
+struct InfoView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
@@ -60,7 +60,7 @@ struct AboutView: View {
     // MARK: - Kort
 
     private var about: some View {
-        card("Om Fróði røst") {
+        card("Fróði røst") {
             paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.")
             paragraph("Trykk på opptaksknappen nederst, eller hold inne handlingsknappen på venstre side. Hold inne én gang for å starte, én gang til for å stoppe.")
             paragraph("Før du kan bruke handlingsknappen, må du sette den opp: Gå til Innstillinger > Handlingsknapp, sveip til Snarvei, trykk på «Velg en snarvei» og velg «Start eller stopp opptak» under Fróði røst.")

@@ -9,7 +9,7 @@ import Foundation
 /// men transkripsjonen etterpå – og da er teksten tapt uten at noen sa fra.
 ///
 /// Ti minutter er det lengste som er målt helt gjennom. Tallet står her alene,
-/// og alt annet regnes ut fra det: setningen i Info-arket, nedtellingen i
+/// og alt annet regnes ut fra det: setningen på Info-siden, nedtellingen i
 /// opptaksfeltet og stoppen i `AudioRecorder`. Skal grensen endres, er det
 /// denne linjen som endres.
 ///
