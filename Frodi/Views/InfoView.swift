@@ -71,6 +71,7 @@ struct InfoView: View {
             paragraph("Alt skjer på enheten. Ingen datatrafikk ut eller inn.")
             microphoneAccess
             paragraph("Opptak og tekst krypteres med en nøkkel som lages i enheten (Secure Enclave). Ingen annen enhet kan lese dem, og de følger ikke med i en sikkerhetskopi.")
+            paragraph("Stopper du et opptak mens enheten er låst, krypterer Fróði det så snart du låser opp. Teksten skjules når skjermen tas opp og når du bytter app.")
             paragraph("Skal du bytte enhet, må du hente ut opptakene først. Sletter du appen, forsvinner alt med én gang.")
             link("Mer om personvern", to: Self.privacyPolicy)
             link("Mer om sikkerhet", to: Self.securityPolicy)

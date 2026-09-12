@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 7. september 2026.
+Sist oppdatert 13. september 2026.
 
 Fróði røst sender ingenting og henter ingenting. Appen har ingen adresse å
 sende til, og ingen tjeneste å spørre.
@@ -13,6 +13,15 @@ sende til, og ingen tjeneste å spørre.
 | Tekst fra opptaket | Samme sted, kryptert | Til du sletter den |
 
 Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
+
+Stopper du et opptak mens enheten er låst, krypterer Fróði det så snart du
+låser opp. Fram til da holder iOS filen låst, og ingen kan lese den.
+
+## Skjermen
+
+Teksten skjules når skjermen tas opp eller speiles, og når du bytter app. Da
+havner den ikke i bildet iOS tar til appveksleren. Et vanlig skjermbilde kan
+appen ikke stoppe.
 
 ## Tillatelser
 

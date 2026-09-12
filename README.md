@@ -40,7 +40,7 @@ bruke, og appen kontakter ingen tjeneste for å lage teksten.
 
 ```bash
 brew install xcodegen
-./Scripts/fetch-model.sh   # ca. 487 MB, kjør én gang
+./Scripts/fetch-model.sh   # ca. 467 MB, kjør én gang
 xcodegen generate
 open Frodi.xcodeproj
 ```
@@ -48,18 +48,27 @@ open Frodi.xcodeproj
 Modellen ligger ikke i git. Uten den faller appen tilbake til iOS' egen
 diktatmodell, som er svakere på norsk.
 
+Skriptet henter modellen fra en fast versjon og sjekker hver fil mot
+`Scripts/model-checksums.txt`. Stemmer ikke summene, stopper det. WhisperKit er
+låst til én versjon i `project.yml`, og `Package.resolved` ligger i git, så et
+nytt utsjekk bygger de samme pakkene.
+
 Xcodegen genererer prosjektfilen fra `project.yml`. Rediger aldri
 `.xcodeproj` direkte.
 
 ## Test
 
 Appen har sin egen simulator. Deler du en startet simulator med en annen
-sesjon, feiler UI-testene med `Application failed preflight checks`.
+sesjon, feiler UI-testene med `Application failed preflight checks`. Den samme
+feilen kommer hvis xcodebuild starter simulatoren selv og åpner appen før iOS
+er ferdig med å starte. Start simulatoren først, og vent til den er klar.
 
 ```bash
 xcrun simctl create "Frodi-Test" \
   com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro \
   com.apple.CoreSimulator.SimRuntime.iOS-26-5
+xcrun simctl boot Frodi-Test
+xcrun simctl bootstatus Frodi-Test -b
 xcodebuild -project Frodi.xcodeproj -scheme Frodi \
   -destination 'platform=iOS Simulator,name=Frodi-Test' test
 ```
