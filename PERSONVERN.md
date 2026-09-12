@@ -2,8 +2,12 @@
 
 Sist oppdatert 13. september 2026.
 
-Fróði røst sender ingenting og henter ingenting. Appen har ingen adresse å
-sende til, og ingen tjeneste å spørre.
+Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
+å sende til, og ingen tjeneste å spørre.
+
+## Hvem står bak
+
+Fróði røst er laget av elzacka. Spørsmål om personvern: **hei@tazk.no**.
 
 ## Hva som lagres
 
@@ -46,6 +50,12 @@ Mister du enheten, er opptakene borte for godt. Skal du bytte enhet: Hent ut
 opptakene først.
 
 ## Rettighetene dine
+
+Opptak og tekst forlater aldri enheten din. Ingen andre mottar dem, og ingen
+kan hente dem ut. Derfor finnes det ingen behandling av personopplysninger
+utenfor enheten: ingen å be om innsyn hos, ingen databehandlere og ingen
+overføring til utlandet. Rettighetene i tabellen utøver du selv, i appen. Det
+er den eneste måten, fordi det er det eneste stedet dataene finnes.
 
 | Rettighet | Slik gjør du det |
 |---|---|

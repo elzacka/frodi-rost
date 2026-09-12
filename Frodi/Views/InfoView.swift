@@ -66,9 +66,13 @@ struct InfoView: View {
         }
     }
 
+    /// The first sentence of the Personvern card, and the first sentence of
+    /// PERSONVERN.md. A test keeps them the same sentence.
+    static let privacyOpener = "Alt skjer på enheten. Ingen datatrafikk ut eller inn."
+
     private var privacy: some View {
         card("Personvern") {
-            paragraph("Alt skjer på enheten. Ingen datatrafikk ut eller inn.")
+            paragraph(Self.privacyOpener)
             microphoneAccess
             paragraph("Opptak og tekst krypteres med en nøkkel som lages i enheten (Secure Enclave). Ingen annen enhet kan lese dem, og de følger ikke med i en sikkerhetskopi.")
             paragraph("Stopper du et opptak mens enheten er låst, krypterer Fróði det så snart du låser opp. Teksten skjules når skjermen tas opp og når du bytter app.")
@@ -201,9 +205,11 @@ struct InfoView: View {
 
 /// The attribution Apache 2.0 requires, in the app and not only in the repo.
 ///
-/// Same content as TREDJEPART.md. Change one, change the other.
+/// The same names and licences as TREDJEPART.md, which also carries versions
+/// and links. `DocumentTests` fails if the two lists, or `Package.resolved`,
+/// disagree.
 struct LicensesView: View {
-    private struct Component: Identifiable {
+    struct Component: Identifiable {
         let name: String
         let origin: String
         let license: String
@@ -211,13 +217,13 @@ struct LicensesView: View {
         var id: String { name }
     }
 
-    private let model = [
+    static let model = [
         Component(name: "nb-whisper-small", origin: "Nasjonalbiblioteket", license: "Apache 2.0"),
         Component(name: "CoreML-konvertering", origin: "Barrymanalow", license: "Apache 2.0"),
         Component(name: "Tokenizer, whisper-small", origin: "OpenAI", license: "Apache 2.0")
     ]
 
-    private let code = [
+    static let code = [
         Component(name: "WhisperKit", origin: "Argmax", license: "MIT"),
         Component(name: "swift-transformers", origin: "Hugging Face", license: "Apache 2.0"),
         Component(name: "swift-jinja", origin: "Hugging Face", license: "Apache 2.0"),
@@ -228,14 +234,16 @@ struct LicensesView: View {
         Component(name: "yyjson", origin: "Yao Yuan", license: "MIT")
     ]
 
-    private let icons = [
+    static let icons = [
         Component(name: "Heroicons", origin: "Tailwind Labs", license: "MIT")
     ]
 
-    private let fonts = [
+    static let fonts = [
         Component(name: "Skranji", origin: "Font Diner", license: "SIL Open Font License 1.1"),
         Component(name: "Inter", origin: "Rasmus Andersson", license: "SIL Open Font License 1.1")
     ]
+
+    static var allComponents: [Component] { model + code + icons + fonts }
 
     var body: some View {
         ZStack {
@@ -243,10 +251,10 @@ struct LicensesView: View {
 
             ScrollView {
                 VStack(spacing: Space.s4) {
-                    group("Modell", model)
-                    group("Kode", code)
-                    group("Ikoner", icons)
-                    group("Fonter", fonts)
+                    group("Modell", Self.model)
+                    group("Kode", Self.code)
+                    group("Ikoner", Self.icons)
+                    group("Fonter", Self.fonts)
                 }
                 .padding(Space.s4)
             }
