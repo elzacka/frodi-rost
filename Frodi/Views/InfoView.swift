@@ -113,12 +113,12 @@ struct InfoView: View {
             LicensesView()
         } label: {
             card("Lisenser", opensScreen: true) {
-                paragraph("Modellen, koden og skriftene appen bygger på, med opphav og lisens.")
+                paragraph("Modellen, koden og fontene appen bygger på, med opphav og lisens.")
             }
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Lisenser")
-        .accessibilityHint("Åpner listen over modell, kode og skrifter")
+        .accessibilityHint("Åpner listen over modell, kode og fonter")
     }
 
     private var version: some View {
@@ -248,7 +248,7 @@ struct LicensesView: View {
                     group("Modell", model)
                     group("Kode", code)
                     group("Ikoner", icons)
-                    group("Skrifter", fonts)
+                    group("Fonter", fonts)
                 }
                 .padding(Space.s4)
             }

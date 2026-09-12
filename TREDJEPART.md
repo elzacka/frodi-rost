@@ -29,7 +29,7 @@ Oppdatert: 10. september 2026.
 |---|---|---|
 | Heroicons | Tailwind Labs | MIT |
 
-## Skrifter
+## Fonter
 
 | Skrift | Opphav | Lisens |
 |---|---|---|
