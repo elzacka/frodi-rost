@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 /// Hvor lydfilene ligger, og hvordan de beskyttes.
 ///
@@ -73,6 +74,25 @@ enum AudioStorage {
             .appendingPathComponent(UUID().uuidString + ".m4a")
         try plaintext.write(to: temporary, options: [.completeFileProtectionUnlessOpen])
         return temporary
+    }
+
+    /// Holder databasen utenfor iCloud-sikkerhetskopien.
+    ///
+    /// Teksten i den er forseglet, så det som ellers ville fulgt med er
+    /// metadata: datoer, lengder og filnavn. Lite, men ingenting av det har
+    /// noe i en sikkerhetskopi å gjøre. Settes ved hver oppstart, av samme
+    /// grunn som for opptaksmappen. SQLite skriver til tre filer, og alle
+    /// tre må med.
+    static func excludeFromBackup(store container: ModelContainer) {
+        for configuration in container.configurations {
+            let url = configuration.url
+            excludeFromBackup(url)
+            for suffix in ["-wal", "-shm"] {
+                excludeFromBackup(
+                    url.deletingLastPathComponent().appending(path: url.lastPathComponent + suffix)
+                )
+            }
+        }
     }
 
     static func delete(fileName: String) {

@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import Testing
 @testable import Frodi
 
@@ -40,6 +41,20 @@ struct IsolationTests {
     func recordingsAreExcludedFromBackup() throws {
         let dir = AudioStorage.directory
         let values = try dir.resourceValues(forKeys: [.isExcludedFromBackupKey])
+        #expect(values.isExcludedFromBackup == true)
+    }
+
+    /// Databasen skal heller ikke. Innholdet er forseglet, men datoer og
+    /// lengder er ikke det.
+    @Test("Databasen er holdt utenfor sikkerhetskopi")
+    func storeIsExcludedFromBackup() throws {
+        let url = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString + ".store")
+        let container = try ModelContainer(for: Recording.self, configurations: ModelConfiguration(url: url))
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        AudioStorage.excludeFromBackup(store: container)
+
+        let values = try url.resourceValues(forKeys: [.isExcludedFromBackupKey])
         #expect(values.isExcludedFromBackup == true)
     }
 }

@@ -13,6 +13,7 @@ struct FrodiApp: App {
         var resolved: ModelContainer
         do {
             resolved = try ModelContainer(for: Recording.self)
+            AudioStorage.excludeFromBackup(store: resolved)
         } catch {
             failed = true
             let memoryOnly = ModelConfiguration(isStoredInMemoryOnly: true)
