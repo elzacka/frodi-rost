@@ -15,6 +15,30 @@ struct IsolationTests {
         #expect(ats == nil, "NSAppTransportSecurity er lagt inn – appen skal ikke snakke med nett i det hele tatt")
     }
 
+    /// No networking API in the app's own sources. The plist tests above guard
+    /// the configuration; this one guards the code. It reads the source tree from
+    /// the path the test was compiled at, which is on the same Mac the simulator
+    /// runs on.
+    @Test("Ingen nettverkskode i appens kildekode")
+    func noNetworkingInSources() throws {
+        let sources = URL(filePath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "Frodi")
+        let enumerator = try #require(FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil))
+
+        let forbidden = ["URLSession", "URLRequest", "NWConnection", "import Network"]
+        var checked = 0
+        for case let url as URL in enumerator where url.pathExtension == "swift" {
+            let code = try String(contentsOf: url, encoding: .utf8)
+            for symbol in forbidden {
+                #expect(!code.contains(symbol), "\(url.lastPathComponent) bruker \(symbol)")
+            }
+            checked += 1
+        }
+        #expect(checked > 10, "Fant bare \(checked) kildefiler; stien til kildekoden er feil")
+    }
+
     /// `audio` is the only background mode the app should have. `fetch` or
     /// `processing` would open the door to work that can reach the network.
     @Test("Bare lyd kjører i bakgrunnen")
