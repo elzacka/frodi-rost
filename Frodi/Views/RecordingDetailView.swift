@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct RecordingDetailView: View {
     let recording: Recording
@@ -9,6 +10,10 @@ struct RecordingDetailView: View {
     @State private var showsTranscript = false
     @State private var exportURLs: [URL] = []
     @State private var exportError: String?
+    @State private var copied = false
+
+    /// How long a copied transcript stays on the pasteboard.
+    static let pasteboardLifetime: TimeInterval = 5 * 60
 
     private func exportRecording() async {
         do {
@@ -82,10 +87,11 @@ struct RecordingDetailView: View {
                 transcriptToggle
 
                 if showsTranscript {
+                    copyButton
+
                     Text(transcript)
                         .font(.Frodi.body)
                         .foregroundStyle(Color.Frodi.textPrimary)
-                        .textSelection(.enabled)
                         .hiddenWhileScreenCaptured()
                 }
             } else if recording.isTranscribing {
@@ -165,6 +171,35 @@ struct RecordingDetailView: View {
         .buttonStyle(.plain)
         .accessibilityLabel("Tekst, \(wordCount)")
         .accessibilityHint(showsTranscript ? "Skjuler teksten" : "Viser teksten")
+    }
+
+    /// Copies the whole text, and only to this device.
+    ///
+    /// The text used to be selectable, which gave the system copy menu. That menu
+    /// writes to the general pasteboard with Universal Clipboard on, so a
+    /// transcript would travel to every Mac and iPad on the same Apple account,
+    /// in an app whose premise is that nothing leaves the device. A button of our
+    /// own can say `localOnly`, and give the text a lifetime so it does not sit on
+    /// the pasteboard for the next app to read an hour later.
+    private var copyButton: some View {
+        Button(copied ? "Kopiert" : "Kopier") {
+            UIPasteboard.general.setItems(
+                [[UTType.utf8PlainText.identifier: transcript]],
+                options: [.localOnly: true, .expirationDate: Date.now.addingTimeInterval(Self.pasteboardLifetime)]
+            )
+            AccessibilityNotification.Announcement("Kopiert").post()
+            copied = true
+            Task {
+                try? await Task.sleep(for: .seconds(2))
+                copied = false
+            }
+        }
+        .font(.Frodi.bodyMedium)
+        .foregroundStyle(Color.Frodi.accentRecordOn)
+        .padding(.horizontal, Space.s4)
+        .padding(.vertical, Space.s2)
+        .background(Color.Frodi.accentRecord, in: Capsule())
+        .accessibilityHint("Kopierer hele teksten. Den blir bare på denne enheten.")
     }
 
     /// «312 ord». The number is also the answer to whether the whole recording came through.

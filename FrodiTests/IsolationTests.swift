@@ -39,6 +39,27 @@ struct IsolationTests {
         #expect(checked > 10, "Fant bare \(checked) kildefiler; stien til kildekoden er feil")
     }
 
+    /// The transcript reaches the pasteboard from one button, and that button keeps
+    /// it on this device with an expiry. Text selection is what would bring the
+    /// system copy menu back, and with it Universal Clipboard.
+    @Test("Teksten kopieres bare lokalt, og kan ikke markeres")
+    func transcriptCopiesLocallyOnly() throws {
+        let views = URL(filePath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "Frodi/Views")
+        let detail = try String(contentsOf: views.appending(path: "RecordingDetailView.swift"), encoding: .utf8)
+        #expect(!detail.contains("textSelection"), "Markering gir systemets kopimeny, som ikke kan holdes lokal")
+        #expect(detail.contains(".localOnly: true"))
+        #expect(detail.contains(".expirationDate:"))
+
+        let enumerator = try #require(FileManager.default.enumerator(at: views, includingPropertiesForKeys: nil))
+        for case let url as URL in enumerator where url.pathExtension == "swift" && url.lastPathComponent != "RecordingDetailView.swift" {
+            let code = try String(contentsOf: url, encoding: .utf8)
+            #expect(!code.contains("UIPasteboard"), "\(url.lastPathComponent) skriver til utklippstavlen utenom kopiknappen")
+        }
+    }
+
     /// `audio` is the only background mode the app should have. `fetch` or
     /// `processing` would open the door to work that can reach the network.
     @Test("Bare lyd kjører i bakgrunnen")
