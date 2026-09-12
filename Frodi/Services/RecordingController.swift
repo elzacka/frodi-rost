@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import SwiftData
+import UIKit
 
 /// Owns the recording, and is what both the interface and the Action Button talk to.
 ///
@@ -30,6 +31,21 @@ final class RecordingController {
     func attach(container: ModelContainer, storageFailed: Bool) {
         self.container = container
         self.storageFailed = storageFailed
+
+        // Plaintext a crash left in the temporary folder. Nothing is running at
+        // launch, so all of it is leftovers.
+        AudioStorage.clearScratch()
+
+        // A recording stopped while the device was locked is still plaintext. It is
+        // sealed as soon as the device is unlocked, and at launch if it already is.
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.protectedDataDidBecomeAvailableNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in await self?.sealPending() }
+        }
+        Task { await sealPending() }
     }
 
     /// Starts if idle, stops if running. This is what the Action Button calls.
@@ -60,11 +76,34 @@ final class RecordingController {
 
         let recording = Recording(duration: result.duration, fileName: result.fileName)
 
-        guard let context = container?.mainContext else { return }
+        guard let container else { return }
+        let context = container.mainContext
         context.insert(recording)
         try? context.save()
 
-        // The text is made afterwards. If that fails, the reason is stored on the recording.
+        // The first save creates the database's -wal and -shm files. At launch they
+        // did not exist yet, so the backup flag set then landed on nothing.
+        AudioStorage.excludeFromBackup(store: container)
+
+        // Sealed and turned into text afterwards. If that fails, the reason is
+        // stored on the recording.
         Task { await Transcription.run(for: recording, context: context) }
+    }
+
+    /// Seals, and then transcribes, every recording that is still plaintext.
+    ///
+    /// `Transcription.run` does the sealing, so a recording sealed here gets its
+    /// text in the same pass, and the list's own pass at launch cannot collide
+    /// with this one. The check on protected data is what makes the launch case
+    /// safe: an App Intent can launch the app in the background with the device
+    /// locked, and the attempt would fail anyway.
+    func sealPending() async {
+        guard UIApplication.shared.isProtectedDataAvailable,
+              let context = container?.mainContext else { return }
+
+        let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
+        for recording in recordings where !AudioStorage.isSealed(recording.fileName) {
+            await Transcription.run(for: recording, context: context)
+        }
     }
 }

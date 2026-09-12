@@ -7,6 +7,10 @@ import SwiftData
 /// the recording must be writable while the screen is locked, and the finished
 /// file must not be readable while the screen is locked.
 enum AudioStorage {
+    /// The suffix of a sealed recording. A file without it is plaintext that is
+    /// still waiting to be sealed; see `seal(fileName:)`.
+    static let sealedSuffix = ".enc"
+
     static var directory: URL {
         let base = URL.documentsDirectory.appendingPathComponent("Opptak", isDirectory: true)
         if !FileManager.default.fileExists(atPath: base.path) {
@@ -20,6 +24,32 @@ enum AudioStorage {
         // operations, and a folder made by an earlier version does not have it at all.
         excludeFromBackup(base)
         return base
+    }
+
+    /// Plaintext that exists only while a job runs: transcription and export.
+    ///
+    /// One folder, so it can be emptied at launch. Each job removes its own files
+    /// in a `defer`, but a `defer` does not run if the process is killed, and a
+    /// transcription can take minutes. Whatever a crash leaves behind is removed
+    /// by `clearScratch()` the next time the app starts.
+    static var scratchDirectory: URL {
+        if !FileManager.default.fileExists(atPath: scratchURL.path) {
+            try? FileManager.default.createDirectory(
+                at: scratchURL,
+                withIntermediateDirectories: true,
+                attributes: [.protectionKey: FileProtectionType.completeUnlessOpen]
+            )
+        }
+        return scratchURL
+    }
+
+    private static let scratchURL = FileManager.default.temporaryDirectory
+        .appendingPathComponent("Klartekst", isDirectory: true)
+
+    /// Removes every temporary plaintext file. Called at launch, when no job is
+    /// running and everything in the folder is a leftover.
+    static func clearScratch() {
+        try? FileManager.default.removeItem(at: scratchURL)
     }
 
     /// Protection while the recording runs.
@@ -38,6 +68,48 @@ enum AudioStorage {
     static func protectFinished(_ url: URL) {
         setProtection(.complete, on: url)
         excludeFromBackup(url)
+    }
+
+    static func isSealed(_ fileName: String) -> Bool {
+        fileName.hasSuffix(sealedSuffix)
+    }
+
+    /// Seals a recording that is still plaintext, and returns its new file name.
+    ///
+    /// The plaintext is removed only once the sealed copy is written. If sealing
+    /// fails, the plaintext stays where it is: it is `.completeUnlessOpen` and
+    /// closed, so it cannot be read while the device is locked, and the caller
+    /// tries again at the next unlock. Deleting it would lose the recording, and a
+    /// delay is the lesser harm.
+    ///
+    /// Failing here is the expected outcome when the Action Button stops a
+    /// recording on a locked device. A `.completeUnlessOpen` file cannot be
+    /// reopened once closed until the device is unlocked, and a `.complete` file
+    /// cannot be created at all. The Secure Enclave key would have been available,
+    /// but the file classes are not. See `RecordingController.sealPending()`.
+    ///
+    /// `@concurrent` for the same reason as `decryptToTemporary`: a ten minute
+    /// recording is several megabytes read, encrypted and written whole.
+    @concurrent
+    static func seal(fileName: String) async throws -> String {
+        let source = directory.appendingPathComponent(fileName)
+        let sealedName = fileName + sealedSuffix
+        let target = directory.appendingPathComponent(sealedName)
+
+        try RecordingVault.seal(fileAt: source).write(to: target, options: [.completeFileProtection])
+        try? FileManager.default.removeItem(at: source)
+        protectFinished(target)
+        return sealedName
+    }
+
+    /// The audio of a recording, unlocked.
+    ///
+    /// A sealed file goes through the vault. A file still waiting to be sealed is
+    /// read as it is; that only happens while the device has not been unlocked
+    /// since the recording was stopped.
+    static func plaintext(fileName: String) throws -> Data {
+        let stored = try Data(contentsOf: directory.appendingPathComponent(fileName))
+        return isSealed(fileName) ? try RecordingVault.open(stored) : stored
     }
 
     /// Runs a job with the recording temporarily decrypted.
@@ -66,12 +138,10 @@ enum AudioStorage {
     /// still be called from there.
     @concurrent
     private static func decryptToTemporary(fileName: String) async throws -> URL {
-        let sealed = try Data(contentsOf: directory.appendingPathComponent(fileName))
-        let plaintext = try RecordingVault.open(sealed)
+        let audio = try plaintext(fileName: fileName)
 
-        let temporary = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString + ".m4a")
-        try plaintext.write(to: temporary, options: [.completeFileProtectionUnlessOpen])
+        let temporary = scratchDirectory.appendingPathComponent(UUID().uuidString + ".m4a")
+        try audio.write(to: temporary, options: [.completeFileProtectionUnlessOpen])
         return temporary
     }
 
@@ -79,8 +149,9 @@ enum AudioStorage {
     ///
     /// The text in it is sealed, so what would otherwise travel is metadata: dates,
     /// lengths and file names. Little, but none of it belongs in a backup. Set at
-    /// every launch, for the same reason as the recordings folder. SQLite writes to
-    /// three files, and all three must be covered.
+    /// every launch, for the same reason as the recordings folder, and again after
+    /// the first save: SQLite creates `-wal` and `-shm` on the first write, and a
+    /// flag set on a file that does not exist yet sets nothing.
     static func excludeFromBackup(store container: ModelContainer) {
         for configuration in container.configurations {
             let url = configuration.url

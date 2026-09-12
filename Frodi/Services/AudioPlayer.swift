@@ -46,14 +46,14 @@ final class AudioPlayer {
         stop()
 
         state = .loading
-        fileName = recording.fileName
-        let url = recording.fileURL
+        let name = recording.fileName
+        fileName = name
 
         do {
             // The decryption bypasses the main actor. A long recording is tens of
             // megabytes, and the interface must not freeze meanwhile.
             let audio = try await Task.detached(priority: .userInitiated) {
-                try RecordingVault.open(try Data(contentsOf: url))
+                try AudioStorage.plaintext(fileName: name)
             }.value
 
             let newPlayer = try AVAudioPlayer(data: audio)

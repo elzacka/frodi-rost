@@ -77,7 +77,7 @@ enum RecordingVault {
 
     static func open(_ blob: Data) throws -> Data {
         guard blob.count > 2 else { throw VaultError.decryptionFailed }
-        let length = Int(blob.prefix(2).withUnsafeBytes { $0.load(as: UInt16.self).bigEndian })
+        let length = Int(blob.prefix(2).withUnsafeBytes { $0.loadUnaligned(as: UInt16.self).bigEndian })
         guard blob.count > 2 + length else { throw VaultError.decryptionFailed }
 
         let wrappedKey = blob.subdata(in: 2..<(2 + length))

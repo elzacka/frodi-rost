@@ -64,6 +64,95 @@ struct VaultTests {
     }
 }
 
+/// A recording is plaintext from the moment it is stopped until it is sealed.
+/// Sealing renames it, removes the plaintext and leaves a file that can only be
+/// read through the vault. Nothing here may delete a recording: if sealing
+/// fails, the plaintext stays and is retried.
+@Suite("Forsegling av opptak")
+struct FileSealingTests {
+    private func plaintextRecording(_ contents: Data) throws -> String {
+        let name = "\(UUID().uuidString).m4a"
+        try contents.write(to: AudioStorage.directory.appendingPathComponent(name))
+        return name
+    }
+
+    @Test("Filnavnet forteller om opptaket er forseglet")
+    func suffixTellsSealedFromPending() {
+        #expect(AudioStorage.isSealed("a.m4a.enc"))
+        #expect(!AudioStorage.isSealed("a.m4a"))
+    }
+
+    @Test("Forsegling bytter navn, fjerner klarteksten og kan åpnes igjen")
+    func sealingReplacesPlaintext() async throws {
+        let original = Data("et opptak som venter på forsegling".utf8)
+        let name = try plaintextRecording(original)
+
+        let sealed = try await AudioStorage.seal(fileName: name)
+        defer { AudioStorage.delete(fileName: sealed) }
+
+        #expect(sealed == name + ".enc")
+        #expect(AudioStorage.isSealed(sealed))
+        #expect(!FileManager.default.fileExists(atPath: AudioStorage.directory.appendingPathComponent(name).path))
+
+        let stored = try Data(contentsOf: AudioStorage.directory.appendingPathComponent(sealed))
+        #expect(stored.range(of: original) == nil)
+        #expect(try AudioStorage.plaintext(fileName: sealed) == original)
+    }
+
+    /// A recording that is not sealed yet is read as it is, so the list can play
+    /// and export it in the short window before the seal.
+    @Test("Et uforseglet opptak leses som det er")
+    func pendingRecordingIsReadable() throws {
+        let original = Data("ikke forseglet ennå".utf8)
+        let name = try plaintextRecording(original)
+        defer { AudioStorage.delete(fileName: name) }
+
+        #expect(try AudioStorage.plaintext(fileName: name) == original)
+    }
+
+    /// A missing plaintext fails instead of producing an empty sealed file.
+    @Test("Forsegling av en fil som mangler feiler")
+    func sealingMissingFileThrows() async {
+        await #expect(throws: (any Error).self) {
+            try await AudioStorage.seal(fileName: "finnes-ikke.m4a")
+        }
+    }
+}
+
+/// Temporary plaintext lives in one folder so that a crash cannot leave any of
+/// it behind for longer than until the next launch.
+@Suite("Midlertidig klartekst", .serialized)
+struct ScratchTests {
+    @Test("Mappen tømmes ved oppstart")
+    func clearRemovesLeftovers() throws {
+        let leftover = AudioStorage.scratchDirectory.appendingPathComponent("etterlatt.m4a")
+        try Data("klartekst".utf8).write(to: leftover)
+        #expect(FileManager.default.fileExists(atPath: leftover.path))
+
+        AudioStorage.clearScratch()
+        #expect(!FileManager.default.fileExists(atPath: leftover.path))
+
+        // And the folder comes back on demand.
+        #expect(FileManager.default.fileExists(atPath: AudioStorage.scratchDirectory.path))
+    }
+
+    @Test("Eksporten skriver til klartekstmappen")
+    func exportWritesIntoScratch() async throws {
+        let name = "\(UUID().uuidString).m4a.enc"
+        try RecordingVault.seal(Data("lyd".utf8)).write(to: AudioStorage.directory.appendingPathComponent(name))
+        defer { AudioStorage.delete(fileName: name) }
+
+        let recording = Recording(duration: 1, fileName: name)
+        let urls = try await RecordingExport.prepare(recording)
+        defer { RecordingExport.cleanUp(urls) }
+
+        let scratch = AudioStorage.scratchDirectory.standardizedFileURL.path
+        for url in urls {
+            #expect(url.standardizedFileURL.path.hasPrefix(scratch), "\(url.path) ligger utenfor \(scratch)")
+        }
+    }
+}
+
 @Suite("Forsegling av tekst")
 struct TranscriptSealingTests {
     @Test("Tekst kan forsegles og åpnes igjen")

@@ -14,8 +14,30 @@ enum Transcription {
 
     static var usesBundledModel: Bool { WhisperTranscriber.isBundled }
 
+    /// Recordings being worked on right now.
+    ///
+    /// Launch and unlock each start a pass over the pending recordings, and the
+    /// list starts its own at launch. Whichever reaches a recording first does the
+    /// work; the others skip it. The flag on the recording cannot serve here: it is
+    /// saved to disk and would be stale after a crash.
+    @MainActor
+    private static var inFlight: Set<PersistentIdentifier> = []
+
     @MainActor
     static func run(for recording: Recording, context: ModelContext) async {
+        let id = recording.persistentModelID
+        guard inFlight.insert(id).inserted else { return }
+        defer { inFlight.remove(id) }
+
+        // Sealing comes first. It fails while the device is locked; the recording
+        // then waits for the next unlock or launch, and nothing is marked failed,
+        // because nothing has. See `AudioStorage.seal`.
+        if !AudioStorage.isSealed(recording.fileName) {
+            guard let sealed = try? await AudioStorage.seal(fileName: recording.fileName) else { return }
+            recording.fileName = sealed
+            try? context.save()
+        }
+
         recording.isTranscribing = true
         do {
             let text = try await AudioStorage.withDecrypted(fileName: recording.fileName) { url in

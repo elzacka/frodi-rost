@@ -6,9 +6,10 @@ import Foundation
 /// rest and unlocked only at the moment you ask. The plaintext goes into the
 /// temporary directory and is cleaned up after sharing.
 ///
-/// Sharing goes through iOS' own share sheet, which lets you pick Files on the
-/// device or AirDrop. Both are local. Fróði uploads nothing itself, and has no
-/// network code to do it with.
+/// Sharing goes through iOS' own share sheet. Where the files go is your choice
+/// there: Files on the device and AirDrop keep them local, Mail, Messages and
+/// iCloud Drive do not. Fróði uploads nothing itself, and has no network code
+/// to do it with.
 enum RecordingExport {
     /// Writes audio and text to temporary files ready for sharing.
     ///
@@ -39,13 +40,12 @@ enum RecordingExport {
         var urls: [URL] = []
 
         let stamp = Self.stamp(createdAt)
-        let folder = FileManager.default.temporaryDirectory
+        let folder = AudioStorage.scratchDirectory
             .appendingPathComponent("Eksport-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 
-        let sealed = try Data(contentsOf: AudioStorage.directory.appendingPathComponent(fileName))
         let audio = folder.appendingPathComponent("frodi-\(stamp).m4a")
-        try RecordingVault.open(sealed).write(to: audio, options: [.completeFileProtectionUnlessOpen])
+        try AudioStorage.plaintext(fileName: fileName).write(to: audio, options: [.completeFileProtectionUnlessOpen])
         urls.append(audio)
 
         if let transcript, !transcript.isEmpty {

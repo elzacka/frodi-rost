@@ -94,22 +94,12 @@ final class AudioRecorder {
             return nil
         }
 
-        // The file is closed now. It is sealed with a key that exists only in this
-        // device's Secure Enclave, and the plaintext is deleted.
-        do {
-            let sealed = try RecordingVault.seal(fileAt: recorder.url)
-            let name = recorder.url.lastPathComponent + ".enc"
-            let target = AudioStorage.directory.appendingPathComponent(name)
-            try sealed.write(to: target, options: [.completeFileProtection])
-            try? FileManager.default.removeItem(at: recorder.url)
-            AudioStorage.protectFinished(target)
-            return (name, length)
-        } catch {
-            // If we cannot encrypt, we do not leave the plaintext lying around.
-            try? FileManager.default.removeItem(at: recorder.url)
-            state = .failed(String(localized: "Fróði fikk ikke låst opptaket, og slettet det."))
-            return nil
-        }
+        // The file is closed now, and stays `.completeUnlessOpen` until
+        // `Transcription.run` seals it. Sealing is not done here: it has to read the
+        // closed file back, and that fails while the device is locked, which is
+        // exactly when the Action Button stops a recording in the car. It used to
+        // be done here, and the failure deleted the recording.
+        return (recorder.url.lastPathComponent, length)
     }
 
     private func startTicker() {
