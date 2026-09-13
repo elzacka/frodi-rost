@@ -16,9 +16,13 @@ Appen er foreløpig kun i TestFlight, ikke App Store. Den vil bare bli tilgjenge
 - Tar opp lyd, også når skjermen er av
 - Handlingsknappen starter og stopper opptak
 - Skriver teksten på norsk bokmål, med tegnsetting og store bokstaver
-- Lar deg hente ut lyd og tekst
-- Tar opp i inntil ti minutter om gangen. Grensen og målingene bak den står
-  i `Frodi/Services/RecordingLimit.swift`
+- Lar deg hente ut lyd og tekst, som `.m4a`, `.txt` og `.rtf`
+- Tar opp så lenge du vil. Et intervju på en time er et vanlig opptak
+- Deler teksten i avsnitt med tidspunkt, så du finner stedet i lyden bak en
+  setning
+- Lager teksten med en gang for korte opptak. Er opptaket over ti minutter,
+  lager appen teksten når du ber om den, og fortsetter der den slapp om den
+  blir avbrutt
 
 ## Modell
 
@@ -105,10 +109,12 @@ Ett opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
 |---|---|
 | Handlingsknappen kjører intenten, i bakgrunnen når iOS lar den | `Intents/ToggleRecordingIntent.swift` |
 | Intenten og opptaksknappen går gjennom én kontroller, som også eier databasen | `Services/RecordingController.swift` |
-| Lyden tas opp, med nedtelling mot grensen | `Services/AudioRecorder.swift`, `Services/RecordingLimit.swift` |
+| Lyden tas opp som PCM, så et krasj ikke tar opptaket med seg | `Services/AudioRecorder.swift` |
+| Listen og mappen sjekkes mot hverandre ved oppstart, så en fil uten rad får en rad | `Services/RecordingController.swift` |
 | Filen ligger i sandkassen med filvern, utenfor sikkerhetskopien | `Services/AudioStorage.swift` |
 | Opptaket forsegles med en nøkkel fra Secure Enclave | `Services/RecordingVault.swift` |
-| Teksten lages, med nb-whisper i appen eller med diktatmodellen i iOS | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift`, `Services/SpeechEngine.swift` |
+| Teksten lages stykke for stykke, med nb-whisper i appen eller med diktatmodellen i iOS. Fremdriften lagres etter hvert stykke | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift`, `Services/SpeechEngine.swift` |
+| Teksten er avsnitt med tidspunkt | `Services/Transcript.swift` |
 | Teksten forsegles på samme måte som lyden | `Services/RecordingVault.swift` |
 | Teksten vises bak et vern som skjuler den ved skjermopptak og appbytte | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift` |
 | Hent ut dekrypterer filene til en midlertidig mappe og gir dem til delingsarket | `Services/RecordingExport.swift`, `Views/ShareSheet.swift` |

@@ -15,7 +15,7 @@ ikke finnes noen.
 | Teksten følger Dynamic Type | Alle skriftstiler i `Theme.swift` bruker `Font.custom(_:size:relativeTo:)`, så størrelsen følger innstillingen på enheten | `ThemeTests` |
 | Ingen tekst under 11 px | De minste stilene, `eyebrow` og `meta`, er 11 px. Tidtakeren er 32 px, så den kan leses på armlengdes avstand i en bil | `Theme.swift` |
 | Treffflater på minst 44 pt | Info-knappen, hopp-knappene i spilleren og raden som folder teksten ut er 44 pt. Opptaksknappen er 76 pt og spill av-knappen 56 pt | `Theme.swift` |
-| VoiceOver | Hver knapp har norsk navn. Tidtakeren og nedtellingen leses som tid, ikke som «0:04». Opptaksknappen heter «Start opptak» og «Stopp opptak». Raden i listen leses som én enhet | Ingen test |
+| VoiceOver | Hver knapp har norsk navn. Tidtakeren leses som tid, ikke som «0:04». Tidspunktene i teksten leses som «Spill av fra 12 minutter, 37 sekunder». Opptaksknappen heter «Start opptak» og «Stopp opptak». Raden i listen leses som én enhet | Ingen test |
 | Farge er aldri det eneste signalet | Når opptaket går, bytter knappen ikon fra mikrofon til stopp, tidtakeren starter og VoiceOver-navnet endres. Lenker er understreket | Ingen test |
 | Lukk med VoiceOver-gesten | `UIAccessibilityPerformEscapeEnabled` er satt, så Z-gesten lukker arkene | `Info.plist` |
 | Ingen tomme knapper | Et ikon som mangler i katalogen tegner ingenting, og knappen blir stående tom. En test laster hvert ikon | `IconTests` |

@@ -6,6 +6,25 @@ Ingenting er i App Store ennå.
 
 ## Ikke utgitt
 
+### Lagt til
+
+- Et opptak kan vare så lenge du vil. Grensen på ti minutter er borte
+- Teksten deles i avsnitt med tidspunkt. Trykk på tidspunktet for å høre
+  stedet i opptaket
+- Er opptaket over ti minutter, lager appen teksten når du ber om den, og
+  viser hvor langt den har kommet. Blir den avbrutt, fortsetter den der den
+  slapp neste gang
+- Teksten hentes ut som `.rtf` i tillegg til `.txt`, med overskrift og avsnitt
+- «Slett» spør først
+
+### Rettet
+
+- Et opptak overlever en telefonsamtale. Før ble det slettet når du stoppet
+  etterpå
+- Et opptak overlever at appen krasjer eller blir avsluttet midt i. Lyden tas
+  opp i et format som kan spilles av uansett hvor den ble avbrutt
+- Et opptak som mistet raden sin i listen, får den tilbake ved neste oppstart
+
 ### Sikkerhet
 
 - Nøkkelen som låser opp opptak og tekst, kan bare brukes mens enheten er låst

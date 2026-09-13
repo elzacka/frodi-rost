@@ -62,6 +62,13 @@ skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
   flytter ved oppdatering
 - Et forseglet opptak har filvern `.complete`
 - `versionIdentifier` i en SwiftData-modell som er tatt i bruk, endres aldri
+- Et opptak går aldri tapt. Filen på disk er opptaket; raden i listen er
+  bare et bilde av den og bygges opp igjen fra filen. Det eneste som sletter
+  lyd, er brukeren, etter et spørsmål
+- Ingen modus og ingen innstillinger. Det appen gjør ulikt for et kort notat
+  og et intervju på en time, avgjør den ut fra det den kan se, først og fremst
+  lengden. Ikke ut fra en bryter
+- Skriv «intervju», aldri «revisjon», i tekst brukeren leser
 - Ingen emoji, verken i kode, commit-meldinger eller grensesnitt
 - Bare iPhone, bare stående, bare Norge. Ikke legg til engelsk grensesnitt
 

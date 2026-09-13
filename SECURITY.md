@@ -110,6 +110,18 @@ Plaintext exists only while a job runs: during transcription, during export, and
 while a detail screen is open. It is removed afterwards, and anything a crash
 leaves behind is removed at the next launch.
 
+A transcription in progress writes what it has so far to a `.tekst` file beside
+the recording after every piece, sealed through the same vault as the text.
+Sealing needs only the public key, so this works whatever the lock state; the
+file is deleted when the transcript is saved. It is what lets an hour of audio
+be transcribed across suspensions without starting over.
+
+**A long transcription runs only while the app is open.** The sealed audio is a
+`.complete` file and cannot be read once the device locks, so no background task
+can transcribe it there. The app keeps the screen awake while it works instead.
+This is a consequence of the file classes above, chosen over a background
+transcription that would have needed the audio readable on a locked device.
+
 In memory, the text exists while the detail screen shows it and is cleared when
 the screen closes; the export holds it until the files are written. Nothing pins
 or wipes memory beyond that, and iOS offers no supported way to.
@@ -118,9 +130,10 @@ or wipes memory beyond that, and iOS offers no supported way to.
 
 | State | Class | Reason |
 |---|---|---|
-| Recording in progress | `.completeUnlessOpen` | `.complete` blocks writes when the screen locks, which is when recordings run |
+| Recording in progress | `.completeUnlessOpen` | `.complete` blocks writes when the screen locks, which is when recordings run. The file is linear PCM in a CAF container: an AAC file killed mid-write cannot be opened, and a recording must survive a crash |
 | Stopped, awaiting seal | `.completeUnlessOpen`, closed | Cannot be reopened until the device is unlocked, which is also when the seal happens |
-| Sealed recording | `.complete` | Unreadable while locked |
+| Sealed recording | `.complete` | Unreadable while locked. The seal encodes the PCM to AAC through a scratch copy, which is temporary plaintext as below |
+| Transcription progress | `.completeUnlessOpen` | Ciphertext already; the class only has to allow writing after the screen locks |
 | Temporary plaintext | `.completeUnlessOpen` | Removed in a `defer`; the folder is emptied at launch |
 
 Files are also marked `isExcludedFromBackup`, re-applied on every folder access
