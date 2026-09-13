@@ -22,7 +22,11 @@ Stopper du et opptak mens enheten er låst, krypterer Fróði det så snart du
 låser opp. Fram til da holder iOS filen låst, og ingen kan lese den.
 
 Mens teksten lages, lagrer Fróði det som er ferdig underveis, kryptert på
-samme måte som teksten. Det er slik den kan fortsette der den slapp.
+samme måte som teksten. Det er slik den kan fortsette der den slapp, også
+mens enheten lader med skjermen låst.
+
+Ordlisten du kan skrive på Info-siden, lagres kryptert på samme måte, og
+holdes utenfor sikkerhetskopien.
 
 Tar du opp et intervju, er det du som må fortelle den du intervjuer at det
 blir tatt opp, og hva opptaket skal brukes til. Fróði kan love at opptaket blir

@@ -34,7 +34,8 @@ The app assumes a passcode is set and iOS is not compromised.
 
 | Scenario | Result |
 |---|---|
-| Device lost or stolen, locked | Audio unreadable: the files are `NSFileProtectionComplete`. Transcripts are ciphertext in the database, whose own protection class is weaker; the key that opens them is `WhenUnlocked`, so the Secure Enclave refuses to unwrap while the device is locked, also for code running on the device with the app's keychain access. Dates, durations and file names in the database are not encrypted |
+| Device lost or stolen, locked, not rebooted | The sealed audio and the transcripts are ciphertext under a key the Secure Enclave will unwrap for the app's own code after the first unlock since boot. So the protection against this attacker is the app sandbox and the Enclave's refusal to hand the key to anyone but this app, not the lock screen. This is the class chosen on 14 September 2026 so that a transcription can run on the charger with the screen locked; from 13 to 14 September it was `WhenUnlocked`, which would have refused even the app. Dates, durations and file names in the database are not encrypted |
+| Device lost or stolen, locked, rebooted | Unreadable until the passcode is entered. Both the files and the key require the first unlock |
 | Device lost, wiped or replaced | Every recording and transcript is gone. The key exists only in that device's Secure Enclave and is in no backup. Export is the only way to keep a recording |
 | Recording stopped while the device is locked | Saved as plaintext under `NSFileProtectionCompleteUnlessOpen`, which cannot be reopened until the device is unlocked. Sealed and transcribed at the next unlock or launch. Never deleted |
 | Backup copied, or restored to another device | Unreadable. The key is device-bound |
@@ -57,7 +58,7 @@ The sections below explain the choices.
 |---|---|---|
 | Isolation | iOS app sandbox. No app group, no shared container | System |
 | Encryption at rest | AES-GCM, one random 256-bit key per recording and per transcript | `RecordingVault` |
-| Key wrapping | P-256 key created in the Secure Enclave, `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`. The public key is kept in memory once read, so sealing does not touch the keychain | `RecordingVault` |
+| Key wrapping | P-256 key created in the Secure Enclave, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`. The public key is kept in memory once read, so sealing does not touch the keychain | `RecordingVault` |
 | File protection, recording in progress and awaiting seal | `NSFileProtectionCompleteUnlessOpen` | `AudioStorage` |
 | File protection, sealed recording | `NSFileProtectionComplete` | `AudioStorage` |
 | File protection, temporary plaintext | `NSFileProtectionCompleteUnlessOpen`, in one folder, removed in a `defer` and emptied at launch | `AudioStorage`, `RecordingExport`, `RecordingController` |
@@ -84,18 +85,20 @@ key cannot be extracted. That stops the key from being copied; it does not stop
 code running on this device in the app's context from asking the Enclave to use
 it. What limits that is the access class.
 
-Access control is `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`.
+Access control is `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`.
 
-- **WhenUnlocked**, not AfterFirstUnlock: the private key is used only to open,
-  and every path that opens runs on an unlocked device, because it starts from a
-  `.complete` audio file or from a screen the user is looking at. Sealing needs
-  only the public key, which the app keeps in memory once it has read it, so a
-  transcription that finishes after the screen has locked still seals its text.
-  AfterFirstUnlock was the class until 13 September 2026. It would have let the
-  key unwrap on a locked device that had been unlocked once since boot, which is
-  the state a seized device is usually in. A key created by a build before
-  0.1.0 (5) keeps that class: the class is fixed at creation, and the app does
-  not rotate keys.
+- **AfterFirstUnlock**: the key can be used by this app once the device has
+  been unlocked once since boot, including while it is locked again. That is
+  what lets a transcription run while the device sits locked on the charger,
+  see *Background transcription* below. The stricter WhenUnlocked was the
+  class from 13 to 14 September 2026, and would have let a locked device
+  refuse even the app. Decided by the app's owner on 14 September 2026: an
+  hour of interview transcribed overnight is worth that margin, and what
+  remains between the two classes is the sandbox and the Enclave's binding of
+  the key to this app's code. A key created by a build in between keeps the
+  stricter class: the class is fixed at creation, and the app does not rotate
+  keys. On such a device the background run finds nothing it can open and
+  ends; transcription then runs when the app is open.
 - **ThisDeviceOnly**: the key is excluded from backups and device migration.
 
 **Sealing waits for the device to be unlocked.** The Action Button can stop a
@@ -116,11 +119,17 @@ Sealing needs only the public key, so this works whatever the lock state; the
 file is deleted when the transcript is saved. It is what lets an hour of audio
 be transcribed across suspensions without starting over.
 
-**A long transcription runs only while the app is open.** The sealed audio is a
-`.complete` file and cannot be read once the device locks, so no background task
-can transcribe it there. The app keeps the screen awake while it works instead.
-This is a consequence of the file classes above, chosen over a background
-transcription that would have needed the audio readable on a locked device.
+### Background transcription
+
+With the app open, a transcription runs with the screen kept awake. With the
+device on a charger, iOS runs the app's `BGProcessingTask`
+(`com.Tazk.Frodi.transcribe`) while the device is idle, screen locked, and the
+task picks up whatever is waiting from where it left off. It ends at the next
+piece when iOS calls time. For that to work the sealed audio, the progress
+file and the key all have to be usable after the first unlock, which is the
+reason for the classes above. The plaintext copy the model reads is opened
+once, while it can be, and held open across the pieces; a fresh open of a
+`.completeUnlessOpen` file on a locked device would fail.
 
 In memory, the text exists while the detail screen shows it and is cleared when
 the screen closes; the export holds it until the files are written. Nothing pins
@@ -132,9 +141,9 @@ or wipes memory beyond that, and iOS offers no supported way to.
 |---|---|---|
 | Recording in progress | `.completeUnlessOpen` | `.complete` blocks writes when the screen locks, which is when recordings run. The file is linear PCM in a CAF container: an AAC file killed mid-write cannot be opened, and a recording must survive a crash |
 | Stopped, awaiting seal | `.completeUnlessOpen`, closed | Cannot be reopened until the device is unlocked, which is also when the seal happens |
-| Sealed recording | `.complete` | Unreadable while locked. The seal encodes the PCM to AAC through a scratch copy, which is temporary plaintext as below |
-| Transcription progress | `.completeUnlessOpen` | Ciphertext already; the class only has to allow writing after the screen locks |
-| Temporary plaintext | `.completeUnlessOpen` | Removed in a `defer`; the folder is emptied at launch |
+| Sealed recording | `.completeUntilFirstUserAuthentication` | Ciphertext under a key of the same class. Readable by the app on the charger with the screen locked, which is what background transcription needs; unreadable from boot until the first unlock. The seal encodes the PCM to AAC through a scratch copy, which is temporary plaintext as below |
+| Transcription progress | `.completeUntilFirstUserAuthentication` | Ciphertext already; read back by the background run |
+| Temporary plaintext | `.completeUnlessOpen` | Held open for the length of the job, so the lock does not stop it; cannot be reopened once closed. Removed in a `defer`; the folder is emptied at launch |
 
 Files are also marked `isExcludedFromBackup`, re-applied on every folder access
 because Apple documents the flag as resettable guidance. The SwiftData store is

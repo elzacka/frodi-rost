@@ -1,28 +1,22 @@
 # Fróði røst
 
-Tar opp lyd på iPhone og gjør den om til norsk tekst. Alt skjer på enheten.
+Tar opp lyd på iPhone og transkriberer på norsk (gjør om lydopptaket til tekst). Alt skjer på enheten.
 
-«Fróði» er norrønt for «den kunnskapsrike». «Røst» er stemme.
-
-Fróði er en serie med to apper. Den andre heter [«Fróði vit»](https://github.com/elzacka/frodi-vit)
-og er en kunnskapsassistent som svarer på det du spør om.
+«Fróði» er norrønt for «den kunnskapsrike». «Røst» er synonymt for stemme og henviser til opptaksfunksjonen.
 
 ## Status
 
-Appen er foreløpig kun i TestFlight, ikke App Store. Den vil bare bli tilgjengelig i Norge.
+Appen er foreløpig kun i TestFlight, ikke App Store. Vil bare bli tilgjengelig i Norge.
 
 ## Hva appen gjør
 
-- Tar opp lyd, også når skjermen er av
+- Tar opp lyd selv om skjermlåsen er på
 - Handlingsknappen starter og stopper opptak
-- Skriver teksten på norsk bokmål, med tegnsetting og store bokstaver
-- Lar deg hente ut lyd og tekst, som `.m4a`, `.txt` og `.rtf`
-- Tar opp så lenge du vil. Et intervju på en time er et vanlig opptak
-- Deler teksten i avsnitt med tidspunkt, så du finner stedet i lyden bak en
-  setning
-- Lager teksten med en gang for korte opptak. Er opptaket over ti minutter,
-  lager appen teksten når du ber om den, og fortsetter der den slapp om den
-  blir avbrutt
+- Transkriberer på norsk bokmål – med riktig tegnsetting og store/små bokstaver
+- Lar deg eksportere lydopptak i filformatet `.m4a` og transkripsjoner i `.txt` og `.rtf`
+- Tar opp så lenge du vil. F. eks et lengre intervju på en time
+- Deler transkripsjonen i avsnitt med tidspunkt, så du lettere finner tilbake til riktig sted i lydopptaket
+- Transkriberer korte opptak i sanntid. Opptak over ti minutter, transkriberes når du ber om det, og fortsetter der det slapp om det blir avbrutt
 
 ## Modell
 
@@ -115,6 +109,8 @@ Ett opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
 | Opptaket forsegles med en nøkkel fra Secure Enclave | `Services/RecordingVault.swift` |
 | Teksten lages stykke for stykke, med nb-whisper i appen eller med diktatmodellen i iOS. Fremdriften lagres etter hvert stykke | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift`, `Services/SpeechEngine.swift` |
 | Teksten er avsnitt med tidspunkt | `Services/Transcript.swift` |
+| Ordlisten går til modellen som prompt | `Services/WordList.swift` |
+| På laderen kjører transkriberingen som bakgrunnsjobb | `Services/BackgroundTranscription.swift` |
 | Teksten forsegles på samme måte som lyden | `Services/RecordingVault.swift` |
 | Teksten vises bak et vern som skjuler den ved skjermopptak og appbytte | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift` |
 | Hent ut dekrypterer filene til en midlertidig mappe og gir dem til delingsarket | `Services/RecordingExport.swift`, `Views/ShareSheet.swift` |

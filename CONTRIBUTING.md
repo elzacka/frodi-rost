@@ -60,7 +60,10 @@ skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
   skal ikke inn i Info.plist. En test passer på det
 - Filstier lagres som filnavn, aldri som absolutte adresser. Sandkassen
   flytter ved oppdatering
-- Et forseglet opptak har filvern `.complete`
+- Et forseglet opptak har filvern `.completeUntilFirstUserAuthentication`, og
+  nøkkelen som åpner det, kan brukes etter første opplåsing. Det er det som
+  lar teksten lages mens enheten lader. Ikke stram til uten å fjerne
+  bakgrunnsjobben samtidig
 - `versionIdentifier` i en SwiftData-modell som er tatt i bruk, endres aldri
 - Et opptak går aldri tapt. Filen på disk er opptaket; raden i listen er
   bare et bilde av den og bygges opp igjen fra filen. Det eneste som sletter

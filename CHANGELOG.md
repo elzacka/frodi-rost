@@ -16,6 +16,9 @@ Ingenting er i App Store ennå.
   slapp neste gang
 - Teksten hentes ut som `.rtf` i tillegg til `.txt`, med overskrift og avsnitt
 - «Slett» spør først
+- Ordliste på Info-siden: navn og ord Fróði bør kjenne, som firmaer, personer
+  og forkortelser. Modellen skriver dem slik du har skrevet dem
+- Teksten lages også mens enheten lader, med skjermen låst
 
 ### Endret
 
@@ -31,9 +34,12 @@ Ingenting er i App Store ennå.
 
 ### Sikkerhet
 
-- Nøkkelen som låser opp opptak og tekst, kan bare brukes mens enheten er låst
-  opp. Før holdt det at enheten hadde vært låst opp én gang siden omstart.
-  Nøkler laget av build 4 eller tidligere beholder den gamle klassen
+- Nøkkelen som låser opp opptak og tekst, kan brukes av appen etter at
+  enheten har vært låst opp én gang siden omstart, også mens den er låst
+  igjen. Det er det som lar teksten lages mens enheten lader. Fra build 5 til
+  14. september 2026 krevde nøkkelen at enheten var låst opp; en nøkkel laget
+  av build 5 eller 6 beholder det kravet, og på den enheten lages teksten
+  bare mens appen er åpen
 - «Kopier»-knappen i tekstkortet erstatter markering av teksten. Det du
   kopierer, blir på enheten og forsvinner fra utklippstavlen etter fem minutter
 
