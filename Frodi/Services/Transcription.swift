@@ -35,6 +35,14 @@ enum Transcription {
     @MainActor
     private static var inFlight: Set<PersistentIdentifier> = []
 
+    /// Set when iOS ends a background run. The run stops at the next piece; what
+    /// is done is saved, and the rest waits. Cleared when a pass starts.
+    @MainActor
+    private static var stopRequested = false
+
+    @MainActor
+    static func stop() { stopRequested = true }
+
     /// Seals the recording, and transcribes it if it is short, was asked for, or
     /// `requested` says so now.
     ///
@@ -86,7 +94,7 @@ enum Transcription {
                     progress.position = position
                     progress.save(for: fileName)
                     TranscriptionState.shared.update(id, fraction: fraction(position, of: duration))
-                    return !RecordingController.shared.isRecording
+                    return !RecordingController.shared.isRecording && !stopRequested
                 }
                 return progress.position >= duration - 0.5
             }
@@ -120,8 +128,10 @@ enum Transcription {
     /// every launch adds up. «Prøv teksten på nytt» in the row still works.
     @MainActor
     static func runPending(context: ModelContext) async {
+        stopRequested = false
         let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
         for recording in recordings where !recording.hasTranscript && recording.failureCode != "empty" {
+            guard !stopRequested else { return }
             await run(for: recording, context: context)
         }
     }
@@ -155,10 +165,9 @@ enum Transcription {
 
 /// What the interface can see of a transcription in progress.
 ///
-/// While one runs, the screen is kept awake. A long transcription only runs while
-/// the app is open, since the sealed audio cannot be read once the device locks,
-/// and a screen that goes dark on the table would stop it. That is the cost of
-/// the file classes chosen in `AudioStorage`, and a deliberate one.
+/// While one runs in the foreground, the screen is kept awake, so a device left
+/// on the table keeps working. On the charger it runs without the screen; see
+/// `BackgroundTranscription`.
 @MainActor
 @Observable
 final class TranscriptionState {

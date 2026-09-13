@@ -77,7 +77,10 @@ targets:
         # Recording must survive the screen locking. Without this iOS stops the
         # recording the moment the app goes to the background, which is exactly what
         # happens when you put the device down in the car.
-        UIBackgroundModes: [audio]
+        # audio: recording. processing: transcription on the charger, see
+        # BackgroundTranscription.
+        UIBackgroundModes: [audio, processing]
+        BGTaskSchedulerPermittedIdentifiers: [com.Tazk.Frodi.transcribe]
         NSMicrophoneUsageDescription: "Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på enheten."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

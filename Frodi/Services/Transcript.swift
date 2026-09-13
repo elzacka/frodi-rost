@@ -112,7 +112,9 @@ struct TranscriptProgress: Codable, Sendable {
         guard let json = try? JSONEncoder().encode(self),
               let sealed = try? RecordingVault.seal(String(decoding: json, as: UTF8.self))
         else { return }
-        try? sealed.write(to: Self.url(for: fileName), options: [.atomic, .completeFileProtectionUnlessOpen])
+        // The same class as the sealed audio, for the same reason: a run on the
+        // charger reads it back while the screen is locked. Ciphertext either way.
+        try? sealed.write(to: Self.url(for: fileName), options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
     }
 
     static func clear(for fileName: String) {

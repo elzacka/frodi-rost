@@ -62,12 +62,15 @@ enum AudioStorage {
         setProtection(.completeUnlessOpen, on: url)
     }
 
-    /// Protection once the recording is finished.
+    /// Protection once the recording is sealed.
     ///
-    /// Now the file is closed, and `complete` is right: the content cannot be read
-    /// while the device is locked, not even by something with physical access.
+    /// `completeUntilFirstUserAuthentication`, not `complete`: a transcription on
+    /// the charger has to open the file while the screen is locked, and `complete`
+    /// forbids that. What the class gives up is the window between boot and the
+    /// first unlock, which is short; the content is ciphertext under a key with
+    /// the same class, and both are decided together. See `RecordingVault.createKey`.
     static func protectFinished(_ url: URL) {
-        setProtection(.complete, on: url)
+        setProtection(.completeUntilFirstUserAuthentication, on: url)
         excludeFromBackup(url)
     }
 
@@ -120,7 +123,7 @@ enum AudioStorage {
                 ? try await encodeToAAC(source)
                 : source
             defer { if audio != source { try? FileManager.default.removeItem(at: audio) } }
-            try RecordingVault.seal(fileAt: audio).write(to: target, options: [.atomic, .completeFileProtection])
+            try RecordingVault.seal(fileAt: audio).write(to: target, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
         }
         try? FileManager.default.removeItem(at: source)
         protectFinished(target)

@@ -81,7 +81,12 @@ final class WhisperTranscriber: Transcriber {
         try await load()
         guard let whisper else { throw TranscriptionError.modelMissing }
 
-        let duration = try Self.duration(of: fileURL)
+        // Opened once and kept open. The plaintext copy is `.completeUnlessOpen`: a
+        // handle taken while it could be opened keeps working after the screen
+        // locks, but a fresh open would fail. On the charger every piece after the
+        // first would otherwise fail.
+        let file = try AudioPieces(url: fileURL)
+        let duration = file.duration
         var position = start
         promptTokens = WordList.prompt(from: WordList.load()).flatMap { promptTokens(for: $0, whisper: whisper) }
         defer { promptTokens = nil }
@@ -89,7 +94,7 @@ final class WhisperTranscriber: Transcriber {
         // The last fraction of a second is never a piece on its own.
         while position < duration - 0.1 {
             let nominalEnd = min(position + Self.pieceLength, duration)
-            var audio = try await Self.samples(at: fileURL.path, from: position, to: nominalEnd)
+            var audio = try await file.samples(from: position, to: nominalEnd)
 
             let end: TimeInterval
             if nominalEnd < duration, let cut = Self.seam(in: audio) {
@@ -203,17 +208,6 @@ final class WhisperTranscriber: Transcriber {
     /// silence, not speech we have lost.
     private static let shortestRetry: Double = 4
 
-    /// Reads one piece of the file as 16 kHz samples, off the main thread.
-    ///
-    /// `@concurrent` for the same reason as in `AudioStorage`: a `nonisolated async`
-    /// function inherits the caller's actor, and here that is the main actor. Three
-    /// minutes of audio is about 11 MB as `Float`, and that work does not belong on
-    /// the main thread. Only the piece is read; the whole file never is.
-    @concurrent
-    private nonisolated static func samples(at path: String, from start: TimeInterval, to end: TimeInterval) async throws -> [Float] {
-        try AudioProcessor.loadAudioAsFloatArray(fromPath: path, startTime: start, endTime: end)
-    }
-
     nonisolated static func duration(of url: URL) throws -> TimeInterval {
         let file = try AVAudioFile(forReading: url)
         return Double(file.length) / file.fileFormat.sampleRate
@@ -290,5 +284,29 @@ final class WhisperTranscriber: Transcriber {
 
     nonisolated static var tokenizerFolder: URL? {
         Bundle.main.url(forResource: "tokenizer", withExtension: nil, subdirectory: "Model")
+    }
+}
+
+/// An audio file held open for the length of a transcription, read a piece at a time.
+///
+/// `@unchecked Sendable` because `AVAudioFile` is not marked, and the reads have
+/// to happen off the main actor: three minutes of audio is about 11 MB as `Float`
+/// and does not belong there. The reads are sequential, one piece after the
+/// other from one caller, which is what makes the assertion hold.
+final class AudioPieces: @unchecked Sendable {
+    private let file: AVAudioFile
+    let duration: TimeInterval
+
+    init(url: URL) throws {
+        file = try AVAudioFile(forReading: url, commonFormat: .pcmFormatFloat32, interleaved: false)
+        duration = Double(file.length) / file.fileFormat.sampleRate
+    }
+
+    /// One piece as 16 kHz samples. `@concurrent` for the same reason as in
+    /// `AudioStorage`: a `nonisolated async` function inherits the caller's actor.
+    @concurrent
+    func samples(from start: TimeInterval, to end: TimeInterval) async throws -> [Float] {
+        let buffer = try AudioProcessor.loadAudio(fromFile: file, startTime: start, endTime: end)
+        return AudioProcessor.convertBufferToArray(buffer: buffer)
     }
 }

@@ -123,7 +123,7 @@ struct RecordingDetailView: View {
                         .hiddenWhileScreenCaptured()
                 }
             } else if Transcription.awaitsRequest(recording) {
-                Text("Opptaket er langt, så Fróði lager teksten når du ber om det. Det tar en stund. Skjermen holder seg på imens, så la appen være åpen.")
+                Text("Opptaket er langt, så Fróði lager teksten når du ber om det. Det tar en stund. La appen være åpen, eller sett enheten til lading, så fortsetter Fróði mens den lader.")
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)

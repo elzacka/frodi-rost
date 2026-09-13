@@ -62,10 +62,12 @@ struct IsolationTests {
 
     /// `audio` is the only background mode the app should have. `fetch` or
     /// `processing` would open the door to work that can reach the network.
-    @Test("Bare lyd kjører i bakgrunnen")
-    func onlyAudioRunsInBackground() {
+    @Test("Bare lyd og transkribering kjører i bakgrunnen")
+    func onlyAudioAndProcessingRunInBackground() {
         let modes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") as? [String] ?? []
-        #expect(modes == ["audio"], "Uventede bakgrunnsmoduser: \(modes)")
+        #expect(modes == ["audio", "processing"], "Uventede bakgrunnsmoduser: \(modes)")
+        let identifiers = Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") as? [String] ?? []
+        #expect(identifiers == [BackgroundTranscription.identifier])
     }
 
     /// The privacy manifest must say the app collects nothing and does not track.

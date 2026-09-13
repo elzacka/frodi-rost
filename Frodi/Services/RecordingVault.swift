@@ -184,17 +184,19 @@ enum RecordingVault {
     }
 
     private static func createKey() throws -> SecKey {
-        // whenUnlockedThisDeviceOnly: the private key is used only to open, and
-        // every path that opens runs on an unlocked device, because the audio it
-        // starts from is `.complete`. Sealing needs only the public key, which is
-        // kept in memory once seen, so a seal does not need the keychain at all.
-        // Until 13 September 2026 this was afterFirstUnlock, which let the key be
-        // used on a locked device that had been unlocked once since boot. That is
-        // the state a seized device is in. ThisDeviceOnly keeps it out of backups.
+        // afterFirstUnlockThisDeviceOnly, so a transcription can open a recording
+        // while the device sits locked on the charger; see BackgroundTranscription.
+        // The stricter whenUnlocked was the class from 13 September to 14 September
+        // 2026, and would have kept a seized, locked, once-unlocked device from
+        // using the key. Decided by elzacka on 14 September 2026: an hour of
+        // interview transcribed overnight is worth that margin. A key created by a
+        // build in between keeps whenUnlocked, and on that device the transcription
+        // runs only while unlocked; the class is fixed at creation and the app does
+        // not rotate keys. ThisDeviceOnly keeps it out of backups.
         var accessError: Unmanaged<CFError>?
         guard let access = SecAccessControlCreateWithFlags(
             nil,
-            kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+            kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
             .privateKeyUsage,
             &accessError
         ) else {

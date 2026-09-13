@@ -64,7 +64,7 @@ struct InfoView: View {
             paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.")
             paragraph("Trykk på opptaksknappen nederst, eller hold inne handlingsknappen på venstre side. Hold inne én gang for å starte, én gang til for å stoppe.")
             paragraph("Før du kan bruke handlingsknappen, må du sette den opp: Gå til Innstillinger > Handlingsknapp, sveip til Snarvei, trykk på «Velg en snarvei» og velg «Start eller stopp opptak» under Fróði røst.")
-            paragraph("Et opptak kan vare så lenge du vil. Er det under \(Transcription.immediateMinutes) minutter, lager Fróði teksten med en gang. Er det lengre, lager Fróði teksten når du ber om det. Da må appen være åpen, og det tar en stund.")
+            paragraph("Et opptak kan vare så lenge du vil. Er det under \(Transcription.immediateMinutes) minutter, lager Fróði teksten med en gang. Er det lengre, lager Fróði teksten når du ber om det. Det tar en stund: la appen være åpen, eller sett enheten til lading, så fortsetter Fróði mens den lader.")
         }
     }
 
