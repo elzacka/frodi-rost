@@ -289,7 +289,8 @@ struct LongExportTests {
         let urls = try await RecordingExport.prepare(recording)
         defer { RecordingExport.cleanUp(urls) }
 
-        #expect(urls.count == 2)
+        #expect(urls.count == 3)
+        #expect(urls.contains { $0.pathExtension == "rtf" })
 
         let exportedAudio = try Data(contentsOf: try #require(urls.first { $0.pathExtension == "m4a" }))
         #expect(exportedAudio == audio)

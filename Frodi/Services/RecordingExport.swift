@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 /// Exports a recording for further use.
 ///
@@ -19,6 +20,7 @@ enum RecordingExport {
         try await write(
             fileName: recording.fileName,
             createdAt: recording.createdAt,
+            duration: recording.duration,
             transcript: try recording.transcript()
         )
     }
@@ -35,6 +37,7 @@ enum RecordingExport {
     private static func write(
         fileName: String,
         createdAt: Date,
+        duration: TimeInterval,
         transcript: String?
     ) async throws -> [URL] {
         var urls: [URL] = []
@@ -55,9 +58,69 @@ enum RecordingExport {
             let text = folder.appendingPathComponent("frodi-\(stamp).txt")
             try utf8WithBOM(transcript).write(to: text, options: [.completeFileProtectionUnlessOpen])
             urls.append(text)
+
+            let document = folder.appendingPathComponent("frodi-\(stamp).rtf")
+            try rtf(transcript, createdAt: createdAt, duration: duration).write(to: document, options: [.completeFileProtectionUnlessOpen])
+            urls.append(document)
         }
 
         return urls
+    }
+
+    /// The text as a document: a heading, the date and the length, then the
+    /// paragraphs with their marks.
+    ///
+    /// RTF rather than `.docx` because Apple writes it natively and Word, Pages
+    /// and Notes all open it with the structure intact. A `.txt` loses the
+    /// heading and the paragraphs the moment it is pasted into a report; this
+    /// does not. The fonts are the system's own, not the app's: the document is
+    /// read on another machine, and asking for Inter there gives a fallback anyway.
+    static func rtf(_ transcript: String, createdAt: Date, duration: TimeInterval) throws -> Data {
+        let body = UIFont.systemFont(ofSize: 12)
+        let heading = UIFont.boldSystemFont(ofSize: 16)
+        let meta = UIFont.systemFont(ofSize: 10)
+        let secondary = UIColor(white: 0.4, alpha: 1)
+
+        let spaced = NSMutableParagraphStyle()
+        spaced.paragraphSpacing = 8
+
+        let document = NSMutableAttributedString()
+        document.append(NSAttributedString(
+            string: "Opptak \(createdAt.formatted(exportDate))\n",
+            attributes: [.font: heading, .paragraphStyle: spaced]
+        ))
+        document.append(NSAttributedString(
+            string: "Lengde \(Duration.seconds(duration).formatted(exportLength)). Tatt opp med Fróði røst.\n\n",
+            attributes: [.font: meta, .foregroundColor: secondary, .paragraphStyle: spaced]
+        ))
+
+        for paragraph in Transcript.paragraphs(in: transcript) {
+            if let mark = paragraph.mark {
+                document.append(NSAttributedString(
+                    string: "[\(Transcript.mark(mark))] ",
+                    attributes: [.font: meta, .foregroundColor: secondary]
+                ))
+            }
+            document.append(NSAttributedString(
+                string: paragraph.text + "\n",
+                attributes: [.font: body, .paragraphStyle: spaced]
+            ))
+        }
+
+        return try document.data(
+            from: NSRange(location: 0, length: document.length),
+            documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf]
+        )
+    }
+
+    /// «14. september 2026 kl. 10:30», in Bokmål whatever the device says.
+    private static var exportDate: Date.FormatStyle {
+        Date.FormatStyle(date: .long, time: .shortened, locale: AppLocale.norwegian)
+    }
+
+    /// «58 min, 12 sek».
+    private static var exportLength: Duration.UnitsFormatStyle {
+        .units(allowed: [.hours, .minutes, .seconds], width: .abbreviated).locale(AppLocale.norwegian)
     }
 
     /// Writes the text as UTF-8 with a byte order mark.
