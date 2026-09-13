@@ -173,7 +173,7 @@ struct RecordingListView: View {
                     .buttonStyle(.plain)
                     .contextMenu {
                         if !recording.hasTranscript, !recording.isTranscribing {
-                            Button("Prøv teksten på nytt") {
+                            Button(Transcription.awaitsRequest(recording) ? "Lag tekst" : "Prøv teksten på nytt") {
                                 Task { await transcribe(recording) }
                             }
                         }
@@ -204,22 +204,17 @@ struct RecordingListView: View {
         }
     }
 
-    /// Transcribes everything that lacks text. Called at launch, so recordings made
-    /// before the speech model was in place are not left without text.
-    ///
-    /// A recording the model already found no speech in is left alone. The same
-    /// audio gives the same answer, and a whisper run per silent recording at
-    /// every launch adds up. «Prøv teksten på nytt» in the row still works.
+    /// Transcribes everything that is waiting. Called at launch, so recordings made
+    /// before the speech model was in place are not left without text. Without a
+    /// model there is nothing to run, and running would only mark them failed.
     private func transcribePending() async {
         guard Transcription.usesBundledModel || speechModel.isReady else { return }
-        for recording in recordings where !recording.hasTranscript && recording.failureCode != "empty" {
-            await transcribe(recording, surfaceErrors: false)
-        }
+        await Transcription.runPending(context: context)
     }
 
-    private func transcribe(_ recording: Recording, surfaceErrors: Bool = true) async {
-        await Transcription.run(for: recording, context: context)
-        if surfaceErrors, recording.transcriptionFailed {
+    private func transcribe(_ recording: Recording) async {
+        await Transcription.run(for: recording, context: context, requested: true)
+        if recording.transcriptionFailed {
             errorMessage = TranscriptionError.explanation(for: recording.failureCode)
         }
     }

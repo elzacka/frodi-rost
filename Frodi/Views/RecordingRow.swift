@@ -3,6 +3,8 @@ import SwiftUI
 struct RecordingRow: View {
     let recording: Recording
 
+    @State private var transcription = TranscriptionState.shared
+
     var body: some View {
         HStack(alignment: .center, spacing: Space.s3) {
             VStack(alignment: .leading, spacing: Space.s1) {
@@ -47,10 +49,12 @@ struct RecordingRow: View {
     /// Only what the title does not say: why the text is missing.
     private var status: String? {
         if recording.hasTranscript { return nil }
-        if recording.isTranscribing { return "transkriberer" }
-        return recording.transcriptionFailed
-            ? TranscriptionError.shortText(for: recording.failureCode)
-            : "venter på transkribering"
+        if recording.isTranscribing {
+            guard let fraction = transcription.fraction[recording.persistentModelID] else { return "transkriberer" }
+            return "transkriberer, \(fraction.formatted(.percent.precision(.fractionLength(0)).locale(AppLocale.norwegian)))"
+        }
+        if recording.transcriptionFailed { return TranscriptionError.shortText(for: recording.failureCode) }
+        return Transcription.awaitsRequest(recording) ? "ingen tekst ennå" : "venter på transkribering"
     }
 
     /// VoiceOver does not read a vertical bar as a pause, so it gets its own sentence.

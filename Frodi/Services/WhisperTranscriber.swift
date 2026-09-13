@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import WhisperKit
 
@@ -54,50 +55,104 @@ final class WhisperTranscriber: Transcriber {
         whisper = try await WhisperKit(config)
     }
 
-    func transcribe(fileURL: URL) async throws -> String {
+    /// How much audio goes through the model in one call.
+    ///
+    /// Memory grows with the length of a single call, about 60 MB a minute on the
+    /// simulator on top of the model itself, and a ten minute call was the longest
+    /// that survived there. Three minutes keeps a call well inside that, and makes
+    /// the piece the unit of progress: what is saved when the app is suspended,
+    /// and what is lost at most when it is.
+    nonisolated static let pieceLength: TimeInterval = 3 * 60
+
+    /// A piece is not cut at exactly `pieceLength` but at the quietest moment in the
+    /// last stretch before it, so the seam falls between words rather than inside
+    /// one. This is how far back the search goes, and how long a quiet moment is.
+    nonisolated static let seamSearch: TimeInterval = 15
+    nonisolated static let seamWindow: TimeInterval = 0.3
+
+    func transcribe(
+        fileURL: URL,
+        from start: TimeInterval,
+        piece: ([TranscriptParagraph], TimeInterval) async -> Bool
+    ) async throws {
         try await load()
         guard let whisper else { throw TranscriptionError.modelMissing }
 
+        let duration = try Self.duration(of: fileURL)
+        var position = start
+
+        // The last fraction of a second is never a piece on its own.
+        while position < duration - 0.1 {
+            let nominalEnd = min(position + Self.pieceLength, duration)
+            var audio = try await Self.samples(at: fileURL.path, from: position, to: nominalEnd)
+
+            let end: TimeInterval
+            if nominalEnd < duration, let cut = Self.seam(in: audio) {
+                audio.removeSubrange(cut...)
+                end = position + Double(cut) / Double(WhisperKit.sampleRate)
+            } else {
+                end = nominalEnd
+            }
+
+            let paragraphs = try await transcribePiece(audio, offset: position, whisper: whisper)
+            guard await piece(paragraphs, end) else { return }
+            position = end
+        }
+    }
+
+    /// One call to the model, chunked by voice activity inside the piece, with the
+    /// refused-window repair from `retry`. Times come back relative to the piece
+    /// and are moved to the recording's own clock here.
+    private func transcribePiece(
+        _ audio: [Float],
+        offset: TimeInterval,
+        whisper: WhisperKit
+    ) async throws -> [TranscriptParagraph] {
         do {
             let results = try await whisper.transcribe(
-                audioPath: fileURL.path,
+                audioArray: audio,
                 decodeOptions: Self.options(chunked: true)
             )
 
-            // The audio samples are fetched only if a piece actually came back empty.
-            // They cost memory, and on an ordinary recording they are never needed.
-            var audio: [Float]?
-            var pieces: [String] = []
-
+            var paragraphs: [TranscriptParagraph] = []
             for result in results {
-                let text = result.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard let first = result.segments.first?.start, let last = result.segments.last?.end else { continue }
+                let start = Double(first), end = Double(last)
+                var text = result.text.trimmingCharacters(in: .whitespacesAndNewlines)
 
-                guard text.isEmpty,
-                      let start = result.segments.first?.start,
-                      let end = result.segments.last?.end,
-                      Double(end - start) >= Self.shortestRetry
-                else {
-                    pieces.append(text)
-                    continue
+                // The audio is at hand already, so a refused window costs no second read.
+                if text.isEmpty, end - start >= Self.shortestRetry {
+                    text = await retry(in: audio, from: start, to: end)
                 }
-
-                if audio == nil { audio = try? await Self.samples(at: fileURL.path) }
-                guard let audio else { continue }
-                pieces.append(await retry(in: audio, from: Double(start), to: Double(end)))
+                guard !text.isEmpty else { continue }
+                paragraphs.append(TranscriptParagraph(start: offset + start, end: offset + end, text: text))
             }
-
-            let text = pieces
-                .filter { !$0.isEmpty }
-                .joined(separator: " ")
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-
-            guard !text.isEmpty else { throw TranscriptionError.empty }
-            return text
+            return paragraphs
         } catch let error as TranscriptionError {
             throw error
         } catch {
             throw TranscriptionError.underlying(error.localizedDescription)
         }
+    }
+
+    /// The sample index to cut a piece at: the start of the quietest `seamWindow`
+    /// in the last `seamSearch` seconds. Nil when the piece is too short to search.
+    nonisolated static func seam(in audio: [Float]) -> Int? {
+        let rate = WhisperKit.sampleRate
+        let window = Int(seamWindow * Double(rate))
+        let searchStart = audio.count - Int(seamSearch * Double(rate))
+        guard searchStart > window, audio.count - searchStart > window else { return nil }
+
+        var quietest = searchStart
+        var lowest = Float.greatestFiniteMagnitude
+        for index in stride(from: searchStart, to: audio.count - window, by: window / 3) {
+            let energy = AudioProcessor.calculateAverageEnergy(of: Array(audio[index..<index + window]))
+            if energy < lowest {
+                lowest = energy
+                quietest = index
+            }
+        }
+        return quietest
     }
 
     /// Retries a piece by splitting it in two.
@@ -143,15 +198,20 @@ final class WhisperTranscriber: Transcriber {
     /// silence, not speech we have lost.
     private static let shortestRetry: Double = 4
 
-    /// Reads the audio file as samples, off the main thread.
+    /// Reads one piece of the file as 16 kHz samples, off the main thread.
     ///
     /// `@concurrent` for the same reason as in `AudioStorage`: a `nonisolated async`
-    /// function inherits the caller's actor, and here that is the main actor. An
-    /// hour of audio is about 57 MB as `Float`, and that work does not belong on
-    /// the main thread.
+    /// function inherits the caller's actor, and here that is the main actor. Three
+    /// minutes of audio is about 11 MB as `Float`, and that work does not belong on
+    /// the main thread. Only the piece is read; the whole file never is.
     @concurrent
-    private nonisolated static func samples(at path: String) async throws -> [Float] {
-        try AudioProcessor.loadAudioAsFloatArray(fromPath: path)
+    private nonisolated static func samples(at path: String, from start: TimeInterval, to end: TimeInterval) async throws -> [Float] {
+        try AudioProcessor.loadAudioAsFloatArray(fromPath: path, startTime: start, endTime: end)
+    }
+
+    nonisolated static func duration(of url: URL) throws -> TimeInterval {
+        let file = try AVAudioFile(forReading: url)
+        return Double(file.length) / file.fileFormat.sampleRate
     }
 
     private static func options(chunked: Bool) -> DecodingOptions {

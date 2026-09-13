@@ -235,6 +235,7 @@ enum AudioStorage {
 
     static func delete(fileName: String) {
         try? FileManager.default.removeItem(at: directory.appendingPathComponent(fileName))
+        TranscriptProgress.clear(for: fileName)
     }
 
     private static func setProtection(_ level: FileProtectionType, on url: URL) {

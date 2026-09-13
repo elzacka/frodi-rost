@@ -28,17 +28,6 @@ final class AudioRecorder {
 
     var isRecording: Bool { state == .recording }
 
-    /// How much of the limit is left. The countdown in the recorder bar reads this,
-    /// so the user sees the end coming instead of being caught by it.
-    var remaining: TimeInterval { max(RecordingLimit.duration - duration, 0) }
-
-    /// Called when the recording has reached the limit and must be saved.
-    ///
-    /// The recorder does not save; `RecordingController` does, and only it knows
-    /// about the database. Hence a closure here rather than the recorder learning
-    /// about saving.
-    var onLimitReached: (() -> Void)?
-
     /// Called when an interruption ends without the recording being able to go on:
     /// iOS said not to resume, or the audio system was reset underneath us. What is
     /// on disk is complete and must be saved, the same way as after a press on stop.
@@ -209,13 +198,6 @@ final class AudioRecorder {
                 // Frozen while paused: `currentTime` holds across a pause, and the
                 // display should say so rather than keep counting.
                 if !self.isInterrupted { self.duration = recorder.currentTime }
-
-                // The recording stops itself at the limit. The countdown has shown it
-                // coming, so this is no surprise.
-                if self.duration >= RecordingLimit.duration {
-                    self.onLimitReached?()
-                    return
-                }
             }
         }
     }

@@ -18,8 +18,10 @@ struct RecorderBar: View {
 
                 recordButton
 
-                remaining
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+                // Empty, and the same width as the timer, so the button stays centred.
+                // A countdown sat here while recordings had a limit; they no longer do.
+                Color.clear
+                    .frame(maxWidth: .infinity, maxHeight: 1)
             }
 
             if recorder.isInterrupted {
@@ -60,33 +62,6 @@ struct RecorderBar: View {
             .contentTransition(.numericText())
             .accessibilityLabel("Tid gått")
             .accessibilityValue(spoken(recorder.duration))
-            .accessibilityHidden(!recorder.isRecording)
-    }
-
-    /// What is left of the limit while recording runs.
-    ///
-    /// It sits to the right of the button, where the mirrored timer used to be.
-    /// The space was already reserved, and two numbers on either side of the button
-    /// read as what they are: what has passed, and what remains.
-    ///
-    /// The minus sign is the one the player uses for remaining time, and is what
-    /// tells the two numbers apart without a label.
-    ///
-    /// When idle the field is empty. The limit belongs with the information about
-    /// the app, not above the record button: someone who has not started talking
-    /// does not need the ceiling yet, and a number there would just be noise beside
-    /// the button. Like the timer, the field still holds its space, or the button
-    /// moves the moment recording starts.
-    private var remaining: some View {
-        Text(recorder.isRecording ? "−" + clock(recorder.remaining) : " ")
-            .font(.Frodi.bodyMedium)
-            .monospacedDigit()
-            .lineLimit(1)
-            .minimumScaleFactor(0.7)
-            .foregroundStyle(Color.Frodi.textSecondary)
-            .contentTransition(.numericText())
-            .accessibilityLabel("Tid igjen av opptaket")
-            .accessibilityValue(spoken(recorder.remaining))
             .accessibilityHidden(!recorder.isRecording)
     }
 

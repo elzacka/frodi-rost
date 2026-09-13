@@ -6,7 +6,10 @@ struct RecordingDetailView: View {
     let onRetry: () async -> Void
 
     @State private var player = AudioPlayer.shared
+    @State private var transcription = TranscriptionState.shared
     @State private var transcript: String = ""
+    /// What has come out so far while the transcription runs, read from its progress.
+    @State private var partial: [TranscriptParagraph] = []
     @State private var showsTranscript = false
     @State private var exportURLs: [URL] = []
     @State private var exportError: String?
@@ -69,9 +72,16 @@ struct RecordingDetailView: View {
             // The text is unlocked only when it is about to be shown.
             transcript = (try? recording.transcript()) ?? ""
         }
+        // An hour of interview takes a while. The paragraphs done so far are shown
+        // as they arrive, so the wait is not a blank card.
+        .task(id: fraction) {
+            guard recording.isTranscribing else { partial = []; return }
+            partial = TranscriptProgress.load(for: recording.fileName)?.paragraphs ?? []
+        }
         .onDisappear {
             // No reason to leave the plaintext in memory afterwards.
             transcript = ""
+            partial = []
         }
     }
 
@@ -89,20 +99,43 @@ struct RecordingDetailView: View {
                 if showsTranscript {
                     copyButton
 
-                    Text(transcript)
-                        .font(.Frodi.body)
-                        .foregroundStyle(Color.Frodi.textPrimary)
+                    paragraphs(Transcript.paragraphs(in: transcript))
                         .hiddenWhileScreenCaptured()
                 }
             } else if recording.isTranscribing {
                 HStack(spacing: Space.s3) {
-                    ProgressView()
-                    Text("Transkriberer …")
+                    if let fraction {
+                        ProgressView(value: fraction)
+                            .tint(Color.Frodi.accentRecord)
+                    } else {
+                        ProgressView()
+                    }
+                    Text(progressText)
                         .font(.Frodi.body)
                         .foregroundStyle(Color.Frodi.textSecondary)
+                        .monospacedDigit()
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, Space.s5)
+                .padding(.vertical, Space.s3)
+
+                if !partial.isEmpty {
+                    paragraphs(partial.map { ($0.start, $0.text) })
+                        .hiddenWhileScreenCaptured()
+                }
+            } else if Transcription.awaitsRequest(recording) {
+                Text("Opptaket er langt, så Fróði lager teksten når du ber om det. Det tar en stund. Skjermen holder seg på imens, så la appen være åpen.")
+                    .font(.Frodi.body)
+                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Button("Lag tekst") {
+                    Task { await onRetry() }
+                }
+                .font(.Frodi.bodyMedium)
+                .foregroundStyle(Color.Frodi.accentRecordOn)
+                .padding(.horizontal, Space.s4)
+                .padding(.vertical, Space.s2)
+                .background(Color.Frodi.accentRecord, in: Capsule())
             } else if recording.transcriptionFailed {
                 Text(TranscriptionError.explanation(for: recording.failureCode))
                     .font(.Frodi.body)
@@ -202,9 +235,61 @@ struct RecordingDetailView: View {
         .accessibilityHint("Kopierer hele teksten. Den blir bare på denne enheten.")
     }
 
+    /// The text as paragraphs, each opened by the time it was said at.
+    ///
+    /// The mark is a button: it moves the player there, which is what a mark is
+    /// for. A reader checking a quote against the audio should not have to scrub
+    /// for it. The number is shown, not only spoken, so it serves the sighted
+    /// reader too.
+    private func paragraphs(_ items: [(mark: TimeInterval?, text: String)]) -> some View {
+        VStack(alignment: .leading, spacing: Space.s3) {
+            ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                VStack(alignment: .leading, spacing: Space.s1) {
+                    if let mark = item.mark {
+                        Button {
+                            player.seek(to: mark)
+                            if !player.isPlaying { player.togglePlayback() }
+                        } label: {
+                            Text(Transcript.mark(mark))
+                                .font(.Frodi.meta)
+                                .monospacedDigit()
+                                .foregroundStyle(Color.Frodi.textSecondary)
+                                .underline()
+                                .frame(minHeight: Disclosure.row / 2)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!player.isLoaded)
+                        .accessibilityLabel("Spill av fra \(spoken(mark))")
+                    }
+
+                    Text(item.text)
+                        .font(.Frodi.body)
+                        .foregroundStyle(Color.Frodi.textPrimary)
+                }
+            }
+        }
+    }
+
+    private var fraction: Double? {
+        transcription.fraction[recording.persistentModelID]
+    }
+
+    /// «Transkriberer, 43 %». The percentage is what says the work is moving.
+    private var progressText: String {
+        guard let fraction else { return "Transkriberer …" }
+        return "Transkriberer, \(fraction.formatted(.percent.precision(.fractionLength(0)).locale(AppLocale.norwegian)))"
+    }
+
+    /// «12 minutter, 37 sekunder», the way the player already says it.
+    private func spoken(_ seconds: TimeInterval) -> String {
+        let units = Duration.UnitsFormatStyle(allowedUnits: [.hours, .minutes, .seconds], width: .wide)
+        return Duration.seconds(seconds).formatted(units)
+    }
+
     /// «312 ord». The number is also the answer to whether the whole recording came through.
     private var wordCount: String {
-        let words = transcript.split(whereSeparator: \.isWhitespace).count
+        let words = Transcript.paragraphs(in: transcript)
+            .reduce(0) { $0 + $1.text.split(whereSeparator: \.isWhitespace).count }
         return "\(words.formatted(.number.locale(AppLocale.norwegian))) ord"
     }
 

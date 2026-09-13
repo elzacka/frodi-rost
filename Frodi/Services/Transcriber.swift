@@ -9,7 +9,16 @@ import Speech
 /// cannot cross an actor boundary. The engines do the actual work on their own threads.
 @MainActor
 protocol Transcriber {
-    func transcribe(fileURL: URL) async throws -> String
+    /// Turns the audio from `start` to the end into paragraphs, a piece at a time.
+    ///
+    /// After each piece the paragraphs found in it and the position reached are
+    /// handed to `piece`. Returning false stops the transcription there; what has
+    /// been handed over is kept, and a later call from that position goes on.
+    func transcribe(
+        fileURL: URL,
+        from start: TimeInterval,
+        piece: ([TranscriptParagraph], TimeInterval) async -> Bool
+    ) async throws
 }
 
 enum TranscriptionError: LocalizedError {
@@ -81,7 +90,20 @@ enum TranscriptionError: LocalizedError {
 struct SystemTranscriber: Transcriber {
     let locale: Locale
 
-    func transcribe(fileURL: URL) async throws -> String {
+    /// One piece for the whole file. The system engine streams the audio itself
+    /// and has no memory ceiling to work around, so there is nothing to resume.
+    func transcribe(
+        fileURL: URL,
+        from start: TimeInterval,
+        piece: ([TranscriptParagraph], TimeInterval) async -> Bool
+    ) async throws {
+        let text = try await transcribe(fileURL: fileURL)
+        let file = try AVAudioFile(forReading: fileURL)
+        let duration = Double(file.length) / file.fileFormat.sampleRate
+        _ = await piece([TranscriptParagraph(start: 0, end: duration, text: text)], duration)
+    }
+
+    private func transcribe(fileURL: URL) async throws -> String {
         guard let resolved = await SpeechEngine.resolve() else {
             throw TranscriptionError.localeUnsupported
         }

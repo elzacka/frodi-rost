@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import UIKit
 
 /// One place that turns recordings into text, so the interface and the Action
 /// Button handle errors the same way.
@@ -14,6 +15,17 @@ enum Transcription {
 
     static var usesBundledModel: Bool { WhisperTranscriber.isBundled }
 
+    /// Up to this length a recording is transcribed as soon as it is stopped. A
+    /// longer one waits until the user asks: an hour of interview takes the device
+    /// a long time at full load, and the next interview needs that battery. The
+    /// app decides by length; the user decides when. `TranscriptProgress.begin` is
+    /// how the asking is remembered.
+    static let immediateLimit: TimeInterval = 10 * 60
+
+    /// The same number as the Info page states it. One line to change, and the
+    /// sentence follows.
+    static var immediateMinutes: Int { Int(immediateLimit / 60) }
+
     /// Recordings being worked on right now.
     ///
     /// Launch and unlock each start a pass over the pending recordings, and the
@@ -23,8 +35,15 @@ enum Transcription {
     @MainActor
     private static var inFlight: Set<PersistentIdentifier> = []
 
+    /// Seals the recording, and transcribes it if it is short, was asked for, or
+    /// `requested` says so now.
+    ///
+    /// The transcription goes piece by piece and writes its progress after each,
+    /// so a run cut short by a suspension, a crash or a new recording goes on from
+    /// where it was. It stops by itself when a recording starts: the microphone
+    /// must not compete with the model for the device.
     @MainActor
-    static func run(for recording: Recording, context: ModelContext) async {
+    static func run(for recording: Recording, context: ModelContext, requested: Bool = false) async {
         let id = recording.persistentModelID
         guard inFlight.insert(id).inserted else { return }
         defer { inFlight.remove(id) }
@@ -38,17 +57,52 @@ enum Transcription {
             try? context.save()
         }
 
+        let fileName = recording.fileName
+        var progress = TranscriptProgress.load(for: fileName)
+        if progress == nil, requested {
+            TranscriptProgress.begin(for: fileName)
+            progress = TranscriptProgress()
+        }
+        guard var progress = progress ?? (recording.duration <= immediateLimit ? TranscriptProgress() : nil) else {
+            return
+        }
+
         recording.isTranscribing = true
+        try? context.save()
+        TranscriptionState.shared.began(id, fraction: fraction(progress.position, of: recording.duration))
+        defer { TranscriptionState.shared.ended(id) }
+
         do {
-            let text = try await AudioStorage.withDecrypted(fileName: recording.fileName) { url in
-                try await transcriber(for: url)
+            let finished = try await AudioStorage.withDecrypted(fileName: fileName) { url in
+                // A row made by `reconcile` for a sealed orphan does not know its length
+                // until the file is open.
+                if recording.duration == 0, let duration = try? WhisperTranscriber.duration(of: url) {
+                    recording.duration = duration
+                }
+                let duration = recording.duration
+
+                try await transcriber().transcribe(fileURL: url, from: progress.position) { paragraphs, position in
+                    progress.paragraphs.append(contentsOf: paragraphs)
+                    progress.position = position
+                    progress.save(for: fileName)
+                    TranscriptionState.shared.update(id, fraction: fraction(position, of: duration))
+                    return !RecordingController.shared.isRecording
+                }
+                return progress.position >= duration - 0.5
             }
-            try recording.setTranscript(text)
-            recording.transcriptionFailed = false
-            recording.failureCode = nil
+
+            if finished {
+                let text = Transcript.compose(progress.paragraphs)
+                guard !text.isEmpty else { throw TranscriptionError.empty }
+                try recording.setTranscript(text)
+                recording.transcriptionFailed = false
+                recording.failureCode = nil
+                TranscriptProgress.clear(for: fileName)
+            }
         } catch let error as TranscriptionError {
             recording.transcriptionFailed = true
             recording.failureCode = error.code
+            if error.code == "empty" { TranscriptProgress.clear(for: fileName) }
         } catch {
             recording.transcriptionFailed = true
             recording.failureCode = "other"
@@ -57,11 +111,36 @@ enum Transcription {
         try? context.save()
     }
 
+    /// Everything that is waiting: plaintext to seal, short recordings without
+    /// text, and long ones the user has asked for. Called at launch, on unlock,
+    /// and after a recording stops, which is when a paused transcription can go on.
+    ///
+    /// A recording the model already found no speech in is left alone. The same
+    /// audio gives the same answer, and a whisper run per silent recording at
+    /// every launch adds up. «Prøv teksten på nytt» in the row still works.
     @MainActor
-    private static func transcriber(for url: URL) async throws -> String {
-        if usesBundledModel {
-            return try await whisper.transcribe(fileURL: url)
+    static func runPending(context: ModelContext) async {
+        let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
+        for recording in recordings where !recording.hasTranscript && recording.failureCode != "empty" {
+            await run(for: recording, context: context)
         }
+    }
+
+    /// Whether a recording is waiting for the user to ask for its text.
+    static func awaitsRequest(_ recording: Recording) -> Bool {
+        !recording.hasTranscript
+            && !recording.transcriptionFailed
+            && recording.duration > immediateLimit
+            && !TranscriptProgress.exists(for: recording.fileName)
+    }
+
+    private static func fraction(_ position: TimeInterval, of duration: TimeInterval) -> Double {
+        duration > 0 ? min(position / duration, 1) : 0
+    }
+
+    @MainActor
+    private static func transcriber() async throws -> any Transcriber {
+        if usesBundledModel { return whisper }
 
         let model = SpeechModel()
         await model.refresh()
@@ -70,6 +149,35 @@ enum Transcription {
                 ? TranscriptionError.localeUnsupported
                 : TranscriptionError.modelMissing
         }
-        return try await SystemTranscriber(locale: AppLocale.norwegian).transcribe(fileURL: url)
+        return SystemTranscriber(locale: AppLocale.norwegian)
+    }
+}
+
+/// What the interface can see of a transcription in progress.
+///
+/// While one runs, the screen is kept awake. A long transcription only runs while
+/// the app is open, since the sealed audio cannot be read once the device locks,
+/// and a screen that goes dark on the table would stop it. That is the cost of
+/// the file classes chosen in `AudioStorage`, and a deliberate one.
+@MainActor
+@Observable
+final class TranscriptionState {
+    static let shared = TranscriptionState()
+
+    /// How far each running transcription has got, 0 to 1.
+    private(set) var fraction: [PersistentIdentifier: Double] = [:]
+
+    fileprivate func began(_ id: PersistentIdentifier, fraction: Double) {
+        self.fraction[id] = fraction
+        UIApplication.shared.isIdleTimerDisabled = true
+    }
+
+    fileprivate func update(_ id: PersistentIdentifier, fraction: Double) {
+        self.fraction[id] = fraction
+    }
+
+    fileprivate func ended(_ id: PersistentIdentifier) {
+        fraction[id] = nil
+        if fraction.isEmpty { UIApplication.shared.isIdleTimerDisabled = false }
     }
 }

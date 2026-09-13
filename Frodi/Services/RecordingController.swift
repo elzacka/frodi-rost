@@ -21,9 +21,6 @@ final class RecordingController {
     private var container: ModelContainer?
 
     private init() {
-        // The recorder keeps its own count and reports when the limit is reached.
-        // Saving is the same as when you press stop.
-        recorder.onLimitReached = { [weak self] in self?.stopAndSave() }
         // An interruption the recording could not come back from. Same save path:
         // whatever reached the disk is the recording.
         recorder.onInterruptionEnded = { [weak self] in self?.stopAndSave() }
@@ -89,11 +86,15 @@ final class RecordingController {
         AudioStorage.excludeFromBackup(store: container)
 
         // Sealed and turned into text afterwards. If that fails, the reason is
-        // stored on the recording.
-        Task { await Transcription.run(for: recording, context: context) }
+        // stored on the recording. Then whatever was paused while the microphone
+        // was open: a transcription stops itself when a recording starts.
+        Task {
+            await Transcription.run(for: recording, context: context)
+            await Transcription.runPending(context: context)
+        }
     }
 
-    /// Seals, and then transcribes, every recording that is still plaintext.
+    /// Seals, and then transcribes, everything that is waiting.
     ///
     /// `Transcription.run` does the sealing, so a recording sealed here gets its
     /// text in the same pass, and the list's own pass at launch cannot collide
@@ -105,11 +106,7 @@ final class RecordingController {
               let context = container?.mainContext else { return }
 
         reconcile(context)
-
-        let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
-        for recording in recordings where !AudioStorage.isSealed(recording.fileName) {
-            await Transcription.run(for: recording, context: context)
-        }
+        await Transcription.runPending(context: context)
     }
 
     /// Makes the list agree with the disk.
