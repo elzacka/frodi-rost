@@ -235,7 +235,7 @@ struct LicensesView: View {
     ]
 
     static let icons = [
-        Component(name: "Heroicons", origin: "Tailwind Labs", license: "MIT")
+        Component(name: "Material Symbols", origin: "Google", license: "Apache 2.0")
     ]
 
     static let fonts = [

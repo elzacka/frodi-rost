@@ -87,7 +87,7 @@ enum HeaderButton {
 // MARK: - Icons
 /// Icon sizes, in points.
 ///
-/// Heroicons are drawn on a 24 × 24 grid and scaled to these. The measures live
+/// Material Symbols are drawn on a 24 × 24 grid and scaled to these. The measures live
 /// here for the same reason as the rest of the design system: a number at the
 /// call site never gets changed along with the others.
 enum IconSize {

@@ -17,6 +17,10 @@ Ingenting er i App Store ennå.
 - Teksten hentes ut som `.rtf` i tillegg til `.txt`, med overskrift og avsnitt
 - «Slett» spør først
 
+### Endret
+
+- Ikonene kommer fra Material Symbols, ikke lenger fra Heroicons
+
 ### Rettet
 
 - Et opptak overlever en telefonsamtale. Før ble det slettet når du stoppet

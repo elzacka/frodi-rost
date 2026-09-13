@@ -46,7 +46,7 @@ skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
   etter det
 - Ingenting under 11 px. Tidtakeren skal kunne leses på armlengdes avstand i
   en bil
-- Ikonene kommer fra Heroicons, aldri fra SF Symbols. Én ikonfamilie
+- Ikonene kommer fra Material Symbols, aldri fra SF Symbols. Én ikonfamilie
 - Fargen `accent-knowledge` er reservert for Fróði vit og finnes ikke i
   asset-katalogen. En test passer på det
 

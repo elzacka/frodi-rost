@@ -35,7 +35,7 @@ Modellen og tokenizeren hentes fra faste revisjoner. Revisjonene står i
 
 | Hva | Opphav | Lisens | Lenke |
 |---|---|---|---|
-| Heroicons | Tailwind Labs | MIT | https://heroicons.com |
+| Material Symbols | Google | Apache 2.0 | https://fonts.google.com/icons |
 
 ## Fonter
 

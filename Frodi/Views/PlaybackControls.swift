@@ -107,9 +107,6 @@ struct PlaybackControls: View {
 
                 IconView(player.isPlaying ? .pause : .play, size: PlayerControl.playIcon)
                     .foregroundStyle(Color.Frodi.accentRecordOn)
-                    // The triangle's centre of mass sits left of centre and looks off in a circle
-                    // without this. Optical correction, not spacing.
-                    .offset(x: player.isPlaying ? 0 : 2)
             }
         }
         .buttonStyle(.plain)
@@ -120,10 +117,10 @@ struct PlaybackControls: View {
 
     /// The arrow says the direction, the number below says how far.
     ///
-    /// The SF Symbol had the 15 inside the arc. Heroicons has no arrow with a number
-    /// in it, and two identical arrows without one would not say how much a press
-    /// jumps. So the number sits below, read from the same place the jump is
-    /// computed from, so they cannot disagree.
+    /// The SF Symbol had the 15 inside the arc. Material Symbols has arrows with
+    /// 5, 10 and 30 in them but none with 15, and two identical arrows without one
+    /// would not say how much a press jumps. So the number sits below, read from
+    /// the same place the jump is computed from, so they cannot disagree.
     private func skipButton(_ offset: TimeInterval, icon: Icon, label: String) -> some View {
         Button {
             player.skip(offset)
