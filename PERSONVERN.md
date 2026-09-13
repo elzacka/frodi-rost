@@ -7,7 +7,7 @@ Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 
 ## Hvem står bak
 
-Fróði røst er laget av elzacka. Spørsmål om personvern: **hei@tazk.no**.
+Fróði røst er laget av elzacka (Tazk).
 
 ## Hva som lagres
 

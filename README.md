@@ -9,8 +9,7 @@ og er en kunnskapsassistent som svarer på det du spør om.
 
 ## Status
 
-Appen er på TestFlight, ikke i App Store. Den blir bare tilgjengelig i Norge,
-og grensesnittet er på norsk bokmål. Engelsk grensesnitt er ikke planlagt.
+Appen er foreløpig kun i TestFlight, ikke App Store. Den vil bare bli tilgjengelig i Norge.
 
 ## Hva appen gjør
 
@@ -20,14 +19,6 @@ og grensesnittet er på norsk bokmål. Engelsk grensesnitt er ikke planlagt.
 - Lar deg hente ut lyd og tekst
 - Tar opp i inntil ti minutter om gangen. Grensen og målingene bak den står
   i `Frodi/Services/RecordingLimit.swift`
-
-## Hva appen ikke gjør
-
-- Ingen samtale, ingen kunnskapsbase, ingen tekst til tale. Samtalen finner
-  du i Fróði vit
-- Ingen sky, ingen konto, ingen nettverkstrafikk. Ikke engang en nedlasting
-  av modellen, for den følger med appen
-- Ingen iPad, ingen Mac, ingen liggende visning. Bare iPhone, stående
 
 ## Modell
 
