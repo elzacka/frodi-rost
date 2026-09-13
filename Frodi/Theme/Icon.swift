@@ -24,8 +24,8 @@ enum Icon: String, CaseIterable {
     case chevronDown = "expand_more"
     case hidden = "visibility_off"
     case share = "ios_share"
-    case skipBack = "replay"
-    case skipForward = "forward_media"
+    case skipBack = "replay_10"
+    case skipForward = "forward_10"
 
     case microphone = "mic_fill"
     case stop = "stop_fill"

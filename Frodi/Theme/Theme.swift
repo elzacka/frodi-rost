@@ -72,7 +72,7 @@ enum RecordButton {
     static let diameter: CGFloat = 76
     static let inner: CGFloat = 56
     static let ring: CGFloat = 3
-    static let icon: CGFloat = 22
+    static let icon: CGFloat = 30
 }
 
 // MARK: - Header button
@@ -80,7 +80,7 @@ enum RecordButton {
 /// measure, so the icon is the size of the one in the system navigation bar, and
 /// the hit area is set to the 44 pt minimum.
 enum HeaderButton {
-    static let icon: CGFloat = 18
+    static let icon: CGFloat = 22
     static let touch: CGFloat = 44
 }
 
@@ -90,13 +90,18 @@ enum HeaderButton {
 /// Material Symbols are drawn on a 24 × 24 grid and scaled to these. The measures live
 /// here for the same reason as the rest of the design system: a number at the
 /// call site never gets changed along with the others.
+///
+/// The numbers are frames, not glyphs. Material leaves generous padding inside
+/// its grid, so each frame was set to give the same visible glyph as the SF
+/// Symbol the design was drawn with: a chevron 7 × 12 pt, a close cross 15 pt,
+/// and so on. The measurements are in the design file under Ikoner.
 enum IconSize {
     /// Chevrons in rows and cards, in line with the caption beside them.
-    static let inline: CGFloat = 13
+    static let inline: CGFloat = 24
     /// Buttons in the navigation bar.
-    static let toolbar: CGFloat = 20
+    static let toolbar: CGFloat = 26
     /// An icon standing alone above a message.
-    static let notice: CGFloat = 22
+    static let notice: CGFloat = 24
 }
 
 // MARK: - Playback controls
@@ -105,11 +110,9 @@ enum IconSize {
 /// skip buttons are 44 pt, the minimum hit area.
 enum PlayerControl {
     static let play: CGFloat = 56
-    static let playIcon: CGFloat = 22
+    static let playIcon: CGFloat = 30
     static let skip: CGFloat = 44
-    // The arrow shares the button with the number below it, and went to 18 so the
-    // two fit inside the 44 points without being pushed against the edge.
-    static let skipIcon: CGFloat = 18
+    static let skipIcon: CGFloat = 26
 }
 
 // MARK: - Collapsed content

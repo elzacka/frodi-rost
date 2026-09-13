@@ -1,13 +1,14 @@
 import SwiftUI
 
-/// Playback of one recording: play and pause, skip fifteen seconds either way,
+/// Playback of one recording: play and pause, skip ten seconds either way,
 /// and a slider that both shows and sets the position.
 struct PlaybackControls: View {
     let recording: Recording
     let player: AudioPlayer
 
-    /// How far the skip buttons move. Behaviour, not a design token.
-    private static let skipSeconds: TimeInterval = 15
+    /// How far the skip buttons move. Behaviour, not a design token. Internal
+    /// so `IconTests` can hold it to the number drawn inside the skip icons.
+    static let skipSeconds: TimeInterval = 10
 
     /// Holds the finger's position while you drag. Without it the knob jumps back
     /// every time the ticker updates the playback time.
@@ -83,7 +84,7 @@ struct PlaybackControls: View {
             skipButton(
                 -Self.skipSeconds,
                 icon: .skipBack,
-                label: "Hopp 15 sekunder tilbake"
+                label: "Hopp 10 sekunder tilbake"
             )
 
             playButton
@@ -91,7 +92,7 @@ struct PlaybackControls: View {
             skipButton(
                 Self.skipSeconds,
                 icon: .skipForward,
-                label: "Hopp 15 sekunder fram"
+                label: "Hopp 10 sekunder fram"
             )
         }
     }
@@ -115,24 +116,17 @@ struct PlaybackControls: View {
         .accessibilityAddTraits(.isButton)
     }
 
-    /// The arrow says the direction, the number below says how far.
+    /// The arrow says the direction, the number inside it says how far.
     ///
-    /// The SF Symbol had the 15 inside the arc. Material Symbols has arrows with
-    /// 5, 10 and 30 in them but none with 15, and two identical arrows without one
-    /// would not say how much a press jumps. So the number sits below, read from
-    /// the same place the jump is computed from, so they cannot disagree.
+    /// The number is part of the glyph, so `skipSeconds` and the icons are held
+    /// together by `IconTests`, not by the layout: change one, change the other.
     private func skipButton(_ offset: TimeInterval, icon: Icon, label: String) -> some View {
         Button {
             player.skip(offset)
         } label: {
-            VStack(spacing: Space.s1 / 2) {
-                IconView(icon, size: PlayerControl.skipIcon)
-                Text(verbatim: "\(Int(Self.skipSeconds))")
-                    .font(.Frodi.meta)
-                    .monospacedDigit()
-            }
-            .foregroundStyle(Color.Frodi.textPrimary)
-            .frame(width: PlayerControl.skip, height: PlayerControl.skip)
+            IconView(icon, size: PlayerControl.skipIcon)
+                .foregroundStyle(Color.Frodi.textPrimary)
+                .frame(width: PlayerControl.skip, height: PlayerControl.skip)
         }
         .buttonStyle(.plain)
         .disabled(!player.isLoaded)

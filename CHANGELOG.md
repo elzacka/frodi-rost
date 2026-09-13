@@ -23,6 +23,8 @@ Ingenting er i App Store ennå.
 ### Endret
 
 - Ikonene kommer fra Material Symbols, ikke lenger fra Heroicons
+- Hoppknappene i avspilleren hopper ti sekunder, ikke femten. Tallet står
+  inne i pilen igjen
 
 ### Rettet
 
