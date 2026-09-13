@@ -27,6 +27,9 @@ extension WhisperKit: @retroactive @unchecked Sendable {}
 final class WhisperTranscriber: Transcriber {
     private var whisper: WhisperKit?
 
+    /// The word list as tokens, for the transcription running right now.
+    private var promptTokens: [Int]?
+
     /// Loads the model if it is not already loaded.
     ///
     /// It deliberately returns nothing: `WhisperKit` is not `Sendable`, and handing
@@ -80,6 +83,8 @@ final class WhisperTranscriber: Transcriber {
 
         let duration = try Self.duration(of: fileURL)
         var position = start
+        promptTokens = WordList.prompt(from: WordList.load()).flatMap { promptTokens(for: $0, whisper: whisper) }
+        defer { promptTokens = nil }
 
         // The last fraction of a second is never a piece on its own.
         while position < duration - 0.1 {
@@ -111,7 +116,7 @@ final class WhisperTranscriber: Transcriber {
         do {
             let results = try await whisper.transcribe(
                 audioArray: audio,
-                decodeOptions: Self.options(chunked: true)
+                decodeOptions: options(chunked: true)
             )
 
             var paragraphs: [TranscriptParagraph] = []
@@ -181,7 +186,7 @@ final class WhisperTranscriber: Transcriber {
             let part = Array(audio[first..<last])
             let results = try? await whisper.transcribe(
                 audioArray: part,
-                decodeOptions: Self.options(chunked: false)
+                decodeOptions: options(chunked: false)
             )
             let text = (results ?? [])
                 .map(\.text)
@@ -212,6 +217,21 @@ final class WhisperTranscriber: Transcriber {
     nonisolated static func duration(of url: URL) throws -> TimeInterval {
         let file = try AVAudioFile(forReading: url)
         return Double(file.length) / file.fileFormat.sampleRate
+    }
+
+    /// The word list encoded the way WhisperKit's own command line does it: a
+    /// leading space, and no special tokens. The decoder puts it after
+    /// `<|startofprev|>`, as text that was just said.
+    private func promptTokens(for prompt: String, whisper: WhisperKit) -> [Int]? {
+        guard let tokenizer = whisper.tokenizer else { return nil }
+        let tokens = tokenizer.encode(text: " " + prompt).filter { $0 < tokenizer.specialTokens.specialTokenBegin }
+        return tokens.isEmpty ? nil : tokens
+    }
+
+    private func options(chunked: Bool) -> DecodingOptions {
+        var options = Self.options(chunked: chunked)
+        options.promptTokens = promptTokens
+        return options
     }
 
     private static func options(chunked: Bool) -> DecodingOptions {

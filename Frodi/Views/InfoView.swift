@@ -18,6 +18,7 @@ struct InfoView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var microphone = AVAudioApplication.shared.recordPermission
+    @State private var words = WordList.load()
 
     var body: some View {
         NavigationStack {
@@ -29,6 +30,7 @@ struct InfoView: View {
                         about
                         privacy
                         speechModel
+                        wordList
                         licenses
                         version
                     }
@@ -108,6 +110,29 @@ struct InfoView: View {
                 paragraph("Modellen fra Nasjonalbiblioteket er ikke med i dette bygget. Fróði bruker diktatmodellen fra iOS i stedet.")
                 paragraph("Den kjører også på enheten, men er svakere på norsk: du må si «punktum» og «komma» selv, og dialekt blir ofte feil.")
             }
+        }
+    }
+
+    /// The app's one setting. Names the model should spell right: the field is
+    /// where a user types them once, and every transcription reads them.
+    private var wordList: some View {
+        card("Ordliste") {
+            paragraph("Navn og ord Fróði bør kjenne: firmaer, personer, forkortelser. Skriv dem slik du vil ha dem i teksten, med komma mellom. Listen blir på enheten, kryptert som teksten.")
+
+            TextField("Nordkvist AS, HMS, Kari Berg", text: $words, axis: .vertical)
+                .lineLimit(2...8)
+                .font(.Frodi.body)
+                .foregroundStyle(Color.Frodi.textPrimary)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .padding(Space.s3)
+                .background(Color.Frodi.background, in: RoundedRectangle(cornerRadius: Radius.control))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Radius.control)
+                        .strokeBorder(Color.Frodi.border, lineWidth: 1)
+                )
+                .accessibilityLabel("Ordliste")
+                .onChange(of: words) { _, text in WordList.save(text) }
         }
     }
 

@@ -42,12 +42,24 @@ struct PiecewiseTranscriptionTests {
     }
 
     /// The whole file, in pieces that end where the file ends, with the memory it took.
+    ///
+    /// With `FRODI_WORDS` set, that text is the word list for the run, and the
+    /// output says which of its entries came through. That is the check that
+    /// the prompt reaches this model at all.
     @MainActor
     @Test("Hele filen kommer gjennom, stykke for stykke", .enabled(if: enabled))
     func wholeFile() async throws {
+        let list = ProcessInfo.processInfo.environment["FRODI_WORDS"] ?? ""
+        WordList.save(list)
+        defer { WordList.save("") }
+
         let duration = try WhisperTranscriber.duration(of: Self.fixture!)
         let started = Date()
         let pieces = try await transcribe(from: 0)
+        let text = pieces.flatMap(\.paragraphs).map(\.text).joined(separator: " ")
+        for entry in WordList.prompt(from: list)?.components(separatedBy: ", ") ?? [] {
+            print("  WORD \(entry): \(text.localizedCaseInsensitiveContains(entry) ? "found" : "missing")")
+        }
 
         let expected = Int((duration / WhisperTranscriber.pieceLength).rounded(.up))
         #expect(pieces.count == expected)
