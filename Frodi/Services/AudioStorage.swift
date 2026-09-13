@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import SwiftData
 
@@ -74,6 +75,18 @@ enum AudioStorage {
         fileName.hasSuffix(sealedSuffix)
     }
 
+    /// The suffix of a recording in progress or waiting to be sealed: linear PCM in
+    /// a CAF container, see `AudioRecorder.start`. Recordings made before build 6
+    /// wait as `.m4a`, and `seal` takes both.
+    static let pendingSuffix = ".caf"
+
+    /// The name a plaintext file gets once sealed. Always `.m4a.enc`, whatever the
+    /// plaintext was: a PCM recording is turned into AAC on the way.
+    static func sealedName(for fileName: String) -> String {
+        let stem = (fileName as NSString).deletingPathExtension
+        return stem + ".m4a" + sealedSuffix
+    }
+
     /// Seals a recording that is still plaintext, and returns its new file name.
     ///
     /// The plaintext is removed only once the sealed copy is written. If sealing
@@ -88,18 +101,74 @@ enum AudioStorage {
     /// cannot be created at all. The Secure Enclave key would have been available,
     /// but the file classes are not. See `RecordingController.sealPending()`.
     ///
-    /// `@concurrent` for the same reason as `decryptToTemporary`: a ten minute
-    /// recording is several megabytes read, encrypted and written whole.
+    /// A sealed copy that already exists is taken as finished: it is written
+    /// atomically, so it is either whole or absent. That covers a crash between
+    /// writing the copy and removing the plaintext, and a crash between removing
+    /// the plaintext and saving the new name on the recording; either way the
+    /// next pass lands here and gets the same answer.
+    ///
+    /// `@concurrent` for the same reason as `decryptToTemporary`: an hour of
+    /// audio is many megabytes read, encoded, encrypted and written whole.
     @concurrent
     static func seal(fileName: String) async throws -> String {
         let source = directory.appendingPathComponent(fileName)
-        let sealedName = fileName + sealedSuffix
+        let sealedName = sealedName(for: fileName)
         let target = directory.appendingPathComponent(sealedName)
 
-        try RecordingVault.seal(fileAt: source).write(to: target, options: [.completeFileProtection])
+        if !FileManager.default.fileExists(atPath: target.path) {
+            let audio = fileName.hasSuffix(pendingSuffix)
+                ? try await encodeToAAC(source)
+                : source
+            defer { if audio != source { try? FileManager.default.removeItem(at: audio) } }
+            try RecordingVault.seal(fileAt: audio).write(to: target, options: [.atomic, .completeFileProtection])
+        }
         try? FileManager.default.removeItem(at: source)
         protectFinished(target)
         return sealedName
+    }
+
+    /// Encodes a PCM recording as AAC in an `.m4a`, in the scratch folder.
+    ///
+    /// The recording is written as PCM so a crash cannot take it; see
+    /// `AudioRecorder.start`. Stored, it should be a quarter of that size and in
+    /// the format everything else already expects. The export session streams
+    /// from disk to disk, so an hour of audio never sits in memory here.
+    private static func encodeToAAC(_ source: URL) async throws -> URL {
+        let asset = AVURLAsset(url: source)
+        guard let session = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetAppleM4A) else {
+            throw CocoaError(.fileWriteUnknown)
+        }
+        let target = scratchDirectory.appendingPathComponent(UUID().uuidString + ".m4a")
+        try await session.export(to: target, as: .m4a)
+        setProtection(.completeUnlessOpen, on: target)
+        return target
+    }
+
+    /// The length of a plaintext recording, read from the file itself.
+    ///
+    /// Nil if the file cannot be opened. The recorder's own `currentTime` is zero
+    /// once it has stopped, so this is what `AudioRecorder.stop` trusts.
+    static func duration(fileName: String) -> TimeInterval? {
+        guard let file = try? AVAudioFile(forReading: directory.appendingPathComponent(fileName)) else {
+            return nil
+        }
+        return Double(file.length) / file.fileFormat.sampleRate
+    }
+
+    /// Every recording file on disk, sealed or not, by file name.
+    ///
+    /// The list is the truth about what exists; the database is a view of it.
+    /// `RecordingController.reconcile` compares the two.
+    static func storedFileNames() -> [String] {
+        let names = (try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []
+        return names.filter { isSealed($0) || $0.hasSuffix(pendingSuffix) || $0.hasSuffix(".m4a") }
+    }
+
+    /// When a file was made, from the file system. Used for a recording whose row
+    /// was lost; the recorder itself does not store the date anywhere else.
+    static func creationDate(fileName: String) -> Date? {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: directory.appendingPathComponent(fileName).path)
+        return attributes?[.creationDate] as? Date
     }
 
     /// The audio of a recording, unlocked.

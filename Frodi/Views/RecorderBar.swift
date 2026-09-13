@@ -22,6 +22,14 @@ struct RecorderBar: View {
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
 
+            if recorder.isInterrupted {
+                Text("Opptaket er satt på pause og fortsetter etterpå.")
+                    .font(.Frodi.caption)
+                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, Space.s4)
+            }
+
             if case .denied = recorder.state {
                 Text("Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger.")
                     .font(.Frodi.caption)

@@ -9,6 +9,7 @@ struct RecordingListView: View {
     @State private var speechModel = SpeechModel()
     @State private var errorMessage: String?
     @State private var showInfo = false
+    @State private var pendingDeletion: Recording?
 
     var body: some View {
         NavigationStack {
@@ -176,7 +177,7 @@ struct RecordingListView: View {
                                 Task { await transcribe(recording) }
                             }
                         }
-                        Button("Slett", role: .destructive) { delete(recording) }
+                        Button("Slett", role: .destructive) { pendingDeletion = recording }
                     }
                 }
             }
@@ -185,6 +186,22 @@ struct RecordingListView: View {
             .padding(.bottom, Space.s3)
         }
         .scrollContentBackground(.hidden)
+        // One tap in a context menu is one tap too few for something that cannot be
+        // undone. The recording and its text go together, and nothing brings them back.
+        .confirmationDialog(
+            "Slett opptaket?",
+            isPresented: Binding(
+                get: { pendingDeletion != nil },
+                set: { if !$0 { pendingDeletion = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: pendingDeletion
+        ) { recording in
+            Button("Slett", role: .destructive) { delete(recording) }
+            Button("Avbryt", role: .cancel) {}
+        } message: { _ in
+            Text("Opptaket og teksten blir borte fra enheten. Du kan ikke angre.")
+        }
     }
 
     /// Transcribes everything that lacks text. Called at launch, so recordings made

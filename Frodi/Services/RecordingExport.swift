@@ -44,7 +44,10 @@ enum RecordingExport {
             .appendingPathComponent("Eksport-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 
-        let audio = folder.appendingPathComponent("frodi-\(stamp).m4a")
+        // A recording stopped on a locked device is still PCM until the next unlock;
+        // the export then carries the format it actually has.
+        let format = fileName.hasSuffix(AudioStorage.pendingSuffix) ? "caf" : "m4a"
+        let audio = folder.appendingPathComponent("frodi-\(stamp).\(format)")
         try AudioStorage.plaintext(fileName: fileName).write(to: audio, options: [.completeFileProtectionUnlessOpen])
         urls.append(audio)
 

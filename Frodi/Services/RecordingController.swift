@@ -24,6 +24,9 @@ final class RecordingController {
         // The recorder keeps its own count and reports when the limit is reached.
         // Saving is the same as when you press stop.
         recorder.onLimitReached = { [weak self] in self?.stopAndSave() }
+        // An interruption the recording could not come back from. Same save path:
+        // whatever reached the disk is the recording.
+        recorder.onInterruptionEnded = { [weak self] in self?.stopAndSave() }
     }
 
     var isRecording: Bool { recorder.isRecording }
@@ -101,9 +104,53 @@ final class RecordingController {
         guard UIApplication.shared.isProtectedDataAvailable,
               let context = container?.mainContext else { return }
 
+        reconcile(context)
+
         let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
         for recording in recordings where !AudioStorage.isSealed(recording.fileName) {
             await Transcription.run(for: recording, context: context)
         }
+    }
+
+    /// Makes the list agree with the disk.
+    ///
+    /// The file is the recording; the row is what the list knows about it. The
+    /// two come apart when the app dies between writing one and the other: killed
+    /// while recording, before `stopAndSave` ran; a database that fell back to
+    /// memory, so the rows vanished at the next launch; a crash inside the seal,
+    /// after the plaintext was removed and before the new name was saved. In every
+    /// case the audio is intact and nothing was looking for it.
+    ///
+    /// Two repairs. A sealed file whose row still carries the plaintext name gets
+    /// the row pointed at it. A file no row knows gets a row, dated from the file.
+    /// The duration of a sealed orphan is unknown until it is opened, and that is
+    /// left to the transcription, which opens it anyway.
+    ///
+    /// The file being recorded right now has no row yet by design, and is skipped:
+    /// the unlock pass runs while the car recording is still going.
+    func reconcile(_ context: ModelContext) {
+        let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
+        var onDisk = Set(AudioStorage.storedFileNames())
+        if let current = recorder.currentFileName { onDisk.remove(current) }
+        var referenced = Set(recordings.map(\.fileName))
+
+        for recording in recordings where !onDisk.contains(recording.fileName) {
+            let sealed = AudioStorage.sealedName(for: recording.fileName)
+            if onDisk.contains(sealed) {
+                recording.fileName = sealed
+                referenced.insert(sealed)
+            }
+        }
+
+        for fileName in onDisk.subtracting(referenced) {
+            let recording = Recording(
+                createdAt: AudioStorage.creationDate(fileName: fileName) ?? .now,
+                duration: AudioStorage.duration(fileName: fileName) ?? 0,
+                fileName: fileName
+            )
+            context.insert(recording)
+        }
+
+        try? context.save()
     }
 }
