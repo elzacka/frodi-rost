@@ -1,32 +1,28 @@
 # Fróði røst
 
-Tar opp lyd på iPhone og transkriberer på norsk (gjør om lydopptaket til tekst). Alt skjer på enheten.
+Tar opp lyd på iPhone, gjør den om til tekst (transkriberer), på norsk. Alt på enheten.
 
-«Fróði» er norrønt for «den kunnskapsrike». «Røst» er synonymt for stemme og henviser til opptaksfunksjonen.
+«Fróði»: Norrønt for «den kunnskapsrike». «Røst»: Stemme, viser til opptaksfunksjonen.
 
 ## Status
 
-Appen er foreløpig kun i TestFlight, ikke App Store. Vil bare bli tilgjengelig i Norge.
+Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 
 ## Hva appen gjør
 
-- Tar opp lyd selv om skjermlåsen er på
+- Tar opp lyd – også når skjermen er låst
 - Handlingsknappen starter og stopper opptak
-- Transkriberer på norsk bokmål – med riktig tegnsetting og store/små bokstaver
-- Lar deg eksportere lydopptak i filformatet `.m4a` og transkripsjoner i `.txt` og `.rtf`
-- Tar opp så lenge du vil. F. eks et lengre intervju på en time
-- Deler transkripsjonen i avsnitt med tidspunkt, så du lettere finner tilbake til riktig sted i lydopptaket
-- Transkriberer korte opptak i sanntid. Opptak over ti minutter, transkriberes når du ber om det, og fortsetter der det slapp om det blir avbrutt
+- Ingen tidsgrense på opptak
+- Korte opptak transkriberes i sanntid. Opptak over ti minutter transkriberes på forespørsel, fortsetter der det slapp ved avbrudd
+- Transkriberer til bokmål, med tegnsetting og stor/liten forbokstav
+- Transkripsjonen deles i avsnitt med tidspunkt du kan klikke på for å finne tilbake i lydopptaket og spille av derfra
+- Lar deg eksportere lydopptak som `.m4a`, transkripsjon som `.txt` eller `.rtf`
 
 ## Modell
 
-**nb-whisper-small** fra Nasjonalbiblioteket (NB) gjør tale om til tekst. Modellen
-bygger på OpenAIs Whisper og er videretrent på 66 000 timer norsk tale fra
-Språkbanken og NBs egen samling. Derfor setter den tegn og store
-bokstaver selv, og skriver om dialekt til bokmål.
+**nb-whisper-small** fra Nasjonalbiblioteket: Tale til tekst. Bygger på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra Språkbanken og Nasjonalbibliotekets egen samling. Setter tegn og stor forbokstav selv, skriver om dialekt til bokmål.
 
-Modellen følger med appen og kjører på enheten. Den koster ingenting å
-bruke, og appen kontakter ingen tjeneste for å lage teksten.
+Modellen følger med appen og kjører på enheten. Gratis i bruk, ingen kobling til eksterne tjenester.
 
 | Kilde | Lenke |
 |---|---|
@@ -37,16 +33,16 @@ bruke, og appen kontakter ingen tjeneste for å lage teksten.
 
 ## Krav
 
-For å bruke appen:
+For bruk:
 
 - iPhone med iOS 26.5 eller nyere
 - Handlingsknappen krever iPhone 15 Pro eller nyere
 
-For å bygge den:
+For bygging:
 
 - Xcode 26.6 med iOS 26.5 SDK
-- xcodegen, `brew install xcodegen`
-- Rundt 500 MB ledig plass til modellen
+- xcodegen: `brew install xcodegen`
+- Ca. 500 MB ledig plass til modellen
 
 ## Bygg
 
@@ -57,31 +53,22 @@ xcodegen generate
 open Frodi.xcodeproj
 ```
 
-Fra terminalen, mot appens egen simulator (se under Test):
+Fra terminalen, mot appens egen simulator (se Test):
 
 ```bash
 xcodebuild -project Frodi.xcodeproj -scheme Frodi \
   -destination 'platform=iOS Simulator,name=Frodi-Test' build
 ```
 
-Modellen ligger ikke i git. Uten den faller appen tilbake til iOS' egen
-diktatmodell, som er svakere på norsk. Info-siden i appen sier hvilken
-modell som kjører.
+nb-whisper-small ligger ikke i git-repoet. Uten modellen: appen bruker iOS' egen diktatmodell (`DictationTranscriber` i `SpeechAnalyzer`), som er svakere på norsk. Info-siden i appen viser hvilken modell som kjører.
 
-Skriptet henter modellen fra en fast versjon og sjekker hver fil mot
-`Scripts/model-checksums.txt`. Stemmer ikke summene, stopper det. WhisperKit er
-låst til én versjon i `project.yml`, og `Package.resolved` ligger i git, så et
-nytt utsjekk bygger de samme pakkene.
+`fetch-model.sh` henter modellen fra en fast versjon, sjekker hver fil mot `Scripts/model-checksums.txt`. Feil sum: Skriptet stopper. WhisperKit låst til én versjon i `project.yml`. `Package.resolved` ligger i git, samme pakker ved nytt utsjekk.
 
-Xcodegen genererer prosjektfilen fra `project.yml`. Rediger aldri
-`.xcodeproj` direkte.
+Xcodegen genererer prosjektfilen fra `project.yml`. Aldri rediger `.xcodeproj` direkte.
 
 ## Test
 
-Appen har sin egen simulator. Deler du en startet simulator med en annen
-sesjon, feiler UI-testene med `Application failed preflight checks`. Den samme
-feilen kommer hvis xcodebuild starter simulatoren selv og åpner appen før iOS
-er ferdig med å starte. Start simulatoren først, og vent til den er klar.
+Appen har egen simulator. Delt simulator mellom sesjoner: UI-testene feiler med `Application failed preflight checks`. Samme feil skjer hvis xcodebuild starter simulatoren selv og åpner appen før iOS er ferdig med å starte. Start simulatoren først, vent til den er klar.
 
 ```bash
 xcrun simctl create "Frodi-Test" \
@@ -93,41 +80,37 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
   -destination 'platform=iOS Simulator,name=Frodi-Test' test
 ```
 
-Uten modellen hopper testene i «Modell i pakken» over. Resten kjører.
+Uten modellen: Hopper over testene i «Modell i pakken». Resten kjører.
 
 ## Arkitektur
 
-Ett opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
+Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
 
-| Steg | Fil |
-|---|---|
-| Handlingsknappen kjører intenten, i bakgrunnen når iOS lar den | `Intents/ToggleRecordingIntent.swift` |
-| Intenten og opptaksknappen går gjennom én kontroller, som også eier databasen | `Services/RecordingController.swift` |
-| Lyden tas opp som PCM, så et krasj ikke tar opptaket med seg | `Services/AudioRecorder.swift` |
-| Listen og mappen sjekkes mot hverandre ved oppstart, så en fil uten rad får en rad | `Services/RecordingController.swift` |
-| Filen ligger i sandkassen med filvern, utenfor sikkerhetskopien | `Services/AudioStorage.swift` |
-| Opptaket forsegles med en nøkkel fra Secure Enclave | `Services/RecordingVault.swift` |
-| Teksten lages stykke for stykke, med nb-whisper i appen eller med diktatmodellen i iOS. Fremdriften lagres etter hvert stykke | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift`, `Services/SpeechEngine.swift` |
-| Teksten er avsnitt med tidspunkt | `Services/Transcript.swift` |
-| Ordlisten går til modellen som prompt | `Services/WordList.swift` |
-| På laderen kjører transkriberingen som bakgrunnsjobb | `Services/BackgroundTranscription.swift` |
-| Teksten forsegles på samme måte som lyden | `Services/RecordingVault.swift` |
-| Teksten vises bak et vern som skjuler den ved skjermopptak og appbytte | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift` |
-| Hent ut dekrypterer filene til en midlertidig mappe og gir dem til delingsarket | `Services/RecordingExport.swift`, `Views/ShareSheet.swift` |
+| Steg                                                                                                                                                                                                    | Fil                                                                                                |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Handlingsknappen trigger intenten (App Intent), som kjører i bakgrunnen når iOS tillater det                                                                                                          | `Intents/ToggleRecordingIntent.swift`                                                              |
+| Kontrolleren tar imot kall fra intenten og opptaksknappen, og «eier» databasen                                                                                                                         | `Services/RecordingController.swift`                                                               |
+| Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Et krasj vil derfor ikke føre til at opptaket går tapt.           | `Services/AudioRecorder.swift`                                                                     |
+| Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad, får en ny rad                                                                                          | `Services/RecordingController.swift`                                                               |
+| Lagringen holder filen i appens sandkasse (App Sandbox) med filvern (Data Protection), utenom sikkerhetskopiering                                                                                       | `Services/AudioStorage.swift`                                                                      |
+| Vault forsegler opptaket med en nøkkel fra Secure Enclave                                                                                                                                               | `Services/RecordingVault.swift`                                                                    |
+| Transkripsjonen lager teksten i puljer, med nb-whisper i appen som hovedmotor og iOS' egen diktatmodell (`DictationTranscriber` i `SpeechAnalyzer`) som reserve. Fremdriften lagres etter hver pulje | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift`, `Services/SpeechEngine.swift` |
+| Transcript strukturerer teksten som avsnitt med tidspunkt                                                                                                                                               | `Services/Transcript.swift`                                                                        |
+| WordList sender ordlisten til modellen som prompt                                                                                                                                                       | `Services/WordList.swift`                                                                          |
+| Når iPhone lader, kjører BackgroundTranscription transkriberingen som bakgrunnsoppgave (Background Task)                                                                                                | `Services/BackgroundTranscription.swift`                                                           |
+| Vault forsegler teksten på samme måte som lyden                                                                                                                                                         | `Services/RecordingVault.swift`                                                                    |
+| RecordingDetailView viser teksten bak et vern (CaptureGuard) som skjuler den ved skjermopptak (Screen Recording) og appbytte (App Switcher)                                                             | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift`                                      |
+| Ved eksport dekrypterer RecordingExport filene til en midlertidig mappe, og gir dem til delingsarket (Activity View, ofte kalt Share Sheet)                                                             | `Services/RecordingExport.swift`, `Views/ShareSheet.swift`                                         |
 
-Visningene når aldri talemotoren direkte. Alt går gjennom protokollen
-`Transcriber`, og `Transcription.usesBundledModel` avgjør hvilken motor som
-kjører.
+Visningene når aldri talemotoren direkte. Alt går via protokollen `Transcriber`. `Transcription.usesBundledModel` avgjør hvilken motor som kjører.
 
 ## Lisens
 
-Koden er MIT, se [LICENSE](LICENSE). Modellen, pakkene, ikonene og fontene
-har egne lisenser, se [TREDJEPART.md](TREDJEPART.md).
+Kode: MIT, se [LICENSE](LICENSE). Modell, pakker, ikoner, fonter: Egne lisenser, se [TREDJEPART.md](TREDJEPART.md).
 
 ## Bidrag
 
-Dette er et personlig prosjekt. Meld feil og forslag som issues på GitHub.
-Vil du sende en pull request, les [CONTRIBUTING.md](CONTRIBUTING.md) først.
+Appen er et personlig prosjekt. Feil og forslag meldes som issues på GitHub. Pull request: Les [CONTRIBUTING.md](CONTRIBUTING.md) først.
 
 ## Mer
 
