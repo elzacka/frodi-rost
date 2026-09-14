@@ -28,11 +28,13 @@ enum RecordingVault {
     /// The public half of the Enclave key, as X9.63 bytes, once it has been read.
     ///
     /// Sealing needs only the public key, and the public key is not secret. The
-    /// private key, by contrast, is `WhenUnlocked`: the keychain refuses to hand it
-    /// out while the screen is locked. A transcription can outlast the screen, and
-    /// its text is sealed the moment it finishes, so the seal must not depend on
-    /// the lock state. It does not: every path that seals has opened something
-    /// first in the same process, and that is when the public key is kept.
+    /// private key, by contrast, lives in the keychain under an access class that
+    /// can refuse it: `AfterFirstUnlock` before the first unlock since boot, and
+    /// `WhenUnlocked` on a device whose key was made by build 5 or 6. A
+    /// transcription can outlast the screen, and its text is sealed the moment it
+    /// finishes, so the seal must not depend on the lock state. It does not: every
+    /// path that seals has opened something first in the same process, and that is
+    /// when the public key is kept.
     private static let publicKeyBytes = OSAllocatedUnfairLock<Data?>(initialState: nil)
 
     enum VaultError: LocalizedError {
