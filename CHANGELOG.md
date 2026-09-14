@@ -2,7 +2,6 @@
 
 Formatet følger [Keep a Changelog](https://keepachangelog.com/nb/1.1.0/).
 Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
-Ingenting er i App Store ennå.
 
 ## Ikke utgitt
 
@@ -16,7 +15,7 @@ Ingenting er i App Store ennå.
   slapp neste gang
 - Teksten hentes ut som `.rtf` i tillegg til `.txt`, med overskrift og avsnitt
 - «Slett» spør først
-- Ordliste på Info-siden: navn og ord Fróði bør kjenne, som firmaer, personer
+- Ordliste på Info-siden: Navn og ord Fróði bør kjenne, som firmaer, personer
   og forkortelser. Modellen får listen før den lytter, og ord i teksten som
   nesten stemmer med listen, rettes etterpå. «Lag teksten på nytt» i listen
   bruker listen på et opptak du alt har
@@ -98,7 +97,7 @@ Ingenting er i App Store ennå.
 ### Endret
 
 - Siden bak info-knappen heter «Info», ikke «Om»
-- Handlingsknappen beskrives slik iOS 26 gjør det: hold inne, ikke trykk
+- Handlingsknappen beskrives slik iOS 26 gjør det: Hold inne, ikke trykk
 - Personvern-kortet lenker til PERSONVERN.md og SECURITY.md
 
 ## 0.1.0 (1) – 12. september 2026
@@ -120,5 +119,5 @@ Første build.
 - Krypter opptak og tekst med en nøkkel som aldri forlater enheten
 - Skjul teksten mens skjermen tas opp eller speiles
 - App-ikon og logo i Skranji, ikoner fra Heroicons
-- Om-siden bak info-knappen i logohodet: hva appen gjør, personvern,
+- Om-siden bak info-knappen i logohodet: Hva appen gjør, personvern,
   mikrofontilgang, hvilken språkmodell som kjører, lisenser og versjon

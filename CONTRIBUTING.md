@@ -5,32 +5,29 @@ hvordan du bygger og tester.
 
 ## Navn
 
-| Form | Skrives | Brukes til |
-|---|---|---|
-| Fróði røst | med ó og ø, og «røst» med liten forbokstav | alt en bruker leser: appnavn, App Store, prosa |
-| Frodi | ASCII | kode, filnavn, bundle-ID, scheme og target |
+| Form       | Skrives                                    | Brukes til                                     |
+| ---------- | ------------------------------------------ | ---------------------------------------------- |
+| Fróði røst | med ó og ø, og «røst» med liten forbokstav | alt en bruker leser: Appnavn, App Store, prosa |
+| Frodi      | ASCII                                      | kode, filnavn, bundle-ID, scheme og target     |
 
-«røst» er en del av ordmerket, ikke et egennavn. Fróði vit er den andre appen
-i serien og har [sitt eget repo](https://github.com/elzacka/frodi-vit). De to
-deler merke, designsystem og holdning til personvern, ikke kode.
+«røst» er en del av ordmerket, ikke et egennavn.
 
 ## Språk
 
-| Hva | Språk |
-|---|---|
-| Alt en bruker leser: tekstene i appen, App Store, README, PERSONVERN, CHANGELOG, TREDJEPART, TILGJENGELIGHET | norsk bokmål |
-| Testnavn og det skriptene skriver ut | norsk bokmål |
-| SECURITY.md | engelsk, fordi de som melder sårbarheter sjelden leser norsk |
-| Kode, identifikatorer, filnavn, kommentarer og commit-meldinger | engelsk |
+| Hva                                                                                                          | Språk                                                        |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| Alt en bruker leser: Tekstene i appen, App Store, README, PERSONVERN, CHANGELOG, TREDJEPART, TILGJENGELIGHET | norsk bokmål                                                 |
+| SECURITY.md                                                                                                  | engelsk, fordi de som melder sårbarheter sjelden leser norsk |
+| Kode, identifikatorer, filnavn, kommentarer og commit-meldinger                                              | engelsk                                                      |
 
-Norsk tekst skrives som norsk, ikke oversatt fra engelsk til slutt: aktiv
+Norsk tekst skrives som norsk, ikke oversatt fra engelsk til slutt: Aktiv
 form, korte setninger, «du», og alltid æ, ø og å. Sitattegn er «slik». Lag
 aldri et norsk sammensatt ord ved å oversette et engelsk uttrykk ord for
 ord. Bruk det norske ordet der det finnes, og det engelske der det ikke gjør.
 
 ## Omfang
 
-Versjon 1 gjør én ting: tar opp, og gjør lyden om til tekst. Ingen samtale,
+Versjon 1 gjør én ting: Tar opp, og gjør lyden om til tekst. Ingen samtale,
 ingen kunnskapsbase, ingen tekst til tale. Det hører til Fróði vit eller til
 senere versjoner, og legges ikke til uten at noen har bedt om det.
 
@@ -46,7 +43,7 @@ skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
   etter det
 - Ingenting under 11 px. Tidtakeren skal kunne leses på armlengdes avstand i
   en bil
-- Ikonene kommer fra Material Symbols, aldri fra SF Symbols. Én ikonfamilie
+- Ikonene kommer fra Material Symbols, aldri fra SF Symbols
 - Fargen `accent-knowledge` er reservert for Fróði vit og finnes ikke i
   asset-katalogen. En test passer på det
 

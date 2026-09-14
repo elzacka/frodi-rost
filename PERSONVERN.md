@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 13. september 2026.
+Sist oppdatert 15. september 2026.
 
 Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 å sende til, og ingen tjeneste å spørre.
@@ -14,19 +14,13 @@ Fróði røst er laget av elzacka (Tazk).
 | Hva | Hvor | Hvor lenge |
 |---|---|---|
 | Lydopptak | På enheten, kryptert | Til du sletter det |
-| Tekst fra opptaket | Samme sted, kryptert | Til du sletter den |
+| Tekst fra opptaket, også den delen som er ferdig underveis | Samme sted, kryptert | Til du sletter den |
+| Ordlisten på Info-siden | Samme sted, kryptert | Til du endrer den |
 
 Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
 
 Stopper du et opptak mens enheten er låst, krypterer Fróði det så snart du
 låser opp. Fram til da holder iOS filen låst, og ingen kan lese den.
-
-Mens teksten lages, lagrer Fróði det som er ferdig underveis, kryptert på
-samme måte som teksten. Det er slik den kan fortsette der den slapp, også
-mens enheten lader med skjermen låst.
-
-Ordlisten du kan skrive på Info-siden, lagres kryptert på samme måte, og
-holdes utenfor sikkerhetskopien.
 
 Tar du opp et intervju, er det du som må fortelle den du intervjuer at det
 blir tatt opp, og hva opptaket skal brukes til. Fróði kan love at opptaket blir
@@ -62,16 +56,15 @@ opptakene først.
 
 ## Rettighetene dine
 
-Opptak og tekst forlater aldri enheten din. Ingen andre mottar dem, og ingen
-kan hente dem ut. Derfor finnes det ingen behandling av personopplysninger
-utenfor enheten: Ingen å be om innsyn hos, ingen databehandlere og ingen
-overføring til utlandet. Rettighetene i tabellen utøver du selv, i appen. Det
-er den eneste måten, fordi det er det eneste stedet dataene finnes.
+Dataene finnes bare på enheten din. Derfor er det ingen behandling av
+personopplysninger utenfor den: Ingen å be om innsyn hos, ingen
+databehandlere, ingen overføring til utlandet. Rettighetene utøver du selv,
+i appen.
 
 | Rettighet | Slik gjør du det |
 |---|---|
 | Innsyn | Åpne opptaket i appen |
-| Hente ut | Trykk på delingsikonet. Du får `.m4a` og `.txt` |
+| Hente ut | Trykk på delingsikonet. Du får `.m4a`, `.txt` og `.rtf` |
 | Sletting | Hold fingeren på opptaket i listen, og velg «Slett» |
 
 Sletter du appen, forsvinner alt. Det skjer med én gang, og du kan ikke angre.

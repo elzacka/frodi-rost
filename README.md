@@ -13,9 +13,9 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 - Tar opp lyd – også når skjermen er låst
 - Handlingsknappen starter og stopper opptak
 - Ingen tidsgrense på opptak
-- Korte opptak transkriberes i sanntid. Opptak over ti minutter transkriberes på forespørsel, fortsetter der det slapp ved avbrudd
+- Opptak under ti minutter transkriberes når du stopper. Lengre opptak transkriberes når du ber om det, og fortsetter der de slapp ved avbrudd
 - Transkriberer til bokmål, med tegnsetting og stor/liten forbokstav
-- Transkripsjonen deles i avsnitt med tidspunkt du kan klikke på for å finne tilbake i lydopptaket og spille av derfra
+- Transkripsjonen deles i avsnitt med tidspunkt du kan trykke på for å spille av derfra
 - Lar deg eksportere lydopptak som `.m4a`, transkripsjon som `.txt` eller `.rtf`
 
 ## Modell
@@ -42,13 +42,13 @@ For bygging:
 
 - Xcode 26.6 med iOS 26.5 SDK
 - xcodegen: `brew install xcodegen`
-- Ca. 500 MB ledig plass til modellen
+- 467 MB ledig plass til modellen
 
 ## Bygg
 
 ```bash
 brew install xcodegen
-./Scripts/fetch-model.sh   # ca. 467 MB, kjør én gang
+./Scripts/fetch-model.sh   # kjør én gang
 xcodegen generate
 open Frodi.xcodeproj
 ```
@@ -60,11 +60,9 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
   -destination 'platform=iOS Simulator,name=Frodi-Test' build
 ```
 
-nb-whisper-small ligger ikke i git-repoet. Uten modellen: Fallback til iOS' innebygde diktering (systemets talegjenkjenning, `DictationTranscriber` i Apples `SpeechAnalyzer`), svakere på norsk. Info-siden i appen viser hvilken modell som kjører.
+nb-whisper-small ligger ikke i git-repoet. Uten modellen: Fallback til iOS' innebygde diktering, svakere på norsk. Info-siden i appen viser hvilken modell som kjører.
 
-`fetch-model.sh` henter modellen fra en fast versjon, sjekker hver fil mot `Scripts/model-checksums.txt`. Feil sum: Skriptet stopper. WhisperKit låst til én versjon i `project.yml`. `Package.resolved` ligger i git, samme pakker ved nytt utsjekk.
-
-Xcodegen genererer prosjektfilen fra `project.yml`. Aldri rediger `.xcodeproj` direkte.
+`fetch-model.sh` sjekker hver fil mot `Scripts/model-checksums.txt` og stopper ved avvik. Hvordan modell og pakker er låst: [SECURITY.md](SECURITY.md).
 
 ## Test
 

@@ -1,9 +1,9 @@
 # Tredjepartslisenser
 
-Oppdatert 13. september 2026.
+Oppdatert 15. september 2026.
 
 Listen i appen, under Info > Lisenser, har de samme navnene og lisensene som
-denne filen. Versjonene under Kode er de `Package.resolved` løser opp. En test
+denne filen. Versjonene under Kode er de som står i `Package.resolved`. En test
 i `FrodiTests/DocumentTests.swift` feiler hvis de tre skiller lag.
 
 ## Modell
