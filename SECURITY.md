@@ -2,7 +2,7 @@
 
 Fróði røst records audio and transcribes it on the device. Nothing is transmitted.
 
-Last reviewed 13 September 2026.
+Last reviewed 14 September 2026.
 
 ## Reporting a vulnerability
 
@@ -84,6 +84,12 @@ That key is wrapped by a P-256 key created inside the Secure Enclave. The privat
 key cannot be extracted. That stops the key from being copied; it does not stop
 code running on this device in the app's context from asking the Enclave to use
 it. What limits that is the access class.
+
+GCM authenticates as well as encrypts: a sealed file altered by so much as one
+byte fails to open, so the app never plays modified audio or shows a modified
+transcript as if it were the original. `VaultTests` covers it. That is integrity
+against a third party, not non-repudiation: nothing stops the user of an unlocked
+device from deleting a recording, and no hash kept beside it would.
 
 Access control is `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`.
 
@@ -228,6 +234,11 @@ repositories serve on the day.
 - **No biometric lock.** The app is used hands-busy while driving. A Face ID gate
   at the moment of recording would defeat its purpose.
 - **No certificate pinning.** There is no transport.
+- **No overwrite on delete.** Deleting a recording removes the file and nothing
+  else, because there is nothing an overwrite would add. The file is ciphertext,
+  and the only copy of its key is wrapped inside it, so the deleted blocks are
+  noise. iOS deletes by discarding the per-file key, and APFS is copy-on-write,
+  so an overwrite would land on other blocks and leave the old ones as they were.
 - **No screenshot blocking.** `userDidTakeScreenshotNotification` fires after the
   image exists. The hidden `isSecureTextEntry` trick is undocumented and can break
   without warning. The app does not offer what it cannot deliver.
