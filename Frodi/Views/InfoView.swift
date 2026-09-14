@@ -105,7 +105,7 @@ struct InfoView: View {
         card("Språkmodell") {
             if Transcription.usesBundledModel {
                 paragraph("nb-whisper-small fra Nasjonalbiblioteket gjør tale om til tekst. Modellen følger med appen og kjører inne i den.")
-                paragraph("Den er trent på 66\u{00A0}000 timer norsk tale. Derfor setter den tegn og store bokstaver selv, og skriver dialekt om til bokmål. Du trenger ikke si «punktum» og «komma».")
+                paragraph("Den er trent på 66\u{00A0}000 timer norsk tale. Derfor setter den tegn og store bokstaver selv, og skriver om dialekt til bokmål. Du trenger ikke si «punktum» og «komma».")
             } else {
                 paragraph("Modellen fra Nasjonalbiblioteket er ikke med i dette bygget. Fróði bruker diktatmodellen fra iOS i stedet.")
                 paragraph("Den kjører også på enheten, men er svakere på norsk: du må si «punktum» og «komma» selv, og dialekt blir ofte feil.")
