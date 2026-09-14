@@ -23,7 +23,7 @@ Appen er foreløpig kun i TestFlight, ikke App Store. Vil bare bli tilgjengelig 
 **nb-whisper-small** fra Nasjonalbiblioteket (NB) gjør tale om til tekst. Modellen
 bygger på OpenAIs Whisper og er videretrent på 66 000 timer norsk tale fra
 Språkbanken og NBs egen samling. Derfor setter den tegn og store
-bokstaver selv, og skriver dialekt om til bokmål.
+bokstaver selv, og skriver om dialekt til bokmål.
 
 Modellen følger med appen og kjører på enheten. Den koster ingenting å
 bruke, og appen kontakter ingen tjeneste for å lage teksten.
