@@ -31,7 +31,7 @@ struct CaptureGuard: ViewModifier {
 
                     Text(isCaptured ? "Teksten er skjult mens skjermen tas opp." : "Teksten er skjult.")
                         .font(.Frodi.caption)
-                        .foregroundStyle(Color.Frodi.textSecondary)
+                        .foregroundStyle(Color.Frodi.textPrimary)
                         .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)

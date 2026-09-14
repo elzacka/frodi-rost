@@ -21,6 +21,16 @@ extension Color {
         /// A recording is in progress.
         static let recordingActive = Color("RecordingActive")
 
+        // A footnote used to be `textSecondary` at 0.9 opacity, because running
+        // text was also `textSecondary` and the footnote had to read as quieter
+        // than the text it belongs to. That blend measured 4,54:1 on Surface: the
+        // lowest the rule allows, and a difference no one can see.
+        //
+        // The step is made with the two colours instead. Running text is
+        // `textPrimary` (16,25:1 on Surface), a footnote is `textSecondary`
+        // (5,65:1). The gap is visible, both clear WCAG 2.2 AA with room to
+        // spare, and the app is back to two text colours. There is no third.
+
         // accent-knowledge (#2E9C82) is reserved for the knowledge feature and is
         // therefore not here yet. Add it when that feature is built.
     }
@@ -45,6 +55,20 @@ extension Font {
         static let bodyMedium = custom("Inter-Medium", size: 15, relativeTo: .body)
         static let caption = custom("Inter-Regular", size: 13, relativeTo: .footnote)
         static let meta = custom("Inter-Regular", size: 11, relativeTo: .caption2)
+        /// Inter Regular 10 pt. A footnote to running text, and nothing else.
+        ///
+        /// 23 % under the 13 pt of the text it belongs to, so the note reads as a
+        /// note at a glance. It used to borrow `meta`, which is a size for
+        /// timestamps and status lines: two different jobs on one token, and the
+        /// footnote could not be made smaller without moving every timestamp with
+        /// it.
+        ///
+        /// 10 pt is under the 11 pt the design system otherwise sets as the
+        /// smallest text. The exception is deliberate and limited to this one
+        /// token: the footnote carries an estimate you can read past, the colour
+        /// clears AA with room to spare, and `relativeTo: .caption2` lets anyone
+        /// who needs it scale the whole scale up.
+        static let footnote = custom("Inter-Regular", size: 10, relativeTo: .caption2)
     }
 }
 

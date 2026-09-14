@@ -19,7 +19,7 @@ struct PlaybackControls: View {
             if case .failed(let message) = player.state {
                 Text(message)
                     .font(.Frodi.caption)
-                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .foregroundStyle(Color.Frodi.textPrimary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             } else {

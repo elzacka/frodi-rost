@@ -125,7 +125,7 @@ struct RecordingListView: View {
 
             Text("Fróði får ikke åpnet databasen på enheten. Du kan ta opp og hente ut som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette feilen.")
                 .font(.Frodi.caption)
-                .foregroundStyle(Color.Frodi.textSecondary)
+                .foregroundStyle(Color.Frodi.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -149,7 +149,7 @@ struct RecordingListView: View {
 
             Text("Trykk på opptaksknappen, eller hold inne handlingsknappen på venstre side. Trykk på Info-knappen for veiledning.")
                 .font(.Frodi.caption)
-                .foregroundStyle(Color.Frodi.textSecondary)
+                .foregroundStyle(Color.Frodi.textPrimary)
                 .multilineTextAlignment(.center)
         }
         .padding(Space.s8)

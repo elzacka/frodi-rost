@@ -1,3 +1,4 @@
+import SwiftUI
 import Testing
 import UIKit
 @testable import Frodi
@@ -11,7 +12,7 @@ import UIKit
 @Suite("Kontrast")
 struct ContrastTests {
     /// Relative luminance as WCAG defines it.
-    private static func luminance(_ color: UIColor) -> Double {
+    static func luminance(_ color: UIColor) -> Double {
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
         color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
 
@@ -70,6 +71,28 @@ struct ContrastTests {
         #expect(
             measured >= 3.0,
             "\(pair.foreground) på \(pair.background) er \(String(format: "%.2f", measured)):1, WCAG 2.2 AA krever 3:1"
+        )
+    }
+
+    /// The footnote has to read as quieter than the text it belongs to, and the
+    /// difference has to be visible. It was not: the footnote used to be
+    /// `TextSecondary` at 0.9 opacity on running text that was `TextSecondary`
+    /// itself, which is 1,24:1 between the two. Nobody sees 1,24:1.
+    ///
+    /// Running text is `TextPrimary` now and the footnote is `TextSecondary`,
+    /// which measures 2,88:1 between them. The ratio is a stand-in for «visibly
+    /// lighter», not a WCAG requirement: the rules say nothing about two text
+    /// colours on the same surface. 2,5 is the floor, so the tones can be tuned
+    /// without the step quietly disappearing again.
+    ///
+    /// Each tone meets AA on its own: both pairs are in `textMeetsAA` above, and
+    /// `TextSecondary` on `Surface` is the footnote's own number, 5,65:1.
+    @Test("Fotnoten skiller seg synlig fra brødteksten")
+    func footnoteIsVisiblyLighterThanBody() throws {
+        let measured = try Self.ratio("TextSecondary", on: "TextPrimary")
+        #expect(
+            measured >= 2.5,
+            "Fotnoten mot brødteksten er \(String(format: "%.2f", measured)):1, skillet må være minst 2,5:1"
         )
     }
 }

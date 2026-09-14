@@ -1,4 +1,3 @@
-import AVFoundation
 import SwiftUI
 
 /// The Info page: what the app does, what it does not do, and what it builds on.
@@ -9,15 +8,12 @@ import SwiftUI
 /// not a new page, because you should return to the list where you left it.
 ///
 /// The sheet was called «Innstillinger» until 10 September 2026, and that was the
-/// wrong name: nothing here is set. The one paragraph that does anything sends you
-/// to Settings in iOS; the app has no options of its own. The title now says what
-/// the page is.
+/// wrong name: the app has no options of its own. The word list is the one field
+/// on the page, and a list of names is not a setting. The title now says what the
+/// page is.
 struct InfoView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
-    @Environment(\.scenePhase) private var scenePhase
 
-    @State private var microphone = AVAudioApplication.shared.recordPermission
     @State private var words = WordList.load()
 
     var body: some View {
@@ -50,21 +46,27 @@ struct InfoView: View {
                 }
             }
         }
-        // If you go to Settings to grant microphone access, the card should say the
-        // right thing when you come back.
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active { microphone = AVAudioApplication.shared.recordPermission }
-        }
     }
 
     // MARK: - Cards
+    /// The mark on the one footnote the page has. A raised digit and not a star:
+    /// a star beside a field means «må fylles ut», and this card has a field.
+    static let footnoteMark = "\u{00B9}"
+
     private var about: some View {
         card("Fróði røst") {
             paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
-            paragraph("Fróði tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.")
-            paragraph("Trykk på opptaksknappen nederst, eller hold inne handlingsknappen på venstre side. Hold inne én gang for å starte, én gang til for å stoppe.")
-            paragraph("Før du kan bruke handlingsknappen, må du sette den opp: Gå til Innstillinger > Handlingsknapp, sveip til Snarvei, trykk på «Velg en snarvei» og velg «Start eller stopp opptak» under Fróði røst.")
-            paragraph("Et opptak kan vare så lenge du vil. Er det under \(Transcription.immediateMinutes) minutter, lager Fróði teksten med en gang. Er det lengre, lager Fróði teksten når du ber om det. Det tar en stund: la appen være åpen, eller sett enheten til lading, så fortsetter Fróði mens den lader.")
+            paragraph("Appen tar opp lyd og gjør den om til norsk tekst, også med skjermen låst.")
+            paragraph("Start og stopp med opptaksknappen nederst, eller ved å holde inne handlingsknappen. Knappen finnes på iPhone 15 Pro og nyere.")
+            paragraph("Handlingsknappen må settes opp først: Innstillinger > Handlingsknapp > Snarvei > Bla ned og velg «Fróði røst – Start eller stopp opptak».")
+            paragraph(
+                "Ingen tidsgrense på opptak. Opptak lengre enn \(Transcription.immediateMinutes) minutter\(Self.footnoteMark) transkriberes når du ber om det.",
+                // VoiceOver reads the mark as «opphøyd én», which says nothing. It
+                // hears the footnote as the next element instead.
+                spokenAs: "Ingen tidsgrense på opptak. Opptak lengre enn \(Transcription.immediateMinutes) minutter transkriberes når du ber om det."
+            )
+            paragraph("Teksten deles i avsnitt med tidspunkt du kan spille av lyden fra.")
+            footnote("10 min: 4–5 min. 30 min: 11–13 min. 60 min: 22–27 min. (Grovt estimat)")
         }
     }
 
@@ -75,40 +77,27 @@ struct InfoView: View {
     private var privacy: some View {
         card("Personvern") {
             paragraph(Self.privacyOpener)
-            microphoneAccess
-            paragraph("Opptak og tekst krypteres med en nøkkel som lages i enheten (Secure Enclave). Ingen annen enhet kan lese dem, og de følger ikke med i en sikkerhetskopi.")
-            paragraph("Stopper du et opptak mens enheten er låst, krypterer Fróði det så snart du låser opp. Teksten skjules når skjermen tas opp og når du bytter app.")
-            paragraph("Skal du bytte enhet, må du hente ut opptakene først. Sletter du appen, forsvinner alt med én gang.")
+            // One sentence, not three states. The app exists to record, so the
+            // permission is not a condition the page reports on: it is the one
+            // thing the app asks for. RecorderBar says so on the main screen when
+            // access is refused, which is where a user who cannot record is.
+            paragraph("Appen ber om tilgang til mikrofonen. Ingenting annet.")
+            paragraph("Opptak og tekst krypteres med en nøkkel som bare finnes i enheten (Secure Enclave), og blir ikke med i sikkerhetskopier.")
+            paragraph("Teksten skjules når skjermen tas opp og når du bytter app.")
+            paragraph("Eksporter lyd som .m4a og tekst som .txt eller .rtf. Bytter du enhet, må du hente ut opptakene først. Sletter du appen, er alt borte.")
             link("Mer om personvern", to: Self.privacyPolicy)
             link("Mer om sikkerhet", to: Self.securityPolicy)
-        }
-    }
-
-    /// The microphone is the only permission the app asks for, so it belongs under
-    /// Personvern. Re-read every time the app becomes active.
-    @ViewBuilder
-    private var microphoneAccess: some View {
-        switch microphone {
-        case .granted:
-            paragraph("Fróði har tilgang til mikrofonen. Det er den eneste tilgangen appen ber om.")
-        case .denied:
-            paragraph("Fróði har ikke tilgang til mikrofonen og kan ikke ta opp. Du gir tilgang i Innstillinger på enheten.")
-            pillButton("Åpne Innstillinger") {
-                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
-            }
-        default:
-            paragraph("Fróði spør om tilgang til mikrofonen første gang du tar opp. Det er den eneste tilgangen appen ber om.")
         }
     }
 
     private var speechModel: some View {
         card("Språkmodell") {
             if Transcription.usesBundledModel {
-                paragraph("nb-whisper-small fra Nasjonalbiblioteket gjør tale om til tekst. Modellen følger med appen og kjører inne i den.")
-                paragraph("Den er trent på 66\u{00A0}000 timer norsk tale. Derfor setter den tegn og store bokstaver selv, og skriver om dialekt til bokmål. Du trenger ikke si «punktum» og «komma».")
+                paragraph("Modellen nb-whisper-small fra Nasjonalbiblioteket følger med appen og kjører inne i den.")
+                paragraph("Modellen er videretrent på 66\u{00A0}000 timer norsk tale. Den setter tegn og store bokstaver selv, og skriver om dialekt til bokmål.")
             } else {
-                paragraph("Modellen fra Nasjonalbiblioteket er ikke med i dette bygget. Fróði bruker diktatmodellen fra iOS i stedet.")
-                paragraph("Den kjører også på enheten, men er svakere på norsk: du må si «punktum» og «komma» selv, og dialekt blir ofte feil.")
+                paragraph("Modellen fra Nasjonalbiblioteket er ikke med i dette bygget. Appen bruker dikteringen som følger med iOS.")
+                paragraph("Den kjører også på enheten, men er svakere på norsk: Du må si «punktum» og «komma» selv, og dialekt blir ofte feil.")
             }
         }
     }
@@ -117,9 +106,9 @@ struct InfoView: View {
     /// where a user types them once, and every transcription reads them.
     private var wordList: some View {
         card("Ordliste") {
-            paragraph("Navn og ord Fróði bør kjenne: firmaer, personer, forkortelser. Skriv dem slik du vil ha dem i teksten, med komma mellom. Fróði retter ord i teksten som nesten stemmer. Har du et opptak fra før, kan du holde på det i listen og velge «Lag teksten på nytt». Listen blir på enheten, kryptert som teksten.")
+            paragraph("Skriv inn navn og ord som en KI-modell vil kunne bomme på når den transkriberer. Skill dem med komma. Appen vil finne ord som ligner. Langt trykk på et opptak i listen gir deg valget «Lag teksten på nytt». Ordlisten er også kryptert på enheten.")
 
-            TextField("Nordkvist AS, HMS, Kari Berg", text: $words, axis: .vertical)
+            TextField("Aall & Ulefos Brug, ISO 19011", text: $words, axis: .vertical)
                 .lineLimit(2...8)
                 .font(.Frodi.body)
                 .foregroundStyle(Color.Frodi.textPrimary)
@@ -142,7 +131,7 @@ struct InfoView: View {
             LicensesView()
         } label: {
             card("Lisenser", opensScreen: true) {
-                paragraph("Modellen, koden og fontene appen bygger på, med opphav og lisens.")
+                paragraph("Modell, kode, ikoner og fonter appen bygger på, med lisens.")
             }
         }
         .buttonStyle(.plain)
@@ -201,31 +190,49 @@ struct InfoView: View {
         )
     }
 
-    private func paragraph(_ text: String) -> some View {
+    /// Running text in a card. `textPrimary`, not `textSecondary`: this is what
+    /// the page is for, and the footnote below it has to read as quieter than
+    /// something. The card label above it is the secondary tone, so the card has
+    /// a label, a text and a note in three visibly different weights of grey.
+    private func paragraph(_ text: String, spokenAs spoken: String? = nil) -> some View {
         Text(text)
             .font(.Frodi.caption)
+            .foregroundStyle(Color.Frodi.textPrimary)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityLabel(spoken ?? text)
+    }
+
+    /// A footnote to the paragraph marked `footnoteMark`. Smaller and quieter
+    /// than the text it belongs to: `footnote` at 10 pt, 23 % under the 13 pt of
+    /// the paragraph, in `textSecondary` against the paragraph's `textPrimary`.
+    ///
+    /// Both steps are visible and neither costs contrast: the tone measures
+    /// 5,65:1 on Surface, well over the 4,5:1 WCAG 2.2 AA asks for. The opacity
+    /// blend this used to need is gone; `ContrastTests` measures what is left.
+    ///
+    /// The mark is written into the footnote itself rather than laid out as a
+    /// hanging indent: one footnote on one card does not need the machinery, and
+    /// a hanging indent breaks when the text scales.
+    private func footnote(_ text: String) -> some View {
+        Text(Self.footnoteMark + " " + text)
+            .font(.Frodi.footnote)
             .foregroundStyle(Color.Frodi.textSecondary)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityLabel("Fotnote. " + text)
     }
 
-    /// A link out of the app, at the same size as the body text. Underlined and in
-    /// text-primary, so it differs from the text around it by more than colour.
+    /// A link out of the app, at the same size and in the same tone as the text
+    /// around it. The underline is what marks it, and it is the only mark: a link
+    /// must not be told apart by colour alone, so nothing is lost by dropping the
+    /// colour difference the running text used to give it for free.
     private func link(_ title: String, to url: URL) -> some View {
         Link(title, destination: url)
             .font(.Frodi.caption)
             .underline()
             .tint(Color.Frodi.textPrimary)
             .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func pillButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(title, action: action)
-            .font(.Frodi.bodyMedium)
-            .foregroundStyle(Color.Frodi.accentRecordOn)
-            .padding(.horizontal, Space.s4)
-            .padding(.vertical, Space.s2)
-            .background(Color.Frodi.accentRecord, in: Capsule())
     }
 }
 

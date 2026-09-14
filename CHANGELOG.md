@@ -23,6 +23,9 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 ### Endret
 
+- Teksten i kort, bannere og meldinger står mørkere, så den er lettere å lese.
+  Fotnoten på Info-siden er blitt mindre og lysere, så den skiller seg tydelig
+  fra teksten den hører til
 - Ikonene kommer fra Material Symbols, ikke lenger fra Heroicons
 - Hoppknappene i avspilleren hopper ti sekunder, ikke femten. Tallet står
   inne i pilen igjen

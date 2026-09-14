@@ -125,7 +125,7 @@ struct RecordingDetailView: View {
             } else if Transcription.awaitsRequest(recording) {
                 Text("Opptaket er langt, så Fróði lager teksten når du ber om det. Det tar en stund. La appen være åpen, eller sett enheten til lading, så fortsetter Fróði mens den lader.")
                     .font(.Frodi.body)
-                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Button("Lag tekst") {
@@ -139,7 +139,7 @@ struct RecordingDetailView: View {
             } else if recording.transcriptionFailed {
                 Text(TranscriptionError.explanation(for: recording.failureCode))
                     .font(.Frodi.body)
-                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 // A retry does not help when iOS lacks the language.
@@ -157,7 +157,7 @@ struct RecordingDetailView: View {
                 // No transcription started yet, and none has failed.
                 Text(TranscriptionError.explanation(for: nil))
                     .font(.Frodi.body)
-                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }

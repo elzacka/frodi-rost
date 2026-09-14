@@ -25,7 +25,7 @@ struct SpeechModelBanner: View {
                 ProgressView()
                 Text("Laster ned språkmodellen …")
                     .font(.Frodi.caption)
-                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .foregroundStyle(Color.Frodi.textPrimary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(Space.s4)
@@ -39,7 +39,7 @@ struct SpeechModelBanner: View {
 
                 Text("iOS har ingen norsk språkmodell for tale til tekst på denne enheten. Opptakene dine lagres som vanlig, men uten tekst.")
                     .font(.Frodi.caption)
-                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Button(showDiagnostics ? "Skjul detaljer" : "Vis hvilke språk som finnes") {
@@ -82,7 +82,7 @@ struct SpeechModelBanner: View {
 
             Text(body)
                 .font(.Frodi.caption)
-                .foregroundStyle(Color.Frodi.textSecondary)
+                .foregroundStyle(Color.Frodi.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
 
             if let action {
