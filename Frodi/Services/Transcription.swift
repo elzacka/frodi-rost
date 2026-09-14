@@ -89,8 +89,14 @@ enum Transcription {
                 }
                 let duration = recording.duration
 
+                let entries = WordList.entries(in: WordList.load())
                 try await transcriber().transcribe(fileURL: url, from: progress.position) { paragraphs, position in
-                    progress.paragraphs.append(contentsOf: paragraphs)
+                    // The listed names, spelled as listed, where the model nearly did.
+                    progress.paragraphs.append(contentsOf: paragraphs.map { paragraph in
+                        var corrected = paragraph
+                        corrected.text = WordList.correct(paragraph.text, entries: entries)
+                        return corrected
+                    })
                     progress.position = position
                     progress.save(for: fileName)
                     TranscriptionState.shared.update(id, fraction: fraction(position, of: duration))

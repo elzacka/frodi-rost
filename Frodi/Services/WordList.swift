@@ -39,14 +39,95 @@ enum WordList {
         try? target.setResourceValues(values)
     }
 
+    /// The entries, one per name or term, as the user wrote them.
+    static func entries(in text: String) -> [String] {
+        text
+            .split(whereSeparator: { $0 == "," || $0.isNewline })
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+    }
+
+    /// Spells the listed names the way the list does, where the model nearly did.
+    ///
+    /// The prompt is a bias, not a rule: measured on 14 September 2026, it fixed
+    /// «Osserud» to «Aaserud» and left «Norgkvist» for «Nordkvist» and «TASK» for
+    /// «Tazk» every time. Those are one or two letters off, and the user has said
+    /// what the word is. So the finished text is compared against the list, whole
+    /// words only, and a word within a small edit distance of an entry becomes
+    /// the entry. A multi-word entry is matched as a unit, so «Maskin» on its own
+    /// never touches «maskinen».
+    ///
+    /// Conservative on purpose: nothing shorter than four letters, no more than
+    /// one letter in six, never a word that is only a case away, never a word
+    /// that already equals another entry. A false replacement is worse than a
+    /// missed one, because the user cannot see it happened.
+    static func correct(_ text: String, entries: [String]) -> String {
+        let entries = entries.filter { $0.count >= 4 }
+        guard !entries.isEmpty else { return text }
+
+        let exact = Set(entries.map { $0.lowercased() })
+        let words = text.matches(of: /[\p{L}\p{N}]+/)
+        var result = text
+        var replacements: [(Range<String.Index>, String)] = []
+        var index = 0
+
+        while index < words.count {
+            var matched = false
+            for entry in entries {
+                let count = entry.split(separator: " ").count
+                guard index + count <= words.count else { continue }
+                let window = words[index..<index + count]
+                let candidate = String(text[window.first!.range.lowerBound..<window.last!.range.upperBound])
+                // Words in the window separated by more than one space or a punctuation
+                // mark are not one name.
+                guard candidate.split(separator: " ").count == count,
+                      !candidate.contains(where: \.isNumber),
+                      !exact.contains(candidate.lowercased()),
+                      candidate.lowercased() != entry.lowercased(),
+                      distance(candidate.lowercased(), entry.lowercased()) <= allowed(for: entry)
+                else { continue }
+                replacements.append((window.first!.range.lowerBound..<window.last!.range.upperBound, entry))
+                index += count
+                matched = true
+                break
+            }
+            if !matched { index += 1 }
+        }
+
+        for (range, entry) in replacements.reversed() {
+            result.replaceSubrange(range, with: entry)
+        }
+        return result
+    }
+
+    /// One letter in six, rounded up, at most three: four to six letters allow
+    /// one, seven to twelve two. «Osserud» reaches «Aaserud»; «Bergen» does not
+    /// reach «Berg».
+    private static func allowed(for entry: String) -> Int {
+        min((entry.count + 5) / 6, 3)
+    }
+
+    /// Levenshtein distance, for words: both sides are short.
+    static func distance(_ a: String, _ b: String) -> Int {
+        let a = Array(a), b = Array(b)
+        if a.isEmpty { return b.count }
+        if b.isEmpty { return a.count }
+        var previous = Array(0...b.count)
+        for (i, ca) in a.enumerated() {
+            var current = [i + 1]
+            for (j, cb) in b.enumerated() {
+                current.append(min(previous[j + 1] + 1, current[j] + 1, previous[j] + (ca == cb ? 0 : 1)))
+            }
+            previous = current
+        }
+        return previous[b.count]
+    }
+
     /// The list as the model gets it: one line, the entries separated by commas,
     /// whether the user wrote them with commas or on separate lines. Nil when
     /// there is nothing, so the decoder runs without a prompt at all.
     static func prompt(from text: String) -> String? {
-        let entries = text
-            .split(whereSeparator: { $0 == "," || $0.isNewline })
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty }
+        let entries = entries(in: text)
         return entries.isEmpty ? nil : entries.joined(separator: ", ")
     }
 }

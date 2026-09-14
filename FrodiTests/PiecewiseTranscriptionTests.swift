@@ -56,10 +56,14 @@ struct PiecewiseTranscriptionTests {
         let duration = try WhisperTranscriber.duration(of: Self.fixture!)
         let started = Date()
         let pieces = try await transcribe(from: 0)
-        let text = pieces.flatMap(\.paragraphs).map(\.text).joined(separator: " ")
+        let text = WordList.correct(
+            pieces.flatMap(\.paragraphs).map(\.text).joined(separator: " "),
+            entries: WordList.entries(in: list)
+        )
         for entry in WordList.prompt(from: list)?.components(separatedBy: ", ") ?? [] {
             print("  WORD \(entry): \(text.localizedCaseInsensitiveContains(entry) ? "found" : "missing")")
         }
+        print("TEXT \(text)")
 
         let expected = Int((duration / WhisperTranscriber.pieceLength).rounded(.up))
         #expect(pieces.count == expected)

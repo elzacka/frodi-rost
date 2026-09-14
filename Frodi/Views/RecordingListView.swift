@@ -177,6 +177,15 @@ struct RecordingListView: View {
                                 Task { await transcribe(recording) }
                             }
                         }
+                        // For a word list written after the interview. The audio is
+                        // the same, so nothing is lost that the new run does not remake.
+                        if recording.hasTranscript, !recording.isTranscribing {
+                            Button("Lag teksten på nytt") {
+                                recording.sealedTranscript = nil
+                                try? context.save()
+                                Task { await transcribe(recording) }
+                            }
+                        }
                         Button("Slett", role: .destructive) { pendingDeletion = recording }
                     }
                 }

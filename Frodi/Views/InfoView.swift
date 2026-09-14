@@ -117,7 +117,7 @@ struct InfoView: View {
     /// where a user types them once, and every transcription reads them.
     private var wordList: some View {
         card("Ordliste") {
-            paragraph("Navn og ord Fróði bør kjenne: firmaer, personer, forkortelser. Skriv dem slik du vil ha dem i teksten, med komma mellom. Listen blir på enheten, kryptert som teksten.")
+            paragraph("Navn og ord Fróði bør kjenne: firmaer, personer, forkortelser. Skriv dem slik du vil ha dem i teksten, med komma mellom. Fróði retter ord i teksten som nesten stemmer. Har du et opptak fra før, kan du holde på det i listen og velge «Lag teksten på nytt». Listen blir på enheten, kryptert som teksten.")
 
             TextField("Nordkvist AS, HMS, Kari Berg", text: $words, axis: .vertical)
                 .lineLimit(2...8)

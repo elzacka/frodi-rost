@@ -17,7 +17,9 @@ Ingenting er i App Store ennå.
 - Teksten hentes ut som `.rtf` i tillegg til `.txt`, med overskrift og avsnitt
 - «Slett» spør først
 - Ordliste på Info-siden: navn og ord Fróði bør kjenne, som firmaer, personer
-  og forkortelser. Modellen skriver dem slik du har skrevet dem
+  og forkortelser. Modellen får listen før den lytter, og ord i teksten som
+  nesten stemmer med listen, rettes etterpå. «Lag teksten på nytt» i listen
+  bruker listen på et opptak du alt har
 - Teksten lages også mens enheten lader, med skjermen låst
 
 ### Endret

@@ -13,8 +13,18 @@ struct DocumentTests {
         .deletingLastPathComponent()
         .deletingLastPathComponent()
 
+    /// Lines, with table cells trimmed to one space around each pipe, so a
+    /// formatter that pads the columns does not change what a row says.
     private static func document(_ name: String) throws -> [Substring] {
-        try String(contentsOf: root.appending(path: name), encoding: .utf8).split(separator: "\n")
+        try String(contentsOf: root.appending(path: name), encoding: .utf8)
+            .split(separator: "\n")
+            .map { line in
+                guard line.hasPrefix("|") else { return line }
+                return Substring(line.split(separator: "|", omittingEmptySubsequences: false)
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .joined(separator: " | ")
+                    .trimmingCharacters(in: .whitespaces))
+            }
     }
 
     /// The table row whose first cell is `name`, ignoring case.
