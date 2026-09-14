@@ -60,7 +60,7 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
   -destination 'platform=iOS Simulator,name=Frodi-Test' build
 ```
 
-nb-whisper-small ligger ikke i git-repoet. Uten modellen: Fallback til iOS' innebygde diktering (systemets talegjenkjenning, via Apples `SFSpeechRecognizer`/`SpeechAnalyzer`), svakere på norsk. Info-siden i appen viser hvilken modell som kjører.
+nb-whisper-small ligger ikke i git-repoet. Uten modellen: Fallback til iOS' innebygde diktering (systemets talegjenkjenning, `DictationTranscriber` i Apples `SpeechAnalyzer`), svakere på norsk. Info-siden i appen viser hvilken modell som kjører.
 
 `fetch-model.sh` henter modellen fra en fast versjon, sjekker hver fil mot `Scripts/model-checksums.txt`. Feil sum: Skriptet stopper. WhisperKit låst til én versjon i `project.yml`. `Package.resolved` ligger i git, samme pakker ved nytt utsjekk.
 
