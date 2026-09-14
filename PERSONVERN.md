@@ -64,7 +64,7 @@ opptakene først.
 
 Opptak og tekst forlater aldri enheten din. Ingen andre mottar dem, og ingen
 kan hente dem ut. Derfor finnes det ingen behandling av personopplysninger
-utenfor enheten: ingen å be om innsyn hos, ingen databehandlere og ingen
+utenfor enheten: Ingen å be om innsyn hos, ingen databehandlere og ingen
 overføring til utlandet. Rettighetene i tabellen utøver du selv, i appen. Det
 er den eneste måten, fordi det er det eneste stedet dataene finnes.
 

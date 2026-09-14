@@ -3,7 +3,7 @@
 Oppdatert 13. september 2026.
 
 Appen skal oppfylle WCAG 2.2 AA. Det som står her, er målt eller passet på
-av en test, ikke lovet. Kolonnen til høyre sier hvilken test, eller at det
+av en test. Les: Ingen garanti. Kolonnen til høyre sier hvilken test, eller at det
 ikke finnes noen.
 
 ## Hva som er på plass
@@ -47,15 +47,14 @@ se tabellen over.
 
 ## Kjente grenser
 
-| Grense | Hvorfor |
-|---|---|
-| Bare lys modus | Designsystemet har ingen mørk palett. Kontrastene over gjelder den lyse, og en mørk måtte måles på nytt |
-| Bare stående | Ingen visning har en liggende utgave |
-| Ikonene skalerer ikke | Ikonene har fast størrelse. Teksten ved siden av dem følger Dynamic Type |
-| Ingen egen lås i appen | Appen brukes med hendene opptatt, i bil. En Face ID-sperre i det øyeblikket du skal ta opp, ville ødelegge poenget. Se [SECURITY.md](SECURITY.md) |
-| Ingen lyd eller vibrasjon når opptaket starter og stopper | Bare skjermen viser om opptaket går. Et lydsignal ble bygget og tatt ut igjen |
-| Redusert bevegelse | Appen har én animasjon, når teksten foldes ut. Den tar ikke hensyn til innstillingen ennå |
+| Grense                                                                      | Hvorfor                                                                                                                                                                                                                                |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Bare lys modus                                                              | Designsystemet har ingen mørk palett. Kontrastene over gjelder den lyse, og en mørk måtte måles på nytt                                                                                                                                |
+| Bare stående modus                                                          | Ikke behov for liggende modus, så appen støtter ikke dette                                                                                                                                                                             |
+| Ikonene skalerer ikke                                                       | Ikonene har fast størrelse. Teksten ved siden av dem følger Dynamic Type                                                                                                                                                               |
+| Ingen egen lås i appen                                                      | Appen er blant annet laget for å kunne brukes med hendene opptatt, f. eks når en kjører bil. En Face ID-sperre (på app-nivå) i det øyeblikket du skal ta opp, ville blitt et hinder i slike situasjoner. Se [SECURITY.md](SECURITY.md) |
+| Ingen tilbakemelding fra appen om at opptaket faktisk startet eller stoppet | Handlingsknappen gir en følbar respons ved trykk, uansett hvilken handling den er satt til. Det bekrefter bare trykket – ikke om opptaket startet. Bare skjermen viser om opptaket går.                                                |
+| Redusert bevegelse                                                          | Appen har én animasjon, når teksten foldes ut. Den tar ikke hensyn til innstillingen ennå                                                                                                                                              |
 
-Om forskriften om universell utforming av IKT gjelder for en gratis app fra
-én person, er ikke avklart. Målingene finnes uansett, og da hører de hjemme
+Ikke avklart: Om *Forskrift om universell utforming av IKT-løsninger* gjelder for en gratis app utviklet i privat regi. Målingene finnes uansett, og da hører de hjemme
 her.
