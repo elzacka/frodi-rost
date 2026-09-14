@@ -8,11 +8,11 @@ i `FrodiTests/DocumentTests.swift` feiler hvis de tre skiller lag.
 
 ## Modell
 
-| Hva | Opphav | Lisens | Lenke |
-|---|---|---|---|
-| nb-whisper-small | Nasjonalbiblioteket | Apache 2.0 | https://huggingface.co/NbAiLab/nb-whisper-small |
-| CoreML-konvertering | Barrymanalow | Apache 2.0 | https://huggingface.co/Barrymanalow/nb-whisper-coreml |
-| Tokenizer, whisper-small | OpenAI | Apache 2.0 | https://huggingface.co/openai/whisper-small |
+| Hva                      | Opphav              | Lisens     | Lenke                                                 |
+| ------------------------ | ------------------- | ---------- | ----------------------------------------------------- |
+| nb-whisper-small         | Nasjonalbiblioteket | Apache 2.0 | https://huggingface.co/NbAiLab/nb-whisper-small       |
+| CoreML-konvertering      | Barrymanalow        | Apache 2.0 | https://huggingface.co/Barrymanalow/nb-whisper-coreml |
+| Tokenizer, whisper-small | OpenAI              | Apache 2.0 | https://huggingface.co/openai/whisper-small           |
 
 Modellen og tokenizeren hentes fra faste revisjoner. Revisjonene står i
 `Scripts/fetch-model.sh`, og sjekksummen for hver fil i
