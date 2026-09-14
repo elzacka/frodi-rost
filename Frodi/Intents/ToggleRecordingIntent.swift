@@ -47,15 +47,15 @@ struct ToggleRecordingIntent: AppIntent {
     }
 }
 
+/// Published so the intent appears under Fróði røst in the Action Button's
+/// shortcut picker. No Siri phrases: the button is the only route wanted, and
+/// the phrases are the one part of the publication it does not need. Siri can
+/// still run any shortcut by its name; that cannot be switched off.
 struct FrodiShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
             intent: ToggleRecordingIntent(),
-            phrases: [
-                "Start opptak i \(.applicationName)",
-                "Stopp opptak i \(.applicationName)",
-                "Ta opp med \(.applicationName)"
-            ],
+            phrases: [],
             shortTitle: "Start eller stopp opptak",
             systemImageName: "mic.fill"
         )
