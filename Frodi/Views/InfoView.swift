@@ -133,6 +133,7 @@ struct InfoView: View {
                 )
                 .accessibilityLabel("Ordliste")
                 .onChange(of: words) { _, text in WordList.save(text) }
+                .hiddenWhileScreenCaptured()
         }
     }
 

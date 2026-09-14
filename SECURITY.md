@@ -30,6 +30,17 @@ The app assumes a passcode is set and iOS is not compromised.
 | Defended against | A locked device in someone else's hands, including forensic extraction of its storage after first unlock. A copy of a backup. Another app on the device. Anyone watching the screen over the air, or the app switcher, while a transcript is open |
 | Not defended against | A compromised OS, or an exploit chain on an unlocked device. An unlocked device in someone else's hands. A screenshot. Whatever happens to a file after export |
 
+Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0 on
+14 September 2026, by reading the controls against the code, not by running
+the MASTG tests. By OWASP's own examples the app is a MAS-L2+P profile: it
+holds a key that encrypts user data, and the data is of the kind they list as
+high risk. Every L2 and P control that applies is met, with one exception:
+local authentication (MASVS-AUTH-2 and AUTH-3), under *Deliberate omissions*
+below. MASVS-NETWORK does not apply; there is no transport. MAS-R is not
+applied, on the reasoning MASVS itself gives for public-interest apps: the
+source is open, and obfuscation or jailbreak detection would make the app
+harder to audit without making the data safer.
+
 ## What happens in each scenario
 
 | Scenario | Result |
@@ -69,7 +80,8 @@ The sections below explain the choices.
 | Speech to text | nb-whisper bundled in the app, loaded through WhisperKit with `download: false` and explicit local paths. The app checks that both tokenizer files are present before WhisperKit is created. Apple's on-device `DictationTranscriber` as fallback when the model is missing | `Transcription`, `WhisperTranscriber`, `SpeechEngine` |
 | Logging | WhisperKit runs with `verbose: false` and `logLevel: .none`. The app itself writes nothing to the unified log | `WhisperTranscriber` |
 | Privacy manifest | No tracking, no tracking domains, no collected data. One accessed API: file timestamps, C617.1 | `PrivacyInfo.xcprivacy`, `IsolationTests` |
-| Screen capture | Transcript hidden while `UIScreen.isCaptured` is true, and while the scene is not active | `CaptureGuard` |
+| Screen capture | Transcript and word list hidden while `UIScreen.isCaptured` is true, and while the scene is not active | `CaptureGuard` |
+| Keyboard | The word list is the only text field. Autocorrection and predictive text are off, so the names typed there do not enter the keyboard's learned dictionary, which lives outside the sandbox and in backups | `InfoView` |
 | Pasteboard | The transcript cannot be selected. One button copies it, with `localOnly` and a five minute expiry. A test fails if selection returns or the pasteboard is written from anywhere else | `RecordingDetailView`, `IsolationTests` |
 | Export | Decrypted on demand to the temporary directory, handed to the system share sheet, removed when the sheet closes | `RecordingExport`, `ShareSheet` |
 | Export compliance | `ITSAppUsesNonExemptEncryption` is `false`. The only cryptography is Apple's CryptoKit and the Secure Enclave | `project.yml` |
@@ -234,6 +246,15 @@ repositories serve on the day.
 - **No biometric lock.** The app is used hands-busy while driving. A Face ID gate
   at the moment of recording would defeat its purpose.
 - **No certificate pinning.** There is no transport.
+- **No jailbreak detection.** The threat model assumes iOS is not compromised,
+  and a check that a compromised OS can lie to adds nothing. The source is
+  public so that the app can be audited instead.
+- **No forced update.** The app cannot check for a newer version without a
+  network request. TestFlight expires builds on its own; on the App Store, an
+  organisation that needs a minimum version enforces it through its MDM.
+- **No advisory feed.** Dependencies are pinned to exact versions, so a fix
+  upstream reaches the app only when a person bumps the version. Nothing
+  watches for advisories on WhisperKit or its seven packages.
 - **No overwrite on delete.** Deleting a recording removes the file and nothing
   else, because there is nothing an overwrite would add. The file is ciphertext,
   and the only copy of its key is wrapped inside it, so the deleted blocks are
