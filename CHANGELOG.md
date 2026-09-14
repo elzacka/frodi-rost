@@ -44,8 +44,21 @@ Ingenting er i App Store ennå.
   14. september 2026 krevde nøkkelen at enheten var låst opp; en nøkkel laget
   av build 5 eller 6 beholder det kravet, og på den enheten lages teksten
   bare mens appen er åpen
+
+## 0.1.0 (5) – 13. september 2026
+
+### Sikkerhet
+
+- Nøkkelen som låser opp opptak og tekst, kunne bare brukes mens enheten var
+  låst opp. Endret igjen etter denne builden, se over
 - «Kopier»-knappen i tekstkortet erstatter markering av teksten. Det du
   kopierer, blir på enheten og forsvinner fra utklippstavlen etter fem minutter
+- Får ikke appen tak i nøkkelen, sier den fra og ber deg låse opp enheten
+
+### Endret
+
+- PERSONVERN.md forteller hva som skjer når du kopierer, og at opptakene er
+  borte for godt om du mister enheten
 
 ## 0.1.0 (4) – 13. september 2026
 
