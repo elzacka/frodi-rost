@@ -146,6 +146,13 @@ enum Disclosure {
     static let row: CGFloat = 44
 }
 
+// MARK: - Choice sheet
+/// The design system describes no dialog. An answer in a `ChoiceSheet` is a row
+/// in the shape of a list row, 44 pt tall, the minimum hit area.
+enum ChoiceRow {
+    static let height: CGFloat = 44
+}
+
 // MARK: - Tracking
 extension Text {
     /// Eyebrow labels are tracked 0.06 em in the design system.

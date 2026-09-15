@@ -8,13 +8,16 @@ import SwiftUI
 /// not a new page, because you should return to the list where you left it.
 ///
 /// The sheet was called «Innstillinger» until 10 September 2026, and that was the
-/// wrong name: the app has no options of its own. The word list is the one field
-/// on the page, and a list of names is not a setting. The title now says what the
-/// page is.
+/// wrong name: the app has no options of its own. The word list and the text
+/// format are the two things you can change on the page, and neither is a mode:
+/// a list of names is not a setting, and a file extension is chosen once. The
+/// title says what the page is.
 struct InfoView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var words = WordList.load()
+    /// The same key `RecordingExport.TextFormat.chosen` reads.
+    @AppStorage(RecordingExport.TextFormat.key) private var textFormat = RecordingExport.TextFormat.rtf
 
     var body: some View {
         NavigationStack {
@@ -27,6 +30,7 @@ struct InfoView: View {
                         privacy
                         speechModel
                         wordList
+                        export
                         licenses
                         version
                     }
@@ -124,6 +128,45 @@ struct InfoView: View {
                 .onChange(of: words) { _, text in WordList.save(text) }
                 .hiddenWhileScreenCaptured()
         }
+    }
+
+    /// The one choice the export offers in advance. What to hand over, audio or
+    /// text or both, is asked where the export is made; the shape of the text
+    /// is decided here, once, because it is the same every time.
+    private var export: some View {
+        card("Uthenting") {
+            paragraph("Lyden hentes alltid ut som .m4a. Velg hvilket format teksten skal hentes ut i.")
+
+            HStack(spacing: Space.s2) {
+                ForEach(RecordingExport.TextFormat.allCases, id: \.self) { format in
+                    formatChoice(format)
+                }
+            }
+
+            paragraph(".txt er ren tekst og kan limes inn hvor som helst. .rtf åpnes som dokument i Word, Pages og Notater, med overskrift, dato og tidspunkt for hvert avsnitt.")
+        }
+    }
+
+    /// A pill that is filled when chosen and outlined when not. The fill is
+    /// the signal for sighted readers; VoiceOver hears «valgt».
+    private func formatChoice(_ format: RecordingExport.TextFormat) -> some View {
+        let chosen = textFormat == format
+        return Button {
+            textFormat = format
+        } label: {
+            Text(format.label)
+                .font(.Frodi.bodyMedium)
+                .foregroundStyle(chosen ? Color.Frodi.accentRecordOn : Color.Frodi.textPrimary)
+                .padding(.horizontal, Space.s4)
+                .padding(.vertical, Space.s2)
+                .background(chosen ? Color.Frodi.accentRecord : Color.Frodi.background, in: Capsule())
+                .overlay(Capsule().strokeBorder(Color.Frodi.border, lineWidth: chosen ? 0 : 1))
+                .frame(minHeight: ChoiceRow.height)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Tekst som \(format.label)")
+        .accessibilityAddTraits(chosen ? .isSelected : [])
     }
 
     private var licenses: some View {

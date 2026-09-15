@@ -13,8 +13,10 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Er opptaket over ti minutter, lager appen teksten når du ber om den, og
   viser hvor langt den har kommet. Blir den avbrutt, fortsetter den der den
   slapp neste gang
-- Teksten hentes ut som `.rtf` i tillegg til `.txt`, med overskrift og avsnitt
-- «Slett» spør først
+- Teksten hentes ut som `.rtf` eller `.txt`. Formatet velger du på Info-siden;
+  `.rtf` har overskrift og avsnitt
+- Når du henter ut, velger du opptaket, teksten eller begge
+- «Slett» spør først, i et ark nederst på skjermen
 - Ordliste på Info-siden: Navn og ord Fróði bør kjenne, som firmaer, personer
   og forkortelser. Modellen får listen før den lytter, og ord i teksten som
   nesten stemmer med listen, rettes etterpå. «Lag teksten på nytt» i listen

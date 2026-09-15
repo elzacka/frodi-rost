@@ -12,16 +12,47 @@ import UIKit
 /// iCloud Drive do not. Fróði uploads nothing itself, and has no network code
 /// to do it with.
 enum RecordingExport {
+    /// What goes to the share sheet. Chosen where the export is made: a note
+    /// pasted into a message wants the text alone, an interview sent to a
+    /// colleague for a second listen wants the audio alone.
+    enum Content {
+        case both, audio, text
+    }
+
+    /// The document the text becomes. Chosen once, on the Info page, and kept
+    /// in `UserDefaults`: a format name is not personal data, so it needs none
+    /// of the vault the word list gets.
+    enum TextFormat: String, CaseIterable {
+        case txt, rtf
+
+        static let key = "exportTextFormat"
+
+        /// `.rtf` until chosen otherwise: it is the one that opens as a document,
+        /// with the heading, the date and the marks intact.
+        static var chosen: TextFormat {
+            UserDefaults.standard.string(forKey: key).flatMap(TextFormat.init) ?? .rtf
+        }
+
+        /// «.txt», the way a user knows the format.
+        var label: String { ".\(rawValue)" }
+    }
+
     /// Writes audio and text to temporary files ready for sharing.
     ///
     /// The recording is a SwiftData object and cannot be passed to another thread.
     /// So we pull the values out here and pass only those.
-    static func prepare(_ recording: Recording) async throws -> [URL] {
+    static func prepare(
+        _ recording: Recording,
+        content: Content = .both,
+        format: TextFormat = .chosen
+    ) async throws -> [URL] {
         try await write(
             fileName: recording.fileName,
             createdAt: recording.createdAt,
             duration: recording.duration,
-            transcript: try recording.transcript()
+            transcript: content == .audio ? nil : try recording.transcript(),
+            audio: content != .text,
+            format: format
         )
     }
 
@@ -38,7 +69,9 @@ enum RecordingExport {
         fileName: String,
         createdAt: Date,
         duration: TimeInterval,
-        transcript: String?
+        transcript: String?,
+        audio: Bool,
+        format: TextFormat
     ) async throws -> [URL] {
         var urls: [URL] = []
 
@@ -47,21 +80,23 @@ enum RecordingExport {
             .appendingPathComponent("Eksport-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 
-        // A recording stopped on a locked device is still PCM until the next unlock;
-        // the export then carries the format it actually has.
-        let format = fileName.hasSuffix(AudioStorage.pendingSuffix) ? "caf" : "m4a"
-        let audio = folder.appendingPathComponent("frodi-\(stamp).\(format)")
-        try AudioStorage.plaintext(fileName: fileName).write(to: audio, options: [.completeFileProtectionUnlessOpen])
-        urls.append(audio)
+        if audio {
+            // A recording stopped on a locked device is still PCM until the next unlock;
+            // the export then carries the format it actually has.
+            let container = fileName.hasSuffix(AudioStorage.pendingSuffix) ? "caf" : "m4a"
+            let file = folder.appendingPathComponent("frodi-\(stamp).\(container)")
+            try AudioStorage.plaintext(fileName: fileName).write(to: file, options: [.completeFileProtectionUnlessOpen])
+            urls.append(file)
+        }
 
         if let transcript, !transcript.isEmpty {
-            let text = folder.appendingPathComponent("frodi-\(stamp).txt")
-            try utf8WithBOM(transcript).write(to: text, options: [.completeFileProtectionUnlessOpen])
-            urls.append(text)
-
-            let document = folder.appendingPathComponent("frodi-\(stamp).rtf")
-            try rtf(transcript, createdAt: createdAt, duration: duration).write(to: document, options: [.completeFileProtectionUnlessOpen])
-            urls.append(document)
+            let file = folder.appendingPathComponent("frodi-\(stamp).\(format.rawValue)")
+            let data = switch format {
+            case .txt: utf8WithBOM(transcript)
+            case .rtf: try rtf(transcript, createdAt: createdAt, duration: duration)
+            }
+            try data.write(to: file, options: [.completeFileProtectionUnlessOpen])
+            urls.append(file)
         }
 
         return urls

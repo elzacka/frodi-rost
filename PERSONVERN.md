@@ -69,7 +69,7 @@ i appen.
 | Rettighet | Slik gjør du det |
 |---|---|
 | Innsyn | Åpne opptaket i appen |
-| Hente ut | Trykk på delingsikonet. Du får `.m4a`, `.txt` og `.rtf` |
+| Hente ut | Trykk på delingsikonet, og velg opptaket, teksten eller begge. Lyden kommer som `.m4a`, teksten som `.txt` eller `.rtf`, det du har valgt på Info-siden |
 | Sletting | Hold fingeren på opptaket i listen, og velg «Slett» |
 
 Sletter du appen, forsvinner alt. Det skjer med én gang, og du kan ikke angre.

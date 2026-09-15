@@ -197,19 +197,20 @@ struct RecordingListView: View {
         .scrollContentBackground(.hidden)
         // One tap in a context menu is one tap too few for something that cannot be
         // undone. The recording and its text go together, and nothing brings them back.
-        .confirmationDialog(
-            "Slett opptaket?",
-            isPresented: Binding(
-                get: { pendingDeletion != nil },
-                set: { if !$0 { pendingDeletion = nil } }
-            ),
-            titleVisibility: .visible,
-            presenting: pendingDeletion
-        ) { recording in
-            Button("Slett", role: .destructive) { delete(recording) }
-            Button("Avbryt", role: .cancel) {}
-        } message: { _ in
-            Text("Opptaket og teksten blir borte fra enheten. Du kan ikke angre.")
+        .sheet(item: $pendingDeletion) { recording in
+            ChoiceSheet(
+                title: "Slett opptaket?",
+                message: "Opptaket og teksten blir borte fra enheten. Du kan ikke angre."
+            ) {
+                Button {
+                    // The sheet closes first: its content is this recording, and
+                    // the row must not be redrawn from an object that is gone.
+                    pendingDeletion = nil
+                    delete(recording)
+                } label: {
+                    Text("Slett").choiceRow(destructive: true)
+                }
+            }
         }
     }
 

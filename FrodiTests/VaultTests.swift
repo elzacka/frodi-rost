@@ -286,11 +286,10 @@ struct LongExportTests {
         let recording = try sealedRecording(audio: audio, transcript: transcript)
         defer { AudioStorage.delete(fileName: recording.fileName) }
 
-        let urls = try await RecordingExport.prepare(recording)
+        let urls = try await RecordingExport.prepare(recording, content: .both, format: .txt)
         defer { RecordingExport.cleanUp(urls) }
 
-        #expect(urls.count == 3)
-        #expect(urls.contains { $0.pathExtension == "rtf" })
+        #expect(urls.count == 2)
 
         let exportedAudio = try Data(contentsOf: try #require(urls.first { $0.pathExtension == "m4a" }))
         #expect(exportedAudio == audio)

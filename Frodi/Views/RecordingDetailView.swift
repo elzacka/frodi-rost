@@ -14,16 +14,28 @@ struct RecordingDetailView: View {
     @State private var exportURLs: [URL] = []
     @State private var exportError: String?
     @State private var copied = false
+    /// The question of what to hand over is asked only when there is a text to
+    /// hand over with the audio. Without one there is nothing to choose.
+    @State private var asksWhatToExport = false
+    /// The answer, carried from the choice sheet to the share sheet. The second
+    /// sheet can only come up once the first is down, so the export starts
+    /// from the choice sheet's `onDismiss`, not from the tap.
+    @State private var chosenExport: RecordingExport.Content?
 
     /// How long a copied transcript stays on the pasteboard.
     static let pasteboardLifetime: TimeInterval = 5 * 60
 
-    private func exportRecording() async {
+    private func exportRecording(_ content: RecordingExport.Content) async {
         do {
-            exportURLs = try await RecordingExport.prepare(recording)
+            exportURLs = try await RecordingExport.prepare(recording, content: content)
         } catch {
             exportError = error.localizedDescription
         }
+    }
+
+    private func choose(_ content: RecordingExport.Content) {
+        chosenExport = content
+        asksWhatToExport = false
     }
 
     var body: some View {
@@ -47,11 +59,29 @@ struct RecordingDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    Task { await exportRecording() }
+                    if recording.hasTranscript {
+                        asksWhatToExport = true
+                    } else {
+                        Task { await exportRecording(.audio) }
+                    }
                 } label: {
                     IconView(.share, size: IconSize.toolbar)
                 }
                 .accessibilityLabel("Hent ut opptaket")
+            }
+        }
+        .sheet(isPresented: $asksWhatToExport) {
+            guard let chosenExport else { return }
+            self.chosenExport = nil
+            Task { await exportRecording(chosenExport) }
+        } content: {
+            ChoiceSheet(
+                title: "Hent ut",
+                message: "Lyd som .m4a, tekst som \(RecordingExport.TextFormat.chosen.label). Tekstformatet velger du på Info-siden."
+            ) {
+                Button { choose(.both) } label: { Text("Opptak og tekst").choiceRow() }
+                Button { choose(.audio) } label: { Text("Bare opptaket").choiceRow() }
+                Button { choose(.text) } label: { Text("Bare teksten").choiceRow() }
             }
         }
         .sheet(isPresented: .constant(!exportURLs.isEmpty)) {
