@@ -1,18 +1,18 @@
 import AppIntents
-import AVFoundation
 
 /// The intent the Action Button runs. The button is held, not tapped: the first
 /// hold starts, the next stops.
 ///
-/// `supportedModes` lets it run in the background. Both start and stop are tried
-/// there first, because opening the app is what forces Face ID or the passcode
-/// when the screen is locked. In a car the device typically lies flat on the
-/// charging pad and cannot see your face, so the unlock is not just an extra tap;
-/// it cannot be completed while you drive.
-///
-/// If iOS does not give us the microphone in the background, the foreground is
-/// the only way, and then the device has to be unlocked. The attempt costs
-/// nothing when it fails.
+/// `supportedModes` lets it run in the background, and stopping does: it needs
+/// nothing from the interface and no unlock. Starting cannot. iOS lets an app
+/// continue a recording in the background, never begin one; the answer is
+/// `AVAudioSession.ErrorCode.cannotStartRecording`, which `AVAudioRecorder`
+/// reports as `record()` returning false. Measured on a device on
+/// 16 September 2026, first with a non-mixable session (activation refused)
+/// and then with a mixable one (activation allowed, recording refused). So a
+/// start goes to the foreground at once, and on a locked device that means
+/// Face ID or the passcode. In a car, start before you drive; the button then
+/// only has to stop, and stopping works with the screen locked.
 struct ToggleRecordingIntent: AppIntent {
     static let title: LocalizedStringResource = "Start eller stopp opptak"
     static let description = IntentDescription("Starter et opptak i Fróði, eller stopper det som går.")
@@ -28,15 +28,6 @@ struct ToggleRecordingIntent: AppIntent {
             return .result()
         }
 
-        // Without microphone permission there is no point trying in the background:
-        // the question can only be asked in the foreground, and an attempt here would
-        // just get a no without you being asked.
-        if AVAudioApplication.shared.recordPermission == .granted,
-           await controller.start() {
-            return .result()
-        }
-
-        // Then the app has to come forward, and iOS requires an unlock.
         // alwaysConfirm is false because you already asked for this by pressing the
         // button. Another confirmation step would be in the way in a car.
         if systemContext.currentMode == .background {

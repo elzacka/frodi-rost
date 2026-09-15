@@ -39,9 +39,6 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Et opptak overlever at appen krasjer eller blir avsluttet midt i. Lyden tas
   opp i et format som kan spilles av uansett hvor den ble avbrutt
 - Et opptak som mistet raden sin i listen, får den tilbake ved neste oppstart
-- Handlingsknappen kan starte et opptak mens enheten er låst. Før måtte
-  appen åpnes først, og på en låst enhet stoppet det på Face ID. Spiller
-  enheten annen lyd, blir den dempet mens opptaket går
 - Et opptak som stoppes mens enheten er låst, blir tatt vare på. Før slettet
   appen det, fordi den ikke fikk lest filen og tok det for tomt
 

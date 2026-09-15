@@ -58,18 +58,12 @@ final class AudioRecorder {
             // spokenAudio treats speech better than default, and playAndRecord lets us
             // play back without switching category afterwards.
             //
-            // duckOthers is what lets the Action Button start a recording with the
-            // device locked. A non-mixable session cannot be activated from the
-            // background: setActive(true) fails with '!int', cannotInterruptOthers,
-            // and the intent then has to open the app, which on a locked device
-            // means Face ID. Seen on a device on 16 September 2026. A mixable
-            // session may activate in the background, and ducking lowers whatever
-            // else is playing instead of stopping it.
-            try session.setCategory(
-                .playAndRecord,
-                mode: .spokenAudio,
-                options: [.defaultToSpeaker, .allowBluetoothHFP, .duckOthers]
-            )
+            // Non-mixable on purpose: other audio pauses while recording and resumes
+            // after, so music does not end up in the recording. It also means the
+            // session cannot be activated from the background ('!int'), but that
+            // buys nothing to give up: a recording cannot be started from the
+            // background at all, see `ToggleRecordingIntent`.
+            try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.defaultToSpeaker, .allowBluetoothHFP])
             try session.setActive(true)
 
             let name = "\(UUID().uuidString).caf"
@@ -93,7 +87,14 @@ final class AudioRecorder {
 
             let newRecorder = try AVAudioRecorder(url: url, settings: settings)
             guard newRecorder.record() else {
+                // What iOS answers when an app tries to begin recording in the
+                // background: cannotStartRecording, reported here as false. The
+                // session is active and the recorder may have created the file;
+                // both are cleaned up, or the next launch would find an empty
+                // recording and other apps' audio would stay interrupted.
                 Self.log.error("Recording did not start: record() returned false")
+                try? session.setActive(false, options: .notifyOthersOnDeactivation)
+                try? FileManager.default.removeItem(at: url)
                 state = .failed(String(localized: "Fikk ikke startet opptaket."))
                 return false
             }
