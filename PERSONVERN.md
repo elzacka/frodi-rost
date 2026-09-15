@@ -34,9 +34,14 @@ appen ikke stoppe.
 
 ## Kopiering
 
-Trykker du på «Kopier», blir teksten på denne enheten. Den følger ikke med til
-Mac eller iPad gjennom Universell utklippstavle, og den forsvinner fra
-utklippstavlen etter fem minutter.
+Knappen «Kopier» kopierer hele teksten, så du kan lime den inn i en annen app
+– en melding, et notat eller et dokument. Teksten blir på denne enheten. Den
+følger ikke med til Mac eller iPad gjennom Universell utklippstavle, og den
+forsvinner fra utklippstavlen etter fem minutter.
+
+Du kan ikke markere teksten. Markering gir systemets egen kopimeny, og den
+kan appen ikke holde på enheten. Det du limer inn i en annen app, blir den
+appens data – som når du henter ut et opptak.
 
 ## Tillatelser
 
