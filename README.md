@@ -16,7 +16,7 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 - Opptak under ti minutter transkriberes når du stopper. Lengre opptak transkriberes når du ber om det, og fortsetter der de slapp ved avbrudd
 - Transkriberer til bokmål, med tegnsetting og stor/liten forbokstav
 - Transkripsjonen deles i avsnitt med tidspunkt du kan trykke på for å spille av derfra
-- Lar deg hente ut lydopptak som `.m4a` og transkripsjon som `.txt` eller `.rtf`, hver for seg eller sammen
+- Lar deg eksportere lydopptak som `.m4a` og transkripsjon som `.txt` eller `.rtf`, hver for seg eller sammen
 
 ## Modell
 

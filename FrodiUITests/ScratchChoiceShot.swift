@@ -1,7 +1,7 @@
 import XCTest
 
 /// A tool, not a test, like `ScratchPlaybackShot`: pictures of the delete
-/// sheet, the export sheet and the Uthenting card on the Info page. Runs only
+/// sheet, the export sheet and the Eksport card on the Info page. Runs only
 /// with `TEST_RUNNER_FRODI_SHOTS=1`.
 ///
 /// The export sheet only comes up for a recording with text, and a silent
@@ -35,9 +35,9 @@ final class ScratchChoiceShot: XCTestCase {
 
         row.tap()
         Thread.sleep(forTimeInterval: 1)
-        app.buttons["Hent ut opptaket"].tap()
+        app.buttons["Eksporter opptaket"].tap()
         Thread.sleep(forTimeInterval: 1)
-        attach("hent-ut")
+        attach("eksport")
         if app.buttons["Avbryt"].exists {
             app.buttons["Avbryt"].tap()
             Thread.sleep(forTimeInterval: 1)

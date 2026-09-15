@@ -88,7 +88,7 @@ struct InfoView: View {
             paragraph("Appen ber om tilgang til mikrofonen. Ingenting annet.")
             paragraph("Opptak og tekst krypteres med en nøkkel som bare finnes i enheten (Secure Enclave), og blir ikke med i sikkerhetskopier.")
             paragraph("Teksten skjules når skjermen tas opp og når du bytter app.")
-            paragraph("Eksporter lyd som .m4a og tekst som .txt eller .rtf. Bytter du enhet, må du hente ut opptakene først. Sletter du appen, er alt borte.")
+            paragraph("Eksporter lyd som .m4a og tekst som .txt eller .rtf. Bytter du enhet, må du eksportere opptakene først. Sletter du appen, er alt borte.")
             link("Mer om personvern", to: Self.privacyPolicy)
             link("Mer om sikkerhet", to: Self.securityPolicy)
         }
@@ -134,8 +134,8 @@ struct InfoView: View {
     /// text or both, is asked where the export is made; the shape of the text
     /// is decided here, once, because it is the same every time.
     private var export: some View {
-        card("Uthenting") {
-            paragraph("Lyden hentes alltid ut som .m4a. Velg hvilket format teksten skal hentes ut i.")
+        card("Eksport") {
+            paragraph("Lyden eksporteres alltid som .m4a. Velg hvilket format teksten skal eksporteres i.")
 
             HStack(spacing: Space.s2) {
                 ForEach(RecordingExport.TextFormat.allCases, id: \.self) { format in

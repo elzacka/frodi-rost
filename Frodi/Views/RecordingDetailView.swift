@@ -67,7 +67,7 @@ struct RecordingDetailView: View {
                 } label: {
                     IconView(.share, size: IconSize.toolbar)
                 }
-                .accessibilityLabel("Hent ut opptaket")
+                .accessibilityLabel("Eksporter opptaket")
             }
         }
         .sheet(isPresented: $asksWhatToExport) {
@@ -76,7 +76,7 @@ struct RecordingDetailView: View {
             Task { await exportRecording(chosenExport) }
         } content: {
             ChoiceSheet(
-                title: "Hent ut",
+                title: "Eksporter",
                 message: "Lyd som .m4a, tekst som \(RecordingExport.TextFormat.chosen.label). Tekstformatet velger du på Info-siden."
             ) {
                 Button { choose(.both) } label: { Text("Opptak og tekst").choiceRow() }
@@ -90,7 +90,7 @@ struct RecordingDetailView: View {
                 exportURLs = []
             }
         }
-        .alert("Kunne ikke hente ut", isPresented: .constant(exportError != nil)) {
+        .alert("Kunne ikke eksportere", isPresented: .constant(exportError != nil)) {
             Button("Greit") { exportError = nil }
         } message: {
             Text(exportError ?? "").font(.Frodi.body)

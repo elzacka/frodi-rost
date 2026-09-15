@@ -41,7 +41,7 @@ forsvinner fra utklippstavlen etter fem minutter.
 
 Du kan ikke markere teksten. Markering gir systemets egen kopimeny, og den
 kan appen ikke holde på enheten. Det du limer inn i en annen app, blir den
-appens data – som når du henter ut et opptak.
+appens data – som når du eksporterer et opptak.
 
 ## Tillatelser
 
@@ -56,7 +56,7 @@ Nøkkelen finnes bare inne i enheten din. Et opptak kan ikke leses av en annen
 enhet – heller ikke av deg selv på en ny, og heller ikke fra en
 sikkerhetskopi.
 
-Mister du enheten, er opptakene borte for godt. Skal du bytte enhet: Hent ut
+Mister du enheten, er opptakene borte for godt. Skal du bytte enhet: Eksporter
 opptakene først.
 
 ## Rettighetene dine
@@ -69,7 +69,7 @@ i appen.
 | Rettighet | Slik gjør du det |
 |---|---|
 | Innsyn | Åpne opptaket i appen |
-| Hente ut | Trykk på delingsikonet, og velg opptaket, teksten eller begge. Lyden kommer som `.m4a`, teksten som `.txt` eller `.rtf`, det du har valgt på Info-siden |
+| Eksportere | Trykk på delingsikonet, og velg opptaket, teksten eller begge. Lyden kommer som `.m4a`, teksten som `.txt` eller `.rtf`, det du har valgt på Info-siden |
 | Sletting | Hold fingeren på opptaket i listen, og velg «Slett» |
 
 Sletter du appen, forsvinner alt. Det skjer med én gang, og du kan ikke angre.

@@ -4,7 +4,7 @@ import Testing
 
 /// The document the auditor sends on. It has to open as a document, with the
 /// paragraphs and marks intact, in Bokmål whatever the device is set to.
-@Suite("Uthenting")
+@Suite("Eksportvalg")
 struct ExportTests {
     private let transcript = """
     [0:00] Vi starter med å gå gjennom prosedyren.
@@ -29,7 +29,7 @@ struct ExportTests {
 
     /// The share sheet gets what was asked for and nothing else: the audio alone,
     /// the text alone in the chosen format, or both.
-    @Test("Uthentingen gir det som ble valgt", arguments: [
+    @Test("Eksporten gir det som ble valgt", arguments: [
         (RecordingExport.Content.both, RecordingExport.TextFormat.rtf, ["m4a", "rtf"]),
         (.both, .txt, ["m4a", "txt"]),
         (.audio, .rtf, ["m4a"]),
