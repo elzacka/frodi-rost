@@ -102,9 +102,14 @@ final class AudioRecorder {
     ///
     /// Nothing is deleted here. A recording is the user's, and the only thing that
     /// removes one is the user asking for it. A file with no frames at all is not
-    /// a recording and is the one exception.
+    /// a recording and is the one exception; a file that cannot be opened is not
+    /// that file, see `savedDuration`.
     func stop() -> (fileName: String, duration: TimeInterval)? {
         guard let recorder, state == .recording else { return nil }
+
+        // What the recorder counted, taken before it stops and forgets. The ticker's
+        // copy covers a recorder the audio system has already invalidated.
+        let counted = max(recorder.currentTime, duration)
 
         recorder.stop()
         stopTicker()
@@ -117,7 +122,7 @@ final class AudioRecorder {
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
 
         let fileName = recorder.url.lastPathComponent
-        guard let length = AudioStorage.duration(fileName: fileName), length > 0 else {
+        guard let length = Self.savedDuration(measured: AudioStorage.duration(fileName: fileName), counted: counted) else {
             AudioStorage.delete(fileName: fileName)
             return nil
         }
@@ -128,6 +133,21 @@ final class AudioRecorder {
         // exactly when the Action Button stops a recording in the car. It used to
         // be done here, and the failure deleted the recording.
         return (fileName, length)
+    }
+
+    /// The length to save, or nil when the file is empty and should go.
+    ///
+    /// `measured` is the file's own length, nil when the file could not be opened.
+    /// The two are not the same case. A closed `.completeUnlessOpen` file cannot be
+    /// reopened while the device is locked, which is where a recording stops
+    /// whenever the Action Button stops it in the car, or an interruption ends
+    /// without the microphone coming back. Until 15 September 2026 nil was treated
+    /// as empty, and the recording was deleted. Now the recorder's own count stands
+    /// in; the file replaces it when it is sealed, if it is still zero. Only a file
+    /// that opened and holds no frames is deleted.
+    nonisolated static func savedDuration(measured: TimeInterval?, counted: TimeInterval) -> TimeInterval? {
+        guard let measured else { return counted }
+        return measured > 0 ? measured : nil
     }
 
     /// A call, Siri, an alarm or another app taking the microphone.

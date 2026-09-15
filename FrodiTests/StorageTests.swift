@@ -40,6 +40,17 @@ struct StorageTests {
         #expect(abs(duration - 2.5) < 0.01)
     }
 
+    /// A file the recorder cannot read back is not an empty file. On a locked
+    /// device a closed `.completeUnlessOpen` file cannot be reopened, and treating
+    /// that as empty deleted the recording; see `AudioRecorder.savedDuration`.
+    @Test("Bare en fil som lot seg åpne og er tom, slettes")
+    func onlyAnOpenedEmptyFileIsDeleted() {
+        #expect(AudioRecorder.savedDuration(measured: 12.5, counted: 12.0) == 12.5)
+        #expect(AudioRecorder.savedDuration(measured: nil, counted: 1_140) == 1_140)
+        #expect(AudioRecorder.savedDuration(measured: nil, counted: 0) == 0)
+        #expect(AudioRecorder.savedDuration(measured: 0, counted: 12.0) == nil)
+    }
+
     @Test("Forseglingen gjør PCM om til AAC som kan åpnes")
     func sealEncodesToAAC() async throws {
         let name = try writeRecording()
