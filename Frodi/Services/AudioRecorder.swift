@@ -1,5 +1,6 @@
 import AVFoundation
 import Observation
+import OSLog
 
 @MainActor
 @Observable
@@ -32,6 +33,11 @@ final class AudioRecorder {
     /// iOS said not to resume, or the audio system was reset underneath us. What is
     /// on disk is complete and must be saved, the same way as after a press on stop.
     var onInterruptionEnded: (() -> Void)?
+
+    /// Events only, never content: when a recording starts and stops, and what
+    /// interrupted it. The 19 minute recording lost on 14 September 2026 left no
+    /// trace of why, and the system's own lines did not say either.
+    nonisolated static let log = Logger(subsystem: "com.Tazk.Frodi", category: "recording")
 
     /// The sample rate of the file on disk. What the speech model hears, and enough
     /// for speech: 8 kHz of bandwidth is wideband telephony.
@@ -75,9 +81,11 @@ final class AudioRecorder {
 
             let newRecorder = try AVAudioRecorder(url: url, settings: settings)
             guard newRecorder.record() else {
+                Self.log.error("Recording did not start: record() returned false")
                 state = .failed(String(localized: "Fikk ikke startet opptaket."))
                 return false
             }
+            Self.log.notice("Recording started: \(name, privacy: .public)")
 
             AudioStorage.protectWhileRecording(url)
             recorder = newRecorder
@@ -88,6 +96,7 @@ final class AudioRecorder {
             startTicker()
             return true
         } catch {
+            Self.log.error("Recording did not start: \(error, privacy: .public)")
             state = .failed(String(localized: "Fikk ikke tilgang til mikrofonen."))
             return false
         }
@@ -122,10 +131,13 @@ final class AudioRecorder {
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
 
         let fileName = recorder.url.lastPathComponent
-        guard let length = Self.savedDuration(measured: AudioStorage.duration(fileName: fileName), counted: counted) else {
+        let measured = AudioStorage.duration(fileName: fileName)
+        guard let length = Self.savedDuration(measured: measured, counted: counted) else {
+            Self.log.notice("Recording stopped: \(fileName, privacy: .public) is empty, deleted")
             AudioStorage.delete(fileName: fileName)
             return nil
         }
+        Self.log.notice("Recording stopped: \(fileName, privacy: .public), measured \(measured.map { String($0) } ?? "unreadable", privacy: .public) s, counted \(counted, privacy: .public) s")
 
         // The file is closed now, and stays `.completeUnlessOpen` until
         // `Transcription.run` seals it. Sealing is not done here: it has to read the
@@ -181,6 +193,7 @@ final class AudioRecorder {
             object: nil,
             queue: .main
         ) { [weak self] _ in
+            Self.log.error("Media services were reset while recording")
             Task { @MainActor in self?.onInterruptionEnded?() }
         })
     }
@@ -190,6 +203,7 @@ final class AudioRecorder {
 
         switch type {
         case .began:
+            Self.log.notice("Interruption began at \(recorder.currentTime, privacy: .public) s")
             recorder.pause()
             isInterrupted = true
         case .ended:
@@ -197,9 +211,10 @@ final class AudioRecorder {
             let resumed = options.contains(.shouldResume)
                 && (try? AVAudioSession.sharedInstance().setActive(true)) != nil
                 && recorder.record()
+            Self.log.notice("Interruption ended, shouldResume \(options.contains(.shouldResume), privacy: .public), resumed \(resumed, privacy: .public)")
             if !resumed { onInterruptionEnded?() }
         default:
-            break
+            Self.log.error("Interruption notification without a type")
         }
     }
 

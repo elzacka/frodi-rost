@@ -61,7 +61,10 @@ struct ChoiceSheet<Answers: View>: View {
             .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height = $0 }
         }
         .scrollBounceBehavior(.basedOnSize)
-        .presentationDetents([.height(height)])
+        // The body runs once before the content is measured. Zero is not a
+        // detent SwiftUI accepts, and it said so in the log at every opening;
+        // one point is, and the measurement replaces it.
+        .presentationDetents([.height(max(height, 1))])
         .presentationDragIndicator(.visible)
         .presentationBackground(Color.Frodi.background)
     }

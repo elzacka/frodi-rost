@@ -76,7 +76,10 @@ final class RecordingController {
 
         let recording = Recording(duration: result.duration, fileName: result.fileName)
 
-        guard let container else { return }
+        guard let container else {
+            AudioRecorder.log.error("No container to save \(result.fileName, privacy: .public); reconcile picks it up at launch")
+            return
+        }
         let context = container.mainContext
         context.insert(recording)
         try? context.save()

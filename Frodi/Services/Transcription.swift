@@ -60,9 +60,13 @@ enum Transcription {
         // then waits for the next unlock or launch, and nothing is marked failed,
         // because nothing has. See `AudioStorage.seal`.
         if !AudioStorage.isSealed(recording.fileName) {
-            guard let sealed = try? await AudioStorage.seal(fileName: recording.fileName) else { return }
-            recording.fileName = sealed
-            try? context.save()
+            do {
+                recording.fileName = try await AudioStorage.seal(fileName: recording.fileName)
+                try? context.save()
+            } catch {
+                AudioRecorder.log.notice("Seal of \(recording.fileName, privacy: .public) deferred: \(error, privacy: .public)")
+                return
+            }
         }
 
         let fileName = recording.fileName
