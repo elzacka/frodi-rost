@@ -57,7 +57,19 @@ final class AudioRecorder {
             let session = AVAudioSession.sharedInstance()
             // spokenAudio treats speech better than default, and playAndRecord lets us
             // play back without switching category afterwards.
-            try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.defaultToSpeaker, .allowBluetoothHFP])
+            //
+            // duckOthers is what lets the Action Button start a recording with the
+            // device locked. A non-mixable session cannot be activated from the
+            // background: setActive(true) fails with '!int', cannotInterruptOthers,
+            // and the intent then has to open the app, which on a locked device
+            // means Face ID. Seen on a device on 16 September 2026. A mixable
+            // session may activate in the background, and ducking lowers whatever
+            // else is playing instead of stopping it.
+            try session.setCategory(
+                .playAndRecord,
+                mode: .spokenAudio,
+                options: [.defaultToSpeaker, .allowBluetoothHFP, .duckOthers]
+            )
             try session.setActive(true)
 
             let name = "\(UUID().uuidString).caf"
