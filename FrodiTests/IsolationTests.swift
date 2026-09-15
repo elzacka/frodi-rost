@@ -60,8 +60,10 @@ struct IsolationTests {
         }
     }
 
-    /// `audio` is the only background mode the app should have. `fetch` or
-    /// `processing` would open the door to work that can reach the network.
+    /// `audio` and `processing` are the only background modes the app should
+    /// have. `processing` runs the `BGProcessingTask` that resumes
+    /// transcription while charging and locked; anything else would open the
+    /// door to work that can reach the network.
     @Test("Bare lyd og transkribering kjører i bakgrunnen")
     func onlyAudioAndProcessingRunInBackground() {
         let modes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") as? [String] ?? []
