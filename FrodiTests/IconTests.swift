@@ -14,6 +14,7 @@ struct IconTests {
     /// The skip arrows carry their number inside the glyph. Nothing in the layout
     /// reads `skipSeconds`, so this is what keeps the arrow and the jump equal.
     @Test("Hoppikonene viser tallet knappen hopper")
+    @MainActor
     func skipIconsCarryTheJump() {
         let seconds = "_\(Int(PlaybackControls.skipSeconds))"
         #expect(Icon.skipBack.rawValue.hasSuffix(seconds))

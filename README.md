@@ -40,7 +40,7 @@ For bruk:
 
 For bygging:
 
-- Xcode 26.6 med iOS 26.5 SDK
+- Xcode 27.0 med iOS 27.0 SDK
 - xcodegen: `brew install xcodegen`
 - 467 MB ledig plass til modellen
 
@@ -71,7 +71,7 @@ Appen har egen simulator. Delt simulator mellom sesjoner: UI-testene feiler med 
 ```bash
 xcrun simctl create "Frodi-Test" \
   com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro \
-  com.apple.CoreSimulator.SimRuntime.iOS-26-5
+  com.apple.CoreSimulator.SimRuntime.iOS-27-0
 xcrun simctl boot Frodi-Test
 xcrun simctl bootstatus Frodi-Test -b
 xcodebuild -project Frodi.xcodeproj -scheme Frodi \

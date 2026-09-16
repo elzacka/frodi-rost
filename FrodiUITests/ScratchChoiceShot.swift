@@ -52,6 +52,7 @@ final class ScratchChoiceShot: XCTestCase {
         attach("info")
     }
 
+    @MainActor
     private func attach(_ name: String) {
         let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         shot.lifetime = .keepAlways
