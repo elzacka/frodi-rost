@@ -11,10 +11,19 @@
         }
       }
     },
+    "Avbryt" : {
+
+    },
+    "Bare opptaket" : {
+
+    },
+    "Bare teksten" : {
+
+    },
     "fróði" : {
 
     },
-    "Fróði får ikke åpnet databasen på enheten. Du kan ta opp og hente ut som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette feilen." : {
+    "Fróði får ikke åpnet databasen på enheten. Du kan ta opp og eksportere som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette feilen." : {
 
     },
     "Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger." : {
@@ -32,6 +41,9 @@
     "Norsk tale til tekst mangler" : {
 
     },
+    "Opptak og tekst" : {
+
+    },
     "Opptakene lagres ikke" : {
 
     },
@@ -41,10 +53,10 @@
     "Opptaket er satt på pause og fortsetter etterpå." : {
 
     },
-    "Opptaket og teksten blir borte fra enheten. Du kan ikke angre." : {
+    "røst" : {
 
     },
-    "røst" : {
+    "Slett" : {
 
     },
     "Tekst" : {
