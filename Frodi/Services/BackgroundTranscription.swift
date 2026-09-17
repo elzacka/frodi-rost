@@ -1,4 +1,5 @@
 import BackgroundTasks
+import OSLog
 import SwiftData
 
 /// Transcription while the device sits locked on the charger.
@@ -18,6 +19,7 @@ import SwiftData
 @MainActor
 enum BackgroundTranscription {
     nonisolated static let identifier = "com.Tazk.Frodi.transcribe"
+    nonisolated static let log = Logger(subsystem: "com.Tazk.Frodi", category: "transcription")
 
     /// Must run before the app has finished launching, so it is called from the
     /// app's initialiser.
@@ -36,7 +38,15 @@ enum BackgroundTranscription {
         let request = BGProcessingTaskRequest(identifier: identifier)
         request.requiresExternalPower = true
         request.requiresNetworkConnectivity = false
-        try? BGTaskScheduler.shared.submit(request)
+        Task {
+            do {
+                try await BGTaskScheduler.shared.submitTaskRequest(request)
+            } catch {
+                // Refused, not queued. The reason is what a charger run that never
+                // happened would need: not permitted, too many pending, unavailable.
+                log.error("Could not schedule transcription: \(error.localizedDescription, privacy: .public)")
+            }
+        }
     }
 
     static func hasPendingWork(_ context: ModelContext) -> Bool {

@@ -186,17 +186,28 @@ final class AudioRecorder {
         let center = NotificationCenter.default
         let session = AVAudioSession.sharedInstance()
 
+        // iOS 27 split the old interruption notification in two: the session going
+        // inactive, with who did it, and the system's advice on resuming once the
+        // interruption is over. `stop()` deactivates the session itself; that one
+        // carries `.app` and is not an interruption.
         observers.append(center.addObserver(
-            forName: AVAudioSession.interruptionNotification,
+            forName: AVAudioSession.didBecomeInactiveNotification,
             object: session,
             queue: .main
         ) { [weak self] notification in
-            let info = notification.userInfo
-            let type = (info?[AVAudioSessionInterruptionTypeKey] as? UInt)
-                .flatMap { AVAudioSession.InterruptionType(rawValue: $0) }
-            let options = (info?[AVAudioSessionInterruptionOptionKey] as? UInt)
-                .map { AVAudioSession.InterruptionOptions(rawValue: $0) }
-            Task { @MainActor in self?.interruption(type, options: options ?? []) }
+            let context = notification.userInfo?[AVAudioSession.deactivationContextKey]
+                as? AVAudioSession.DeactivationContext
+            Task { @MainActor in self?.interruptionBegan(source: context?.source) }
+        })
+
+        observers.append(center.addObserver(
+            forName: AVAudioSession.resumptionRecommendationNotification,
+            object: session,
+            queue: .main
+        ) { [weak self] notification in
+            let context = notification.userInfo?[AVAudioSession.resumptionContextKey]
+                as? AVAudioSession.ResumptionContext
+            Task { @MainActor in self?.interruptionEnded(recommendation: context?.recommendation) }
         })
 
         // The audio daemon restarted. Every recorder is invalid after this, and there
@@ -211,24 +222,22 @@ final class AudioRecorder {
         })
     }
 
-    private func interruption(_ type: AVAudioSession.InterruptionType?, options: AVAudioSession.InterruptionOptions) {
-        guard state == .recording, let recorder else { return }
+    private func interruptionBegan(source: AVAudioSession.DeactivationSource?) {
+        guard state == .recording, let recorder, source != .app else { return }
+        Self.log.notice("Interruption began at \(recorder.currentTime, privacy: .public) s")
+        recorder.pause()
+        isInterrupted = true
+    }
 
-        switch type {
-        case .began:
-            Self.log.notice("Interruption began at \(recorder.currentTime, privacy: .public) s")
-            recorder.pause()
-            isInterrupted = true
-        case .ended:
-            isInterrupted = false
-            let resumed = options.contains(.shouldResume)
-                && (try? AVAudioSession.sharedInstance().setActive(true)) != nil
-                && recorder.record()
-            Self.log.notice("Interruption ended, shouldResume \(options.contains(.shouldResume), privacy: .public), resumed \(resumed, privacy: .public)")
-            if !resumed { onInterruptionEnded?() }
-        default:
-            Self.log.error("Interruption notification without a type")
-        }
+    private func interruptionEnded(recommendation: AVAudioSession.ResumptionRecommendation?) {
+        guard state == .recording, let recorder, isInterrupted else { return }
+        isInterrupted = false
+        let shouldResume = recommendation == .shouldResume
+        let resumed = shouldResume
+            && (try? AVAudioSession.sharedInstance().setActive(true)) != nil
+            && recorder.record()
+        Self.log.notice("Interruption ended, shouldResume \(shouldResume, privacy: .public), resumed \(resumed, privacy: .public)")
+        if !resumed { onInterruptionEnded?() }
     }
 
     private func stopObserving() {

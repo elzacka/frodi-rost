@@ -25,6 +25,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 ### Endret
 
+- Appen krever iOS 27.0 eller nyere
 - Teksten i kort, bannere og meldinger står mørkere, så den er lettere å lese.
   Fotnoten på Info-siden er blitt mindre og lysere, så den skiller seg tydelig
   fra teksten den hører til

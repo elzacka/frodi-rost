@@ -2,7 +2,7 @@ name: Frodi
 options:
   bundleIdPrefix: com.Tazk
   deploymentTarget:
-    iOS: "26.5"
+    iOS: "27.0"
   xcodeVersion: "27.0"
   developmentLanguage: nb
   generateEmptyDirectories: true

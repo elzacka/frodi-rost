@@ -35,7 +35,7 @@ Modellen følger med appen og kjører på enheten. Gratis i bruk, ingen kobling 
 
 For bruk:
 
-- iPhone med iOS 26.5 eller nyere
+- iPhone med iOS 27.0 eller nyere
 - Handlingsknappen krever iPhone 15 Pro eller nyere
 
 For bygging:
