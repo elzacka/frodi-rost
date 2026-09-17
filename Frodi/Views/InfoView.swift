@@ -28,7 +28,7 @@ struct InfoView: View {
                     VStack(spacing: Space.s4) {
                         about
                         privacy
-                        speechModel
+                        languageModel
                         wordList
                         export
                         licenses
@@ -95,15 +95,10 @@ struct InfoView: View {
         }
     }
 
-    private var speechModel: some View {
+    private var languageModel: some View {
         card("Språkmodell") {
-            if Transcription.usesBundledModel {
-                paragraph("Modellen nb-whisper-small fra Nasjonalbiblioteket følger med appen og kjører inne i den.")
-                paragraph("Modellen er videretrent på 66\u{00A0}000 timer norsk tale. Den setter tegn og store bokstaver selv, og skriver om dialekt til bokmål.")
-            } else {
-                paragraph("Modellen fra Nasjonalbiblioteket er ikke med i dette bygget. Appen bruker dikteringen som følger med iOS.")
-                paragraph("Den kjører også på enheten, men er svakere på norsk: Du må si «punktum» og «komma» selv, og dialekt blir ofte feil.")
-            }
+            paragraph("Modellen nb-whisper-small fra Nasjonalbiblioteket følger med appen og kjører inne i den.")
+            paragraph("Modellen er videretrent på 66\u{00A0}000 timer norsk tale. Den setter tegn og store bokstaver selv, og skriver om dialekt til bokmål.")
         }
     }
 

@@ -6,10 +6,9 @@ import Testing
 /// files collide, and WhisperKit cannot find the tokenizer. These tests catch
 /// exactly that regression.
 ///
-/// The model is optional: a clone that skipped `Scripts/fetch-model.sh` builds
-/// and runs on Apple's engine, and the README says so. The suite therefore skips
-/// without the model instead of turning four tests red.
-@Suite("Modell i pakken", .enabled(if: WhisperTranscriber.modelFolder != nil, "Modellen er ikke i dette bygget. Kjør Scripts/fetch-model.sh"))
+/// The model is the app's only engine, so a build without it is a broken build:
+/// the suite fails rather than skips. `Scripts/fetch-model.sh` is the fix.
+@Suite("Modell i pakken")
 struct BundledModelTests {
     @Test("Modell og tokenizer peker begge et sted")
     func bothFoldersResolve() {
@@ -38,10 +37,5 @@ struct BundledModelTests {
         }
         #expect(WhisperTranscriber.tokenizerFiles == ["tokenizer.json", "tokenizer_config.json"])
         #expect(WhisperTranscriber.tokenizerIsComplete)
-    }
-
-    @Test("Appen bruker den innebygde modellen, ikke Apples")
-    func bundledModelIsPreferred() {
-        #expect(Transcription.usesBundledModel)
     }
 }

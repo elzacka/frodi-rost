@@ -265,8 +265,8 @@ final class WhisperTranscriber: Transcriber {
     /// `download: false` governs the model folder only. When the tokenizer cannot
     /// be read locally, WhisperKit 0.18 falls back to fetching it from Hugging
     /// Face without consulting that flag. So the app checks for the files itself,
-    /// before WhisperKit is ever created, and a build missing one of them uses
-    /// Apple's engine rather than the network.
+    /// before WhisperKit is ever created, and a build missing one of them reports
+    /// the model as missing rather than reach for the network.
     nonisolated static var tokenizerIsComplete: Bool {
         guard let folder = tokenizerFolder?.appendingPathComponent("models/openai/whisper-small") else {
             return false

@@ -5,15 +5,11 @@ import UIKit
 /// One place that turns recordings into text, so the interface and the Action
 /// Button handle errors the same way.
 ///
-/// The engine is chosen here. If nb-whisper is in the build it is used, and
-/// everything then happens inside the app's own container. If it is missing we
-/// fall back to Apple's model, which also runs on the device, but in a system
-/// process outside the app.
+/// The engine is nb-whisper, bundled and run by WhisperKit, so everything
+/// happens inside the app's own container. There is no other engine.
 enum Transcription {
     /// Kept alive between recordings. The model takes several seconds to load.
     private static let whisper = WhisperTranscriber()
-
-    static var usesBundledModel: Bool { WhisperTranscriber.isBundled }
 
     /// Up to this length a recording is transcribed as soon as it is stopped. A
     /// longer one waits until the user asks: an hour of interview takes the device
@@ -172,18 +168,7 @@ enum Transcription {
     }
 
     @MainActor
-    private static func transcriber() async throws -> any Transcriber {
-        if usesBundledModel { return whisper }
-
-        let model = SpeechModel()
-        await model.refresh()
-        guard model.isReady else {
-            throw model.state == .unsupported
-                ? TranscriptionError.localeUnsupported
-                : TranscriptionError.modelMissing
-        }
-        return SystemTranscriber(locale: AppLocale.norwegian)
-    }
+    private static func transcriber() -> any Transcriber { whisper }
 }
 
 /// What the interface can see of a transcription in progress.

@@ -60,7 +60,7 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
   -destination 'platform=iOS Simulator,name=Frodi-Test' build
 ```
 
-nb-whisper-small ligger ikke i git-repoet. Uten modellen: Fallback til iOS' innebygde diktering, svakere på norsk. Info-siden i appen viser hvilken modell som kjører.
+nb-whisper-small ligger ikke i git-repoet. Modellen er appens eneste talemotor, så bygget stopper med en feilmelding hvis den mangler.
 
 `fetch-model.sh` sjekker hver fil mot `Scripts/model-checksums.txt` og stopper ved avvik. Hvordan modell og pakker er låst: [SECURITY.md](SECURITY.md).
 
@@ -78,8 +78,6 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
   -destination 'platform=iOS Simulator,name=Frodi-Test' test
 ```
 
-Uten modellen: Hopper over testene i «Modell i pakken». Resten kjører.
-
 ## Arkitektur
 
 Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
@@ -92,7 +90,7 @@ Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
 | Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad, får en ny rad                                                                                          | `Services/RecordingController.swift`                                                               |
 | Lagringen holder filen i appens sandkasse (App Sandbox) med filvern (Data Protection), utenom sikkerhetskopiering                                                                                       | `Services/AudioStorage.swift`                                                                      |
 | Vault forsegler opptaket med en nøkkel fra Secure Enclave                                                                                                                                               | `Services/RecordingVault.swift`                                                                    |
-| Transkripsjonen lager teksten i puljer, med nb-whisper i appen som hovedmotor og iOS' egen diktatmodell (`DictationTranscriber` i `SpeechAnalyzer`) som reserve. Fremdriften lagres etter hver pulje | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift`, `Services/SpeechEngine.swift` |
+| Transkripsjonen lager teksten i puljer med nb-whisper, som kjører inne i appen. Fremdriften lagres etter hver pulje | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift`, `Services/SpeechEngine.swift` |
 | Transcript strukturerer teksten som avsnitt med tidspunkt                                                                                                                                               | `Services/Transcript.swift`                                                                        |
 | WordList sender ordlisten til modellen som prompt                                                                                                                                                       | `Services/WordList.swift`                                                                          |
 | Når iPhone lader, kjører BackgroundTranscription transkriberingen som bakgrunnsoppgave (Background Task)                                                                                                | `Services/BackgroundTranscription.swift`                                                           |
@@ -100,7 +98,7 @@ Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
 | RecordingDetailView viser teksten bak et vern (CaptureGuard) som skjuler den ved skjermopptak (Screen Recording) og appbytte (App Switcher)                                                             | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift`                                      |
 | Ved eksport dekrypterer RecordingExport filene til en midlertidig mappe, og gir dem til delingsarket (Activity View, ofte kalt Share Sheet)                                                             | `Services/RecordingExport.swift`, `Views/ShareSheet.swift`                                         |
 
-Visningene når aldri talemotoren direkte. Alt går via protokollen `Transcriber`. `Transcription.usesBundledModel` avgjør hvilken motor som kjører.
+Visningene når aldri talemotoren direkte. Alt går via protokollen `Transcriber`.
 
 ## Lisens
 

@@ -72,7 +72,7 @@ The sections below explain the choices.
 | Transport | None. No `URLSession`, no ATS exceptions. A test scans the sources for networking APIs | `Info.plist`, `IsolationTests` |
 | Background | `UIBackgroundModes` is `audio` and `processing`. The `BGProcessingTask` `com.Tazk.Frodi.transcribe` resumes transcription while the device charges, locked. Detail under *Background transcription* | `Info.plist`, `IsolationTests`, `BackgroundTranscription` |
 | Permissions | `NSMicrophoneUsageDescription` only. `NSSpeechRecognitionUsageDescription` is absent, and tested absent | `Info.plist`, `PrivacyTests` |
-| Speech to text | nb-whisper, bundled, run by WhisperKit. Apple's on-device `DictationTranscriber` as the fallback. The tokenizer's network fallback and its mitigation are under *No network* | `Transcription`, `WhisperTranscriber`, `SpeechEngine` |
+| Speech to text | nb-whisper, bundled, run by WhisperKit inside the app's own process. There is no other engine. The tokenizer's network fallback and its mitigation are under *No network* | `Transcription`, `WhisperTranscriber` |
 | Logging | WhisperKit runs with `verbose: false` and `logLevel: .none`. The app writes recording events to the unified log — start, stop and its length, interruptions, a deferred seal, a refused background task — and never content: no audio, no text, no word list. File names are UUIDs. The log stays on the device and is read only with it connected to a Mac | `AudioRecorder.log`, `BackgroundTranscription.log`, `WhisperTranscriber` |
 | Privacy manifest | No tracking, no tracking domains, no collected data. One accessed API: file timestamps, reason C617.1 | `PrivacyInfo.xcprivacy`, `IsolationTests` |
 | Screen capture | Transcript and word list are hidden while `UIScreen.isCaptured` is true and while the scene is not active | `CaptureGuard` |
@@ -146,8 +146,9 @@ The model is bundled and loaded with `download: false` and explicit local
 paths, so a missing model fails rather than fetches. That flag does not cover
 the tokenizer: WhisperKit 0.18 falls back to Hugging Face when it cannot read
 the tokenizer locally. The app therefore checks that both tokenizer files
-exist before it creates WhisperKit. If either is missing, it uses Apple's
-on-device engine instead, which is also fully local.
+exist before it creates WhisperKit, and reports the model as missing if
+either is absent. A build phase fails the build itself when the model is not
+in it, so such a build cannot be archived.
 
 **One qualification.** WhisperKit depends on `swift-transformers`, whose
 `Hub` target contains an HTTP client. It is linked into the binary, and

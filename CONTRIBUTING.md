@@ -51,8 +51,8 @@ skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
 
 - Ingen nettverkskode. Ingen `URLSession`, ingen SDK-er, ingen analyse, ingen
   krasjrapportering. En test leter etter det
-- Tale går gjennom nb-whisper i appen eller `SpeechAnalyzer` i iOS, aldri
-  `SFSpeechRecognizer`. Den viser en dialog fra Apple om at taledata sendes
+- Tale går gjennom nb-whisper i appen, og ingenting annet. Aldri
+  `SFSpeechRecognizer`: Den viser en dialog fra Apple om at taledata sendes
   til Apple, og dialogen kan ikke slås av. `NSSpeechRecognitionUsageDescription`
   skal ikke inn i Info.plist. En test passer på det
 - Filstier lagres som filnavn, aldri som absolutte adresser. Sandkassen

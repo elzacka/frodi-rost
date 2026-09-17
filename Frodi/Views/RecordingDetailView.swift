@@ -172,17 +172,14 @@ struct RecordingDetailView: View {
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                // A retry does not help when iOS lacks the language.
-                if recording.failureCode != "localeUnsupported" {
-                    Button("Prøv på nytt") {
-                        Task { await onRetry() }
-                    }
-                    .font(.Frodi.bodyMedium)
-                    .foregroundStyle(Color.Frodi.accentRecordOn)
-                    .padding(.horizontal, Space.s4)
-                    .padding(.vertical, Space.s2)
-                    .background(Color.Frodi.accentRecord, in: Capsule())
+                Button("Prøv på nytt") {
+                    Task { await onRetry() }
                 }
+                .font(.Frodi.bodyMedium)
+                .foregroundStyle(Color.Frodi.accentRecordOn)
+                .padding(.horizontal, Space.s4)
+                .padding(.vertical, Space.s2)
+                .background(Color.Frodi.accentRecord, in: Capsule())
             } else {
                 // No transcription started yet, and none has failed.
                 Text(TranscriptionError.explanation(for: nil))

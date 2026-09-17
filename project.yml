@@ -49,6 +49,22 @@ targets:
     dependencies:
       - package: WhisperKit
         product: WhisperKit
+    # nb-whisper is the app's only engine. A build without it must fail here,
+    # not ship. The two files are the ones WhisperTranscriber.isBundled checks;
+    # declared as inputs so the sandboxed script may read them.
+    preBuildScripts:
+      - name: Check bundled model
+        basedOnDependencyAnalysis: false
+        inputFiles:
+          - $(SRCROOT)/Frodi/Resources/Model/nb-whisper-small/config.json
+          - $(SRCROOT)/Frodi/Resources/Model/tokenizer/models/openai/whisper-small/tokenizer.json
+        script: |
+          for f in "$SCRIPT_INPUT_FILE_0" "$SCRIPT_INPUT_FILE_1"; do
+            if [ ! -f "$f" ]; then
+              echo "error: nb-whisper is not in the build: $f is missing. Run Scripts/fetch-model.sh"
+              exit 1
+            fi
+          done
     resources:
       - path: Frodi/Resources/Assets.xcassets
       - path: Frodi/Resources/Fonts

@@ -6,7 +6,6 @@ struct RecordingListView: View {
     @Query(sort: \Recording.createdAt, order: .reverse) private var recordings: [Recording]
 
     @State private var controller = RecordingController.shared
-    @State private var speechModel = SpeechModel()
     @State private var errorMessage: String?
     @State private var showInfo = false
     @State private var pendingDeletion: Recording?
@@ -18,12 +17,6 @@ struct RecordingListView: View {
 
                 if controller.storageFailed {
                     storageWarning
-                        .padding(.horizontal, Space.s4)
-                        .padding(.bottom, recordings.isEmpty ? 0 : Space.s4)
-                }
-
-                if !Transcription.usesBundledModel {
-                    SpeechModelBanner(model: speechModel)
                         .padding(.horizontal, Space.s4)
                         .padding(.bottom, recordings.isEmpty ? 0 : Space.s4)
                 }
@@ -52,9 +45,6 @@ struct RecordingListView: View {
             }
         }
         .task {
-            // With nb-whisper in the build there is no system model to wait for.
-            if !Transcription.usesBundledModel { await speechModel.refresh() }
-            // Recordings that were waiting for the model get their text now.
             await transcribePending()
         }
     }
@@ -214,11 +204,9 @@ struct RecordingListView: View {
         }
     }
 
-    /// Transcribes everything that is waiting. Called at launch, so recordings made
-    /// before the speech model was in place are not left without text. Without a
-    /// model there is nothing to run, and running would only mark them failed.
+    /// Transcribes everything that is waiting. Called at launch, so a recording
+    /// whose transcription was cut short goes on from where it was.
     private func transcribePending() async {
-        guard Transcription.usesBundledModel || speechModel.isReady else { return }
         await Transcription.runPending(context: context)
     }
 
