@@ -28,6 +28,9 @@ final class RecordingController {
 
     var isRecording: Bool { recorder.isRecording }
 
+    /// The main context, for an intent that transcribes without the interface.
+    var mainContext: ModelContext? { container?.mainContext }
+
     func attach(container: ModelContainer, storageFailed: Bool) {
         self.container = container
         self.storageFailed = storageFailed

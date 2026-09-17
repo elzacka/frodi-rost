@@ -22,6 +22,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   nesten stemmer med listen, rettes etterpå. «Lag teksten på nytt» i listen
   bruker listen på et opptak du alt har
 - Teksten lages også mens enheten lader, med skjermen låst
+- Snarveien «Lag tekst i Fróði røst» lager teksten uten at appen er åpen, også
+  for lange opptak. Den kan legges i en automatisering i Snarveier
 
 ### Endret
 

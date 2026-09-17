@@ -69,6 +69,7 @@ struct InfoView: View {
                 // hears the footnote as the next element instead.
                 spokenAs: "Ingen tidsgrense på opptak. Opptak lengre enn \(Transcription.immediateMinutes) minutter transkriberes når du ber om det."
             )
+            paragraph("Snarveien «Lag tekst i Fróði røst» lager teksten uten at appen er åpen. Legg den i en automatisering i Snarveier, for eksempel når laderen kobles til.")
             paragraph("Teksten deles i avsnitt med tidspunkt du kan spille av lyden fra.")
             footnote("10 min: 4–5 min. 30 min: 11–13 min. 60 min: 22–27 min. (Grovt estimat)")
         }

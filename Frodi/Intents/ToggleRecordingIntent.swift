@@ -51,5 +51,11 @@ struct FrodiShortcuts: AppShortcutsProvider {
             shortTitle: "Start eller stopp opptak",
             systemImageName: "mic.fill"
         )
+        AppShortcut(
+            intent: TranscribePendingIntent(),
+            phrases: ["Lag tekst i \(.applicationName)"],
+            shortTitle: "Lag tekst",
+            systemImageName: "text.document"
+        )
     }
 }

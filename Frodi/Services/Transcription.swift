@@ -136,14 +136,27 @@ enum Transcription {
     /// A recording the model already found no speech in is left alone. The same
     /// audio gives the same answer, and a whisper run per silent recording at
     /// every launch adds up. «Prøv teksten på nytt» in the row still works.
+    ///
+    /// `requested` is what the «Lag tekst» shortcut passes: the long recordings
+    /// that would otherwise wait for a tap are taken too, because running the
+    /// shortcut is the asking.
     @MainActor
-    static func runPending(context: ModelContext) async {
+    static func runPending(context: ModelContext, requested: Bool = false) async {
         stopRequested = false
         let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
         for recording in recordings where !recording.hasTranscript && recording.failureCode != "empty" {
             guard !stopRequested else { return }
-            await run(for: recording, context: context)
+            await run(for: recording, context: context, requested: requested)
         }
+    }
+
+    /// For the «Lag tekst» shortcut: everything, the long recordings included, on
+    /// the controller's own context. The shortcut runs off the main actor and
+    /// has no context of its own.
+    @MainActor
+    static func runAllPending() async {
+        guard let context = RecordingController.shared.mainContext else { return }
+        await runPending(context: context, requested: true)
     }
 
     /// Whether a recording is waiting for the user to ask for its text.
