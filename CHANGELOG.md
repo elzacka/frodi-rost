@@ -24,13 +24,16 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Teksten lages også mens enheten lader, med skjermen låst
 - Snarveien «Lag tekst i Fróði røst» lager teksten uten at appen er åpen, også
   for lange opptak. Den kan legges i en automatisering i Snarveier
+- Brukerveiledning, [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md), med alt om
+  opptak, handlingsknappen, teksten, ordlisten, eksport og sletting
 
 ### Endret
 
+- Info-siden lenker til brukerveiledningen og personvernerklæringen. Kortene
+  Ordliste og Eksport har én setning hver
+
 - Appen krever iOS 27.0 eller nyere
-- Teksten i kort, bannere og meldinger står mørkere, så den er lettere å lese.
-  Fotnoten på Info-siden er blitt mindre og lysere, så den skiller seg tydelig
-  fra teksten den hører til
+- Teksten i kort, bannere og meldinger står mørkere, så den er lettere å lese
 - Ikonene kommer fra Material Symbols, ikke lenger fra Heroicons
 - Hoppknappene i avspilleren hopper ti sekunder, ikke femten. Tallet står
   inne i pilen igjen

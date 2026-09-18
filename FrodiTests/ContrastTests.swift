@@ -74,25 +74,21 @@ struct ContrastTests {
         )
     }
 
-    /// The footnote has to read as quieter than the text it belongs to, and the
-    /// difference has to be visible. It was not: the footnote used to be
-    /// `TextSecondary` at 0.9 opacity on running text that was `TextSecondary`
-    /// itself, which is 1,24:1 between the two. Nobody sees 1,24:1.
+    /// Secondary text, the labels and status lines beside running text, has to
+    /// read as quieter than the text it accompanies, and the difference has to
+    /// be visible. Running text is `TextPrimary` and secondary text is
+    /// `TextSecondary`, which measures 2,88:1 between them. The ratio is a
+    /// stand-in for «visibly lighter», not a WCAG requirement: the rules say
+    /// nothing about two text colours on the same surface. 2,5 is the floor, so
+    /// the tones can be tuned without the step quietly disappearing.
     ///
-    /// Running text is `TextPrimary` now and the footnote is `TextSecondary`,
-    /// which measures 2,88:1 between them. The ratio is a stand-in for «visibly
-    /// lighter», not a WCAG requirement: the rules say nothing about two text
-    /// colours on the same surface. 2,5 is the floor, so the tones can be tuned
-    /// without the step quietly disappearing again.
-    ///
-    /// Each tone meets AA on its own: both pairs are in `textMeetsAA` above, and
-    /// `TextSecondary` on `Surface` is the footnote's own number, 5,65:1.
-    @Test("Fotnoten skiller seg synlig fra brødteksten")
-    func footnoteIsVisiblyLighterThanBody() throws {
+    /// Each tone meets AA on its own: both pairs are in `textMeetsAA` above.
+    @Test("Sekundær tekst skiller seg synlig fra brødteksten")
+    func secondaryIsVisiblyLighterThanBody() throws {
         let measured = try Self.ratio("TextSecondary", on: "TextPrimary")
         #expect(
             measured >= 2.5,
-            "Fotnoten mot brødteksten er \(String(format: "%.2f", measured)):1, skillet må være minst 2,5:1"
+            "Sekundær tekst mot brødteksten er \(String(format: "%.2f", measured)):1, skillet må være minst 2,5:1"
         )
     }
 }

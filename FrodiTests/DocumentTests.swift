@@ -74,6 +74,15 @@ struct DocumentTests {
         #expect(text.contains(InfoView.privacyOpener))
     }
 
+    /// The length rule is one constant in the code and one number in the guide.
+    /// A markdown file cannot read the constant, so the test does.
+    @Test("Brukerveiledningen oppgir samme grense som Transcription.immediateLimit")
+    func userGuideStatesTheLimit() throws {
+        let text = try String(contentsOf: Self.root.appending(path: "BRUKERVEILEDNING.md"), encoding: .utf8)
+        #expect(text.contains("Inntil \(Transcription.immediateMinutes) minutter"))
+        #expect(text.contains("Over \(Transcription.immediateMinutes) minutter"))
+    }
+
     private struct Resolved: Decodable {
         struct Pin: Decodable {
             struct State: Decodable { let version: String? }

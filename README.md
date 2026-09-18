@@ -112,6 +112,7 @@ Appen er et personlig prosjekt. Feil og forslag meldes som issues på GitHub. Pu
 
 | Dokument | Innhold |
 |---|---|
+| [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md) | Slik tar du opp, lager tekst, bruker ordlisten, eksporterer og sletter |
 | [PERSONVERN.md](PERSONVERN.md) | Hva som lagres, tillatelser, rettighetene dine, hvem som står bak |
 | [SECURITY.md](SECURITY.md) | Hva som beskyttes mot hva, og hvordan melde sårbarhet |
 | [TILGJENGELIGHET.md](TILGJENGELIGHET.md) | Kontrast, Dynamic Type, VoiceOver, og hva som er målt |

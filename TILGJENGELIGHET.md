@@ -1,6 +1,6 @@
 # Tilgjengelighet i Fróði røst
 
-Oppdatert 15. september 2026.
+Oppdatert 18. september 2026.
 
 Appen skal oppfylle WCAG 2.2 AA. Det som står her, er målt eller ivaretatt med en test. Les: Ingen garanti. Kolonnen til høyre sier hvilken test, eller at det
 ikke finnes noen.
@@ -21,9 +21,9 @@ ikke finnes noen.
 
 ## Målte kontraster
 
-Regnet ut fra fargene i asset-katalogen, slik `ContrastTests` gjør det. Fotnoten
-er `TextSecondary` lagt over flaten med 90 prosent dekning, målt på blandingen.
-Den finnes bare på flate, inne i et kort.
+Regnet ut fra fargene i asset-katalogen, slik `ContrastTests` gjør det. Appen
+har to tekstfarger og ingen blanding. Sekundær tekst mot brødtekst måler
+2,88:1, og en test krever minst 2,5:1, så skillet mellom dem er synlig.
 
 | Farge | Mot | Målt | Krav |
 |---|---|---|---|
@@ -31,7 +31,6 @@ Den finnes bare på flate, inne i et kort.
 | Tekst | flate | 16,25:1 | 4,5:1 |
 | Sekundær tekst (`TextSecondary`) | bakgrunn | 5,02:1 | 4,5:1 |
 | Sekundær tekst | flate | 5,65:1 | 4,5:1 |
-| Fotnotetekst (`TextSecondary` 90 %) | flate | 4,53:1 | 4,5:1 |
 | Tekst på opptaksknappen (`AccentRecordOn`) | opptaksknappen | 4,59:1 | 4,5:1 |
 | Opptaksknappen (`AccentRecord`) | bakgrunn | 3,25:1 | 3:1 |
 | Opptaksknappen | flate | 3,66:1 | 3:1 |

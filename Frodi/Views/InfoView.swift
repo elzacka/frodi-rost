@@ -1,17 +1,16 @@
 import SwiftUI
 
-/// The Info page: what the app does, what it does not do, and what it builds on.
-/// Opens as a sheet from the i in the logo header.
+/// The Info page: what the app is, what it builds on, and where the documents
+/// are. Opens as a sheet from the menu button in the logo header. A sheet, not
+/// a new page, because you should return to the list where you left it.
 ///
-/// The sketch put Om fróði, Personvern and Versjonsinfo in a menu on a start
-/// screen. That start screen no longer exists, so the content lives here. A sheet,
-/// not a new page, because you should return to the list where you left it.
+/// How to use the app is in BRUKERVEILEDNING.md and the privacy facts are in
+/// PERSONVERN.md; the page links to both rather than repeating them.
 ///
-/// The sheet was called «Innstillinger» until 10 September 2026, and that was the
-/// wrong name: the app has no options of its own. The word list and the text
-/// format are the two things you can change on the page, and neither is a mode:
-/// a list of names is not a setting, and a file extension is chosen once. The
-/// title says what the page is.
+/// Not «Innstillinger»: the app has no options of its own. The word list and
+/// the text format are the two things you can change on the page, and neither
+/// is a mode: a list of names is not a setting, and a file extension is chosen
+/// once. The title says what the page is.
 struct InfoView: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -53,25 +52,12 @@ struct InfoView: View {
     }
 
     // MARK: - Cards
-    /// The mark on the one footnote the page has. A raised digit and not a star:
-    /// a star beside a field means «må fylles ut», and this card has a field.
-    static let footnoteMark = "\u{00B9}"
-
+    /// What the app is, and the link to how it is used.
     private var about: some View {
         card("Fróði røst") {
             paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
-            paragraph("Appen tar opp lyd og gjør den om til norsk tekst, også med skjermen låst.")
-            paragraph("Start og stopp med opptaksknappen nederst, eller ved å holde inne handlingsknappen. Knappen finnes på iPhone 15 Pro og nyere.")
-            paragraph("Handlingsknappen må settes opp først: Innstillinger > Handlingsknapp > Snarvei > Bla ned og velg «Fróði røst – Start eller stopp opptak».")
-            paragraph(
-                "Ingen tidsgrense på opptak. Opptak lengre enn \(Transcription.immediateMinutes) minutter\(Self.footnoteMark) transkriberes når du ber om det.",
-                // VoiceOver reads the mark as «opphøyd én», which says nothing. It
-                // hears the footnote as the next element instead.
-                spokenAs: "Ingen tidsgrense på opptak. Opptak lengre enn \(Transcription.immediateMinutes) minutter transkriberes når du ber om det."
-            )
-            paragraph("Snarveien «Lag tekst i Fróði røst» lager teksten uten at appen er åpen. Legg den i en automatisering i Snarveier, for eksempel når laderen kobles til.")
-            paragraph("Teksten deles i avsnitt med tidspunkt du kan spille av lyden fra.")
-            footnote("10 min: 4–5 min. 30 min: 11–13 min. 60 min: 22–27 min. (Grovt estimat)")
+            paragraph("Appen tar opp lyd og gjør den om til norsk tekst.")
+            link("Brukerveiledning", to: Self.userGuide)
         }
     }
 
@@ -79,19 +65,11 @@ struct InfoView: View {
     /// PERSONVERN.md. A test keeps them the same sentence.
     static let privacyOpener = "Alt skjer på enheten. Ingen datatrafikk ut eller inn."
 
+    /// The promise, and the document that spells it out.
     private var privacy: some View {
         card("Personvern") {
             paragraph(Self.privacyOpener)
-            // One sentence, not three states. The app exists to record, so the
-            // permission is not a condition the page reports on: it is the one
-            // thing the app asks for. RecorderBar says so on the main screen when
-            // access is refused, which is where a user who cannot record is.
-            paragraph("Appen ber om tilgang til mikrofonen. Ingenting annet.")
-            paragraph("Opptak og tekst krypteres med en nøkkel som bare finnes i enheten (Secure Enclave), og blir ikke med i sikkerhetskopier.")
-            paragraph("Teksten skjules når skjermen tas opp og når du bytter app.")
-            paragraph("Eksporter lyd som .m4a og tekst som .txt eller .rtf. Bytter du enhet, må du eksportere opptakene først. Sletter du appen, er alt borte.")
-            link("Mer om personvern", to: Self.privacyPolicy)
-            link("Mer om sikkerhet", to: Self.securityPolicy)
+            link("Personvernerklæring", to: Self.privacyPolicy)
         }
     }
 
@@ -106,7 +84,7 @@ struct InfoView: View {
     /// where a user types them once, and every transcription reads them.
     private var wordList: some View {
         card("Ordliste") {
-            paragraph("Skriv inn navn og ord som en KI-modell vil kunne bomme på når den transkriberer. Skill dem med komma. Appen vil finne ord som ligner. Langt trykk på et opptak i listen gir deg valget «Lag teksten på nytt». Ordlisten er også kryptert på enheten.")
+            paragraph("Skriv inn navn og ord modellen kan bomme på. Skill dem med komma.")
 
             TextField("Aall & Ulefos Brug, ISO 19011", text: $words, axis: .vertical)
                 .lineLimit(2...8)
@@ -131,15 +109,13 @@ struct InfoView: View {
     /// is decided here, once, because it is the same every time.
     private var export: some View {
         card("Eksport") {
-            paragraph("Lyden eksporteres alltid som .m4a. Velg hvilket format teksten skal eksporteres i.")
+            paragraph("Lyden eksporteres alltid som .m4a. Velg format for teksten.")
 
             HStack(spacing: Space.s2) {
                 ForEach(RecordingExport.TextFormat.allCases, id: \.self) { format in
                     formatChoice(format)
                 }
             }
-
-            paragraph(".txt er ren tekst og kan limes inn hvor som helst. .rtf åpnes som dokument i Word, Pages og Notater, med overskrift, dato og tidspunkt for hvert avsnitt.")
         }
     }
 
@@ -187,8 +163,8 @@ struct InfoView: View {
 
     // The links open in Safari. The app fetches nothing itself; it is the browser
     // that goes online, and only when you tap.
+    private static let userGuide = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/BRUKERVEILEDNING.md")!
     private static let privacyPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/PERSONVERN.md")!
-    private static let securityPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/SECURITY.md")!
 
     private static var versionNumber: String {
         let info = Bundle.main.infoDictionary
@@ -230,37 +206,15 @@ struct InfoView: View {
     }
 
     /// Running text in a card. `textPrimary`, not `textSecondary`: this is what
-    /// the page is for, and the footnote below it has to read as quieter than
-    /// something. The card label above it is the secondary tone, so the card has
-    /// a label, a text and a note in three visibly different weights of grey.
-    private func paragraph(_ text: String, spokenAs spoken: String? = nil) -> some View {
+    /// the page is for. The card label above it is the secondary tone.
+    private func paragraph(_ text: String) -> some View {
         Text(text)
             .font(.Frodi.caption)
             .foregroundStyle(Color.Frodi.textPrimary)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .accessibilityLabel(spoken ?? text)
     }
 
-    /// A footnote to the paragraph marked `footnoteMark`. Smaller and quieter
-    /// than the text it belongs to: `footnote` at 10 pt, 23 % under the 13 pt of
-    /// the paragraph, in `textSecondary` against the paragraph's `textPrimary`.
-    ///
-    /// Both steps are visible and neither costs contrast: the tone measures
-    /// 5,65:1 on Surface, well over the 4,5:1 WCAG 2.2 AA asks for. The opacity
-    /// blend this used to need is gone; `ContrastTests` measures what is left.
-    ///
-    /// The mark is written into the footnote itself rather than laid out as a
-    /// hanging indent: one footnote on one card does not need the machinery, and
-    /// a hanging indent breaks when the text scales.
-    private func footnote(_ text: String) -> some View {
-        Text(Self.footnoteMark + " " + text)
-            .font(.Frodi.footnote)
-            .foregroundStyle(Color.Frodi.textSecondary)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .accessibilityLabel("Fotnote. " + text)
-    }
 
     /// A link out of the app, at the same size and in the same tone as the text
     /// around it. The underline is what marks it, and it is the only mark: a link
