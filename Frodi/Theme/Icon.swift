@@ -17,7 +17,7 @@ import SwiftUI
 /// is Google's own name for the symbol, with `_fill` where the filled variant is
 /// the one bundled.
 enum Icon: String, CaseIterable {
-    case information = "info"
+    case information = "menu"
     case close = "close"
     case chevronRight = "chevron_right"
     case chevronUp = "expand_less"
