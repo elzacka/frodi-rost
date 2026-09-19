@@ -254,6 +254,10 @@ final class AudioRecorder {
         let shouldResume = recommendation == .shouldResume
         var resumed = false
         if shouldResume, (try? await AVAudioSession.sharedInstance().activate(options: [])) == true {
+            // The activation took time, and a stop can have landed meanwhile.
+            // Then the recorder is closed and its file is being saved, and a
+            // `record()` on it would open the file again and write over it.
+            guard state == .recording, self.recorder === recorder else { return }
             resumed = recorder.record()
         }
         Self.log.notice("Interruption ended, shouldResume \(shouldResume, privacy: .public), resumed \(resumed, privacy: .public)")

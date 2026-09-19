@@ -6,6 +6,8 @@ struct PlaybackControls: View {
     let recording: Recording
     let player: AudioPlayer
 
+    @State private var controller = RecordingController.shared
+
     /// How far the skip buttons move. Behaviour, not a design token. Internal
     /// so `IconTests` can hold it to the number drawn inside the skip icons.
     static let skipSeconds: TimeInterval = 10
@@ -34,7 +36,14 @@ struct PlaybackControls: View {
             RoundedRectangle(cornerRadius: Radius.card)
                 .strokeBorder(Color.Frodi.border, lineWidth: 1)
         )
-        .task { await player.prepare(recording) }
+        // Not while a recording runs: readying the player sets the session to
+        // playback, which has no input, and the microphone would go out from
+        // under the recorder. The page opens with the controls disabled, and
+        // the player is readied when the recording stops.
+        .task(id: controller.isRecording) {
+            guard !controller.isRecording else { return }
+            await player.prepare(recording)
+        }
         .onDisappear { player.stop() }
     }
 

@@ -1,14 +1,11 @@
 import SwiftUI
 
-/// A button in the navigation bar: the icon alone, in the tone of every other
-/// icon, on nothing.
+/// An `IconButton` in the navigation bar.
 ///
 /// iOS draws its own bar buttons on a piece of glass with a rim, in the tint
 /// colour. The header's settings button has none of that, and the buttons in
 /// the bars should look like it, not like the system's. So the item drops the
-/// shared background, the button drops the system style, and the icon takes
-/// `textSecondary` like the settings button does. The record button is the
-/// one button with a fill of its own, and it is not in a bar.
+/// shared background, and the button is the same one the header uses.
 struct ToolbarButton: ToolbarContent {
     let icon: Icon
     let label: String
@@ -17,14 +14,7 @@ struct ToolbarButton: ToolbarContent {
 
     var body: some ToolbarContent {
         ToolbarItem(placement: placement) {
-            Button(action: action) {
-                IconView(icon, size: IconSize.toolbar)
-                    .foregroundStyle(Color.Frodi.textSecondary)
-                    .frame(width: HeaderButton.touch, height: HeaderButton.touch)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(label)
+            IconButton(icon: icon, size: IconSize.toolbar, label: label, action: action)
         }
         .sharedBackgroundVisibility(.hidden)
     }
@@ -74,6 +64,8 @@ private struct PopGestureKeeper: UIViewControllerRepresentable {
 
     final class Coordinator: NSObject, UIGestureRecognizerDelegate {
         weak var navigation: UINavigationController?
+        /// The delegate the recognizer had, given back when the screen goes.
+        weak var previous: UIGestureRecognizerDelegate?
 
         func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
             guard let navigation else { return false }
@@ -96,9 +88,22 @@ private struct PopGestureKeeper: UIViewControllerRepresentable {
         // not when this controller is created.
         override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)
-            guard let navigation = navigationController else { return }
+            guard let navigation = navigationController,
+                  let gesture = navigation.interactivePopGestureRecognizer,
+                  gesture.delegate !== coordinator else { return }
             coordinator.navigation = navigation
-            navigation.interactivePopGestureRecognizer?.delegate = coordinator
+            coordinator.previous = gesture.delegate
+            gesture.delegate = coordinator
+        }
+
+        // The delegate is weak, so a screen that goes without giving it back
+        // leaves the recognizer with none, and the next screen with no
+        // back button of its own would be without the system's rule.
+        override func viewWillDisappear(_ animated: Bool) {
+            super.viewWillDisappear(animated)
+            guard let gesture = coordinator.navigation?.interactivePopGestureRecognizer,
+                  gesture.delegate === coordinator else { return }
+            gesture.delegate = coordinator.previous
         }
     }
 }

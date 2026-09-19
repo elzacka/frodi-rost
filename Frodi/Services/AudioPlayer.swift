@@ -51,6 +51,9 @@ final class AudioPlayer {
 
         do {
             let newPlayer = try await Self.makePlayer(fileName: name)
+            // A recording started meanwhile has called `stop()`, and the page
+            // must not come back to life with a player under the recorder.
+            guard fileName == name else { return }
             player = newPlayer
             duration = newPlayer.duration
             currentTime = 0
