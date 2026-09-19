@@ -33,8 +33,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Siden bak knappen i logohodet heter «Innstillinger». Knappen viser tre
   skyvebrytere. Siden har fire kort: Ordliste, Eksport,
   Fróði røst med versjon og kontakt, og Dokumentasjon med lenker til
-  brukerveiledning, personvernerklæring, sikkerhet og tilgjengelighet, og
-  lisensene
+  brukerveiledning, personvernerklæring og sikkerhet, og lisensene
 
 - Appen krever iOS 27.0 eller nyere
 - Teksten i kort, bannere og meldinger står mørkere, så den er lettere å lese

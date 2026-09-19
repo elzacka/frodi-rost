@@ -66,15 +66,14 @@ struct SettingsView: View {
     }
 
     /// One document per reader: the user, the privacy-minded, the security
-    /// reviewer, the accessibility reviewer, and the licence holders. The four
-    /// links open on GitHub in Safari; the licences are a screen in the app,
-    /// since Apache 2.0 requires the attribution to be in the app itself.
+    /// reviewer, and the licence holders. The three links open on GitHub in
+    /// Safari; the licences are a screen in the app, since Apache 2.0 requires
+    /// the attribution to be in the app itself.
     private var documents: some View {
         card("Dokumentasjon") {
             link("Brukerveiledning", to: Self.userGuide)
             link("Personvernerklæring", to: Self.privacyPolicy)
             link("Sikkerhet", to: Self.securityPolicy)
-            link("Tilgjengelighet", to: Self.accessibilityStatement)
             licenses
         }
     }
@@ -225,7 +224,6 @@ struct SettingsView: View {
     private static let userGuide = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/BRUKERVEILEDNING.md")!
     private static let privacyPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/PERSONVERN.md")!
     private static let securityPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/SECURITY.md")!
-    private static let accessibilityStatement = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/TILGJENGELIGHET.md")!
 
     private static var versionNumber: String {
         let info = Bundle.main.infoDictionary

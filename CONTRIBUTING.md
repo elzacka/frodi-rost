@@ -29,7 +29,7 @@ hvordan du bygger og tester.
 | Hva                                                                                                                            | Språk                                                        |
 | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
 | Alt en bruker leser: Tekstene i appen, App Store, README, BRUKERVEILEDNING, PERSONVERN, CHANGELOG, TREDJEPART, TILGJENGELIGHET | norsk bokmål                                                 |
-| SECURITY.md                                                                                                                    | engelsk, fordi de som melder sårbarheter sjelden leser norsk |
+| SECURITY.md                                                                                                                    | engelsk                                                      |
 | Kode, identifikatorer, filnavn, kommentarer og commit-meldinger                                                                | engelsk                                                      |
 
 Norsk tekst skrives som norsk, ikke oversatt fra engelsk til slutt: Aktiv
