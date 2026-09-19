@@ -29,8 +29,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 ### Endret
 
-- Siden bak knappen i logohodet heter «Innstillinger». Knappen er et fylt
-  tannhjul i en avrundet firkant. Siden har fire kort: Ordliste, Eksport,
+- Siden bak knappen i logohodet heter «Innstillinger». Knappen viser tre
+  skyvebrytere. Siden har fire kort: Ordliste, Eksport,
   Fróði røst med versjon og kontakt, og Dokumentasjon med lenker til
   brukerveiledning, personvernerklæring, sikkerhet og tilgjengelighet, og
   lisensene

@@ -86,9 +86,8 @@ enum RecordButton {
 /// measure, so the icon is the size of the one in the system navigation bar, and
 /// the hit area is set to the 44 pt minimum.
 enum HeaderButton {
-    /// The same frame as `IconSize.toolbar`. The glyph fills three quarters
-    /// of it, a 19,5 pt rounded square.
-    static let icon: CGFloat = 26
+    /// The glyph fills 75 × 67 % of the frame: 21 × 18,7 pt.
+    static let icon: CGFloat = 28
     static let touch: CGFloat = 44
 }
 
