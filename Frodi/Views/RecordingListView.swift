@@ -8,10 +8,18 @@ struct RecordingListView: View {
     @State private var controller = RecordingController.shared
     @State private var errorMessage: String?
     @State private var showSettings = false
-    @State private var pendingDeletion: Recording?
+    @State private var path: [Recording] = []
+    /// The one row that is swiped open or asking, if any. One at a time: a
+    /// swipe on another row closes this one.
+    @State private var swipe: Swipe?
+
+    private struct Swipe {
+        let recording: Recording
+        var stage: SwipeStage
+    }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(spacing: 0) {
                 header
 
@@ -42,6 +50,9 @@ struct RecordingListView: View {
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
+            }
+            .navigationDestination(for: Recording.self) { recording in
+                RecordingDetailView(recording: recording, onRetry: { await transcribe(recording) })
             }
         }
         .task {
@@ -155,29 +166,7 @@ struct RecordingListView: View {
         ScrollView {
             LazyVStack(spacing: Space.s3) {
                 ForEach(recordings) { recording in
-                    NavigationLink {
-                        RecordingDetailView(recording: recording, onRetry: { await transcribe(recording) })
-                    } label: {
-                        RecordingRow(recording: recording)
-                    }
-                    .buttonStyle(.plain)
-                    .contextMenu {
-                        if !recording.hasTranscript, !recording.isTranscribing {
-                            Button(Transcription.awaitsRequest(recording) ? "Lag tekst" : "Prøv teksten på nytt") {
-                                Task { await transcribe(recording) }
-                            }
-                        }
-                        // For a word list written after the interview. The audio is
-                        // the same, so nothing is lost that the new run does not remake.
-                        if recording.hasTranscript, !recording.isTranscribing {
-                            Button("Lag teksten på nytt") {
-                                recording.sealedTranscript = nil
-                                try? context.save()
-                                Task { await transcribe(recording) }
-                            }
-                        }
-                        Button("Slett", role: .destructive) { pendingDeletion = recording }
-                    }
+                    row(recording)
                 }
             }
             .padding(.horizontal, Space.s4)
@@ -185,23 +174,91 @@ struct RecordingListView: View {
             .padding(.bottom, Space.s3)
         }
         .scrollContentBackground(.hidden)
-        // One tap in a context menu is one tap too few for something that cannot be
-        // undone. The recording and its text go together, and nothing brings them back.
-        .sheet(item: $pendingDeletion) { recording in
-            ChoiceSheet(
-                title: "Slett opptaket?",
-                message: "Opptaket og teksten blir borte fra enheten. Du kan ikke angre."
-            ) {
-                Button {
-                    // The sheet closes first: its content is this recording, and
-                    // the row must not be redrawn from an object that is gone.
-                    pendingDeletion = nil
-                    delete(recording)
-                } label: {
-                    Text("Slett").choiceRow(destructive: true)
+    }
+
+    /// One recording, with what can be done to it behind a swipe to the left:
+    /// the text action that applies, and «Slett». Deleting asks first, in the
+    /// row: one tap is one tap too few for something that cannot be undone,
+    /// and the recording and its text go together.
+    ///
+    /// VoiceOver has no swipe, so the same actions hang on the row as custom
+    /// actions.
+    ///
+    /// The row opens the recording from a tap gesture, not from a
+    /// `NavigationLink`: a button counts a drag that ends inside it as a tap,
+    /// so the swipe would open the recording instead of the actions.
+    private func row(_ recording: Recording) -> some View {
+        SwipeRow(stage: stage(of: recording), onStage: { setStage($0, of: recording) }) {
+            RecordingRow(recording: recording)
+                .contentShape(Rectangle())
+                .onTapGesture { path.append(recording) }
+                .accessibilityAddTraits(.isButton)
+                .accessibilityActions {
+                    if let action = textAction(for: recording) {
+                        Button(action.label) { action.run() }
+                    }
+                    Button("Slett") { setStage(.asking, of: recording) }
+                }
+        } actions: {
+            if let action = textAction(for: recording) {
+                Button { action.run() } label: {
+                    Text(action.label).choiceRow(inline: true)
                 }
             }
+            Button { setStage(.asking, of: recording) } label: {
+                Text("Slett").choiceRow(destructive: true, inline: true)
+            }
+        } question: {
+            Text("Sikker på at du vil slette?")
+                .font(.Frodi.bodyMedium)
+                .foregroundStyle(Color.Frodi.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                // Where the row's title stood.
+                .padding(.leading, Space.s3)
+                .accessibilityAddTraits(.isHeader)
+
+            Spacer(minLength: Space.s2)
+
+            // «Ja» stands where the text action stood and «Nei» where «Slett»
+            // did, so a second tap in the same place says no.
+            Button { delete(recording) } label: {
+                Text("Ja").choiceRow(destructive: true, inline: true)
+            }
+            Button { setStage(.closed, of: recording) } label: {
+                Text("Nei").choiceRow(inline: true)
+            }
         }
+    }
+
+    private func stage(of recording: Recording) -> SwipeStage {
+        guard let swipe, swipe.recording === recording else { return .closed }
+        return swipe.stage
+    }
+
+    private func setStage(_ stage: SwipeStage, of recording: Recording) {
+        swipe = stage == .closed ? nil : Swipe(recording: recording, stage: stage)
+    }
+
+    /// The one text action a recording can take, or none while it transcribes:
+    /// «Lag tekst» for a long recording that waits to be asked, «Prøv på nytt»
+    /// after a failure, and «Lag ny tekst» for a word list written after the
+    /// interview. The audio is the same, so nothing is lost that the new run
+    /// does not remake.
+    private func textAction(for recording: Recording) -> (label: LocalizedStringKey, run: () -> Void)? {
+        guard !recording.isTranscribing else { return nil }
+        if recording.hasTranscript {
+            return ("Lag ny tekst", {
+                setStage(.closed, of: recording)
+                recording.sealedTranscript = nil
+                try? context.save()
+                Task { await transcribe(recording) }
+            })
+        }
+        let label: LocalizedStringKey = Transcription.awaitsRequest(recording) ? "Lag tekst" : "Prøv på nytt"
+        return (label, {
+            setStage(.closed, of: recording)
+            Task { await transcribe(recording) }
+        })
     }
 
     /// Transcribes everything that is waiting. Called at launch, so a recording
@@ -218,8 +275,13 @@ struct RecordingListView: View {
     }
 
     private func delete(_ recording: Recording) {
+        // The row goes first: it is drawn from this recording, and must not be
+        // redrawn from an object that is gone.
+        swipe = nil
         AudioStorage.delete(fileName: recording.fileName)
-        context.delete(recording)
+        withAnimation(.spring(duration: 0.3)) {
+            context.delete(recording)
+        }
         try? context.save()
     }
 }

@@ -1,8 +1,8 @@
 import XCTest
 
-/// A tool, not a test, like `ScratchPlaybackShot`: pictures of the delete
-/// sheet, the export sheet and the Eksport card in Innstillinger. Runs only
-/// with `TEST_RUNNER_FRODI_SHOTS=1`.
+/// A tool, not a test, like `ScratchPlaybackShot`: pictures of the swiped
+/// row, the question in it, the export sheet and the Eksport card in
+/// Innstillinger. Runs only with `TEST_RUNNER_FRODI_SHOTS=1`.
 ///
 /// The export sheet only comes up for a recording with text, and a silent
 /// simulator recording has none. To picture it, force the question in
@@ -25,12 +25,14 @@ final class ScratchChoiceShot: XCTestCase {
 
         let row = app.scrollViews.otherElements.buttons.firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 5))
-        row.press(forDuration: 1)
+        row.swipeLeft()
+        Thread.sleep(forTimeInterval: 1)
+        attach("sveip")
         app.buttons["Slett"].firstMatch.tap()
         Thread.sleep(forTimeInterval: 1)
         attach("slett")
 
-        app.buttons["Avbryt"].tap()
+        app.buttons["Nei"].tap()
         Thread.sleep(forTimeInterval: 1)
 
         row.tap()

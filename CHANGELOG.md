@@ -16,10 +16,12 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Teksten eksporteres som `.rtf` eller `.txt`. Formatet velger du i Innstillinger;
   `.rtf` har overskrift og avsnitt
 - Når du eksporterer, velger du opptaket, teksten eller begge
-- «Slett» spør først, i et ark nederst på skjermen
+- Sveip et opptak mot venstre for å se hva du kan gjøre med det: «Lag tekst»,
+  «Prøv på nytt» eller «Lag ny tekst», og «Slett». «Slett» spør «Sikker på at
+  du vil slette?» i samme rad, med «Ja» og «Nei»
 - Ordliste i Innstillinger: Navn og ord Fróði bør kjenne, som firmaer, personer
   og forkortelser. Modellen får listen før den lytter, og ord i teksten som
-  nesten stemmer med listen, rettes etterpå. «Lag teksten på nytt» i listen
+  nesten stemmer med listen, rettes etterpå. «Lag ny tekst» i listen
   bruker listen på et opptak du alt har. Feltet gjøres høyere eller lavere
   ved å dra i håndtaket nederst til høyre
 - Teksten lages også mens enheten lader, med skjermen låst

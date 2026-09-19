@@ -35,6 +35,36 @@ final class FrodiUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["WhisperKit"].waitForExistence(timeout: 5), "Lisenslisten mangler")
     }
 
+    /// A swipe to the left shows what can be done with a recording, and «Slett»
+    /// asks in the row before anything goes. «Nei» keeps the recording. Uses a
+    /// recording the simulator already has, or makes a short one.
+    @MainActor
+    func test_swipeLeft_asksBeforeDeleting() {
+        let app = XCUIApplication()
+        app.launch()
+
+        var row = app.scrollViews.otherElements.buttons.firstMatch
+        if !row.waitForExistence(timeout: 3) {
+            app.buttons["Start opptak"].tap()
+            Thread.sleep(forTimeInterval: 2)
+            app.buttons["Stopp opptak"].tap()
+            row = app.scrollViews.otherElements.buttons.firstMatch
+            XCTAssertTrue(row.waitForExistence(timeout: 10), "Ingen rad å sveipe")
+        }
+        let label = row.label
+
+        row.swipeLeft()
+        let delete = app.buttons["Slett"].firstMatch
+        XCTAssertTrue(delete.waitForExistence(timeout: 5), "Sveipet viste ikke «Slett»")
+        delete.tap()
+
+        XCTAssertTrue(app.staticTexts["Sikker på at du vil slette?"].waitForExistence(timeout: 5), "Raden spurte ikke")
+        app.buttons["Nei"].tap()
+
+        XCTAssertTrue(app.staticTexts["Sikker på at du vil slette?"].waitForNonExistence(timeout: 5), "Spørsmålet ble stående")
+        XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "Opptaket forsvant etter «Nei»")
+    }
+
     /// The back button is the app's own, and UIKit switches the swipe from the
     /// left edge off for a screen that hides the system's. `PopGestureKeeper`
     /// switches it back on; this is what tells if an iOS release breaks that.

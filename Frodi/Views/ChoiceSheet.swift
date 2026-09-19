@@ -71,17 +71,19 @@ struct ChoiceSheet<Answers: View>: View {
 }
 
 extension View {
-    /// One answer in a `ChoiceSheet`: a full-width row in the shape of a list row,
-    /// applied to the label of the button.
+    /// One answer in a `ChoiceSheet`, or one action behind a `SwipeRow`: a row
+    /// in the shape of a list row, applied to the label of the button. In the
+    /// sheet it takes the full width; `inline`, it takes the width of its word
+    /// and the height of the row it stands behind.
     ///
     /// The destructive one is outlined and written in `recordingActive`, the
     /// red the design system reserves for where something is lost. Outlined,
     /// not filled: there is no `-on` colour for red, and an outline says
     /// «careful» without shouting. 5,48:1 on Surface, so the word is readable.
-    func choiceRow(destructive: Bool = false) -> some View {
+    func choiceRow(destructive: Bool = false, inline: Bool = false) -> some View {
         font(.Frodi.bodyMedium)
             .foregroundStyle(destructive ? Color.Frodi.recordingActive : Color.Frodi.textPrimary)
-            .frame(maxWidth: .infinity, minHeight: ChoiceRow.height)
+            .frame(maxWidth: inline ? nil : .infinity, minHeight: inline ? nil : ChoiceRow.height, maxHeight: inline ? .infinity : nil)
             .padding(.horizontal, Space.s4)
             .background(Color.Frodi.surface, in: RoundedRectangle(cornerRadius: Radius.control))
             .overlay(

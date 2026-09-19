@@ -65,7 +65,7 @@ Hvor lenge opptaket varer, avgjør når teksten lages:
 | Over 10 minutter    | Lages når du ber om det |
 
 Lange opptak står som «ingen tekst ennå» i listen. Åpne opptaket og trykk på
-«Lag tekst», eller hold fingeren på opptaket i listen og velg «Lag tekst».
+«Lag tekst», eller sveip opptaket i listen mot venstre og trykk på «Lag tekst».
 
 Appen viser i prosent hvor mye av teksten som er laget. Blir transkriberingen
 avbrutt, fortsetter den der den slapp.
@@ -115,8 +115,8 @@ Modellen henter listen før den lytter. Etterpå retter appen ord i teksten som
 nesten stemmer med et ord i listen. Ord på under fire bokstaver og tall rettes
 ikke.
 
-> **Tips:** Endrer du listen etter at teksten er laget: Hold fingeren på
-> opptaket i listen og velg «Lag teksten på nytt».
+> **Tips:** Endrer du listen etter at teksten er laget: Sveip opptaket i
+> listen mot venstre og trykk på «Lag ny tekst».
 
 ## Spille av
 
@@ -150,8 +150,10 @@ under Innstillinger i appen:
 
 ## Slette
 
-Hold fingeren på opptaket i listen og velg «Slett». Appen spør før den sletter.
-Opptaket og teksten blir borte fra enheten, og du kan ikke angre.
+Sveip opptaket i listen mot venstre og trykk på «Slett». Appen spør «Sikker på
+at du vil slette?» i samme rad; trykk på «Ja» for å slette eller «Nei» for å
+beholde opptaket. Opptaket og teksten blir borte fra enheten, og du kan ikke
+angre.
 
 > **Viktig:** Sletter du appen, forsvinner alt.
 
