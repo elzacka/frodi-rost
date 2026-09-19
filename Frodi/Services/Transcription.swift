@@ -61,7 +61,10 @@ enum Transcription {
                 recording.fileName = try await AudioStorage.seal(fileName: recording.fileName)
                 try? context.save()
             } catch {
-                AudioRecorder.log.notice("Seal of \(recording.fileName, privacy: .public) deferred: \(error, privacy: .public)")
+                // Whether the device was locked is what tells the expected deferral
+                // from a failure that needs looking into.
+                let unlocked = UIApplication.shared.isProtectedDataAvailable
+                AudioRecorder.log.notice("Seal of \(recording.fileName, privacy: .public) deferred, protected data available: \(unlocked, privacy: .public): \(error, privacy: .public)")
                 return
             }
         }
