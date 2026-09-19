@@ -131,10 +131,27 @@ final class RecordingController {
     ///
     /// The file being recorded right now has no row yet by design, and is skipped:
     /// the unlock pass runs while the car recording is still going.
+    ///
+    /// A plaintext file that opens and holds no frames is not a recording, the
+    /// same rule `AudioRecorder.stop` applies. The recorder creates the file
+    /// before `record()` can refuse, and a crash in between leaves it. It gets
+    /// no row, and a row it already has goes with it: the seal cannot encode an
+    /// empty file, so the row would say «venter på transkribering» for good and
+    /// the seal would fail at every launch. Measured on 2026-09-19: an empty
+    /// CAF is what gives the export session's -11800 with -12780 underneath.
     func reconcile(_ context: ModelContext) {
-        let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
         var onDisk = Set(AudioStorage.storedFileNames())
         if let current = recorder.currentFileName { onDisk.remove(current) }
+
+        for fileName in onDisk where !AudioStorage.isSealed(fileName) && AudioStorage.duration(fileName: fileName) == 0 {
+            AudioRecorder.log.notice("Empty recording file removed: \(fileName, privacy: .public)")
+            AudioStorage.delete(fileName: fileName)
+            onDisk.remove(fileName)
+            let stale = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
+            for recording in stale where recording.fileName == fileName { context.delete(recording) }
+        }
+
+        let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
         var referenced = Set(recordings.map(\.fileName))
 
         for recording in recordings where !onDisk.contains(recording.fileName) {

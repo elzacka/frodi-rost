@@ -21,8 +21,10 @@ final class AudioRecorder {
 
     private var recorder: AVAudioRecorder?
 
-    /// The file being written right now, so a pass over the folder can leave it alone.
-    var currentFileName: String? { recorder?.url.lastPathComponent }
+    /// The file being written right now, so a pass over the folder can leave it
+    /// alone. Set before the file exists: the recorder creates it before `record()`
+    /// answers, and a pass in that moment must not take it for an orphan.
+    private(set) var currentFileName: String?
 
     private var ticker: Task<Void, Never>?
     private var observers: [any NSObjectProtocol] = []
@@ -74,6 +76,7 @@ final class AudioRecorder {
 
             let name = "\(UUID().uuidString).caf"
             let url = AudioStorage.directory.appendingPathComponent(name)
+            currentFileName = name
 
             let (newRecorder, started) = try await Self.startRecorder(at: url)
             guard started else {
@@ -85,6 +88,7 @@ final class AudioRecorder {
                 Self.log.error("Recording did not start: record() returned false")
                 _ = try? await session.deactivate(options: .notifyOthersOnDeactivation)
                 try? FileManager.default.removeItem(at: url)
+                currentFileName = nil
                 state = .failed(String(localized: "Fikk ikke startet opptaket."))
                 return false
             }
@@ -100,6 +104,7 @@ final class AudioRecorder {
             return true
         } catch {
             Self.log.error("Recording did not start: \(error, privacy: .public)")
+            currentFileName = nil
             state = .failed(String(localized: "Fikk ikke tilgang til mikrofonen."))
             return false
         }
@@ -162,6 +167,7 @@ final class AudioRecorder {
         stopTicker()
         stopObserving()
         self.recorder = nil
+        currentFileName = nil
         state = .idle
         duration = 0
         isInterrupted = false

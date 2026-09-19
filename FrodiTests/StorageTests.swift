@@ -113,6 +113,24 @@ struct StorageTests {
     }
 
     @MainActor
+    @Test("En tom klartekstfil er ikke et opptak: ingen rad, og filen fjernes")
+    func emptyFileGetsNoRow() throws {
+        let name = try writeRecording(seconds: 0)
+        defer { remove(name) }
+        let container = try memoryContainer()
+        let context = container.mainContext
+        let row = Recording(duration: 0, fileName: name)
+        context.insert(row)
+        try context.save()
+
+        RecordingController.shared.reconcile(context)
+
+        let rows = try context.fetch(FetchDescriptor<Recording>())
+        #expect(!rows.contains { $0.fileName == name })
+        #expect(!AudioStorage.storedFileNames().contains(name))
+    }
+
+    @MainActor
     @Test("En rad som peker på klartekst som er forseglet får det nye navnet")
     func rowFollowsTheSeal() async throws {
         let name = try writeRecording()
