@@ -68,10 +68,10 @@ struct DocumentTests {
 
     /// The sentence has been rewritten in two apps at once before, which is
     /// exactly when copies drift.
-    @Test("Personvern-kortet åpner med samme setning som PERSONVERN.md")
+    @Test("Innstillinger og PERSONVERN.md sier den samme setningen om personvern")
     func privacyOpenerAgrees() throws {
         let text = try String(contentsOf: Self.root.appending(path: "PERSONVERN.md"), encoding: .utf8)
-        #expect(text.contains(InfoView.privacyOpener))
+        #expect(text.contains(SettingsView.privacyOpener))
     }
 
     /// The length rule is one constant in the code and one number in the guide.

@@ -13,11 +13,11 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Er opptaket over ti minutter, lager appen teksten når du ber om den, og
   viser hvor langt den har kommet. Blir den avbrutt, fortsetter den der den
   slapp neste gang
-- Teksten eksporteres som `.rtf` eller `.txt`. Formatet velger du på Info-siden;
+- Teksten eksporteres som `.rtf` eller `.txt`. Formatet velger du i Innstillinger;
   `.rtf` har overskrift og avsnitt
 - Når du eksporterer, velger du opptaket, teksten eller begge
 - «Slett» spør først, i et ark nederst på skjermen
-- Ordliste på Info-siden: Navn og ord Fróði bør kjenne, som firmaer, personer
+- Ordliste i Innstillinger: Navn og ord Fróði bør kjenne, som firmaer, personer
   og forkortelser. Modellen får listen før den lytter, og ord i teksten som
   nesten stemmer med listen, rettes etterpå. «Lag teksten på nytt» i listen
   bruker listen på et opptak du alt har
@@ -29,8 +29,11 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 ### Endret
 
-- Info-siden lenker til brukerveiledningen og personvernerklæringen. Kortene
-  Ordliste og Eksport har én setning hver
+- Siden bak knappen i logohodet heter «Innstillinger». Knappen er et fylt
+  tannhjul i en avrundet firkant. Siden har fire kort: Ordliste, Eksport,
+  Fróði røst med versjon og kontakt, og Dokumentasjon med lenker til
+  brukerveiledning, personvernerklæring, sikkerhet og tilgjengelighet, og
+  lisensene
 
 - Appen krever iOS 27.0 eller nyere
 - Teksten i kort, bannere og meldinger står mørkere, så den er lettere å lese

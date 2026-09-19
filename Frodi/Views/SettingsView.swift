@@ -1,17 +1,16 @@
 import SwiftUI
 
-/// The Info page: what the app is, what it builds on, and where the documents
-/// are. Opens as a sheet from the menu button in the logo header. A sheet, not
-/// a new page, because you should return to the list where you left it.
+/// Innstillinger: the two things you can set, what the app is, and the
+/// documents. Opens as a sheet from the settings button in the logo header. A
+/// sheet, not a new page, because you should return to the list where you
+/// left it.
 ///
-/// How to use the app is in BRUKERVEILEDNING.md and the privacy facts are in
-/// PERSONVERN.md; the page links to both rather than repeating them.
-///
-/// Not «Innstillinger»: the app has no options of its own. The word list and
-/// the text format are the two things you can change on the page, and neither
-/// is a mode: a list of names is not a setting, and a file extension is chosen
-/// once. The title says what the page is.
-struct InfoView: View {
+/// Settings first, since they are what the title promises. Then the card that
+/// says what the app is, with the version and the address, and last the
+/// documents: how to use the app, privacy, security, accessibility and the
+/// licences. The prose lives in the documents; the page links to them rather
+/// than repeating them.
+struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var words = WordList.load()
@@ -25,18 +24,15 @@ struct InfoView: View {
 
                 ScrollView {
                     VStack(spacing: Space.s4) {
-                        about
-                        privacy
-                        languageModel
                         wordList
                         export
-                        licenses
-                        version
+                        about
+                        documents
                     }
                     .padding(Space.s4)
                 }
             }
-            .navigationTitle("Info")
+            .navigationTitle("Innstillinger")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Color.Frodi.background, for: .navigationBar)
             .toolbar {
@@ -52,36 +48,37 @@ struct InfoView: View {
     }
 
     // MARK: - Cards
-    /// What the app is, and the link to how it is used.
-    private var about: some View {
-        card("Fróði røst") {
-            paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
-            paragraph("Appen tar opp lyd og gjør den om til norsk tekst.")
-            link("Brukerveiledning", to: Self.userGuide)
-        }
-    }
-
-    /// The first sentence of the Personvern card, and the first sentence of
+    /// The first sentence about privacy here, and the first sentence of
     /// PERSONVERN.md. A test keeps them the same sentence.
     static let privacyOpener = "Alt skjer på enheten. Ingen datatrafikk ut eller inn."
 
-    /// The promise, and the document that spells it out.
-    private var privacy: some View {
-        card("Personvern") {
-            paragraph(Self.privacyOpener)
-            link("Personvernerklæring", to: Self.privacyPolicy)
-        }
-    }
-
-    private var languageModel: some View {
-        card("Språkmodell") {
+    /// What the app is, what it runs on, which build this is, and where to write.
+    private var about: some View {
+        card("Fróði røst") {
+            paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
+            paragraph("Appen tar opp lyd og gjør den om til norsk tekst. " + Self.privacyOpener)
             paragraph("Modellen nb-whisper-small fra Nasjonalbiblioteket følger med appen og kjører inne i den.")
-            paragraph("Modellen er videretrent på 66\u{00A0}000 timer norsk tale. Den setter tegn og store bokstaver selv, og skriver om dialekt til bokmål.")
+            paragraph("Versjon \(Self.versionNumber)")
+            paragraph("Spørsmål eller feil: hei@tazk.no")
         }
     }
 
-    /// The app's one setting. Names the model should spell right: the field is
-    /// where a user types them once, and every transcription reads them.
+    /// One document per reader: the user, the privacy-minded, the security
+    /// reviewer, the accessibility reviewer, and the licence holders. The four
+    /// links open on GitHub in Safari; the licences are a screen in the app,
+    /// since Apache 2.0 requires the attribution to be in the app itself.
+    private var documents: some View {
+        card("Dokumentasjon") {
+            link("Brukerveiledning", to: Self.userGuide)
+            link("Personvernerklæring", to: Self.privacyPolicy)
+            link("Sikkerhet", to: Self.securityPolicy)
+            link("Tilgjengelighet", to: Self.accessibilityStatement)
+            licenses
+        }
+    }
+
+    /// Names the model should spell right: the field is where a user types
+    /// them once, and every transcription reads them.
     private var wordList: some View {
         card("Ordliste") {
             paragraph("Skriv inn navn og ord modellen kan bomme på. Skill dem med komma.")
@@ -141,30 +138,33 @@ struct InfoView: View {
         .accessibilityAddTraits(chosen ? .isSelected : [])
     }
 
+    /// A row, not a link: the licences are inside the app. The chevron says so.
     private var licenses: some View {
         NavigationLink {
             LicensesView()
         } label: {
-            card("Lisenser", opensScreen: true) {
-                paragraph("Modell, kode, ikoner og fonter appen bygger på, med lisens.")
+            HStack(spacing: Space.s2) {
+                Text("Lisenser")
+                    .font(.Frodi.caption)
+                    .foregroundStyle(Color.Frodi.textPrimary)
+                Spacer()
+                IconView(.chevronRight, size: IconSize.inline)
+                    .foregroundStyle(Color.Frodi.textSecondary)
             }
+            .frame(minHeight: ChoiceRow.height)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Lisenser")
-        .accessibilityHint("Åpner listen over modell, kode og fonter")
-    }
-
-    private var version: some View {
-        card("Versjon") {
-            paragraph("Fróði røst \(Self.versionNumber)")
-            paragraph("Spørsmål eller feil: hei@tazk.no")
-        }
+        .accessibilityHint("Åpner listen over modell, kode, ikoner og fonter")
     }
 
     // The links open in Safari. The app fetches nothing itself; it is the browser
     // that goes online, and only when you tap.
     private static let userGuide = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/BRUKERVEILEDNING.md")!
     private static let privacyPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/PERSONVERN.md")!
+    private static let securityPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/SECURITY.md")!
+    private static let accessibilityStatement = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/TILGJENGELIGHET.md")!
 
     private static var versionNumber: String {
         let info = Bundle.main.infoDictionary
@@ -177,22 +177,14 @@ struct InfoView: View {
     /// The settings card from the design system: eyebrow label in capitals over
     /// body text in caption, on surface with a 1 px border.
     @ViewBuilder
-    private func card(_ label: String, opensScreen: Bool = false, @ViewBuilder content: () -> some View) -> some View {
+    private func card(_ label: String, @ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: Space.s3) {
-            HStack(spacing: Space.s2) {
-                Text(label)
-                    .font(.Frodi.eyebrow)
-                    .eyebrowTracking()
-                    .textCase(.uppercase)
-                    .foregroundStyle(Color.Frodi.textSecondary)
-                    .accessibilityAddTraits(.isHeader)
-
-                if opensScreen {
-                    Spacer()
-                    IconView(.chevronRight, size: IconSize.inline)
-                        .foregroundStyle(Color.Frodi.textSecondary)
-                }
-            }
+            Text(label)
+                .font(.Frodi.eyebrow)
+                .eyebrowTracking()
+                .textCase(.uppercase)
+                .foregroundStyle(Color.Frodi.textSecondary)
+                .accessibilityAddTraits(.isHeader)
 
             content()
         }

@@ -18,8 +18,8 @@ enum Transcription {
     /// how the asking is remembered.
     static let immediateLimit: TimeInterval = 10 * 60
 
-    /// The same number as the Info page states it. One line to change, and the
-    /// sentence follows.
+    /// The same number as BRUKERVEILEDNING.md states it; `DocumentTests` holds
+    /// the two together.
     static var immediateMinutes: Int { Int(immediateLimit / 60) }
 
     /// Recordings being worked on right now.

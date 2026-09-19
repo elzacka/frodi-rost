@@ -19,17 +19,17 @@ final class FrodiUITests: XCTestCase {
         )
     }
 
-    /// The Info page is the app's only place for privacy, permissions and
+    /// Innstillinger is the app's only place for privacy, permissions and
     /// attribution. Apache 2.0 requires the licence list to actually be in the app.
     @MainActor
     func test_about_opensAndReachesLicenses() {
         let app = XCUIApplication()
         app.launch()
 
-        XCTAssertTrue(app.buttons["Info om appen"].waitForExistence(timeout: 5), "Knappen i logohodet mangler")
-        app.buttons["Info om appen"].tap()
+        XCTAssertTrue(app.buttons["Innstillinger"].waitForExistence(timeout: 5), "Knappen i logohodet mangler")
+        app.buttons["Innstillinger"].tap()
 
-        XCTAssertTrue(app.buttons["Lisenser"].waitForExistence(timeout: 5), "Info-siden åpnet ikke")
+        XCTAssertTrue(app.buttons["Lisenser"].waitForExistence(timeout: 5), "Innstillinger åpnet ikke")
         app.buttons["Lisenser"].tap()
 
         XCTAssertTrue(app.staticTexts["WhisperKit"].waitForExistence(timeout: 5), "Lisenslisten mangler")

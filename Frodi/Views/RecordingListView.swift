@@ -7,7 +7,7 @@ struct RecordingListView: View {
 
     @State private var controller = RecordingController.shared
     @State private var errorMessage: String?
-    @State private var showInfo = false
+    @State private var showSettings = false
     @State private var pendingDeletion: Recording?
 
     var body: some View {
@@ -40,8 +40,8 @@ struct RecordingListView: View {
             } message: {
                 Text(errorMessage ?? "").font(.Frodi.body)
             }
-            .sheet(isPresented: $showInfo) {
-                InfoView()
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
             }
         }
         .task {
@@ -58,7 +58,7 @@ struct RecordingListView: View {
             // An overlay, not a row: the wordmark should sit in the middle of the screen,
             // not in the middle of the space left beside the info button.
             .overlay(alignment: .trailing) {
-                aboutButton
+                settingsButton
                     .padding(.trailing, Space.s1)
             }
             .overlay(alignment: .bottom) {
@@ -90,17 +90,17 @@ struct RecordingListView: View {
         .accessibilityAddTraits(.isHeader)
     }
 
-    private var aboutButton: some View {
+    private var settingsButton: some View {
         Button {
-            showInfo = true
+            showSettings = true
         } label: {
-            IconView(.information, size: HeaderButton.icon)
+            IconView(.settings, size: HeaderButton.icon)
                 .foregroundStyle(Color.Frodi.textSecondary)
                 .frame(width: HeaderButton.touch, height: HeaderButton.touch)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Info om appen")
+        .accessibilityLabel("Innstillinger")
     }
 
     /// The database could not be opened, so the app runs on memory.
@@ -137,7 +137,7 @@ struct RecordingListView: View {
                 .font(.Frodi.title)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            Text("Trykk på opptaksknappen, eller hold inne handlingsknappen på venstre side. Trykk på Info-knappen for veiledning.")
+            Text("Trykk på opptaksknappen, eller hold inne handlingsknappen på venstre side. Brukerveiledningen ligger under Innstillinger.")
                 .font(.Frodi.caption)
                 .foregroundStyle(Color.Frodi.textPrimary)
                 .multilineTextAlignment(.center)

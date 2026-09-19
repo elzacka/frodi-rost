@@ -26,7 +26,7 @@
     "Fróði får ikke åpnet databasen på enheten. Du kan ta opp og eksportere som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette feilen." : {
 
     },
-    "Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger." : {
+    "Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger på enheten." : {
 
     },
     "Ingen opptak ennå" : {
@@ -53,7 +53,7 @@
     "Tekst" : {
 
     },
-    "Trykk på opptaksknappen, eller hold inne handlingsknappen på venstre side. Trykk på Info-knappen for veiledning." : {
+    "Trykk på opptaksknappen, eller hold inne handlingsknappen på venstre side. Brukerveiledningen ligger under Innstillinger." : {
 
     }
   },

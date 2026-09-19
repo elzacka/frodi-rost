@@ -13,11 +13,12 @@ import SwiftUI
 ///
 /// One style, Outlined, at weight 400 and optical size 24. Two fills are in use:
 /// unfilled for everything that is frame and navigation, filled for the buttons
-/// that sit on a coloured surface, where an outline would vanish. The raw value
-/// is Google's own name for the symbol, with `_fill` where the filled variant is
-/// the one bundled.
+/// that sit on a coloured surface, where an outline would vanish, and for the
+/// settings button in the header, where the solid rounded square is what gives
+/// a lone glyph on the page enough weight. The raw value is Google's own name
+/// for the symbol, with `_fill` where the filled variant is the one bundled.
 enum Icon: String, CaseIterable {
-    case information = "menu"
+    case settings = "settings_applications_fill"
     case close = "close"
     case chevronRight = "chevron_right"
     case chevronUp = "expand_less"

@@ -1,6 +1,6 @@
 # Brukerveiledning for Fróði røst
 
-Oppdatert 18. september 2026.
+Oppdatert 19. september 2026.
 
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 Denne veiledningen viser hvordan du bruker appen.
@@ -26,8 +26,8 @@ blir tatt opp, og hva opptaket skal brukes til.
 Knappen på venstre side av enheten kan starte og stoppe opptak. Den finnes på
 iPhone 15 Pro og nyere.
 
-Sett den opp først: Innstillinger > Handlingsknapp > Snarvei > Bla ned og velg
-«Fróði røst – Start eller stopp opptak».
+Sett den opp først, i Innstillinger på enheten: Handlingsknapp > Snarvei >
+Bla ned og velg «Fróði røst – Start eller stopp opptak».
 
 Hold knappen inne for å starte et opptak. Hold den inne igjen for å stoppe.
 
@@ -89,8 +89,8 @@ for å spille av lyden derfra.
 ## Ordliste
 
 Modellen kan bomme på navn og ord den ikke kjenner: Firmaer, personer,
-steder, forkortelser og standarder. Skriv dem inn i ordlisten på Info-siden,
-skilt med komma.
+steder, forkortelser og standarder. Skriv dem inn i ordlisten under
+Innstillinger i appen, skilt med komma.
 
 Modellen får listen før den lytter. Etterpå retter appen ord i teksten som
 nesten stemmer med listen. Korte ord på under fire bokstaver og tall rettes
@@ -117,7 +117,7 @@ velger du «Opptak og tekst», «Bare opptaket» eller «Bare teksten». Derette
 kommer delingsmenyen i iOS, der du velger hvor filene skal.
 
 Lyden eksporteres alltid som `.m4a`. Formatet for teksten velger du én gang,
-på Info-siden under Eksport:
+under Innstillinger i appen:
 
 | Format | Passer til |
 |---|---|

@@ -77,7 +77,7 @@ struct RecordingDetailView: View {
         } content: {
             ChoiceSheet(
                 title: "Eksporter",
-                message: "Lyd som .m4a, tekst som \(RecordingExport.TextFormat.chosen.label). Tekstformatet velger du på Info-siden."
+                message: "Lyd som .m4a, tekst som \(RecordingExport.TextFormat.chosen.label). Tekstformatet velger du i Innstillinger."
             ) {
                 Button { choose(.both) } label: { Text("Opptak og tekst").choiceRow() }
                 Button { choose(.audio) } label: { Text("Bare opptaket").choiceRow() }

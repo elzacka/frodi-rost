@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 15. september 2026.
+Sist oppdatert 19. september 2026.
 
 Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 å sende til, og ingen tjeneste å spørre.
@@ -15,7 +15,7 @@ Fróði røst er laget av elzacka (Tazk).
 |---|---|---|
 | Lydopptak | På enheten, kryptert | Til du sletter det |
 | Tekst fra opptaket, også den delen som er ferdig underveis | Samme sted, kryptert | Til du sletter den |
-| Ordlisten på Info-siden | Samme sted, kryptert | Til du endrer den |
+| Ordlisten i Innstillinger | Samme sted, kryptert | Til du endrer den |
 
 Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
 
@@ -69,7 +69,7 @@ i appen.
 | Rettighet | Slik gjør du det |
 |---|---|
 | Innsyn | Åpne opptaket i appen |
-| Eksportere | Trykk på delingsikonet, og velg opptaket, teksten eller begge. Lyden kommer som `.m4a`, teksten som `.txt` eller `.rtf`, det du har valgt på Info-siden |
+| Eksportere | Trykk på delingsikonet, og velg opptaket, teksten eller begge. Lyden kommer som `.m4a`, teksten som `.txt` eller `.rtf`, det du har valgt i Innstillinger |
 | Sletting | Hold fingeren på opptaket i listen, og velg «Slett» |
 
 Sletter du appen, forsvinner alt. Det skjer med én gang, og du kan ikke angre.

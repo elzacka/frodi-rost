@@ -58,9 +58,9 @@ struct ExportTests {
         #expect(urls.map(\.pathExtension) == ["m4a"])
     }
 
-    /// The format chosen on the Info page is what the export reads, and `.rtf`
+    /// The format chosen in Innstillinger is what the export reads, and `.rtf`
     /// is what it reads before anything is chosen.
-    @Test("Formatet velges på Info-siden")
+    @Test("Formatet velges i Innstillinger")
     func chosenFormatIsReadFromDefaults() {
         let key = RecordingExport.TextFormat.key
         let before = UserDefaults.standard.string(forKey: key)

@@ -19,7 +19,7 @@ enum RecordingExport {
         case both, audio, text
     }
 
-    /// The document the text becomes. Chosen once, on the Info page, and kept
+    /// The document the text becomes. Chosen once, in Innstillinger, and kept
     /// in `UserDefaults`: a format name is not personal data, so it needs none
     /// of the vault the word list gets.
     enum TextFormat: String, CaseIterable {
