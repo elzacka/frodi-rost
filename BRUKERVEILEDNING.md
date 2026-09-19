@@ -106,7 +106,8 @@ for å spille av lyden derfra.
 
 Modellen kan bomme på navn og ord den ikke kjenner: Firmaer, personer,
 steder, forkortelser og standarder. Skriv dem inn i ordlisten under
-Innstillinger i appen, skilt med komma.
+Innstillinger i appen, skilt med komma. Blir listen lang, drar du i håndtaket
+nederst til høyre i feltet for å gjøre det høyere.
 
 Modellen henter listen før den lytter. Etterpå retter appen ord i teksten som
 nesten stemmer med et ord i listen. Ord på under fire bokstaver og tall rettes

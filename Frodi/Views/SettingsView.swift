@@ -14,6 +14,11 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var words = WordList.load()
+    /// The height of the word list field, in points. Kept between sessions so
+    /// a field once dragged tall stays tall.
+    @AppStorage(WordList.heightKey) private var fieldHeight = Double(WordListField.minHeight)
+    /// The height when the finger landed on the grip; the drag adds to it.
+    @State private var heightAtDragStart: Double?
     /// The same key `RecordingExport.TextFormat.chosen` reads.
     @AppStorage(RecordingExport.TextFormat.key) private var textFormat = RecordingExport.TextFormat.rtf
 
@@ -79,26 +84,82 @@ struct SettingsView: View {
 
     /// Names the model should spell right: the field is where a user types
     /// them once, and every transcription reads them.
+    ///
+    /// A `TextEditor` with a fixed height, not a text field that grows with its
+    /// content: the height is the user's to set, by the grip in the lower right
+    /// corner, and the text scrolls inside it. The cards below follow the
+    /// field's height through the layout, so nothing overlaps as it grows.
     private var wordList: some View {
         card("Ordliste") {
             paragraph("Skriv inn navn og ord modellen kan bomme på. Skill dem med komma.")
 
-            TextField("Aall & Ulefos Brug, ISO 19011", text: $words, axis: .vertical)
-                .lineLimit(2...8)
+            TextEditor(text: $words)
                 .font(.Frodi.body)
                 .foregroundStyle(Color.Frodi.textPrimary)
+                .scrollContentBackground(.hidden)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
-                .padding(Space.s3)
+                .accessibilityLabel("Ordliste")
+                .padding(Space.s2)
+                .frame(height: fieldHeight)
                 .background(Color.Frodi.background, in: RoundedRectangle(cornerRadius: Radius.control))
                 .overlay(
                     RoundedRectangle(cornerRadius: Radius.control)
                         .strokeBorder(Color.Frodi.border, lineWidth: 1)
                 )
-                .accessibilityLabel("Ordliste")
+                .overlay(alignment: .topLeading) { placeholder }
+                .overlay(alignment: .bottomTrailing) { grip }
                 .onChange(of: words) { _, text in WordList.save(text) }
                 .hiddenWhileScreenCaptured()
         }
+    }
+
+    /// `TextEditor` has no placeholder of its own. This one sits where the
+    /// first line of text will, and lets touches through to the editor.
+    @ViewBuilder
+    private var placeholder: some View {
+        if words.isEmpty {
+            Text("Aall & Ulefos Brug, ISO 19011")
+                .font(.Frodi.body)
+                .foregroundStyle(Color.Frodi.textSecondary)
+                .padding(WordListField.textInset)
+                .padding(Space.s2)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
+    }
+
+    /// The lower right corner of the field. Drag it to make the field taller or
+    /// shorter; under VoiceOver it is adjustable, one touch target per step.
+    /// High priority, or the scroll view takes the vertical drag for itself.
+    private var grip: some View {
+        IconView(.resize, size: WordListField.grip)
+            .foregroundStyle(Color.Frodi.textSecondary)
+            .padding(Space.s2)
+            .frame(width: WordListField.gripTouch, height: WordListField.gripTouch, alignment: .bottomTrailing)
+            .contentShape(Rectangle())
+            .highPriorityGesture(
+                DragGesture()
+                    .onChanged { drag in
+                        let start = heightAtDragStart ?? fieldHeight
+                        heightAtDragStart = start
+                        fieldHeight = Self.clampedHeight(start + drag.translation.height)
+                    }
+                    .onEnded { _ in heightAtDragStart = nil }
+            )
+            .accessibilityLabel("Høyde på feltet")
+            .accessibilityValue("\(Int(fieldHeight)) punkt")
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: fieldHeight = Self.clampedHeight(fieldHeight + WordListField.step)
+                case .decrement: fieldHeight = Self.clampedHeight(fieldHeight - WordListField.step)
+                @unknown default: break
+                }
+            }
+    }
+
+    private static func clampedHeight(_ height: Double) -> Double {
+        min(max(height, WordListField.minHeight), WordListField.maxHeight)
     }
 
     /// The one choice the export offers in advance. What to hand over, audio or

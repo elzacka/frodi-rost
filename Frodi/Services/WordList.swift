@@ -13,6 +13,10 @@ import Foundation
 /// about them. `UserDefaults` would have put them in the iCloud backup in the
 /// clear.
 enum WordList {
+    /// The `UserDefaults` key for the height of the field in Innstillinger. A
+    /// height is not personal data, so it does not go through the vault.
+    static let heightKey = "wordListFieldHeight"
+
     static var url: URL {
         URL.documentsDirectory.appendingPathComponent("Ordliste.enc")
     }

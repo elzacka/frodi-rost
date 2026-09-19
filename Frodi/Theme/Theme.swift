@@ -136,6 +136,26 @@ enum ChoiceRow {
     static let height: CGFloat = 44
 }
 
+// MARK: - Word list field
+/// The design system describes no resizable field. The one in the Ordliste card
+/// has a grip in its lower right corner that drags it taller or shorter, so a
+/// long list is read in a tall field and a short one does not hold the page.
+enum WordListField {
+    /// Three lines of body text with the insets. Where the field starts, and
+    /// the least the grip allows.
+    static let minHeight: CGFloat = 88
+    /// About half a screen. The page scrolls; the field need not be it.
+    static let maxHeight: CGFloat = 400
+    /// The grip glyph, and the touch area around it.
+    static let grip: CGFloat = 16
+    static let gripTouch: CGFloat = 44
+    /// One step of the grip under VoiceOver: one touch target.
+    static let step: CGFloat = 44
+    /// `TextEditor`'s own inset around its text. The placeholder is drawn over
+    /// the editor and has to start where the typed text will.
+    static let textInset = EdgeInsets(top: 8, leading: 5, bottom: 8, trailing: 5)
+}
+
 // MARK: - Tracking
 extension Text {
     /// Eyebrow labels are tracked 0.06 em in the design system.
