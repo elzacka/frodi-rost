@@ -48,19 +48,21 @@ Bla ned og velg «Fróði røst – Start eller stopp opptak».
 
 Hold knappen inne for å starte et opptak. Hold den inne igjen for å stoppe.
 
-| Enheten er | Starte | Stoppe |
-|---|---|---|
-| Låst opp | Starter med en gang | Stopper med en gang |
-| Låst | Enheten må låses opp først. Har du Face ID, skjer det automatisk når kameraet ser deg | Stopper uten å låse opp |
+| Enheten&nbsp;er | Starte                     | Stoppe                  |
+| --------------- | -------------------------- | ----------------------- |
+| Låst opp        | Starter med en gang        | Stopper med en gang     |
+| Låst            | Enheten må låses opp først | Stopper uten å låse opp |
+
+Har du Face ID, låses enheten opp av seg selv når kameraet ser deg.
 
 ## Teksten
 
 Hvor lenge opptaket varer, avgjør når teksten lages:
 
-| Opptaket varer | Teksten |
-|---|---|
-| Inntil 10 minutter | Lages når du stopper |
-| Over 10 minutter | Lages når du ber om det |
+| Opptaket&nbsp;varer | Teksten                 |
+| ------------------- | ----------------------- |
+| Inntil 10 minutter  | Lages når du stopper    |
+| Over 10 minutter    | Lages når du ber om det |
 
 Lange opptak står som «ingen tekst ennå» i listen. Åpne opptaket og trykk på
 «Lag tekst», eller hold fingeren på opptaket i listen og velg «Lag tekst».
@@ -72,9 +74,9 @@ Teksten lages mens appen er åpen, eller mens enheten lader med skjermen låst.
 
 Omtrent så lang tid tar det:
 
-| Opptak | Tid |
-|---|---|
-| 10 minutter | 4–5 minutter |
+| Opptak      | Tid            |
+| ----------- | -------------- |
+| 10 minutter | 4–5 minutter   |
 | 30 minutter | 11–13 minutter |
 | 60 minutter | 22–27 minutter |
 
@@ -96,11 +98,11 @@ for å spille av lyden derfra.
 
 ### Hvis teksten mangler
 
-| Det står | Det betyr |
-|---|---|
-| «venter på transkribering» | Teksten er i kø og lages snart |
-| «Fant ingen tale i dette opptaket.» | Opptaket er stille, eller lyden er for svak |
-| «Teksten kunne ikke lages denne gangen.» | Noe gikk galt. Trykk på «Prøv på nytt» |
+| Det&nbsp;står                            | Det&nbsp;betyr                              |
+| ---------------------------------------- | ------------------------------------------- |
+| «venter på transkribering»               | Teksten er i kø og lages snart              |
+| «Fant ingen tale i dette opptaket.»      | Opptaket er stille, eller lyden er for svak |
+| «Teksten kunne ikke lages denne gangen.» | Noe gikk galt. Trykk på «Prøv på nytt»      |
 
 ## Ordliste
 
@@ -137,10 +139,10 @@ kommer delingsmenyen i iOS, der du velger hvor filene skal sendes eller lagres.
 Lyden eksporteres alltid som `.m4a`. Formatet for teksten velger du én gang,
 under Innstillinger i appen:
 
-| Format | Passer til |
-|---|---|
+| Format | Passer&nbsp;til                                                                                  |
+| ------ | ------------------------------------------------------------------------------------------------ |
 | `.rtf` | Åpnes som dokument i Word, Pages og Notater. Har overskrift, dato og tidspunkt for hvert avsnitt |
-| `.txt` | Ren tekst som kan limes inn hvor som helst |
+| `.txt` | Ren tekst som kan limes inn hvor som helst                                                       |
 
 > **Viktig:** Skal du bytte enhet: Eksporter opptakene først. Opptakene er
 > låst til enheten og kan ikke leses av en annen, heller ikke fra en
