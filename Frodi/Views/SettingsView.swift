@@ -41,13 +41,10 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Color.Frodi.background, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    // A cross, not «Ferdig»: there is nothing to confirm here, the sheet just
-                    // closes. The icon also carries no type, so the question of Inter beside the
-                    // system title goes away. VoiceOver needs the name the button does not write.
-                    Button { dismiss() } label: { IconView(.close, size: IconSize.toolbar) }
-                        .accessibilityLabel("Lukk")
-                }
+                // A cross, not «Ferdig»: there is nothing to confirm here, the sheet just
+                // closes. The icon also carries no type, so the question of Inter beside the
+                // system title goes away. VoiceOver needs the name the button does not write.
+                ToolbarButton(icon: .close, label: "Lukk", placement: .topBarTrailing) { dismiss() }
             }
         }
     }
@@ -351,6 +348,7 @@ struct LicensesView: View {
         .navigationTitle("Lisenser")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Color.Frodi.background, for: .navigationBar)
+        .frodiBackButton()
     }
 
     private func group(_ label: String, _ components: [Component]) -> some View {

@@ -56,18 +56,14 @@ struct RecordingDetailView: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Color.Frodi.background, for: .navigationBar)
+        .frodiBackButton()
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    if recording.hasTranscript {
-                        asksWhatToExport = true
-                    } else {
-                        Task { await exportRecording(.audio) }
-                    }
-                } label: {
-                    IconView(.share, size: IconSize.toolbar)
+            ToolbarButton(icon: .share, label: "Eksporter opptaket", placement: .topBarTrailing) {
+                if recording.hasTranscript {
+                    asksWhatToExport = true
+                } else {
+                    Task { await exportRecording(.audio) }
                 }
-                .accessibilityLabel("Eksporter opptaket")
             }
         }
         .sheet(isPresented: $asksWhatToExport) {

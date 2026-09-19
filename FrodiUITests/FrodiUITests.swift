@@ -34,4 +34,25 @@ final class FrodiUITests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["WhisperKit"].waitForExistence(timeout: 5), "Lisenslisten mangler")
     }
+
+    /// The back button is the app's own, and UIKit switches the swipe from the
+    /// left edge off for a screen that hides the system's. `PopGestureKeeper`
+    /// switches it back on; this is what tells if an iOS release breaks that.
+    /// Lisenser is the screen used because it needs no recording to reach.
+    @MainActor
+    func test_swipeFromLeftEdge_popsTheScreen() {
+        let app = XCUIApplication()
+        app.launch()
+
+        app.buttons["Innstillinger"].tap()
+        XCTAssertTrue(app.buttons["Lisenser"].waitForExistence(timeout: 5), "Innstillinger åpnet ikke")
+        app.buttons["Lisenser"].tap()
+        XCTAssertTrue(app.buttons["Tilbake"].waitForExistence(timeout: 5), "Tilbakeknappen mangler")
+
+        let edge = app.coordinate(withNormalizedOffset: CGVector(dx: 0.0, dy: 0.5))
+        let inward = app.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5))
+        edge.press(forDuration: 0.05, thenDragTo: inward, withVelocity: .slow, thenHoldForDuration: 0.2)
+
+        XCTAssertTrue(app.buttons["Lisenser"].waitForExistence(timeout: 5), "Sveip fra venstre kant gikk ikke tilbake")
+    }
 }

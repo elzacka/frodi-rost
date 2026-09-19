@@ -19,6 +19,7 @@ import SwiftUI
 enum Icon: String, CaseIterable {
     case settings = "instant_mix"
     case close = "close"
+    case back = "arrow_back_ios_new"
     case chevronRight = "chevron_right"
     case chevronUp = "expand_less"
     case chevronDown = "expand_more"
@@ -27,8 +28,8 @@ enum Icon: String, CaseIterable {
     case skipBack = "replay_10"
     case skipForward = "forward_10"
     case resize = "drag_handle"
-
     case external = "open_in_new"
+
     case microphone = "mic_fill"
     case stop = "stop_fill"
     case play = "play_arrow_fill"
