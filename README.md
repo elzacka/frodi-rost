@@ -92,8 +92,11 @@ xcrun simctl create "Frodi-Test" \
 xcrun simctl boot Frodi-Test
 xcrun simctl bootstatus Frodi-Test -b
 xcodebuild -project Frodi.xcodeproj -scheme Frodi \
-  -destination 'platform=iOS Simulator,name=Frodi-Test' test
+  -destination 'platform=iOS Simulator,name=Frodi-Test' \
+  -collect-test-diagnostics never test
 ```
+
+`-collect-test-diagnostics never` er ikke valgfritt i praksis: Uten det venter xcodebuild ti minutter på en diagnoserapport fra simulatoren som aldri kommer, etter at testene er ferdige. Med det tar hele kjøringen under ett minutt.
 
 ## Arkitektur
 
