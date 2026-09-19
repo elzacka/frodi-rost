@@ -102,16 +102,9 @@ struct RecordingListView: View {
     }
 
     private var settingsButton: some View {
-        Button {
+        IconButton(icon: .settings, size: HeaderButton.icon, label: "Innstillinger") {
             showSettings = true
-        } label: {
-            IconView(.settings, size: HeaderButton.icon)
-                .foregroundStyle(Color.Frodi.textSecondary)
-                .frame(width: HeaderButton.touch, height: HeaderButton.touch)
-                .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Innstillinger")
     }
 
     /// The database could not be opened, so the app runs on memory.
@@ -256,17 +249,19 @@ struct RecordingListView: View {
     /// does not remake.
     private func textAction(for recording: Recording) -> (label: LocalizedStringKey, run: () -> Void)? {
         guard !recording.isTranscribing else { return nil }
-        if recording.hasTranscript {
-            return ("Lag ny tekst", {
-                setStage(.closed, of: recording)
-                recording.sealedTranscript = nil
-                try? context.save()
-                Task { await transcribe(recording) }
-            })
+        let label: LocalizedStringKey = if recording.hasTranscript {
+            "Lag ny tekst"
+        } else if Transcription.awaitsRequest(recording) {
+            "Lag tekst"
+        } else {
+            "Prøv på nytt"
         }
-        let label: LocalizedStringKey = Transcription.awaitsRequest(recording) ? "Lag tekst" : "Prøv på nytt"
         return (label, {
             setStage(.closed, of: recording)
+            if recording.hasTranscript {
+                recording.sealedTranscript = nil
+                try? context.save()
+            }
             Task { await transcribe(recording) }
         })
     }

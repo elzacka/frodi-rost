@@ -56,7 +56,7 @@ struct SettingsView: View {
 
     /// What the app is, what it runs on, which build this is, and where to write.
     private var about: some View {
-        card("Fróði røst") {
+        Card("Fróði røst") {
             paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
             paragraph("Appen tar opp lyd og gjør den om til norsk tekst. " + Self.privacyOpener)
             paragraph("Modellen nb-whisper-small fra Nasjonalbiblioteket følger med appen og kjører inne i den.")
@@ -70,7 +70,7 @@ struct SettingsView: View {
     /// Safari; the licences are a screen in the app, since Apache 2.0 requires
     /// the attribution to be in the app itself.
     private var documents: some View {
-        card("Dokumentasjon") {
+        Card("Dokumentasjon") {
             link("Brukerveiledning", to: Self.userGuide)
             link("Personvernerklæring", to: Self.privacyPolicy)
             link("Sikkerhet", to: Self.securityPolicy)
@@ -86,7 +86,7 @@ struct SettingsView: View {
     /// corner, and the text scrolls inside it. The cards below follow the
     /// field's height through the layout, so nothing overlaps as it grows.
     private var wordList: some View {
-        card("Ordliste") {
+        Card("Ordliste") {
             paragraph("Skriv inn navn og ord modellen kan bomme på. Skill dem med komma.")
 
             TextEditor(text: $words)
@@ -165,7 +165,7 @@ struct SettingsView: View {
     /// text or both, is asked where the export is made; the shape of the text
     /// is decided here, once, because it is the same every time.
     private var export: some View {
-        card("Eksport") {
+        Card("Eksport") {
             paragraph("Lyden eksporteres alltid som .m4a. Velg format for teksten.")
 
             HStack(spacing: Space.s2) {
@@ -233,29 +233,6 @@ struct SettingsView: View {
     }
 
     // MARK: - Building blocks
-    /// The settings card from the design system: eyebrow label in capitals over
-    /// body text in caption, on surface with a 1 px border.
-    @ViewBuilder
-    private func card(_ label: String, @ViewBuilder content: () -> some View) -> some View {
-        VStack(alignment: .leading, spacing: Space.s3) {
-            Text(label)
-                .font(.Frodi.eyebrow)
-                .eyebrowTracking()
-                .textCase(.uppercase)
-                .foregroundStyle(Color.Frodi.textSecondary)
-                .accessibilityAddTraits(.isHeader)
-
-            content()
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(Space.s4)
-        .background(Color.Frodi.surface, in: RoundedRectangle(cornerRadius: Radius.card))
-        .overlay(
-            RoundedRectangle(cornerRadius: Radius.card)
-                .strokeBorder(Color.Frodi.border, lineWidth: 1)
-        )
-    }
-
     /// Running text in a card. `textPrimary`, not `textSecondary`: this is what
     /// the page is for. The card label above it is the secondary tone.
     private func paragraph(_ text: String) -> some View {
@@ -265,7 +242,6 @@ struct SettingsView: View {
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
-
 
     /// A link out of the app, at the same size and in the same tone as the text
     /// around it. The mark is `open_in_new` after the word, small and in the
@@ -350,14 +326,7 @@ struct LicensesView: View {
     }
 
     private func group(_ label: String, _ components: [Component]) -> some View {
-        VStack(alignment: .leading, spacing: Space.s3) {
-            Text(label)
-                .font(.Frodi.eyebrow)
-                .eyebrowTracking()
-                .textCase(.uppercase)
-                .foregroundStyle(Color.Frodi.textSecondary)
-                .accessibilityAddTraits(.isHeader)
-
+        Card(label) {
             ForEach(components) { component in
                 VStack(alignment: .leading, spacing: 2) {
                     Text(component.name)
@@ -371,6 +340,32 @@ struct LicensesView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityElement(children: .combine)
             }
+        }
+    }
+}
+
+/// The settings card from the design system: eyebrow label in capitals over
+/// its content, on surface with a 1 px border. Innstillinger and Lisenser are
+/// both built of it.
+private struct Card<Content: View>: View {
+    let label: String
+    @ViewBuilder let content: () -> Content
+
+    init(_ label: String, @ViewBuilder content: @escaping () -> Content) {
+        self.label = label
+        self.content = content
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Space.s3) {
+            Text(label)
+                .font(.Frodi.eyebrow)
+                .eyebrowTracking()
+                .textCase(.uppercase)
+                .foregroundStyle(Color.Frodi.textSecondary)
+                .accessibilityAddTraits(.isHeader)
+
+            content()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(Space.s4)
