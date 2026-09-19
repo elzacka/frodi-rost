@@ -19,9 +19,10 @@ settings:
     SWIFT_STRICT_CONCURRENCY: complete
     SWIFT_APPROACHABLE_CONCURRENCY: true
     ENABLE_USER_SCRIPT_SANDBOXING: true
-    # Xcode 27's recommended setting; without it the project carries an
+    # Xcode 27's recommended settings; without them the project carries an
     # "Update to recommended settings" issue on every open.
     STRING_CATALOG_GENERATE_SYMBOLS: true
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: true
 packages:
   # Pinned, not a range. A fresh clone must build the same binary that was
   # reviewed, and Package.resolved is committed for the transitive packages.
