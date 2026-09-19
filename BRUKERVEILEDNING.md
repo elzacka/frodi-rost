@@ -5,6 +5,22 @@ Oppdatert 19.09.26.
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 Denne veiledningen viser hvordan du bruker appen.
 
+## Innhold
+
+- [Ta opp](#ta-opp)
+- [Handlingsknappen](#handlingsknappen)
+- [Teksten](#teksten)
+  - [Snarveien «Lag tekst i Fróði røst»](#snarveien-lag-tekst-i-fróði-røst)
+  - [Slik lages teksten](#slik-lages-teksten)
+  - [Hvis teksten mangler](#hvis-teksten-mangler)
+- [Ordliste](#ordliste)
+- [Spille av](#spille-av)
+- [Kopiere teksten](#kopiere-teksten)
+- [Eksportere](#eksportere)
+- [Slette](#slette)
+- [Personvern](#personvern)
+- [Spørsmål eller feil](#spørsmål-eller-feil)
+
 ## Ta opp
 
 Trykk på opptaksknappen nederst på skjermen. Trykk igjen for å stoppe.
