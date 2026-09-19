@@ -5,7 +5,7 @@ Oppdatert 19.09.26.
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 Denne veiledningen viser hvordan du bruker appen.
 
-## Innhold
+**Innhold**
 
 - [Ta opp](#ta-opp)
 - [Handlingsknappen](#handlingsknappen)
@@ -21,6 +21,8 @@ Denne veiledningen viser hvordan du bruker appen.
 - [Personvern](#personvern)
 - [Spørsmål eller feil](#spørsmål-eller-feil)
 
+---
+
 ## Ta opp
 
 Trykk på opptaksknappen nederst på skjermen. Trykk igjen for å stoppe.
@@ -33,8 +35,8 @@ Opptak har ingen tidsgrense.
 Blir du oppringt mens du tar opp, settes opptaket på pause og fortsetter når
 samtalen er over. Hvis ikke, er alt fram til samtalen lagret.
 
-Tar du opp en samtale, må du si fra til de andre at du tar den opp, og hva du
-skal bruke opptaket til.
+> **Viktig:** Tar du opp en samtale, må du si fra til de andre at du tar den
+> opp, og hva du skal bruke opptaket til.
 
 ## Handlingsknappen
 
@@ -85,8 +87,9 @@ i en automatisering i appen Snarveier, for eksempel når laderen kobles til.
 
 Modellen nb-whisper-small fra Nasjonalbiblioteket følger med appen og kjører
 på enheten. Den er trent på 66 000 timer norsk tale, setter tegn og store
-bokstaver selv og skriver dialekt om til bokmål. Du trenger ikke si «punktum»
-eller «komma».
+bokstaver selv og skriver dialekt om til bokmål.
+
+> **Tips:** Du trenger ikke si «punktum» eller «komma».
 
 Teksten deles i avsnitt. Hvert avsnitt har et tidspunkt. Trykk på tidspunktet
 for å spille av lyden derfra.
@@ -109,8 +112,8 @@ Modellen henter listen før den lytter. Etterpå retter appen ord i teksten som
 nesten stemmer med et ord i listen. Ord på under fire bokstaver og tall rettes
 ikke.
 
-Endrer du listen etter at teksten er laget: Hold fingeren på opptaket i listen
-og velg «Lag teksten på nytt».
+> **Tips:** Endrer du listen etter at teksten er laget: Hold fingeren på
+> opptaket i listen og velg «Lag teksten på nytt».
 
 ## Spille av
 
@@ -138,15 +141,16 @@ under Innstillinger i appen:
 | `.rtf` | Åpnes som dokument i Word, Pages og Notater. Har overskrift, dato og tidspunkt for hvert avsnitt |
 | `.txt` | Ren tekst som kan limes inn hvor som helst |
 
-Skal du bytte enhet: Eksporter opptakene først. Opptakene er låst til enheten
-og kan ikke leses av en annen, heller ikke fra en sikkerhetskopi.
+> **Viktig:** Skal du bytte enhet: Eksporter opptakene først. Opptakene er
+> låst til enheten og kan ikke leses av en annen, heller ikke fra en
+> sikkerhetskopi.
 
 ## Slette
 
 Hold fingeren på opptaket i listen og velg «Slett». Appen spør før den sletter.
 Opptaket og teksten blir borte fra enheten, og du kan ikke angre.
 
-Sletter du appen, forsvinner alt.
+> **Viktig:** Sletter du appen, forsvinner alt.
 
 ## Personvern
 
@@ -158,4 +162,8 @@ Hele personvernerklæringen: [PERSONVERN.md](PERSONVERN.md).
 
 ## Spørsmål eller feil
 
-**hei@tazk.no**
+Skriv til **hei@tazk.no**.
+
+---
+
+[Til toppen](#brukerveiledning-for-fróði-røst)
