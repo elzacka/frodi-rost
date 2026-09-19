@@ -83,6 +83,8 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
 
 `-collect-test-diagnostics never` er ikke valgfritt i praksis: Uten det venter xcodebuild ti minutter på en diagnoserapport fra simulatoren som aldri kommer, etter at testene er ferdige. Med det tar hele kjøringen under ett minutt.
 
+Talemotoren kan måles mot en lydfil, med og uten ordliste. Filen bør vare over tre minutter. Se toppen av `FrodiTests/PiecewiseTranscriptionTests.swift`.
+
 ## Arkitektur
 
 Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
@@ -90,6 +92,7 @@ Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
 | Steg                                                                                                                                                                           | Fil                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
 | Handlingsknappen utløser intenten (App Intent), som kjører i bakgrunnen når iOS tillater det                                                                                   | `Intents/ToggleRecordingIntent.swift`                               |
+| Snarveien «Lag tekst» kjører transkriberingen i bakgrunnen, for eksempel fra en automatisering                                                                                 | `Intents/TranscribePendingIntent.swift`                             |
 | Kontrolleren tar imot kall fra intenten og opptaksknappen, og «eier» databasen                                                                                                 | `Services/RecordingController.swift`                                |
 | Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Opptaket går derfor ikke tapt ved krasj. | `Services/AudioRecorder.swift`                                      |
 | Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad får en ny rad                                                                  | `Services/RecordingController.swift`                                |

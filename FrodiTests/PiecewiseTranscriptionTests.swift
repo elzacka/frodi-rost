@@ -13,7 +13,9 @@ import Testing
 /// ```
 ///
 /// Prints the pieces, the words and the peak memory, so a change to the piece
-/// length or the seam can be measured rather than guessed at.
+/// length or the seam can be measured rather than guessed at. The resume
+/// test needs a fixture longer than one piece, `pieceLength`. With
+/// `FRODI_WORDS` set, that text is the word list for the whole-file run.
 @Suite("Transkribering i stykker", .serialized)
 struct PiecewiseTranscriptionTests {
     private static var fixture: URL? {
