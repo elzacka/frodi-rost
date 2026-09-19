@@ -50,14 +50,7 @@ final class AudioPlayer {
         fileName = name
 
         do {
-            // The decryption bypasses the main actor. A long recording is tens of
-            // megabytes, and the interface must not freeze meanwhile.
-            let audio = try await Task.detached(priority: .userInitiated) {
-                try AudioStorage.plaintext(fileName: name)
-            }.value
-
-            let newPlayer = try AVAudioPlayer(data: audio)
-            newPlayer.prepareToPlay()
+            let newPlayer = try await Self.makePlayer(fileName: name)
             player = newPlayer
             duration = newPlayer.duration
             currentTime = 0
@@ -65,6 +58,23 @@ final class AudioPlayer {
         } catch {
             state = .failed(error.localizedDescription)
         }
+    }
+
+    /// Decrypts the recording and readies a player for it, off the main actor.
+    ///
+    /// The decryption is tens of megabytes for a long recording, and
+    /// `prepareToPlay()` configures the audio session synchronously, which Xcode
+    /// flags as a hang risk on the main thread. The category is set here for the
+    /// same reason: setting it while the session is active blocks too.
+    @concurrent
+    private static func makePlayer(fileName: String) async throws -> sending AVAudioPlayer {
+        let audio = try AudioStorage.plaintext(fileName: fileName)
+        // spokenAudio treats speech better than default. playback, not
+        // playAndRecord: playback must not ask for the microphone.
+        try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
+        let player = try AVAudioPlayer(data: audio)
+        player.prepareToPlay()
+        return player
     }
 
     // MARK: - Controls
@@ -112,12 +122,9 @@ final class AudioPlayer {
         guard let player else { return }
 
         do {
-            // spokenAudio treats speech better than default. playback, not
-            // playAndRecord: playback must not ask for the microphone. Activation
-            // is asynchronous, as Xcode asks: on the main thread it blocks.
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .spokenAudio)
-            guard try await session.activate(options: []) else {
+            // Asynchronous, as Xcode asks: on the main thread the activation
+            // blocks. The category was set when the player was made.
+            guard try await AVAudioSession.sharedInstance().activate(options: []) else {
                 state = .failed(String(localized: "Fikk ikke startet avspillingen."))
                 return
             }

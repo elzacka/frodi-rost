@@ -75,28 +75,7 @@ final class AudioRecorder {
             let name = "\(UUID().uuidString).caf"
             let url = AudioStorage.directory.appendingPathComponent(name)
 
-            // Linear PCM in a CAF container, not AAC in an MPEG-4 one. Measured on
-            // 2026-09-14: an app killed mid-recording leaves an `.m4a` that
-            // cannot be opened at all, because the index is written at close. CAF
-            // with AAC opens but has no packets, for the same reason. Only PCM has
-            // no table to write, so a kill at any point leaves every frame playable.
-            // The file is about 115 MB an hour, and `AudioStorage.seal` turns it
-            // into AAC once the recording is finished.
-            let settings: [String: Any] = [
-                AVFormatIDKey: Int(kAudioFormatLinearPCM),
-                AVSampleRateKey: Self.sampleRate,
-                AVNumberOfChannelsKey: 1,
-                AVLinearPCMBitDepthKey: 16,
-                AVLinearPCMIsFloatKey: false,
-                AVLinearPCMIsBigEndianKey: false
-            ]
-
-            let newRecorder = try AVAudioRecorder(url: url, settings: settings)
-            // Xcode still reports one synchronous activation here, from inside
-            // `record()`: the recorder activates the session on its own even when
-            // it is already active. Measured 2026-09-19 with a probe around each
-            // step; nothing in the app's code is left to move.
-            guard newRecorder.record() else {
+            guard let newRecorder = try await Self.startRecorder(at: url) else {
                 // What iOS answers when an app tries to begin recording in the
                 // background: cannotStartRecording, reported here as false. The
                 // session is active and the recorder may have created the file;
@@ -123,6 +102,34 @@ final class AudioRecorder {
             state = .failed(String(localized: "Fikk ikke tilgang til mikrofonen."))
             return false
         }
+    }
+
+    /// Makes the recorder and starts it, off the main actor. Nil when iOS
+    /// refuses to start recording.
+    ///
+    /// `record()` activates the session on its own, synchronously, even when it
+    /// is already active, and Xcode flags that as a hang risk on the main thread.
+    /// Measured 2026-09-19 with a probe around each step.
+    ///
+    /// Linear PCM in a CAF container, not AAC in an MPEG-4 one. Measured on
+    /// 2026-09-14: an app killed mid-recording leaves an `.m4a` that cannot be
+    /// opened at all, because the index is written at close. CAF with AAC opens
+    /// but has no packets, for the same reason. Only PCM has no table to write,
+    /// so a kill at any point leaves every frame playable. The file is about
+    /// 115 MB an hour, and `AudioStorage.seal` turns it into AAC once the
+    /// recording is finished.
+    @concurrent
+    private static func startRecorder(at url: URL) async throws -> sending AVAudioRecorder? {
+        let settings: [String: Any] = [
+            AVFormatIDKey: Int(kAudioFormatLinearPCM),
+            AVSampleRateKey: sampleRate,
+            AVNumberOfChannelsKey: 1,
+            AVLinearPCMBitDepthKey: 16,
+            AVLinearPCMIsFloatKey: false,
+            AVLinearPCMIsBigEndianKey: false
+        ]
+        let recorder = try AVAudioRecorder(url: url, settings: settings)
+        return recorder.record() ? recorder : nil
     }
 
     /// Stops the recording and returns the file name and length.
