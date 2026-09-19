@@ -283,15 +283,16 @@ struct LicensesView: View {
         Component(name: "Tokenizer, whisper-small", origin: "OpenAI", license: "Apache 2.0")
     ]
 
+    /// The packages Xcode resolves, by their identity in `Package.resolved`.
     static let code = [
-        Component(name: "WhisperKit", origin: "Argmax", license: "MIT"),
-        Component(name: "swift-transformers", origin: "Hugging Face", license: "Apache 2.0"),
-        Component(name: "swift-jinja", origin: "Hugging Face", license: "Apache 2.0"),
-        Component(name: "swift-collections", origin: "Apple", license: "Apache 2.0"),
-        Component(name: "swift-argument-parser", origin: "Apple", license: "Apache 2.0"),
-        Component(name: "swift-crypto", origin: "Apple", license: "Apache 2.0"),
-        Component(name: "swift-asn1", origin: "Apple", license: "Apache 2.0"),
-        Component(name: "yyjson", origin: "Yao Yuan", license: "MIT")
+        Component(name: "argmax-oss-swift", origin: "Argmax", license: "MIT"),
+        Component(name: "swift-argument-parser", origin: "Apple", license: "Apache 2.0")
+    ]
+
+    /// Source that ships inside argmax-oss-swift rather than as a package of its
+    /// own. Apache 2.0 asks for attribution whichever way the code arrives.
+    static let embedded = [
+        Component(name: "swift-transformers", origin: "Hugging Face", license: "Apache 2.0")
     ]
 
     static let icons = [
@@ -303,7 +304,7 @@ struct LicensesView: View {
         Component(name: "Inter", origin: "Rasmus Andersson", license: "SIL Open Font License 1.1")
     ]
 
-    static var allComponents: [Component] { model + code + icons + fonts }
+    static var allComponents: [Component] { model + code + embedded + icons + fonts }
 
     var body: some View {
         ZStack {
@@ -312,7 +313,7 @@ struct LicensesView: View {
             ScrollView {
                 VStack(spacing: Space.s4) {
                     group("Modell", Self.model)
-                    group("Kode", Self.code)
+                    group("Kode", Self.code + Self.embedded)
                     group("Ikoner", Self.icons)
                     group("Fonter", Self.fonts)
                 }

@@ -27,8 +27,8 @@ packages:
   # Pinned, not a range. A fresh clone must build the same binary that was
   # reviewed, and Package.resolved is committed for the transitive packages.
   WhisperKit:
-    url: https://github.com/argmaxinc/whisperkit
-    exactVersion: "0.18.0"
+    url: https://github.com/argmaxinc/argmax-oss-swift
+    exactVersion: "1.1.0"
 targets:
   Frodi:
     type: application

@@ -46,7 +46,7 @@ struct DocumentTests {
 
     /// Every package Xcode resolved is attributed, nothing is attributed that is
     /// no longer resolved, and the version and link in TREDJEPART.md are the ones
-    /// in `Package.resolved`. The day WhisperKit pulls in a ninth package, this fails.
+    /// in `Package.resolved`. The day argmax-oss-swift pulls in a third package, this fails.
     @Test("Kodepakkene er de som står i Package.resolved, med samme versjon og lenke")
     func packagesMatchResolved() throws {
         let path = "Frodi.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"

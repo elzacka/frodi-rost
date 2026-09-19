@@ -9,6 +9,7 @@ import UIKit
 /// happens inside the app's own container. There is no other engine.
 enum Transcription {
     /// Kept alive between recordings. The model takes several seconds to load.
+    @MainActor
     private static let whisper = WhisperTranscriber()
 
     /// Up to this length a recording is transcribed as soon as it is stopped. A

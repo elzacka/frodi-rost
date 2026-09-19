@@ -104,7 +104,9 @@ struct PiecewiseTranscriptionTests {
 
         let rest = try await transcribe(from: first[0].position)
         let duration = try WhisperTranscriber.duration(of: Self.fixture!)
-        #expect(abs(rest.last!.position - duration) < 0.2)
+        // A fixture shorter than one piece has no rest to resume; fail, do not trap the host.
+        let last = try #require(rest.last, "Fikseringen er kortere enn ett stykke")
+        #expect(abs(last.position - duration) < 0.2)
         #expect(rest.flatMap(\.paragraphs).allSatisfy { $0.start >= first[0].position - 0.01 })
 
         let whole = try await transcribe(from: 0)

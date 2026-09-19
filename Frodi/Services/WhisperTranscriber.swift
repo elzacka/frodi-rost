@@ -2,15 +2,6 @@ import AVFoundation
 import Foundation
 import WhisperKit
 
-/// WhisperKit 0.18 is not annotated for Swift 6, so the compiler has to be told
-/// that the type can cross an isolation boundary.
-///
-/// This is an assertion on our part, not something the compiler can prove. The
-/// basis: WhisperKit manages its own concurrency internally, and in this app
-/// every call arrives from the main actor via `Transcription`, one recording at
-/// a time. Remove this line as soon as WhisperKit annotates its own type.
-extension WhisperKit: @retroactive @unchecked Sendable {}
-
 /// nb-whisper from the National Library, run inside the app.
 ///
 /// The difference from Apple's engine is not whether the audio leaves the device,
@@ -263,8 +254,8 @@ final class WhisperTranscriber: Transcriber {
     /// Whether both tokenizer files are in the bundle.
     ///
     /// `download: false` governs the model folder only. When the tokenizer cannot
-    /// be read locally, WhisperKit 0.18 falls back to fetching it from Hugging
-    /// Face without consulting that flag. So the app checks for the files itself,
+    /// be read locally, WhisperKit falls back to fetching it from Hugging Face
+    /// without consulting that flag; `ModelUtilities.loadTokenizer` in 1.1.0. So the app checks for the files itself,
     /// before WhisperKit is ever created, and a build missing one of them reports
     /// the model as missing rather than reach for the network.
     nonisolated static var tokenizerIsComplete: Bool {
