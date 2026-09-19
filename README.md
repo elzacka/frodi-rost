@@ -4,21 +4,6 @@ Tar opp lyd på iPhone og gjør den om til norsk tekst (transkriberer). Alt skje
 
 «Fróði»: Norrønt for «den kunnskapsrike». «Røst»: Stemme, viser til opptaksfunksjonen.
 
-**Innhold**
-
-- [Status](#status)
-- [Hva appen gjør](#hva-appen-gjør)
-- [Modell](#modell)
-- [Krav](#krav)
-- [Bygg](#bygg)
-- [Test](#test)
-- [Arkitektur](#arkitektur)
-- [Lisens](#lisens)
-- [Bidrag](#bidrag)
-- [Mer](#mer)
-
----
-
 ## Status
 
 Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
