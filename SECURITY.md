@@ -50,7 +50,7 @@ The app assumes a passcode is set and iOS is not compromised.
 | Not defended against | A compromised OS, or an exploit chain on an unlocked device. An unlocked device in someone else's hands. A screenshot. Whatever happens to a file after export                                                        |
 
 Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0 on
-2026-09-14, by reading the controls against the code rather than by
+2026-09-19, by reading the controls against the code rather than by
 running MASTG. The profile is MAS-L2+P: the app holds a key that encrypts
 user data of a kind OWASP lists as high risk. Every applicable L2 and P
 control is met, with two exceptions: local authentication (AUTH-2, AUTH-3)
@@ -101,7 +101,7 @@ The sections below explain the choices.
 | Export compliance          | `ITSAppUsesNonExemptEncryption` is `false`. The only cryptography is Apple's CryptoKit and the Secure Enclave                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `project.yml`                                                            |
 | Compiler                   | `SWIFT_STRICT_CONCURRENCY: complete`, `SWIFT_APPROACHABLE_CONCURRENCY: true`, `SWIFT_VERSION: 6`, `ENABLE_USER_SCRIPT_SANDBOXING: true`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `project.yml`                                                            |
 | Build integrity            | WhisperKit pinned to an exact version, `Package.resolved` committed, model files fetched at a fixed revision and checked against a committed checksum list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `project.yml`, `Scripts/fetch-model.sh`, `Scripts/model-checksums.txt`   |
-| Attack surface kept closed | No URL schemes, document types, Handoff, Spotlight indexing, extensions or app group. One App Intent, `ToggleRecordingIntent` («Start eller stopp opptak»), published as an App Shortcut so the Action Button can run it. The same publication makes it reachable from the Shortcuts app, automations and Siri; iOS offers no way to admit the button and refuse the rest. It runs without confirmation once microphone access is granted, because a confirmation would defeat the button while driving. The compensating control is the system's: the orange microphone indicator shows whenever the app holds the microphone, in the foreground or not | `Info.plist`, `ToggleRecordingIntent`                                    |
+| Attack surface kept closed | No URL schemes, document types, Handoff, Spotlight indexing, extensions or app group. Two App Intents, both published as App Shortcuts. `ToggleRecordingIntent` («Start eller stopp opptak») exists so the Action Button can run it; it runs without confirmation once microphone access is granted, because a confirmation would defeat the button while driving, and the compensating control is the system's orange microphone indicator. `TranscribePendingIntent` («Lag tekst») transcribes whatever is waiting, in the background, and opens sealed audio the same way the charger run does: after the first unlock, inside the sandbox, with nothing shown and nothing exported. Publication makes both reachable from the Shortcuts app, automations and Siri; iOS offers no way to admit the button and refuse the rest | `Info.plist`, `ToggleRecordingIntent`, `TranscribePendingIntent`         |
 
 ## Encryption
 
@@ -132,8 +132,9 @@ every piece. Sealing needs only the public key, so it works in any lock
 state. In the foreground the screen stays awake. On a charger, the
 `BGProcessingTask` `com.Tazk.Frodi.transcribe` runs while the device is idle
 and locked, resumes from the last piece, and stops when iOS ends the task.
-The plaintext copy the model reads is opened once and held across the pieces,
-because a fresh open would fail on a locked device.
+The plaintext copy the model reads carries the same class as the ciphertext,
+so the engine can open it on a locked device, and it is held open across the
+pieces rather than reopened for each.
 
 > [!NOTE]
 > This has not yet run on a device. The simulator cannot execute a
@@ -147,7 +148,9 @@ because a fresh open would fail on a locked device.
 | Stopped, awaiting seal      | `.completeUnlessOpen`, closed           | Cannot be reopened until unlock, which is also when the seal happens                                                                                                                                                                                      |
 | Sealed recording, word list | `.completeUntilFirstUserAuthentication` | Ciphertext under a key of the same class: readable on the charger with the screen locked, which background transcription needs, and unreadable before the first unlock since boot. Sealing re-encodes PCM to AAC through a scratch copy; see the last row |
 | Transcription progress      | `.completeUntilFirstUserAuthentication` | Already ciphertext. Read back by the background run                                                                                                                                                                                                       |
-| Temporary plaintext         | `.completeUnlessOpen`                   | Held open for the length of the job so a lock does not stop it; cannot be reopened once closed. Removed in a `defer`, and the folder is emptied at launch                                                                                                 |
+| Database                    | `.completeUntilFirstUserAuthentication` | iOS' default for the container. Holds dates, durations, file names and the sealed transcripts; nothing in it is plaintext content                                                                                                                         |
+| Plaintext for transcription | `.completeUntilFirstUserAuthentication` | Written and closed by the decrypt, then opened by the engine and held for the run. `.completeUnlessOpen` would refuse that second open on a locked device, which is where the charger run happens. Same class as the ciphertext and the key it came from, so nothing becomes readable that was not. Removed in a `defer`, and the folder is emptied at launch |
+| Plaintext for export        | `.completeUnlessOpen`                   | Created and handed to the share sheet in one unlocked session. Removed when the sheet closes, and the folder is emptied at launch                                                                                                                         |
 
 The backup flag is re-applied rather than trusted. Apple documents it as
 resettable by file operations, and SQLite creates `-wal` and `-shm` only on
@@ -164,17 +167,17 @@ manifest that declares collected data, or `URLSession`, `URLRequest`,
 
 The model is bundled and loaded with `download: false` and explicit local
 paths, so a missing model fails rather than fetches. That flag does not cover
-the tokenizer: WhisperKit 0.18 falls back to Hugging Face when it cannot read
+the tokenizer: WhisperKit falls back to Hugging Face when it cannot read
 the tokenizer locally. The app therefore checks that both tokenizer files
 exist before it creates WhisperKit, and reports the model as missing if
 either is absent. A build phase fails the build itself when the model is not
 in it, so such a build cannot be archived.
 
 > [!NOTE]
-> One qualification. WhisperKit depends on `swift-transformers`, whose
-> `Hub` target contains an HTTP client. It is linked into the binary, and
-> nothing in the app calls it: the model and the tokenizer are read from the
-> bundle, never fetched. The claim is «this app makes no network requests», not
+> One qualification. WhisperKit ships with a copy of `swift-transformers`'
+> `Hub` module, which contains an HTTP client. It is linked into the binary,
+> and nothing in the app calls it: the model and the tokenizer are read from
+> the bundle, never fetched. The claim is «this app makes no network requests», not
 > «this binary contains no networking code». The second would be stronger, and
 > it would be false.
 
@@ -183,11 +186,11 @@ in it, so such a build cannot be archived.
 Versions and licences are in [TREDJEPART.md](TREDJEPART.md), which a test
 keeps in step with `Package.resolved` and the in-app licence screen.
 
-WhisperKit 0.18 is not annotated for Swift 6. The app gives it a retroactive
-`@unchecked Sendable` conformance. That is an assertion, not something the
-compiler verifies, and it holds only because every call comes from the main
-actor, one recording at a time. Remove it when WhisperKit annotates its own
-types.
+WhisperKit is the `WhisperKit` product of `argmax-oss-swift`, pinned to one
+version. It brings one package with it, `swift-argument-parser`, and carries
+its own copy of `swift-transformers`' Hub and Tokenizers sources; nothing
+else is resolved. The package is annotated for Swift 6, and the app makes no
+`Sendable` assertion on its behalf.
 
 ## Build integrity
 
@@ -204,10 +207,11 @@ with it is transcription quality and bias, not exfiltration.
 | Omission                       | Reason                                                                                                                                                                                                                         |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | No app-level lock              | The device lock already applies: a locked device must be unlocked before the app can start a recording. A second lock, inside the app, would be one more obstacle in the car                                                   |
+| No auto-lock while transcribing in front | A transcription running in the foreground keeps the screen awake, so the device does not lock itself for as long as it runs, which for an hour of interview is a long time on a table. Locking would suspend the run; the charger route exists for that case, and is the one the guide recommends for long recordings |
 | No certificate pinning         | There is no transport                                                                                                                                                                                                          |
 | No jailbreak detection (MAS-R) | The threat model assumes iOS is not compromised, and a check that a compromised OS can lie to adds nothing. The source is public instead, for audit                                                                            |
 | No forced update               | Checking would need a network request. TestFlight expires builds on its own; an organisation that needs a minimum version enforces it through MDM                                                                              |
-| No advisory feed               | Dependencies are pinned, so an upstream fix reaches the app only when someone bumps the version. Nothing watches WhisperKit or its seven packages for advisories                                                               |
+| No advisory feed               | Dependencies are pinned, so an upstream fix reaches the app only when someone bumps the version. Nothing watches `argmax-oss-swift` or `swift-argument-parser` for advisories; the check is done by hand before a release             |
 | No overwrite on delete         | The file is already ciphertext, with its only key wrapped inside it, so deleted blocks are noise. iOS deletes by discarding the per-file key, and APFS is copy-on-write, so an overwrite would land on different blocks anyway |
 | No screenshot blocking         | `userDidTakeScreenshotNotification` fires after the image exists, and the undocumented `isSecureTextEntry` trick can break without warning. The app does not offer what it cannot deliver                                      |
 

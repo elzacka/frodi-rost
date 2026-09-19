@@ -206,6 +206,14 @@ enum AudioStorage {
     /// `Transcription.run` calls from the main actor. All three steps take the whole
     /// file at once, and an hour of audio is about 30 MB.
     ///
+    /// `.completeUntilFirstUserAuthentication`, the class of the ciphertext it
+    /// came from and of the key that opened it. `write` closes the file, and the
+    /// engine opens it again; a closed `.completeUnlessOpen` file cannot be
+    /// reopened while the device is locked, which is where the charger run lives.
+    /// The stricter class would have failed the run at the first piece. Whoever
+    /// can read this copy in the window it exists could open the original the
+    /// same way, so the class costs nothing the threat model counts.
+    ///
     /// `body` stays with the caller. The engine is bound to the main actor and must
     /// still be called from there.
     @concurrent
@@ -213,7 +221,7 @@ enum AudioStorage {
         let audio = try plaintext(fileName: fileName)
 
         let temporary = scratchDirectory.appendingPathComponent(UUID().uuidString + ".m4a")
-        try audio.write(to: temporary, options: [.completeFileProtectionUnlessOpen])
+        try audio.write(to: temporary, options: [.completeFileProtectionUntilFirstUserAuthentication])
         return temporary
     }
 

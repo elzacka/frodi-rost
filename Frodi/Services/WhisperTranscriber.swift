@@ -72,10 +72,10 @@ final class WhisperTranscriber: Transcriber {
         try await load()
         guard let whisper else { throw TranscriptionError.modelMissing }
 
-        // Opened once and kept open. The plaintext copy is `.completeUnlessOpen`: a
-        // handle taken while it could be opened keeps working after the screen
-        // locks, but a fresh open would fail. On the charger every piece after the
-        // first would otherwise fail.
+        // Opened once and kept open across the pieces, so the file is read
+        // through one handle however long the run takes; see
+        // `AudioStorage.decryptToTemporary` for the class that lets the open
+        // itself succeed on a locked device.
         let file = try AudioPieces(url: fileURL)
         let duration = file.duration
         var position = start

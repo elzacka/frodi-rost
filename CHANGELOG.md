@@ -51,8 +51,14 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Et opptak som mistet raden sin i listen, får den tilbake ved neste oppstart
 - Et opptak som stoppes mens enheten er låst, blir tatt vare på. Før slettet
   appen det, fordi den ikke fikk lest filen og tok det for tomt
+- Med ordliste kunne modellen svare med tom tekst uten feilmelding. Rettet i
+  talemotoren, som er oppdatert til argmax-oss-swift 1.1.0
+- Teksten som lages mens enheten lader, fikk ikke åpnet sin egen kopi av lyden
+  på en låst enhet, og opptaket ble merket som mislykket
 
 ### Sikkerhet
+
+- Talemotoren tar med seg to pakker i stedet for åtte. Lisenslisten følger
 
 - Nøkkelen som låser opp opptak og tekst, kan brukes av appen etter at
   enheten har vært låst opp én gang siden omstart, også mens den er låst
