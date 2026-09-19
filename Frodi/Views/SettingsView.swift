@@ -132,6 +132,9 @@ struct SettingsView: View {
     /// The lower right corner of the field. Drag it to make the field taller or
     /// shorter; under VoiceOver it is adjustable, one touch target per step.
     /// High priority, or the scroll view takes the vertical drag for itself.
+    /// Measured in global space: the grip moves down with every point the
+    /// field grows, so in its own space the finger would seem to move back
+    /// and the field would shrink again, frame after frame.
     private var grip: some View {
         IconView(.resize, size: WordListField.grip)
             .foregroundStyle(Color.Frodi.textSecondary)
@@ -139,7 +142,7 @@ struct SettingsView: View {
             .frame(width: WordListField.gripTouch, height: WordListField.gripTouch, alignment: .bottomTrailing)
             .contentShape(Rectangle())
             .highPriorityGesture(
-                DragGesture()
+                DragGesture(coordinateSpace: .global)
                     .onChanged { drag in
                         let start = heightAtDragStart ?? fieldHeight
                         heightAtDragStart = start
