@@ -49,7 +49,7 @@ enum WordList {
 
     /// Spells the listed names the way the list does, where the model nearly did.
     ///
-    /// The prompt is a bias, not a rule: measured on 14 September 2026, it fixed
+    /// The prompt is a bias, not a rule: measured on 2026-09-14, it fixed
     /// «Osserud» to «Aaserud» and left «Norgkvist» for «Nordkvist» and «TASK» for
     /// «Tazk» every time. Those are one or two letters off, and the user has said
     /// what the word is. So the finished text is compared against the list, whole

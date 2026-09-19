@@ -86,7 +86,7 @@ struct ExportTests {
         )
         let text = opened.string
 
-        #expect(text.hasPrefix("Opptak 14. september 2026"))
+        #expect(text.hasPrefix("Opptak 14.09.26"))
         #expect(text.contains("Lengde 58 min, 12 sek"))
         #expect(text.contains("[12:37] Hvem har ansvar for oppfølgingen?"))
         #expect(text.contains("prosedyren.\n"))

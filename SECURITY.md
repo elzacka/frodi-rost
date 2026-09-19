@@ -2,7 +2,7 @@
 
 Fróði røst records audio and transcribes it on the device. Nothing is transmitted.
 
-Last reviewed 15 September 2026.
+Last reviewed 2026-09-19.
 
 ## Reporting a vulnerability
 
@@ -31,7 +31,7 @@ The app assumes a passcode is set and iOS is not compromised.
 | Not defended against | A compromised OS, or an exploit chain on an unlocked device. An unlocked device in someone else's hands. A screenshot. Whatever happens to a file after export |
 
 Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0 on
-14 September 2026, by reading the controls against the code rather than by
+2026-09-14, by reading the controls against the code rather than by
 running MASTG. The profile is MAS-L2+P: the app holds a key that encrypts
 user data of a kind OWASP lists as high risk. Every applicable L2 and P
 control is met, with two exceptions: local authentication (AUTH-2, AUTH-3)
@@ -173,7 +173,7 @@ types.
 What a fresh clone builds is what was reviewed, not what the upstream
 repositories serve on the day. The model is a third-party CoreML conversion
 of nb-whisper-small, not published by the National Library. The checksums
-guarantee that the files are the ones measured on 7 September 2026; they do
+guarantee that the files are the ones measured on 2026-09-07; they do
 not guarantee that the files are benign, since a weights file cannot be read
 for intent. Because the model never touches the network, what could be wrong
 with it is transcription quality and bias, not exfiltration.
@@ -182,7 +182,7 @@ with it is transcription quality and bias, not exfiltration.
 
 | Omission | Reason |
 |---|---|
-| No biometric lock | The app is used with hands busy, while driving. A Face ID gate at the moment of recording would defeat its purpose |
+| No app-level lock | The device lock already applies: a locked device must be unlocked before the app can start a recording. A second lock, inside the app, would be one more obstacle in the car |
 | No certificate pinning | There is no transport |
 | No jailbreak detection (MAS-R) | The threat model assumes iOS is not compromised, and a check that a compromised OS can lie to adds nothing. The source is public instead, for audit |
 | No forced update | Checking would need a network request. TestFlight expires builds on its own; an organisation that needs a minimum version enforces it through MDM |

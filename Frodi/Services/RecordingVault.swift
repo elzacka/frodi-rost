@@ -188,9 +188,9 @@ enum RecordingVault {
     private static func createKey() throws -> SecKey {
         // afterFirstUnlockThisDeviceOnly, so a transcription can open a recording
         // while the device sits locked on the charger; see BackgroundTranscription.
-        // The stricter whenUnlocked was the class from 13 September to 14 September
-        // 2026, and would have kept a seized, locked, once-unlocked device from
-        // using the key. Decided by elzacka on 14 September 2026: an hour of
+        // The stricter whenUnlocked was the class from 2026-09-13 to 2026-09-14,
+        // and would have kept a seized, locked, once-unlocked device from
+        // using the key. Decided by elzacka on 2026-09-14: an hour of
         // interview transcribed overnight is worth that margin. A key created by a
         // build in between keeps whenUnlocked, and on that device the transcription
         // runs only while unlocked; the class is fixed at creation and the app does

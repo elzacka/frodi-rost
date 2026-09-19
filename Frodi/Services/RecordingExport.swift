@@ -62,7 +62,7 @@ enum RecordingExport {
     ///
     /// `@concurrent` keeps it off the main thread. Without it, it lands there:
     /// `SWIFT_APPROACHABLE_CONCURRENCY` makes a `nonisolated async` function inherit
-    /// the caller's actor, and here the view calls. Measured 9 September 2026: the
+    /// the caller's actor, and here the view calls. Measured 2026-09-09: the
     /// interface froze until the share sheet came up.
     @concurrent
     private static func write(
@@ -121,7 +121,7 @@ enum RecordingExport {
 
         let document = NSMutableAttributedString()
         document.append(NSAttributedString(
-            string: "Opptak \(createdAt.formatted(exportDate))\n",
+            string: "Opptak \(createdAt.recordingStamp)\n",
             attributes: [.font: heading, .paragraphStyle: spaced]
         ))
         document.append(NSAttributedString(
@@ -146,11 +146,6 @@ enum RecordingExport {
             from: NSRange(location: 0, length: document.length),
             documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf]
         )
-    }
-
-    /// «14. september 2026 kl. 10:30», in Bokmål whatever the device says.
-    private static var exportDate: Date.FormatStyle {
-        Date.FormatStyle(date: .long, time: .shortened, locale: AppLocale.norwegian)
     }
 
     /// «58 min, 12 sek».

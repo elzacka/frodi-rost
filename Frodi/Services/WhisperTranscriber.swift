@@ -170,7 +170,7 @@ final class WhisperTranscriber: Transcriber {
     /// The model sometimes answers a window full of speech with only the end marker.
     /// The piece then comes back empty, and the text used to get a hole nobody could
     /// see: the recording was as long as before, but the last thing said was gone.
-    /// No decoder setting fixes it: measured on 10 September 2026, higher
+    /// No decoder setting fixes it: measured on 2026-09-10, higher
     /// temperature, `usePrefillPrompt: false` and `suppressBlank` all gave exactly
     /// the same empty answer on the same 15 seconds.
     ///
@@ -240,7 +240,7 @@ final class WhisperTranscriber: Transcriber {
             //
             // Whisper hears 30 seconds at a time. Without chunking, WhisperKit runs every
             // window through the same decoder, and from window two onward nothing comes
-            // out. Measured 9 September 2026 on a recording of 3 minutes 3 seconds: 86 of
+            // out. Measured 2026-09-09 on a recording of 3 minutes 3 seconds: 86 of
             // 516 words. With .vad every chunk is its own run, and 512 words came out.
             //
             // The chunker looks for a pause to cut on. If it finds none, engine noise in

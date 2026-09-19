@@ -1,6 +1,6 @@
 # Brukerveiledning for Fróði røst
 
-Oppdatert 19. september 2026.
+Oppdatert 19.09.26.
 
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 Denne veiledningen viser hvordan du bruker appen.
@@ -12,14 +12,13 @@ Tidtakeren over knappen viser hvor lenge opptaket har vart.
 
 Opptaket fortsetter når skjermen låser seg og når du bytter app.
 
-Det er ingen tidsgrense. Et opptak kan vare så lenge du vil.
+Opptak har ingen tidsgrense.
 
-Ringer noen mens du tar opp, blir opptaket satt på pause. Når samtalen er
-over, fortsetter det. Fortsetter det ikke, er det du har tatt opp fram til
-samtalen lagret.
+Blir du oppringt mens du tar opp, settes opptaket på pause og fortsetter når
+samtalen er over. Hvis ikke, er alt fram til samtalen lagret.
 
-Tar du opp et intervju, er det du som må fortelle den du intervjuer at det
-blir tatt opp, og hva opptaket skal brukes til.
+Tar du opp en samtale, må du si fra til de andre at du tar den opp, og hva du
+skal bruke opptaket til.
 
 ## Handlingsknappen
 
@@ -34,7 +33,7 @@ Hold knappen inne for å starte et opptak. Hold den inne igjen for å stoppe.
 | Enheten er | Starte | Stoppe |
 |---|---|---|
 | Låst opp | Starter med en gang | Stopper med en gang |
-| Låst | Må låses opp først. Face ID gjør det uten at du merker det, hvis den ser deg | Stopper uten å låse opp |
+| Låst | Enheten må låses opp først. Har du Face ID, skjer det automatisk når kameraet ser deg | Stopper uten å låse opp |
 
 ## Teksten
 
@@ -45,17 +44,15 @@ Hvor lenge opptaket varer, avgjør når teksten lages:
 | Inntil 10 minutter | Lages når du stopper |
 | Over 10 minutter | Lages når du ber om det |
 
-For et langt opptak står det «ingen tekst ennå» i listen. Trykk på «Lag
-tekst» på opptakets side, eller hold fingeren på opptaket i listen og velg
-«Lag tekst» der.
+Lange opptak står som «ingen tekst ennå» i listen. Åpne opptaket og trykk på
+«Lag tekst», eller hold fingeren på opptaket i listen og velg «Lag tekst».
 
-Appen viser hvor langt den har kommet, i prosent. Blir den avbrutt, fortsetter
-den der den slapp neste gang.
+Appen viser i prosent hvor mye av teksten som er laget. Blir transkriberingen
+avbrutt, fortsetter den der den slapp.
 
-Teksten kan også lages mens enheten lader med skjermen låst. La appen være
-åpen, eller sett enheten til lading.
+Teksten lages mens appen er åpen, eller mens enheten lader med skjermen låst.
 
-Så lang tid tar det å lage teksten. Tallene er grove anslag:
+Omtrent så lang tid tar det:
 
 | Opptak | Tid |
 |---|---|
@@ -71,9 +68,9 @@ i en automatisering i appen Snarveier, for eksempel når laderen kobles til.
 ### Slik lages teksten
 
 Modellen nb-whisper-small fra Nasjonalbiblioteket følger med appen og kjører
-inne i den. Den er videretrent på 66 000 timer norsk tale. Den setter tegn
-og store bokstaver selv, og skriver om dialekt til bokmål. Du trenger ikke si
-«punktum» eller «komma».
+på enheten. Den er trent på 66 000 timer norsk tale, setter tegn og store
+bokstaver selv og skriver dialekt om til bokmål. Du trenger ikke si «punktum»
+eller «komma».
 
 Teksten deles i avsnitt. Hvert avsnitt har et tidspunkt. Trykk på tidspunktet
 for å spille av lyden derfra.
@@ -92,29 +89,30 @@ Modellen kan bomme på navn og ord den ikke kjenner: Firmaer, personer,
 steder, forkortelser og standarder. Skriv dem inn i ordlisten under
 Innstillinger i appen, skilt med komma.
 
-Modellen får listen før den lytter. Etterpå retter appen ord i teksten som
-nesten stemmer med listen. Korte ord på under fire bokstaver og tall rettes
+Modellen henter listen før den lytter. Etterpå retter appen ord i teksten som
+nesten stemmer med et ord i listen. Ord på under fire bokstaver og tall rettes
 ikke.
 
-Har du skrevet listen etter at teksten ble laget, holder du fingeren på
-opptaket i listen og velger «Lag teksten på nytt».
+Endrer du listen etter at teksten er laget: Hold fingeren på opptaket i listen
+og velg «Lag teksten på nytt».
 
 ## Spille av
 
-Åpne et opptak i listen. Spilleren har spill av og pause, og to knapper som
-hopper ti sekunder tilbake og fram. Skyveknappen viser hvor du er i opptaket.
+Åpne et opptak i listen. Spilleren har spill av, pause og to knapper som
+hopper ti sekunder tilbake eller fram. Skyveknappen viser hvor du er i
+opptaket.
 
 ## Kopiere teksten
 
 Trykk på «Kopier» over teksten. Hele teksten kopieres, så du kan lime den inn
-i en annen app. Den blir på denne enheten og forsvinner fra utklippstavlen
+i en annen app. Teksten blir på enheten og forsvinner fra utklippstavlen
 etter fem minutter.
 
 ## Eksportere
 
 Trykk på delingsikonet øverst til høyre på opptakets side. Har opptaket tekst,
 velger du «Opptak og tekst», «Bare opptaket» eller «Bare teksten». Deretter
-kommer delingsmenyen i iOS, der du velger hvor filene skal.
+kommer delingsmenyen i iOS, der du velger hvor filene skal sendes eller lagres.
 
 Lyden eksporteres alltid som `.m4a`. Formatet for teksten velger du én gang,
 under Innstillinger i appen:

@@ -37,9 +37,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 - Appen krever iOS 27.0 eller nyere
 - Teksten i kort, bannere og meldinger står mørkere, så den er lettere å lese
-- Ikonene kommer fra Material Symbols, ikke lenger fra Heroicons
-- Hoppknappene i avspilleren hopper ti sekunder, ikke femten. Tallet står
-  inne i pilen igjen
+- Ikonene kommer fra Material Symbols
+- Hoppknappene i spilleren hopper ti sekunder. Tallet står inne i pilen
 
 ### Rettet
 
@@ -55,12 +54,11 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 - Nøkkelen som låser opp opptak og tekst, kan brukes av appen etter at
   enheten har vært låst opp én gang siden omstart, også mens den er låst
-  igjen. Det er det som lar teksten lages mens enheten lader. Fra build 5 til
-  14. september 2026 krevde nøkkelen at enheten var låst opp; en nøkkel laget
-  av build 5 eller 6 beholder det kravet, og på den enheten lages teksten
-  bare mens appen er åpen
+  igjen. Det er det som lar teksten lages mens enheten lader. En nøkkel laget av
+  build 5 eller 6 krever fortsatt at enheten er låst opp, og på den enheten
+  lages teksten bare mens appen er åpen
 
-## 0.1.0 (5) – 13. september 2026
+## 0.1.0 (5) – 13.09.26
 
 ### Sikkerhet
 
@@ -75,7 +73,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - PERSONVERN.md forteller hva som skjer når du kopierer, og at opptakene er
   borte for godt om du mister enheten
 
-## 0.1.0 (4) – 13. september 2026
+## 0.1.0 (4) – 13.09.26
 
 ### Sikkerhet
 
@@ -100,7 +98,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Personvern-kortet forteller hva som skjer med et opptak som stoppes mens
   enheten er låst
 
-## 0.1.0 (3) – 12. september 2026
+## 0.1.0 (3) – 12.09.26
 
 ### Endret
 
@@ -108,7 +106,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   Versjon. Mikrofontilgangen står under Personvern
 - Lisenslisten kaller gruppen «Fonter», med Skranji først
 
-## 0.1.0 (2) – 12. september 2026
+## 0.1.0 (2) – 12.09.26
 
 ### Endret
 
@@ -116,7 +114,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Handlingsknappen beskrives slik iOS 26 gjør det: Hold inne, ikke trykk
 - Personvern-kortet lenker til PERSONVERN.md og SECURITY.md
 
-## 0.1.0 (1) – 12. september 2026
+## 0.1.0 (1) – 12.09.26
 
 Første build.
 

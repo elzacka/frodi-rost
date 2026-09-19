@@ -35,7 +35,7 @@ final class AudioRecorder {
     var onInterruptionEnded: (() -> Void)?
 
     /// Events only, never content: when a recording starts and stops, and what
-    /// interrupted it. The 19 minute recording lost on 14 September 2026 left no
+    /// interrupted it. The 19 minute recording lost on 2026-09-14 left no
     /// trace of why, and the system's own lines did not say either.
     nonisolated static let log = Logger(subsystem: "com.Tazk.Frodi", category: "recording")
 
@@ -70,7 +70,7 @@ final class AudioRecorder {
             let url = AudioStorage.directory.appendingPathComponent(name)
 
             // Linear PCM in a CAF container, not AAC in an MPEG-4 one. Measured on
-            // 14 September 2026: an app killed mid-recording leaves an `.m4a` that
+            // 2026-09-14: an app killed mid-recording leaves an `.m4a` that
             // cannot be opened at all, because the index is written at close. CAF
             // with AAC opens but has no packets, for the same reason. Only PCM has
             // no table to write, so a kill at any point leaves every frame playable.
@@ -166,7 +166,7 @@ final class AudioRecorder {
     /// The two are not the same case. A closed `.completeUnlessOpen` file cannot be
     /// reopened while the device is locked, which is where a recording stops
     /// whenever the Action Button stops it in the car, or an interruption ends
-    /// without the microphone coming back. Until 15 September 2026 nil was treated
+    /// without the microphone coming back. Until 2026-09-15 nil was treated
     /// as empty, and the recording was deleted. Now the recorder's own count stands
     /// in; the file replaces it when it is sealed, if it is still zero. Only a file
     /// that opened and holds no frames is deleted.

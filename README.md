@@ -1,6 +1,6 @@
 # Fróði røst
 
-Tar opp lyd på iPhone, gjør den om til tekst (transkriberer), på norsk. Alt på enheten.
+Tar opp lyd på iPhone og gjør den om til norsk tekst (transkriberer). Alt skjer på enheten.
 
 «Fróði»: Norrønt for «den kunnskapsrike». «Røst»: Stemme, viser til opptaksfunksjonen.
 
@@ -16,11 +16,11 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 - Opptak under ti minutter transkriberes når du stopper. Lengre opptak transkriberes når du ber om det, og fortsetter der de slapp ved avbrudd
 - Transkriberer til bokmål, med tegnsetting og stor/liten forbokstav
 - Transkripsjonen deles i avsnitt med tidspunkt du kan trykke på for å spille av derfra
-- Lar deg eksportere lydopptak som `.m4a` og transkripsjon som `.txt` eller `.rtf`, hver for seg eller sammen
+- Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`, hver for seg eller sammen
 
 ## Modell
 
-**nb-whisper-small** fra Nasjonalbiblioteket: Tale til tekst. Bygger på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra Språkbanken og Nasjonalbibliotekets egen samling. Setter tegn og stor forbokstav selv, skriver om dialekt til bokmål.
+**nb-whisper-small** fra Nasjonalbiblioteket: Tale til tekst. Bygger på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra Språkbanken og Nasjonalbibliotekets egen samling. Setter tegn og stor forbokstav selv, og skriver dialekt om til bokmål.
 
 Modellen følger med appen og kjører på enheten. Gratis i bruk, ingen kobling til eksterne tjenester.
 
@@ -66,7 +66,7 @@ nb-whisper-small ligger ikke i git-repoet. Modellen er appens eneste talemotor, 
 
 ## Test
 
-Appen har egen simulator. Delt simulator mellom sesjoner: UI-testene feiler med `Application failed preflight checks`. Samme feil skjer hvis xcodebuild starter simulatoren selv og åpner appen før iOS er ferdig med å starte. Start simulatoren først, vent til den er klar.
+Appen har sin egen simulator, `Frodi-Test`. Hvis flere sesjoner deler den, feiler UI-testene med `Application failed preflight checks`. Det samme skjer hvis xcodebuild starter simulatoren selv og åpner appen før iOS er klar. Start simulatoren først, og vent til den er klar.
 
 ```bash
 xcrun simctl create "Frodi-Test" \
@@ -84,16 +84,16 @@ Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
 
 | Steg                                                                                                                                                                                                    | Fil                                                                                                |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Handlingsknappen trigger intenten (App Intent), som kjører i bakgrunnen når iOS tillater det                                                                                                          | `Intents/ToggleRecordingIntent.swift`                                                              |
+| Handlingsknappen utløser intenten (App Intent), som kjører i bakgrunnen når iOS tillater det                                                                                                          | `Intents/ToggleRecordingIntent.swift`                                                              |
 | Kontrolleren tar imot kall fra intenten og opptaksknappen, og «eier» databasen                                                                                                                         | `Services/RecordingController.swift`                                                               |
-| Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Et krasj vil derfor ikke føre til at opptaket går tapt.           | `Services/AudioRecorder.swift`                                                                     |
-| Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad, får en ny rad                                                                                          | `Services/RecordingController.swift`                                                               |
+| Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Opptaket går derfor ikke tapt ved krasj.                          | `Services/AudioRecorder.swift`                                                                     |
+| Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad får en ny rad                                                                                           | `Services/RecordingController.swift`                                                               |
 | Lagringen holder filen i appens sandkasse (App Sandbox) med filvern (Data Protection), utenom sikkerhetskopiering                                                                                       | `Services/AudioStorage.swift`                                                                      |
 | Vault forsegler opptaket med en nøkkel fra Secure Enclave                                                                                                                                               | `Services/RecordingVault.swift`                                                                    |
-| Transkripsjonen lager teksten i puljer med nb-whisper, som kjører inne i appen. Fremdriften lagres etter hver pulje | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift`, `Services/SpeechEngine.swift` |
+| Transkripsjonen lager teksten i puljer med nb-whisper, som kjører inne i appen. Fremdriften lagres etter hver pulje | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift` |
 | Transcript strukturerer teksten som avsnitt med tidspunkt                                                                                                                                               | `Services/Transcript.swift`                                                                        |
 | WordList sender ordlisten til modellen som prompt                                                                                                                                                       | `Services/WordList.swift`                                                                          |
-| Når iPhone lader, kjører BackgroundTranscription transkriberingen som bakgrunnsoppgave (Background Task)                                                                                                | `Services/BackgroundTranscription.swift`                                                           |
+| Når enheten lader, kjører BackgroundTranscription transkriberingen som bakgrunnsoppgave (Background Task)                                                                                               | `Services/BackgroundTranscription.swift`                                                           |
 | Vault forsegler teksten på samme måte som lyden                                                                                                                                                         | `Services/RecordingVault.swift`                                                                    |
 | RecordingDetailView viser teksten bak et vern (CaptureGuard) som skjuler den ved skjermopptak (Screen Recording) og appbytte (App Switcher)                                                             | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift`                                      |
 | Ved eksport dekrypterer RecordingExport filene til en midlertidig mappe, og gir dem til delingsarket (Activity View, ofte kalt Share Sheet)                                                             | `Services/RecordingExport.swift`, `Views/ShareSheet.swift`                                         |

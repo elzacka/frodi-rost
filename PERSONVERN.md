@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 19. september 2026.
+Sist oppdatert 19.09.26.
 
 Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 å sende til, og ingen tjeneste å spørre.
@@ -14,7 +14,7 @@ Fróði røst er laget av elzacka (Tazk).
 | Hva | Hvor | Hvor lenge |
 |---|---|---|
 | Lydopptak | På enheten, kryptert | Til du sletter det |
-| Tekst fra opptaket, også den delen som er ferdig underveis | Samme sted, kryptert | Til du sletter den |
+| Tekst fra opptaket, også delvis ferdig tekst | Samme sted, kryptert | Til du sletter den |
 | Ordlisten i Innstillinger | Samme sted, kryptert | Til du endrer den |
 
 Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
@@ -22,15 +22,14 @@ Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
 Stopper du et opptak mens enheten er låst, krypterer Fróði det så snart du
 låser opp. Fram til da holder iOS filen låst, og ingen kan lese den.
 
-Tar du opp et intervju, er det du som må fortelle den du intervjuer at det
-blir tatt opp, og hva opptaket skal brukes til. Fróði kan love at opptaket blir
-på enheten din; hva du gjør med det, er ditt ansvar.
+Tar du opp en samtale, må du si fra til de andre at du tar den opp, og hva du
+skal bruke opptaket til. Fróði kan love at opptaket blir på enheten din;
+hva du gjør med det, er ditt ansvar.
 
 ## Skjermen
 
-Teksten skjules når skjermen tas opp eller speiles, og når du bytter app. Da
-havner den ikke i bildet iOS tar til appveksleren. Et vanlig skjermbilde kan
-appen ikke stoppe.
+Teksten skjules når skjermen tas opp eller speiles, og når du bytter app, så
+den ikke vises i appveksleren. Appen har ingen funksjonalitet som blokkerer skjermbilder.
 
 ## Kopiering
 
@@ -39,9 +38,9 @@ Knappen «Kopier» kopierer hele teksten, så du kan lime den inn i en annen app
 følger ikke med til Mac eller iPad gjennom Universell utklippstavle, og den
 forsvinner fra utklippstavlen etter fem minutter.
 
-Du kan ikke markere teksten. Markering gir systemets egen kopimeny, og den
-kan appen ikke holde på enheten. Det du limer inn i en annen app, blir den
-appens data – som når du eksporterer et opptak.
+Du kan ikke markere teksten, fordi systemets egen kopimeny ikke holder teksten
+på enheten. Det du limer inn i en annen app, blir den appens data – som når
+du eksporterer et opptak.
 
 ## Tillatelser
 
@@ -52,9 +51,8 @@ teksten. Se [SECURITY.md](SECURITY.md).
 
 ## Opptakene er låst til denne enheten
 
-Nøkkelen finnes bare inne i enheten din. Et opptak kan ikke leses av en annen
-enhet – heller ikke av deg selv på en ny, og heller ikke fra en
-sikkerhetskopi.
+Nøkkelen finnes bare i enheten din. Ingen annen enhet kan lese opptakene,
+heller ikke en ny enhet du eier selv, og heller ikke fra en sikkerhetskopi.
 
 Mister du enheten, er opptakene borte for godt. Skal du bytte enhet: Eksporter
 opptakene først.

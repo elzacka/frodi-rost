@@ -16,7 +16,7 @@ hvordan du bygger og tester.
 
 | Hva                                                                                                          | Språk                                                        |
 | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
-| Alt en bruker leser: Tekstene i appen, App Store, README, PERSONVERN, CHANGELOG, TREDJEPART, TILGJENGELIGHET | norsk bokmål                                                 |
+| Alt en bruker leser: Tekstene i appen, App Store, README, BRUKERVEILEDNING, PERSONVERN, CHANGELOG, TREDJEPART, TILGJENGELIGHET | norsk bokmål |
 | SECURITY.md                                                                                                  | engelsk, fordi de som melder sårbarheter sjelden leser norsk |
 | Kode, identifikatorer, filnavn, kommentarer og commit-meldinger                                              | engelsk                                                      |
 
@@ -24,6 +24,7 @@ Norsk tekst skrives som norsk, ikke oversatt fra engelsk til slutt: Aktiv
 form, korte setninger, «du», og alltid æ, ø og å. Sitattegn er «slik». Lag
 aldri et norsk sammensatt ord ved å oversette et engelsk uttrykk ord for
 ord. Bruk det norske ordet der det finnes, og det engelske der det ikke gjør.
+Datoer skrives 19.09.26 på norsk og 2026-09-19 på engelsk.
 
 ## Omfang
 
@@ -55,8 +56,8 @@ skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
   `SFSpeechRecognizer`: Den viser en dialog fra Apple om at taledata sendes
   til Apple, og dialogen kan ikke slås av. `NSSpeechRecognitionUsageDescription`
   skal ikke inn i Info.plist. En test passer på det
-- Filstier lagres som filnavn, aldri som absolutte adresser. Sandkassen
-  flytter ved oppdatering
+- Filstier lagres som filnavn, aldri som absolutte adresser. Sandkassens
+  sti endres ved oppdatering
 - Et forseglet opptak har filvern `.completeUntilFirstUserAuthentication`, og
   nøkkelen som åpner det, kan brukes etter første opplåsing. Det er det som
   lar teksten lages mens enheten lader. Ikke stram til uten å fjerne
@@ -65,9 +66,9 @@ skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
 - Et opptak går aldri tapt. Filen på disk er opptaket; raden i listen er
   bare et bilde av den og bygges opp igjen fra filen. Det eneste som sletter
   lyd, er brukeren, etter et spørsmål
-- Ingen modus og ingen innstillinger. Det appen gjør ulikt for et kort notat
-  og et intervju på en time, avgjør den ut fra det den kan se, først og fremst
-  lengden. Ikke ut fra en bryter
+- Ingen modus. Det appen gjør ulikt for et kort notat og et intervju på en
+  time, avgjør den ut fra det den kan se, først og fremst lengden, ikke ut
+  fra en bryter
 - Skriv «intervju», aldri «revisjon», i tekst brukeren leser
 - Ingen emoji, verken i kode, commit-meldinger eller grensesnitt
 - Bare iPhone, bare stående, bare Norge. Ikke legg til engelsk grensesnitt

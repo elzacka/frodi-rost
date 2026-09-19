@@ -10,7 +10,7 @@ import XCTest
 /// afinfo "$(xcrun simctl get_app_container booted com.Tazk.Frodi data)"/Documents/Opptak/*.caf
 /// ```
 ///
-/// Measured on 14 September 2026: an `.m4a` left this way cannot be opened, a
+/// Measured on 2026-09-14: an `.m4a` left this way cannot be opened, a
 /// CAF with AAC opens with zero packets, and PCM in a CAF plays every frame.
 /// That is why the recorder writes PCM. Skipped unless `FRODI_KILL` is set,
 /// since it leaves an orphan behind on purpose.

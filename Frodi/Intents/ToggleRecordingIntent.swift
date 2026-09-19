@@ -8,11 +8,11 @@ import AppIntents
 /// continue a recording in the background, never begin one; the answer is
 /// `AVAudioSession.ErrorCode.cannotStartRecording`, which `AVAudioRecorder`
 /// reports as `record()` returning false. Measured on a device on
-/// 16 September 2026, first with a non-mixable session (activation refused)
+/// 2026-09-16, first with a non-mixable session (activation refused)
 /// and then with a mixable one (activation allowed, recording refused). So a
 /// start goes to the foreground at once, and on a locked device that means
-/// Face ID or the passcode. In a car, start before you drive; the button then
-/// only has to stop, and stopping works with the screen locked.
+/// unlocking it. In a car, start before you drive; the button then only has
+/// to stop, and stopping works with the screen locked.
 struct ToggleRecordingIntent: AppIntent {
     static let title: LocalizedStringResource = "Start eller stopp opptak"
     static let description = IntentDescription("Starter et opptak i Fróði, eller stopper det som går.")
