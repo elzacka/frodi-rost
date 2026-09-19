@@ -85,6 +85,27 @@ struct IsolationTests {
         #expect((plist["NSPrivacyTrackingDomains"] as? [Any])?.isEmpty == true)
     }
 
+    /// The required-reason APIs the app uses, and no others. Apple rejects an
+    /// upload that uses one without declaring it, and nothing before the upload
+    /// says so. File timestamps for `AudioStorage.creationDate`, user defaults
+    /// for the export format and the word list field's height.
+    @Test("Personvernmanifestet erklærer akkurat de API-ene appen bruker")
+    func privacyManifestDeclaresTheAccessedAPIs() throws {
+        let url = try #require(Bundle.main.url(forResource: "PrivacyInfo", withExtension: "xcprivacy"))
+        let data = try Data(contentsOf: url)
+        let plist = try #require(
+            try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
+        )
+        let accessed = try #require(plist["NSPrivacyAccessedAPITypes"] as? [[String: Any]])
+        let declared = Dictionary(uniqueKeysWithValues: accessed.map {
+            ($0["NSPrivacyAccessedAPIType"] as? String ?? "", $0["NSPrivacyAccessedAPITypeReasons"] as? [String] ?? [])
+        })
+        #expect(declared == [
+            "NSPrivacyAccessedAPICategoryFileTimestamp": ["C617.1"],
+            "NSPrivacyAccessedAPICategoryUserDefaults": ["CA92.1"]
+        ])
+    }
+
     /// The recordings folder must not end up in the iCloud backup.
     @Test("Opptaksmappen er holdt utenfor sikkerhetskopi")
     func recordingsAreExcludedFromBackup() throws {
