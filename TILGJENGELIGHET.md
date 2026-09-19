@@ -40,9 +40,11 @@ har to tekstfarger og ingen blanding. Sekundær tekst mot brødtekst måler
 | Kant (`BorderNeutral`)                     | bakgrunn       | 3,23:1  | 3:1   |
 | Kant                                       | flate          | 3,63:1  | 3:1   |
 
-> **Merk:** Ett par er bevisst utenfor testen: Opptaksknappen går fra bronse
-> til rødt når opptaket starter, 1,50:1. Se «Farge er aldri det eneste
-> signalet» over.
+> **Merk:** Ett fargepar er med hensikt ikke testet. Opptaksknappen skifter
+> fra bronse til rødt når opptaket starter, og kontrasten mellom de to
+> fargene er bare 1,50:1. Det går likevel, fordi fargen aldri er det eneste
+> signalet: Ikonet, tidtakeren og VoiceOver-navnet endres samtidig. Se raden
+> «Farge er aldri det eneste signalet» over.
 
 ## Kjente grenser
 
