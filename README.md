@@ -4,6 +4,21 @@ Tar opp lyd på iPhone og gjør den om til norsk tekst (transkriberer). Alt skje
 
 «Fróði»: Norrønt for «den kunnskapsrike». «Røst»: Stemme, viser til opptaksfunksjonen.
 
+**Innhold**
+
+- [Status](#status)
+- [Hva appen gjør](#hva-appen-gjør)
+- [Modell](#modell)
+- [Krav](#krav)
+- [Bygg](#bygg)
+- [Test](#test)
+- [Arkitektur](#arkitektur)
+- [Lisens](#lisens)
+- [Bidrag](#bidrag)
+- [Mer](#mer)
+
+---
+
 ## Status
 
 Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
@@ -24,12 +39,12 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 
 Modellen følger med appen og kjører på enheten. Gratis i bruk, ingen kobling til eksterne tjenester.
 
-| Kilde | Lenke |
-|---|---|
-| Modellen | [NbAiLab/nb-whisper-small](https://huggingface.co/NbAiLab/nb-whisper-small) |
+| Kilde                         | Lenke                                                                                   |
+| ----------------------------- | --------------------------------------------------------------------------------------- |
+| Modellen                      | [NbAiLab/nb-whisper-small](https://huggingface.co/NbAiLab/nb-whisper-small)             |
 | CoreML-versjonen appen bruker | [Barrymanalow/nb-whisper-coreml](https://huggingface.co/Barrymanalow/nb-whisper-coreml) |
-| Alle modellene fra NB | [huggingface.co/NbAiLab](https://huggingface.co/NbAiLab) |
-| Om AI-laben | [ai.nb.no](https://ai.nb.no/) |
+| Alle modellene fra NB         | [huggingface.co/NbAiLab](https://huggingface.co/NbAiLab)                                |
+| Om AI-laben                   | [ai.nb.no](https://ai.nb.no/)                                                           |
 
 ## Krav
 
@@ -60,13 +75,15 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
   -destination 'platform=iOS Simulator,name=Frodi-Test' build
 ```
 
-nb-whisper-small ligger ikke i git-repoet. Modellen er appens eneste talemotor, så bygget stopper med en feilmelding hvis den mangler.
+> **Viktig:** nb-whisper-small ligger ikke i git-repoet. Modellen er appens eneste talemotor, så bygget stopper med en feilmelding hvis den mangler.
 
 `fetch-model.sh` sjekker hver fil mot `Scripts/model-checksums.txt` og stopper ved avvik. Hvordan modell og pakker er låst: [SECURITY.md](SECURITY.md).
 
 ## Test
 
-Appen har sin egen simulator, `Frodi-Test`. Hvis flere sesjoner deler den, feiler UI-testene med `Application failed preflight checks`. Det samme skjer hvis xcodebuild starter simulatoren selv og åpner appen før iOS er klar. Start simulatoren først, og vent til den er klar.
+Appen har sin egen simulator, `Frodi-Test`. Start den først, og vent til den er klar.
+
+> **Viktig:** Hvis flere sesjoner deler simulatoren, feiler UI-testene med `Application failed preflight checks`. Det samme skjer hvis xcodebuild starter simulatoren selv og åpner appen før iOS er klar.
 
 ```bash
 xcrun simctl create "Frodi-Test" \
@@ -82,21 +99,21 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
 
 Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
 
-| Steg                                                                                                                                                                                                    | Fil                                                                                                |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Handlingsknappen utløser intenten (App Intent), som kjører i bakgrunnen når iOS tillater det                                                                                                          | `Intents/ToggleRecordingIntent.swift`                                                              |
-| Kontrolleren tar imot kall fra intenten og opptaksknappen, og «eier» databasen                                                                                                                         | `Services/RecordingController.swift`                                                               |
-| Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Opptaket går derfor ikke tapt ved krasj.                          | `Services/AudioRecorder.swift`                                                                     |
-| Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad får en ny rad                                                                                           | `Services/RecordingController.swift`                                                               |
-| Lagringen holder filen i appens sandkasse (App Sandbox) med filvern (Data Protection), utenom sikkerhetskopiering                                                                                       | `Services/AudioStorage.swift`                                                                      |
-| Vault forsegler opptaket med en nøkkel fra Secure Enclave                                                                                                                                               | `Services/RecordingVault.swift`                                                                    |
-| Transkripsjonen lager teksten i puljer med nb-whisper, som kjører inne i appen. Fremdriften lagres etter hver pulje | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift` |
-| Transcript strukturerer teksten som avsnitt med tidspunkt                                                                                                                                               | `Services/Transcript.swift`                                                                        |
-| WordList sender ordlisten til modellen som prompt                                                                                                                                                       | `Services/WordList.swift`                                                                          |
-| Når enheten lader, kjører BackgroundTranscription transkriberingen som bakgrunnsoppgave (Background Task)                                                                                               | `Services/BackgroundTranscription.swift`                                                           |
-| Vault forsegler teksten på samme måte som lyden                                                                                                                                                         | `Services/RecordingVault.swift`                                                                    |
-| RecordingDetailView viser teksten bak et vern (CaptureGuard) som skjuler den ved skjermopptak (Screen Recording) og appbytte (App Switcher)                                                             | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift`                                      |
-| Ved eksport dekrypterer RecordingExport filene til en midlertidig mappe, og gir dem til delingsarket (Activity View, ofte kalt Share Sheet)                                                             | `Services/RecordingExport.swift`, `Views/ShareSheet.swift`                                         |
+| Steg                                                                                                                                                                           | Fil                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| Handlingsknappen utløser intenten (App Intent), som kjører i bakgrunnen når iOS tillater det                                                                                   | `Intents/ToggleRecordingIntent.swift`                               |
+| Kontrolleren tar imot kall fra intenten og opptaksknappen, og «eier» databasen                                                                                                 | `Services/RecordingController.swift`                                |
+| Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Opptaket går derfor ikke tapt ved krasj. | `Services/AudioRecorder.swift`                                      |
+| Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad får en ny rad                                                                  | `Services/RecordingController.swift`                                |
+| Lagringen holder filen i appens sandkasse (App Sandbox) med filvern (Data Protection), utenom sikkerhetskopiering                                                              | `Services/AudioStorage.swift`                                       |
+| Vault forsegler opptaket med en nøkkel fra Secure Enclave                                                                                                                      | `Services/RecordingVault.swift`                                     |
+| Transkripsjonen lager teksten i puljer med nb-whisper, som kjører inne i appen. Fremdriften lagres etter hver pulje                                                            | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift` |
+| Transcript strukturerer teksten som avsnitt med tidspunkt                                                                                                                      | `Services/Transcript.swift`                                         |
+| WordList sender ordlisten til modellen som prompt                                                                                                                              | `Services/WordList.swift`                                           |
+| Når enheten lader, kjører BackgroundTranscription transkriberingen som bakgrunnsoppgave (Background Task)                                                                      | `Services/BackgroundTranscription.swift`                            |
+| Vault forsegler teksten på samme måte som lyden                                                                                                                                | `Services/RecordingVault.swift`                                     |
+| RecordingDetailView viser teksten bak et vern (CaptureGuard) som skjuler den ved skjermopptak (Screen Recording) og appbytte (App Switcher)                                    | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift`       |
+| Ved eksport dekrypterer RecordingExport filene til en midlertidig mappe, og gir dem til delingsarket (Activity View, ofte kalt Share Sheet)                                    | `Services/RecordingExport.swift`, `Views/ShareSheet.swift`          |
 
 Visningene når aldri talemotoren direkte. Alt går via protokollen `Transcriber`.
 
@@ -110,12 +127,16 @@ Appen er et personlig prosjekt. Feil og forslag meldes som issues på GitHub. Pu
 
 ## Mer
 
-| Dokument | Innhold |
-|---|---|
+| Dokument                                   | Innhold                                                                |
+| ------------------------------------------ | ---------------------------------------------------------------------- |
 | [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md) | Slik tar du opp, lager tekst, bruker ordlisten, eksporterer og sletter |
-| [PERSONVERN.md](PERSONVERN.md) | Hva som lagres, tillatelser, rettighetene dine, hvem som står bak |
-| [SECURITY.md](SECURITY.md) | Hva som beskyttes mot hva, og hvordan melde sårbarhet |
-| [TILGJENGELIGHET.md](TILGJENGELIGHET.md) | Kontrast, Dynamic Type, VoiceOver, og hva som er målt |
-| [TREDJEPART.md](TREDJEPART.md) | Modell, kode, ikoner og fonter, med versjoner og lisenser |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Navn, språk, designsystem og reglene for endringer |
-| [CHANGELOG.md](CHANGELOG.md) | Hva som er endret, build for build |
+| [PERSONVERN.md](PERSONVERN.md)             | Hva som lagres, tillatelser, rettighetene dine, hvem som står bak      |
+| [SECURITY.md](SECURITY.md)                 | Hva som beskyttes mot hva, og hvordan melde sårbarhet                  |
+| [TILGJENGELIGHET.md](TILGJENGELIGHET.md)   | Kontrast, Dynamic Type, VoiceOver, og hva som er målt                  |
+| [TREDJEPART.md](TREDJEPART.md)             | Modell, kode, ikoner og fonter, med versjoner og lisenser              |
+| [CONTRIBUTING.md](CONTRIBUTING.md)         | Navn, språk, designsystem og reglene for endringer                     |
+| [CHANGELOG.md](CHANGELOG.md)               | Hva som er endret, build for build                                     |
+
+---
+
+[Til toppen](#fróði-røst)

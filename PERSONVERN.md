@@ -5,26 +5,39 @@ Sist oppdatert 19.09.26.
 Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 å sende til, og ingen tjeneste å spørre.
 
+**Innhold**
+
+- [Hvem står bak](#hvem-står-bak)
+- [Hva som lagres](#hva-som-lagres)
+- [Skjermen](#skjermen)
+- [Kopiering](#kopiering)
+- [Tillatelser](#tillatelser)
+- [Opptakene er låst til denne enheten](#opptakene-er-låst-til-denne-enheten)
+- [Rettighetene dine](#rettighetene-dine)
+- [Kontakt](#kontakt)
+
+---
+
 ## Hvem står bak
 
 Fróði røst er laget av elzacka (Tazk).
 
 ## Hva som lagres
 
-| Hva | Hvor | Hvor lenge |
-|---|---|---|
-| Lydopptak | På enheten, kryptert | Til du sletter det |
+| Hva                                          | Hvor                 | Hvor&nbsp;lenge    |
+| -------------------------------------------- | -------------------- | ------------------ |
+| Lydopptak                                    | På enheten, kryptert | Til du sletter det |
 | Tekst fra opptaket, også delvis ferdig tekst | Samme sted, kryptert | Til du sletter den |
-| Ordlisten i Innstillinger | Samme sted, kryptert | Til du endrer den |
+| Ordlisten i Innstillinger                    | Samme sted, kryptert | Til du endrer den  |
 
 Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
 
 Stopper du et opptak mens enheten er låst, krypterer Fróði det så snart du
 låser opp. Fram til da holder iOS filen låst, og ingen kan lese den.
 
-Tar du opp en samtale, må du si fra til de andre at du tar den opp, og hva du
-skal bruke opptaket til. Fróði kan love at opptaket blir på enheten din;
-hva du gjør med det, er ditt ansvar.
+> **Viktig:** Tar du opp en samtale, må du si fra til de andre at du tar den
+> opp, og hva du skal bruke opptaket til. Fróði kan love at opptaket blir på
+> enheten din; hva du gjør med det, er ditt ansvar.
 
 ## Skjermen
 
@@ -54,8 +67,8 @@ teksten. Se [SECURITY.md](SECURITY.md).
 Nøkkelen finnes bare i enheten din. Ingen annen enhet kan lese opptakene,
 heller ikke en ny enhet du eier selv, og heller ikke fra en sikkerhetskopi.
 
-Mister du enheten, er opptakene borte for godt. Skal du bytte enhet: Eksporter
-opptakene først.
+> **Viktig:** Mister du enheten, er opptakene borte for godt. Skal du bytte
+> enhet: Eksporter opptakene først.
 
 ## Rettighetene dine
 
@@ -64,14 +77,19 @@ personopplysninger utenfor den: Ingen å be om innsyn hos, ingen
 databehandlere, ingen overføring til utlandet. Rettighetene utøver du selv,
 i appen.
 
-| Rettighet | Slik gjør du det |
-|---|---|
-| Innsyn | Åpne opptaket i appen |
+| Rettighet  | Slik&nbsp;gjør&nbsp;du&nbsp;det                                                                                                                           |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Innsyn     | Åpne opptaket i appen                                                                                                                                     |
 | Eksportere | Trykk på delingsikonet, og velg opptaket, teksten eller begge. Lyden kommer som `.m4a`, teksten som `.txt` eller `.rtf`, det du har valgt i Innstillinger |
-| Sletting | Hold fingeren på opptaket i listen, og velg «Slett» |
+| Sletting   | Hold fingeren på opptaket i listen, og velg «Slett»                                                                                                       |
 
-Sletter du appen, forsvinner alt. Det skjer med én gang, og du kan ikke angre.
+> **Viktig:** Sletter du appen, forsvinner alt. Det skjer med én gang, og du
+> kan ikke angre.
 
 ## Kontakt
 
-**hei@tazk.no**
+Skriv til **hei@tazk.no**.
+
+---
+
+[Til toppen](#personvern-i-fróði-røst)

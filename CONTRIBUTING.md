@@ -3,6 +3,18 @@
 Reglene her gjelder alt som går inn i repoet. [README.md](README.md) sier
 hvordan du bygger og tester.
 
+**Innhold**
+
+- [Navn](#navn)
+- [Språk](#språk)
+- [Omfang](#omfang)
+- [Designsystem](#designsystem)
+- [Regler som ikke fravikes](#regler-som-ikke-fravikes)
+- [Prosjektfilen og versjonen](#prosjektfilen-og-versjonen)
+- [Før en build lastes opp](#før-en-build-lastes-opp)
+
+---
+
 ## Navn
 
 | Form       | Skrives                                    | Brukes til                                     |
@@ -14,11 +26,11 @@ hvordan du bygger og tester.
 
 ## Språk
 
-| Hva                                                                                                          | Språk                                                        |
-| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
-| Alt en bruker leser: Tekstene i appen, App Store, README, BRUKERVEILEDNING, PERSONVERN, CHANGELOG, TREDJEPART, TILGJENGELIGHET | norsk bokmål |
-| SECURITY.md                                                                                                  | engelsk, fordi de som melder sårbarheter sjelden leser norsk |
-| Kode, identifikatorer, filnavn, kommentarer og commit-meldinger                                              | engelsk                                                      |
+| Hva                                                                                                                            | Språk                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| Alt en bruker leser: Tekstene i appen, App Store, README, BRUKERVEILEDNING, PERSONVERN, CHANGELOG, TREDJEPART, TILGJENGELIGHET | norsk bokmål                                                 |
+| SECURITY.md                                                                                                                    | engelsk, fordi de som melder sårbarheter sjelden leser norsk |
+| Kode, identifikatorer, filnavn, kommentarer og commit-meldinger                                                                | engelsk                                                      |
 
 Norsk tekst skrives som norsk, ikke oversatt fra engelsk til slutt: Aktiv
 form, korte setninger, «du», og alltid æ, ø og å. Sitattegn er «slik». Lag
@@ -87,3 +99,7 @@ opp, og stopper hvis buildnummeret alt er brukt.
 - [CHANGELOG.md](CHANGELOG.md) har en overskrift for builden
 - [TREDJEPART.md](TREDJEPART.md) og lisenslisten i appen er like. En test
   passer på det
+
+---
+
+[Til toppen](#bidra-til-fróði-røst)
