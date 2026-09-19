@@ -26,7 +26,7 @@ enum Icon: String, CaseIterable {
     case share = "ios_share"
     case skipBack = "replay_10"
     case skipForward = "forward_10"
-    case resize = "height"
+    case resize = "drag_handle"
 
     case external = "open_in_new"
     case microphone = "mic_fill"
