@@ -81,7 +81,7 @@ i appen.
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Innsyn     | Åpne opptaket i appen                                                                                                                                     |
 | Eksportere | Trykk på delingsikonet, og velg opptaket, teksten eller begge. Lyden kommer som `.m4a`, teksten som `.txt` eller `.rtf`, det du har valgt i Innstillinger |
-| Sletting   | Hold fingeren på opptaket i listen, og velg «Slett»                                                                                                       |
+| Sletting   | Sveip opptaket i listen mot venstre, trykk på «Slett» og svar «Ja»                                                                                        |
 
 > **Viktig:** Sletter du appen, forsvinner alt. Det skjer med én gang, og du
 > kan ikke angre.

@@ -131,7 +131,7 @@ enum Transcription {
     ///
     /// A recording the model already found no speech in is left alone. The same
     /// audio gives the same answer, and a whisper run per silent recording at
-    /// every launch adds up. «Prøv teksten på nytt» in the row still works.
+    /// every launch adds up. «Prøv på nytt» behind the row still works.
     ///
     /// `requested` is what the «Lag tekst» shortcut passes: the long recordings
     /// that would otherwise wait for a tap are taken too, because running the

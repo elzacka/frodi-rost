@@ -35,7 +35,13 @@
     "Ingen opptak ennå" : {
 
     },
+    "Ja" : {
+
+    },
     "Lisenser" : {
+
+    },
+    "Nei" : {
 
     },
     "Opptak og tekst" : {
@@ -51,6 +57,9 @@
 
     },
     "røst" : {
+
+    },
+    "Sikker på at du vil slette?" : {
 
     },
     "Slett" : {

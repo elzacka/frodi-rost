@@ -222,11 +222,21 @@ struct RecordingListView: View {
             // «Ja» stands where the text action stood and «Nei» where «Slett»
             // did, so a second tap in the same place says no.
             Button { delete(recording) } label: {
-                Text("Ja").choiceRow(destructive: true, inline: true)
+                answer("Ja").choiceRow(destructive: true, inline: true)
             }
             Button { setStage(.closed, of: recording) } label: {
-                Text("Nei").choiceRow(inline: true)
+                answer("Nei").choiceRow(inline: true)
             }
+        }
+    }
+
+    /// «Ja» and «Nei» in one size: each is laid out over both words, so the
+    /// wider one sets the width of both at every text size.
+    private func answer(_ word: LocalizedStringKey) -> some View {
+        ZStack {
+            Text("Ja").hidden()
+            Text("Nei").hidden()
+            Text(word)
         }
     }
 

@@ -151,8 +151,8 @@ under Innstillinger i appen:
 ## Slette
 
 Sveip opptaket i listen mot venstre og trykk på «Slett». Appen spør «Sikker på
-at du vil slette?» i samme rad; trykk på «Ja» for å slette eller «Nei» for å
-beholde opptaket. Opptaket og teksten blir borte fra enheten, og du kan ikke
+at du vil slette?» i samme rad. Trykk på «Ja» for å slette, eller på «Nei» for
+å beholde opptaket. Opptaket og teksten blir borte fra enheten, og du kan ikke
 angre.
 
 > **Viktig:** Sletter du appen, forsvinner alt.
