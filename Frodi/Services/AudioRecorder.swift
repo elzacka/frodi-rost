@@ -75,7 +75,8 @@ final class AudioRecorder {
             let name = "\(UUID().uuidString).caf"
             let url = AudioStorage.directory.appendingPathComponent(name)
 
-            guard let newRecorder = try await Self.startRecorder(at: url) else {
+            let (newRecorder, started) = try await Self.startRecorder(at: url)
+            guard started else {
                 // What iOS answers when an app tries to begin recording in the
                 // background: cannotStartRecording, reported here as false. The
                 // session is active and the recorder may have created the file;
@@ -104,12 +105,19 @@ final class AudioRecorder {
         }
     }
 
-    /// Makes the recorder and starts it, off the main actor. Nil when iOS
-    /// refuses to start recording.
+    /// Makes the recorder and starts it, off the main actor. `started` is
+    /// false when iOS refuses to start recording.
     ///
     /// `record()` activates the session on its own, synchronously, even when it
     /// is already active, and Xcode flags that as a hang risk on the main thread.
     /// Measured 2026-09-19 with a probe around each step.
+    ///
+    /// The recorder comes back even when it did not start, so that it is
+    /// released on the main actor and not on this thread. A device crashed on
+    /// 2026-09-19 with an Objective-C weak-reference fatal right after
+    /// `record()` had returned false here; the same failure released on the
+    /// main thread on 2026-09-16 and did not. Suspected, not proven: the
+    /// simulator cannot make `record()` fail the way a device does.
     ///
     /// Linear PCM in a CAF container, not AAC in an MPEG-4 one. Measured on
     /// 2026-09-14: an app killed mid-recording leaves an `.m4a` that cannot be
@@ -119,7 +127,7 @@ final class AudioRecorder {
     /// 115 MB an hour, and `AudioStorage.seal` turns it into AAC once the
     /// recording is finished.
     @concurrent
-    private static func startRecorder(at url: URL) async throws -> sending AVAudioRecorder? {
+    private static func startRecorder(at url: URL) async throws -> sending (recorder: AVAudioRecorder, started: Bool) {
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVSampleRateKey: sampleRate,
@@ -129,7 +137,7 @@ final class AudioRecorder {
             AVLinearPCMIsBigEndianKey: false
         ]
         let recorder = try AVAudioRecorder(url: url, settings: settings)
-        return recorder.record() ? recorder : nil
+        return (recorder, recorder.record())
     }
 
     /// Stops the recording and returns the file name and length.

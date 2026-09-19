@@ -1,4 +1,5 @@
 import AppIntents
+import UIKit
 
 /// The intent the Action Button runs. The button is held, not tapped: the first
 /// hold starts, the next stops.
@@ -13,6 +14,11 @@ import AppIntents
 /// start goes to the foreground at once, and on a locked device that means
 /// unlocking it. In a car, start before you drive; the button then only has
 /// to stop, and stopping works with the screen locked.
+///
+/// `continueInForeground` returns while the scene is still coming forward.
+/// Measured on a device on 2026-09-19: `record()` ran 100 ms after the
+/// scene integration began and was refused, since the process was not yet
+/// active. So the start waits for the app to be active first.
 struct ToggleRecordingIntent: AppIntent {
     static let title: LocalizedStringResource = "Start eller stopp opptak"
     static let description = IntentDescription("Starter et opptak i Fróði, eller stopper det som går.")
@@ -33,8 +39,20 @@ struct ToggleRecordingIntent: AppIntent {
         if systemContext.currentMode == .background {
             try await continueInForeground(alwaysConfirm: false)
         }
+        await waitUntilActive()
         await controller.start()
         return .result()
+    }
+
+    /// Waits for the app to be active, up to `limit`. Without it the start
+    /// runs while the app is still in the background and iOS refuses it.
+    @MainActor
+    private func waitUntilActive(limit: Duration = .seconds(3)) async {
+        let clock = ContinuousClock()
+        let deadline = clock.now + limit
+        while UIApplication.shared.applicationState != .active, clock.now < deadline {
+            try? await Task.sleep(for: .milliseconds(50))
+        }
     }
 }
 
