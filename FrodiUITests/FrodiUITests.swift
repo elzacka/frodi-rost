@@ -32,7 +32,7 @@ final class FrodiUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Lisenser"].waitForExistence(timeout: 5), "Innstillinger åpnet ikke")
         app.buttons["Lisenser"].tap()
 
-        XCTAssertTrue(app.staticTexts["WhisperKit"].waitForExistence(timeout: 5), "Lisenslisten mangler")
+        XCTAssertTrue(app.staticTexts["argmax-oss-swift"].waitForExistence(timeout: 5), "Lisenslisten mangler")
     }
 
     /// A swipe to the left shows what can be done with a recording, and «Slett»
