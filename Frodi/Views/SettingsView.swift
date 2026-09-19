@@ -273,15 +273,22 @@ struct SettingsView: View {
 
 
     /// A link out of the app, at the same size and in the same tone as the text
-    /// around it. The underline is what marks it, and it is the only mark: a link
-    /// must not be told apart by colour alone, so nothing is lost by dropping the
-    /// colour difference the running text used to give it for free.
+    /// around it. The mark is `open_in_new` after the word, small and in the
+    /// secondary tone: it says the document opens outside the app, which the
+    /// chevron on the row below does not, and it is a mark that is not colour.
+    /// The icon is hidden from VoiceOver; the link trait already says «lenke».
     private func link(_ title: String, to url: URL) -> some View {
-        Link(title, destination: url)
-            .font(.Frodi.caption)
-            .underline()
-            .tint(Color.Frodi.textPrimary)
-            .frame(maxWidth: .infinity, alignment: .leading)
+        Link(destination: url) {
+            HStack(spacing: Space.s1) {
+                Text(title)
+                    .font(.Frodi.caption)
+                    .foregroundStyle(Color.Frodi.textPrimary)
+                IconView(.external, size: IconSize.external)
+                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .accessibilityHidden(true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

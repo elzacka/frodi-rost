@@ -109,6 +109,10 @@ enum IconSize {
     static let toolbar: CGFloat = 26
     /// An icon standing alone above a message.
     static let notice: CGFloat = 24
+    /// The mark after a link that leaves the app, beside a caption. The glyph
+    /// fills 75 % of the frame: 10,5 pt, under the text's cap height, so it is
+    /// read as a mark on the word and not as a second word.
+    static let external: CGFloat = 14
 }
 
 // MARK: - Playback controls
