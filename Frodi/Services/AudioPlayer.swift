@@ -70,7 +70,7 @@ final class AudioPlayer {
     // MARK: - Controls
     func togglePlayback() {
         guard let player else { return }
-        if player.isPlaying { pause() } else { play() }
+        if player.isPlaying { pause() } else { Task { await play() } }
     }
 
     func pause() {
@@ -108,15 +108,19 @@ final class AudioPlayer {
     }
 
     // MARK: - Body
-    private func play() {
+    private func play() async {
         guard let player else { return }
 
         do {
             // spokenAudio treats speech better than default. playback, not
-            // playAndRecord: playback must not ask for the microphone.
+            // playAndRecord: playback must not ask for the microphone. Activation
+            // is asynchronous, as Xcode asks: on the main thread it blocks.
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .spokenAudio)
-            try session.setActive(true)
+            guard try await session.activate(options: []) else {
+                state = .failed(String(localized: "Fikk ikke startet avspillingen."))
+                return
+            }
         } catch {
             state = .failed(String(localized: "Fikk ikke startet avspillingen."))
             return
@@ -162,6 +166,6 @@ final class AudioPlayer {
     }
 
     private func deactivateSession() {
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        Task { _ = try? await AVAudioSession.sharedInstance().deactivate(options: .notifyOthersOnDeactivation) }
     }
 }

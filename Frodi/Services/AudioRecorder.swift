@@ -64,7 +64,13 @@ final class AudioRecorder {
             // buys nothing to give up: a recording cannot be started from the
             // background at all, see `ToggleRecordingIntent`.
             try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.defaultToSpeaker, .allowBluetoothHFP])
-            try session.setActive(true)
+            // Asynchronous, as Xcode asks: activation waits for the audio daemon
+            // and blocks the main thread when called on it.
+            guard try await session.activate(options: []) else {
+                Self.log.error("Recording did not start: the session was not activated")
+                state = .failed(String(localized: "Fikk ikke tilgang til mikrofonen."))
+                return false
+            }
 
             let name = "\(UUID().uuidString).caf"
             let url = AudioStorage.directory.appendingPathComponent(name)
@@ -86,6 +92,10 @@ final class AudioRecorder {
             ]
 
             let newRecorder = try AVAudioRecorder(url: url, settings: settings)
+            // Xcode still reports one synchronous activation here, from inside
+            // `record()`: the recorder activates the session on its own even when
+            // it is already active. Measured 2026-09-19 with a probe around each
+            // step; nothing in the app's code is left to move.
             guard newRecorder.record() else {
                 // What iOS answers when an app tries to begin recording in the
                 // background: cannotStartRecording, reported here as false. The
@@ -93,7 +103,7 @@ final class AudioRecorder {
                 // both are cleaned up, or the next launch would find an empty
                 // recording and other apps' audio would stay interrupted.
                 Self.log.error("Recording did not start: record() returned false")
-                try? session.setActive(false, options: .notifyOthersOnDeactivation)
+                _ = try? await session.deactivate(options: .notifyOthersOnDeactivation)
                 try? FileManager.default.removeItem(at: url)
                 state = .failed(String(localized: "Fikk ikke startet opptaket."))
                 return false
@@ -141,7 +151,9 @@ final class AudioRecorder {
         duration = 0
         isInterrupted = false
 
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        // Off the main thread, and nothing here waits for it: the length is read
+        // from the file, which the session has no say in.
+        Task { _ = try? await AVAudioSession.sharedInstance().deactivate(options: .notifyOthersOnDeactivation) }
 
         let fileName = recorder.url.lastPathComponent
         let measured = AudioStorage.duration(fileName: fileName)
@@ -207,7 +219,7 @@ final class AudioRecorder {
         ) { [weak self] notification in
             let context = notification.userInfo?[AVAudioSession.resumptionContextKey]
                 as? AVAudioSession.ResumptionContext
-            Task { @MainActor in self?.interruptionEnded(recommendation: context?.recommendation) }
+            Task { @MainActor in await self?.interruptionEnded(recommendation: context?.recommendation) }
         })
 
         // The audio daemon restarted. Every recorder is invalid after this, and there
@@ -229,13 +241,14 @@ final class AudioRecorder {
         isInterrupted = true
     }
 
-    private func interruptionEnded(recommendation: AVAudioSession.ResumptionRecommendation?) {
+    private func interruptionEnded(recommendation: AVAudioSession.ResumptionRecommendation?) async {
         guard state == .recording, let recorder, isInterrupted else { return }
         isInterrupted = false
         let shouldResume = recommendation == .shouldResume
-        let resumed = shouldResume
-            && (try? AVAudioSession.sharedInstance().setActive(true)) != nil
-            && recorder.record()
+        var resumed = false
+        if shouldResume, (try? await AVAudioSession.sharedInstance().activate(options: [])) == true {
+            resumed = recorder.record()
+        }
         Self.log.notice("Interruption ended, shouldResume \(shouldResume, privacy: .public), resumed \(resumed, privacy: .public)")
         if !resumed { onInterruptionEnded?() }
     }
