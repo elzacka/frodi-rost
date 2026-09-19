@@ -25,8 +25,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   bruker listen på et opptak du alt har. Feltet gjøres høyere eller lavere
   ved å dra i håndtaket nederst til høyre
 - Teksten lages også mens enheten lader, med skjermen låst
-- Snarveien «Lag tekst i Fróði røst» lager teksten uten at appen er åpen, også
-  for lange opptak. Den kan legges i en automatisering i Snarveier
+- Handlingen «Lag tekst» i appen Snarveier lager teksten uten at appen er
+  åpen, også for lange opptak. Den kan legges i en automatisering
 - Brukerveiledning, [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md), med alt om
   opptak, handlingsknappen, teksten, ordlisten, eksport og sletting
 

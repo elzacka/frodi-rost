@@ -1,13 +1,14 @@
 import AppIntents
 
-/// «Lag tekst» as a shortcut: everything waiting for text gets it, the long
-/// recordings included, without the app in front.
+/// «Lag tekst» as an action in the Shortcuts app: everything waiting for text
+/// gets it, the long recordings included, without the app in front.
 ///
 /// The point is an automation. `BackgroundTranscription` asks iOS for a run on
 /// the charger and iOS decides when, or whether; a Shortcuts automation on
 /// «når laderen kobles til» runs this intent at once, and iOS 27's
 /// `LongRunningIntent` lets it keep working after `perform` would otherwise
-/// have been cut off. Whether the system lets it hold the device for an hour
+/// have been cut off. It is deliberately not an App Shortcut: that would put
+/// it in the Action Button's picker beside the one shortcut the button is for. Whether the system lets it hold the device for an hour
 /// of nb-whisper has not been measured; the run saves after every piece, so a
 /// cut costs the piece, not the text.
 ///

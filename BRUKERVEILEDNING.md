@@ -10,7 +10,7 @@ Denne veiledningen viser hvordan du bruker appen.
 - [Ta opp](#ta-opp)
 - [Handlingsknappen](#handlingsknappen)
 - [Teksten](#teksten)
-  - [Snarveien «Lag tekst i Fróði røst»](#snarveien-lag-tekst-i-fróði-røst)
+  - [Handlingen «Lag tekst» i Snarveier](#handlingen-lag-tekst-i-snarveier)
   - [Slik lages teksten](#slik-lages-teksten)
   - [Hvis teksten mangler](#hvis-teksten-mangler)
 - [Ordliste](#ordliste)
@@ -80,10 +80,13 @@ Omtrent så lang tid tar det:
 | 30 minutter | 11–13 minutter |
 | 60 minutter | 22–27 minutter |
 
-### Snarveien «Lag tekst i Fróði røst»
+### Handlingen «Lag tekst» i Snarveier
 
-Snarveien lager teksten uten at appen er åpen, også for lange opptak. Legg den
-i en automatisering i appen Snarveier, for eksempel når laderen kobles til.
+Handlingen lager teksten uten at appen er åpen, også for lange opptak. Legg
+den i en automatisering i appen Snarveier, for eksempel når laderen kobles
+til: Ny automatisering > Lader > Legg til handling > Fróði røst > Lag tekst.
+Den vises ikke under Handlingsknapp; der er «Start eller stopp opptak» det
+eneste valget.
 
 ### Slik lages teksten
 
