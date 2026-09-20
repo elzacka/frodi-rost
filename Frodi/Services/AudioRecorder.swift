@@ -29,6 +29,13 @@ final class AudioRecorder {
     private var ticker: Task<Void, Never>?
     private var observers: [any NSObjectProtocol] = []
 
+    /// The session being given up after a stop. The next start waits for it:
+    /// a deactivation still in flight when the session is activated again
+    /// lands between the activation and `record()`, and `record()` then fails.
+    /// Seen on a device on 2026-09-20 with the player's deactivation; the
+    /// recorder's own is the same call on the same session.
+    private var deactivation: Task<Void, Never>?
+
     var isRecording: Bool { state == .recording }
 
     /// Called when an interruption ends without the recording being able to go on:
@@ -49,6 +56,8 @@ final class AudioRecorder {
     @discardableResult
     func start() async -> Bool {
         guard state != .recording else { return true }
+
+        await deactivation?.value
 
         guard await AVAudioApplication.requestRecordPermission() else {
             state = .denied
@@ -173,8 +182,8 @@ final class AudioRecorder {
         isInterrupted = false
 
         // Off the main thread, and nothing here waits for it: the length is read
-        // from the file, which the session has no say in.
-        Task { _ = try? await AVAudioSession.sharedInstance().deactivate(options: .notifyOthersOnDeactivation) }
+        // from the file, which the session has no say in. The next start does.
+        deactivation = Task { _ = try? await AVAudioSession.sharedInstance().deactivate(options: .notifyOthersOnDeactivation) }
 
         let fileName = recorder.url.lastPathComponent
         let measured = AudioStorage.duration(fileName: fileName)

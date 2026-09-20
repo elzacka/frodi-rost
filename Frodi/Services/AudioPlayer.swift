@@ -32,6 +32,10 @@ final class AudioPlayer {
     private var player: AVAudioPlayer?
     private var ticker: Task<Void, Never>?
 
+    /// The session being given up. Chained, so that whoever waits for the
+    /// latest one waits for all of them; see `stop()`.
+    private var deactivation: Task<Void, Never>?
+
     private init() {}
 
     var isPlaying: Bool { state == .playing }
@@ -43,7 +47,7 @@ final class AudioPlayer {
     /// already loaded.
     func prepare(_ recording: Recording) async {
         guard fileName != recording.fileName else { return }
-        stop()
+        await stop()
 
         state = .loading
         let name = recording.fileName
@@ -109,7 +113,15 @@ final class AudioPlayer {
 
     /// Releases both the audio and the audio session. Called when the detail page
     /// closes, and before a new recording starts.
-    func stop() {
+    ///
+    /// Returns once the session is given up, and the recorder must wait for
+    /// that. Measured on a device on 2026-09-20: fired off and not waited for,
+    /// the deactivation landed between the recorder's activation and its
+    /// `record()`, the audio queue was built on an inactive session with no
+    /// input route, and `record()` answered false at every press until the
+    /// timing happened to fall the other way. The player being idle makes no
+    /// difference; the deactivation is sent either way.
+    func stop() async {
         stopTicker()
         player?.stop()
         player = nil
@@ -118,6 +130,7 @@ final class AudioPlayer {
         duration = 0
         state = .idle
         deactivateSession()
+        await deactivation?.value
     }
 
     // MARK: - Body
@@ -176,6 +189,10 @@ final class AudioPlayer {
     }
 
     private func deactivateSession() {
-        Task { _ = try? await AVAudioSession.sharedInstance().deactivate(options: .notifyOthersOnDeactivation) }
+        let previous = deactivation
+        deactivation = Task {
+            await previous?.value
+            _ = try? await AVAudioSession.sharedInstance().deactivate(options: .notifyOthersOnDeactivation)
+        }
     }
 }

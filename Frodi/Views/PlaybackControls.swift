@@ -44,7 +44,7 @@ struct PlaybackControls: View {
             guard !controller.isRecording else { return }
             await player.prepare(recording)
         }
-        .onDisappear { player.stop() }
+        .onDisappear { Task { await player.stop() } }
     }
 
     // MARK: - Position

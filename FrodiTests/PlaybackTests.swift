@@ -44,7 +44,7 @@ struct PlaybackTests {
     func loadsSealedRecording() async throws {
         try await withSealedRecording { recording in
             let player = AudioPlayer.shared
-            defer { player.stop() }
+            defer { Task { await player.stop() } }
 
             await player.prepare(recording)
 
@@ -58,7 +58,7 @@ struct PlaybackTests {
     func seekingIsClamped() async throws {
         try await withSealedRecording { recording in
             let player = AudioPlayer.shared
-            defer { player.stop() }
+            defer { Task { await player.stop() } }
 
             await player.prepare(recording)
 
@@ -83,7 +83,7 @@ struct PlaybackTests {
         defer { AudioStorage.delete(fileName: name) }
 
         let player = AudioPlayer.shared
-        defer { player.stop() }
+        defer { Task { await player.stop() } }
 
         await player.prepare(Recording(duration: 3, fileName: name))
 
@@ -96,7 +96,7 @@ struct PlaybackTests {
     @Test("Et opptak som mangler på disk gir en beskjed")
     func missingFileFails() async {
         let player = AudioPlayer.shared
-        defer { player.stop() }
+        defer { Task { await player.stop() } }
 
         await player.prepare(Recording(duration: 3, fileName: "finnes-ikke.m4a.enc"))
 
@@ -108,7 +108,7 @@ struct PlaybackTests {
         try await withSealedRecording { recording in
             let player = AudioPlayer.shared
             await player.prepare(recording)
-            player.stop()
+            await player.stop()
 
             #expect(player.state == .idle)
             #expect(player.fileName == nil)

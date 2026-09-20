@@ -59,7 +59,7 @@ final class RecordingController {
             stopAndSave()
             return false
         }
-        AudioPlayer.shared.stop()
+        await AudioPlayer.shared.stop()
         return await recorder.start()
     }
 
@@ -69,8 +69,9 @@ final class RecordingController {
     func start() async -> Bool {
         guard !recorder.isRecording else { return true }
         // Playback and recording share the audio session. If we are playing when the
-        // recording starts, the microphone picks up the speaker.
-        AudioPlayer.shared.stop()
+        // recording starts, the microphone picks up the speaker. Waited for: the
+        // player gives the session up, and the recorder must not take it before.
+        await AudioPlayer.shared.stop()
         return await recorder.start()
     }
 
