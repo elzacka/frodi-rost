@@ -1,6 +1,6 @@
 # Brukerveiledning for Fróði røst
 
-Oppdatert 19.09.26.
+Oppdatert 20.09.26.
 
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 Denne veiledningen viser hvordan du bruker appen.
@@ -32,8 +32,8 @@ Opptaket fortsetter når skjermen låser seg og når du bytter app.
 
 Opptak har ingen tidsgrense.
 
-Blir du oppringt mens du tar opp, settes opptaket på pause og fortsetter når
-samtalen er over. Hvis ikke, er alt fram til samtalen lagret.
+Får du en telefon mens du tar opp, venter opptaket og fortsetter etter
+samtalen. Alt du sa før samtalen, er lagret.
 
 > **Viktig:** Tar du opp en samtale, må du si fra til de andre at du tar den
 > opp, og hva du skal bruke opptaket til.
@@ -64,11 +64,11 @@ Hvor lenge opptaket varer, avgjør når teksten lages:
 | Inntil 10 minutter  | Lages når du stopper    |
 | Over 10 minutter    | Lages når du ber om det |
 
-Lange opptak står som «ingen tekst ennå» i listen. Åpne opptaket og trykk på
-«Lag tekst», eller sveip opptaket i listen mot venstre og trykk på «Lag tekst».
+Lange opptak står som «ingen tekst ennå» i listen. Sveip opptaket mot venstre
+og trykk på «Lag tekst», eller åpne opptaket og trykk der.
 
-Appen viser i prosent hvor mye av teksten som er laget. Blir transkriberingen
-avbrutt, fortsetter den der den slapp.
+Appen viser i prosent hvor langt den har kommet. Blir den avbrutt, fortsetter
+den der den slapp.
 
 Teksten lages mens appen er åpen, eller mens enheten lader med skjermen låst.
 
@@ -90,9 +90,9 @@ eneste valget.
 
 ### Slik lages teksten
 
-Modellen nb-whisper-small fra Nasjonalbiblioteket følger med appen og kjører
-på enheten. Den er trent på 66 000 timer norsk tale, setter tegn og store
-bokstaver selv og skriver dialekt om til bokmål.
+Modellen nb-whisper-small fra Nasjonalbiblioteket er innebygd i appen og
+kjører på enheten. Den setter tegn og store bokstaver selv, og skriver dialekt
+om til bokmål.
 
 > **Tips:** Du trenger ikke si «punktum» eller «komma».
 
@@ -101,11 +101,12 @@ for å spille av lyden derfra.
 
 ### Hvis teksten mangler
 
-| Det&nbsp;står                            | Det&nbsp;betyr                              |
-| ---------------------------------------- | ------------------------------------------- |
-| «venter på transkribering»               | Teksten er i kø og lages snart              |
-| «Fant ingen tale i dette opptaket.»      | Opptaket er stille, eller lyden er for svak |
-| «Teksten kunne ikke lages denne gangen.» | Noe gikk galt. Trykk på «Prøv på nytt»      |
+| Det&nbsp;står                                 | Det&nbsp;betyr                              |
+| --------------------------------------------- | ------------------------------------------- |
+| «venter på tekst»                             | Teksten er i kø og lages snart              |
+| «lager tekst, 43 %»                           | Så langt er appen kommet                    |
+| «Fant ingen tale i dette opptaket.»           | Opptaket er stille, eller lyden er for svak |
+| «Fróði fikk ikke laget teksten denne gangen.» | Noe gikk galt. Trykk på «Prøv på nytt»      |
 
 ## Ordliste
 
@@ -162,11 +163,8 @@ angre.
 
 ## Personvern
 
-Alt skjer på enheten. Ingen datatrafikk ut eller inn. Opptak, tekst og
-ordliste er kryptert, og blir ikke med i sikkerhetskopier. Appen ber bare om
-tilgang til mikrofonen.
-
-Hele personvernerklæringen: [PERSONVERN.md](PERSONVERN.md).
+Alt skjer på enheten. Ingen datatrafikk ut eller inn. Hva som lagres, og
+rettighetene dine: [PERSONVERN.md](PERSONVERN.md).
 
 ## Spørsmål eller feil
 

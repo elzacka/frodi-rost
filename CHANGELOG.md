@@ -56,7 +56,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   sluppet lydsystemet før den tar opp
 - Handlingsknappen venter til appen er i forgrunnen før opptaket starter
 - En opptaksfil uten lyd, etterlatt av et krasj, fikk en rad som sto som
-  «venter på transkribering» for alltid. Filen fjernes, og raden med den
+  «venter på tekst» for alltid. Filen fjernes, og raden med den
 - Med ordliste kunne modellen svare med tom tekst uten feilmelding. Rettet i
   talemotoren, som er oppdatert til argmax-oss-swift 1.1.0
 - Teksten som lages mens enheten lader, fikk ikke åpnet sin egen kopi av lyden

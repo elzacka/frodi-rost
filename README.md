@@ -10,13 +10,12 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 
 ## Hva appen gjør
 
-- Tar opp lyd – også når skjermen er låst
-- Opptaket overlever en telefonsamtale, og at appen avsluttes midt i
-- Handlingsknappen starter og stopper opptak
-- Ingen tidsgrense på opptak
-- Opptak under ti minutter transkriberes når du stopper. Lengre opptak transkriberes når du ber om det, og fortsetter der de slapp ved avbrudd
-- Transkriberer til bokmål, med tegnsetting og stor/liten forbokstav
-- Transkripsjonen deles i avsnitt med tidspunkt du kan trykke på for å spille av derfra
+- Tar opp lyd, også når skjermen er låst, og så lenge du vil
+- Fortsetter etter en telefonsamtale, og tar vare på opptaket hvis appen avsluttes midt i
+- Starter og stopper med handlingsknappen
+- Lager tekst av opptak under ti minutter når du stopper, og av lengre opptak når du ber om det
+- Skriver bokmål med tegnsetting og stor forbokstav, også av dialekt
+- Deler teksten i avsnitt med tidspunkt du kan trykke på for å høre stedet i opptaket
 - Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`, hver for seg eller sammen
 
 ## Modell
