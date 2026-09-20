@@ -32,7 +32,7 @@ final class ScratchChoiceShot: XCTestCase {
         Thread.sleep(forTimeInterval: 1)
         attach("slett")
 
-        app.buttons["Nei"].tap()
+        app.buttons["Behold"].tap()
         Thread.sleep(forTimeInterval: 1)
 
         row.tap()

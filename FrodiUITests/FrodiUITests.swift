@@ -36,7 +36,7 @@ final class FrodiUITests: XCTestCase {
     }
 
     /// A swipe to the left shows what can be done with a recording, and «Slett»
-    /// asks in the row before anything goes. «Nei» keeps the recording. Uses a
+    /// asks in the row before anything goes. «Behold» keeps the recording. Uses a
     /// recording the simulator already has, or makes a short one.
     @MainActor
     func test_swipeLeft_asksBeforeDeleting() {
@@ -59,10 +59,10 @@ final class FrodiUITests: XCTestCase {
         delete.tap()
 
         XCTAssertTrue(app.staticTexts["Sikker på at du vil slette?"].waitForExistence(timeout: 5), "Raden spurte ikke")
-        app.buttons["Nei"].tap()
+        app.buttons["Behold"].tap()
 
         XCTAssertTrue(app.staticTexts["Sikker på at du vil slette?"].waitForNonExistence(timeout: 5), "Spørsmålet ble stående")
-        XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "Opptaket forsvant etter «Nei»")
+        XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "Opptaket forsvant etter «Behold»")
     }
 
     /// The back button is the app's own, and UIKit switches the swipe from the

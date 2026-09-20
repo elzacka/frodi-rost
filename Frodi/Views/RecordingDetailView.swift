@@ -87,7 +87,7 @@ struct RecordingDetailView: View {
             }
         }
         .alert("Kunne ikke eksportere", isPresented: .constant(exportError != nil)) {
-            Button("Greit") { exportError = nil }
+            Button("OK") { exportError = nil }
         } message: {
             Text(exportError ?? "").font(.Frodi.body)
         }

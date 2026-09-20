@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 19.09.26.
+Sist oppdatert 20.09.26.
 
 Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 å sende til, og ingen tjeneste å spørre.
@@ -81,7 +81,7 @@ i appen.
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Innsyn     | Åpne opptaket i appen                                                                                                                                     |
 | Eksportere | Trykk på delingsikonet, og velg opptaket, teksten eller begge. Lyden kommer som `.m4a`, teksten som `.txt` eller `.rtf`, det du har valgt i Innstillinger |
-| Sletting   | Sveip opptaket i listen mot venstre, trykk på «Slett» og svar «Ja»                                                                                        |
+| Sletting   | Sveip opptaket i listen mot venstre, trykk på «Slett», og på «Slett» igjen når raden spør                                                                 |
 
 > **Viktig:** Sletter du appen, forsvinner alt. Det skjer med én gang, og du
 > kan ikke angre.

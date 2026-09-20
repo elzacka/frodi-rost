@@ -3,6 +3,8 @@ import SwiftUI
 struct RecorderBar: View {
     let controller: RecordingController
 
+    @Environment(\.openURL) private var openURL
+
     private var recorder: AudioRecorder { controller.recorder }
 
     var body: some View {
@@ -25,7 +27,7 @@ struct RecorderBar: View {
             }
 
             if recorder.isInterrupted {
-                Text("Opptaket er satt på pause og fortsetter etterpå.")
+                Text("Opptaket er satt på pause og fortsetter når mikrofonen er ledig igjen.")
                     .font(.Frodi.caption)
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .multilineTextAlignment(.center)
@@ -38,6 +40,17 @@ struct RecorderBar: View {
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, Space.s4)
+
+                // The one place a shortcut to the system's Innstillinger belongs:
+                // where the user who cannot record is looking.
+                Button("Åpne Innstillinger") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+                }
+                .font(.Frodi.bodyMedium)
+                .foregroundStyle(Color.Frodi.accentRecordOn)
+                .padding(.horizontal, Space.s4)
+                .padding(.vertical, Space.s2)
+                .background(Color.Frodi.accentRecord, in: Capsule())
             }
         }
         .padding(.horizontal, Space.s5)

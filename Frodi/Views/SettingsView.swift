@@ -59,7 +59,7 @@ struct SettingsView: View {
         Card("Fróði røst") {
             paragraph("Fróði er norrønt og betyr «den kunnskapsrike».")
             paragraph("Appen tar opp lyd og gjør den om til norsk tekst. " + Self.privacyOpener)
-            paragraph("Modellen nb-whisper-small fra Nasjonalbiblioteket følger med appen og kjører inne i den.")
+            paragraph("Modellen nb-whisper-small fra Nasjonalbiblioteket er innebygd i appen og kjører på enheten.")
             paragraph("Versjon \(Self.versionNumber)")
             paragraph("Spørsmål eller feil: hei@tazk.no")
         }
@@ -70,7 +70,7 @@ struct SettingsView: View {
     /// Safari; the licences are a screen in the app, since Apache 2.0 requires
     /// the attribution to be in the app itself.
     private var documents: some View {
-        Card("Dokumentasjon") {
+        Card("Mer om appen") {
             link("Brukerveiledning", to: Self.userGuide)
             link("Personvernerklæring", to: Self.privacyPolicy)
             link("Sikkerhet", to: Self.securityPolicy)

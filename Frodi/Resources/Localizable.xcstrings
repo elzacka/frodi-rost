@@ -35,13 +35,10 @@
     "Ingen opptak ennå" : {
 
     },
-    "Ja" : {
-
-    },
     "Lisenser" : {
 
     },
-    "Nei" : {
+    "Behold" : {
 
     },
     "Opptak og tekst" : {
@@ -53,7 +50,7 @@
     "Opptaket er langt. Trykk på «Lag tekst» når du vil ha teksten. En time med opptak tar noen minutter. Hold appen åpen imens." : {
 
     },
-    "Opptaket er satt på pause og fortsetter etterpå." : {
+    "Opptaket er satt på pause og fortsetter når mikrofonen er ledig igjen." : {
 
     },
     "røst" : {

@@ -18,7 +18,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Når du eksporterer, velger du opptaket, teksten eller begge
 - Sveip et opptak mot venstre for å se hva du kan gjøre med det: «Lag tekst»,
   «Prøv på nytt» eller «Lag ny tekst», og «Slett». «Slett» spør «Sikker på at
-  du vil slette?» i samme rad, med «Ja» og «Nei»
+  du vil slette?» i samme rad, med «Slett» og «Behold»
 - Ordliste i Innstillinger: Navn og ord Fróði bør kjenne, som firmaer, personer
   og forkortelser. Modellen får listen før den lytter, og ord i teksten som
   nesten stemmer med listen, rettes etterpå. «Lag ny tekst» i listen
@@ -31,7 +31,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 - Siden bak knappen i logohodet heter «Innstillinger». Knappen viser tre
   skyvebrytere. Siden har fire kort: Ordliste, Eksport,
-  Fróði røst med versjon og kontakt, og Dokumentasjon med lenker til
+  Fróði røst med versjon og kontakt, og Mer om appen med lenker til
   brukerveiledning, personvernerklæring og sikkerhet, og lisensene
 
 - Appen krever iOS 27.0 eller nyere
@@ -52,6 +52,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   etter at du hadde hørt på et opptak. Appen venter til avspilleren har
   sluppet lydsystemet før den tar opp
 - Handlingsknappen venter til appen er i forgrunnen før opptaket starter
+- Er mikrofontilgangen avslått, står knappen «Åpne Innstillinger» under
+  meldingen om det
 - En opptaksfil uten lyd, etterlatt av et krasj, fikk en rad som sto som
   «venter på tekst» for alltid. Filen fjernes, og raden med den
 - Med ordliste kunne modellen svare med tom tekst uten feilmelding. Rettet i

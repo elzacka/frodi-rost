@@ -44,7 +44,7 @@ struct RecordingListView: View {
                 RecorderBar(controller: controller)
             }
             .alert("Noe gikk galt", isPresented: .constant(errorMessage != nil)) {
-                Button("Greit") { errorMessage = nil }
+                Button("OK") { errorMessage = nil }
             } message: {
                 Text(errorMessage ?? "").font(.Frodi.body)
             }
@@ -212,23 +212,23 @@ struct RecordingListView: View {
 
             Spacer(minLength: Space.s2)
 
-            // «Ja» stands where the text action stood and «Nei» where «Slett»
-            // did, so a second tap in the same place says no.
+            // «Slett» stands where the text action stood and «Behold» where
+            // «Slett» did, so a second tap in the same place keeps the recording.
             Button { delete(recording) } label: {
-                answer("Ja").choiceRow(destructive: true, inline: true)
+                answer("Slett").choiceRow(destructive: true, inline: true)
             }
             Button { setStage(.closed, of: recording) } label: {
-                answer("Nei").choiceRow(inline: true)
+                answer("Behold").choiceRow(inline: true)
             }
         }
     }
 
-    /// «Ja» and «Nei» in one size: each is laid out over both words, so the
-    /// wider one sets the width of both at every text size.
+    /// «Slett» and «Behold» in one size: each is laid out over both words, so
+    /// the wider one sets the width of both at every text size.
     private func answer(_ word: LocalizedStringKey) -> some View {
         ZStack {
-            Text("Ja").hidden()
-            Text("Nei").hidden()
+            Text("Slett").hidden()
+            Text("Behold").hidden()
             Text(word)
         }
     }

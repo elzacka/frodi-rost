@@ -1,8 +1,8 @@
 # Tredjepartslisenser
 
-Oppdatert 19.09.26.
+Oppdatert 20.09.26.
 
-Listen i appen, under Innstillinger > Dokumentasjon > Lisenser, har de samme
+Listen i appen, under Innstillinger > Mer om appen > Lisenser, har de samme
 navnene og lisensene som denne filen. Versjonene under Kode er de som står i
 `Package.resolved`. En test i `FrodiTests/DocumentTests.swift` feiler hvis de
 tre ikke stemmer overens.
