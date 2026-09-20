@@ -62,10 +62,9 @@ struct ToggleRecordingIntent: AppIntent {
 /// one phrase stays, the fewest that keep the button working. It also gives
 /// Siri a way in; that cannot be had one without the other.
 ///
-/// This is the only App Shortcut. The button can be set to one shortcut, and
-/// this is the one it is for; a second entry under the app's name in the
-/// picker only makes the wrong one easy to pick. `TranscribePendingIntent`
-/// is still an action in the Shortcuts app without being published here.
+/// This is the only App Shortcut, and the only intent. The button can be set
+/// to one shortcut, and this is the one it is for; a second entry under the
+/// app's name in the picker only makes the wrong one easy to pick.
 struct FrodiShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(

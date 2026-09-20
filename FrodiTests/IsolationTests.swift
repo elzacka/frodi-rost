@@ -60,16 +60,15 @@ struct IsolationTests {
         }
     }
 
-    /// `audio` and `processing` are the only background modes the app should
-    /// have. `processing` runs the `BGProcessingTask` that resumes
-    /// transcription while charging and locked; anything else would open the
-    /// door to work that can reach the network.
-    @Test("Bare lyd og transkribering kjører i bakgrunnen")
-    func onlyAudioAndProcessingRunInBackground() {
+    /// `audio` is the only background mode the app should have: a recording
+    /// goes on after the screen locks, and nothing else runs without the app in
+    /// front. Any other mode would open the door to work that can reach the
+    /// network, and a background task would need the key on a locked device.
+    @Test("Bare lyd kjører i bakgrunnen")
+    func onlyAudioRunsInBackground() {
         let modes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") as? [String] ?? []
-        #expect(modes == ["audio", "processing"], "Uventede bakgrunnsmoduser: \(modes)")
-        let identifiers = Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") as? [String] ?? []
-        #expect(identifiers == [BackgroundTranscription.identifier])
+        #expect(modes == ["audio"], "Uventede bakgrunnsmoduser: \(modes)")
+        #expect(Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") == nil)
     }
 
     /// The privacy manifest must say the app collects nothing and does not track.

@@ -64,13 +64,12 @@ enum AudioStorage {
 
     /// Protection once the recording is sealed.
     ///
-    /// `completeUntilFirstUserAuthentication`, not `complete`: a transcription on
-    /// the charger has to open the file while the screen is locked, and `complete`
-    /// forbids that. What the class gives up is the window between boot and the
-    /// first unlock, which is short; the content is ciphertext under a key with
-    /// the same class, and both are decided together. See `RecordingVault.createKey`.
+    /// The file is closed now, and `complete` is right: the content cannot be read
+    /// while the device is locked, not even by something with physical access.
+    /// Everything that opens it runs on an unlocked device; the key that opens it
+    /// has the matching class. See `RecordingVault.createKey`.
     static func protectFinished(_ url: URL) {
-        setProtection(.completeUntilFirstUserAuthentication, on: url)
+        setProtection(.complete, on: url)
         excludeFromBackup(url)
     }
 
@@ -161,7 +160,7 @@ enum AudioStorage {
                 ? try await encodeToAAC(segmentNames(of: fileName))
                 : source
             defer { if audio != source { try? FileManager.default.removeItem(at: audio) } }
-            try RecordingVault.seal(fileAt: audio).write(to: target, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+            try RecordingVault.seal(fileAt: audio).write(to: target, options: [.atomic, .completeFileProtection])
         }
         for name in segmentNames(of: fileName) {
             try? FileManager.default.removeItem(at: directory.appendingPathComponent(name))
@@ -266,13 +265,11 @@ enum AudioStorage {
     /// `Transcription.run` calls from the main actor. All three steps take the whole
     /// file at once, and an hour of audio is about 30 MB.
     ///
-    /// `.completeUntilFirstUserAuthentication`, the class of the ciphertext it
-    /// came from and of the key that opened it. `write` closes the file, and the
-    /// engine opens it again; a closed `.completeUnlessOpen` file cannot be
-    /// reopened while the device is locked, which is where the charger run lives.
-    /// The stricter class would have failed the run at the first piece. Whoever
-    /// can read this copy in the window it exists could open the original the
-    /// same way, so the class costs nothing the threat model counts.
+    /// `.completeUnlessOpen`: `write` closes the file, the engine opens it again
+    /// on the unlocked device the run starts on, and holds it across the pieces.
+    /// A held-open file of this class stays readable if the screen locks
+    /// meanwhile, so a run the user locks the screen on goes on until iOS
+    /// suspends the app, and its progress is saved piece by piece.
     ///
     /// `body` stays with the caller. The engine is bound to the main actor and must
     /// still be called from there.
@@ -281,7 +278,7 @@ enum AudioStorage {
         let audio = try plaintext(fileName: fileName)
 
         let temporary = scratchDirectory.appendingPathComponent(UUID().uuidString + ".m4a")
-        try audio.write(to: temporary, options: [.completeFileProtectionUntilFirstUserAuthentication])
+        try audio.write(to: temporary, options: [.completeFileProtectionUnlessOpen])
         return temporary
     }
 

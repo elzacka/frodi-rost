@@ -103,7 +103,7 @@ struct FileSealingTests {
     ///
     /// Device only. The simulator has no data protection and answers `nil` for the
     /// attribute, so there the test would fail without meaning anything.
-    @Test("Et forseglet opptak kan leses etter første opplåsing, ikke før", .enabled(if: !isSimulator))
+    @Test("Et forseglet opptak kan ikke leses mens enheten er låst", .enabled(if: !isSimulator))
     func sealedFileIsCompletelyProtected() async throws {
         let name = try plaintextRecording(Data("innhold".utf8))
         let sealed = try await AudioStorage.seal(fileName: name)
@@ -112,7 +112,7 @@ struct FileSealingTests {
         let attributes = try FileManager.default.attributesOfItem(
             atPath: AudioStorage.directory.appendingPathComponent(sealed).path
         )
-        #expect(attributes[.protectionKey] as? FileProtectionType == .completeUntilFirstUserAuthentication)
+        #expect(attributes[.protectionKey] as? FileProtectionType == .complete)
     }
 
     private static var isSimulator: Bool {

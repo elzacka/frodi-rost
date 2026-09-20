@@ -28,13 +28,12 @@ enum RecordingVault {
     /// The public half of the Enclave key, as X9.63 bytes, once it has been read.
     ///
     /// Sealing needs only the public key, and the public key is not secret. The
-    /// private key, by contrast, lives in the keychain under an access class that
-    /// can refuse it: `AfterFirstUnlock` before the first unlock since boot, and
-    /// `WhenUnlocked` on a device whose key was made by build 5 or 6. A
-    /// transcription can outlast the screen, and its text is sealed the moment it
-    /// finishes, so the seal must not depend on the lock state. It does not: every
-    /// path that seals has opened something first in the same process, and that is
-    /// when the public key is kept.
+    /// private key, by contrast, lives in the keychain under `WhenUnlocked`, which
+    /// refuses it while the device is locked. A transcription can outlast the
+    /// screen, and its text is sealed the moment it finishes, so the seal must not
+    /// depend on the lock state. It does not: every path that seals has opened
+    /// something first in the same process, and that is when the public key is
+    /// kept.
     private static let publicKeyBytes = OSAllocatedUnfairLock<Data?>(initialState: nil)
 
     enum VaultError: LocalizedError {
@@ -186,19 +185,18 @@ enum RecordingVault {
     }
 
     private static func createKey() throws -> SecKey {
-        // afterFirstUnlockThisDeviceOnly, so a transcription can open a recording
-        // while the device sits locked on the charger; see BackgroundTranscription.
-        // The stricter whenUnlocked was the class from 2026-09-13 to 2026-09-14,
-        // and would have kept a seized, locked, once-unlocked device from
-        // using the key. Decided by elzacka on 2026-09-14: an hour of
-        // interview transcribed overnight is worth that margin. A key created by a
-        // build in between keeps whenUnlocked, and on that device the transcription
-        // runs only while unlocked; the class is fixed at creation and the app does
-        // not rotate keys. ThisDeviceOnly keeps it out of backups.
+        // whenUnlockedThisDeviceOnly: the private key is used only to open, and
+        // every path that opens runs on an unlocked device, because the audio it
+        // starts from is `.complete` and `Transcription.run` does not start while
+        // the device is locked. Sealing needs only the public key, which is kept in
+        // memory once seen, so a seal does not need the keychain at all. The looser
+        // afterFirstUnlock would let a seized, locked, once-unlocked device use the
+        // key; nothing in the app needs that. The class is fixed at creation and
+        // the app does not rotate keys. ThisDeviceOnly keeps it out of backups.
         var accessError: Unmanaged<CFError>?
         guard let access = SecAccessControlCreateWithFlags(
             nil,
-            kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+            kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
             .privateKeyUsage,
             &accessError
         ) else {

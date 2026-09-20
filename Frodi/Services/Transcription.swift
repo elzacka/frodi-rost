@@ -13,10 +13,10 @@ enum Transcription {
     private static let whisper = WhisperTranscriber()
 
     /// Up to this length a recording is transcribed as soon as it is stopped. A
-    /// longer one waits until the user asks: an hour of interview takes the device
-    /// a long time at full load, and the next interview needs that battery. The
-    /// app decides by length; the user decides when. `TranscriptProgress.begin` is
-    /// how the asking is remembered.
+    /// longer one waits until the user asks: an hour of interview is minutes at
+    /// full load, and the next interview needs that battery. The app decides by
+    /// length; the user decides when. `TranscriptProgress.begin` is how the asking
+    /// is remembered.
     static let immediateLimit: TimeInterval = 10 * 60
 
     /// The same number as BRUKERVEILEDNING.md states it; `DocumentTests` holds
@@ -32,14 +32,6 @@ enum Transcription {
     @MainActor
     private static var inFlight: Set<PersistentIdentifier> = []
 
-    /// Set when iOS ends a background run. The run stops at the next piece; what
-    /// is done is saved, and the rest waits. Cleared when a pass starts.
-    @MainActor
-    private static var stopRequested = false
-
-    @MainActor
-    static func stop() { stopRequested = true }
-
     /// Seals the recording, and transcribes it if it is short, was asked for, or
     /// `requested` says so now.
     ///
@@ -47,15 +39,21 @@ enum Transcription {
     /// so a run cut short by a suspension, a crash or a new recording goes on from
     /// where it was. It stops by itself when a recording starts: the microphone
     /// must not compete with the model for the device.
+    ///
+    /// Nothing here can succeed on a locked device: the plaintext to seal is
+    /// closed `.completeUnlessOpen`, the sealed audio is `.complete`, and the key
+    /// is `WhenUnlocked`. A stop from the Action Button on a locked device reaches
+    /// this through `stopAndSave`; the work waits for the unlock pass, and nothing
+    /// is marked failed, because nothing has.
     @MainActor
     static func run(for recording: Recording, context: ModelContext, requested: Bool = false) async {
+        guard UIApplication.shared.isProtectedDataAvailable else { return }
         let id = recording.persistentModelID
         guard inFlight.insert(id).inserted else { return }
         defer { inFlight.remove(id) }
 
-        // Sealing comes first. It fails while the device is locked; the recording
-        // then waits for the next unlock or launch, and nothing is marked failed,
-        // because nothing has. See `AudioStorage.seal`.
+        // Sealing comes first. If it fails, the recording waits for the next unlock
+        // or launch, and nothing is marked failed. See `AudioStorage.seal`.
         if !AudioStorage.isSealed(recording.fileName) {
             do {
                 recording.fileName = try await AudioStorage.seal(fileName: recording.fileName)
@@ -104,7 +102,7 @@ enum Transcription {
                     progress.position = position
                     progress.save(for: fileName)
                     TranscriptionState.shared.update(id, fraction: fraction(position, of: duration))
-                    return !RecordingController.shared.isRecording && !stopRequested
+                    return !RecordingController.shared.isRecording
                 }
                 return progress.position >= duration - 0.5
             }
@@ -136,27 +134,12 @@ enum Transcription {
     /// A recording the model already found no speech in is left alone. The same
     /// audio gives the same answer, and a whisper run per silent recording at
     /// every launch adds up. «Prøv på nytt» behind the row still works.
-    ///
-    /// `requested` is what the «Lag tekst» shortcut passes: the long recordings
-    /// that would otherwise wait for a tap are taken too, because running the
-    /// shortcut is the asking.
     @MainActor
-    static func runPending(context: ModelContext, requested: Bool = false) async {
-        stopRequested = false
+    static func runPending(context: ModelContext) async {
         let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
         for recording in recordings where !recording.hasTranscript && recording.failureCode != "empty" {
-            guard !stopRequested else { return }
-            await run(for: recording, context: context, requested: requested)
+            await run(for: recording, context: context)
         }
-    }
-
-    /// For the «Lag tekst» shortcut: everything, the long recordings included, on
-    /// the controller's own context. The shortcut runs off the main actor and
-    /// has no context of its own.
-    @MainActor
-    static func runAllPending() async {
-        guard let context = RecordingController.shared.mainContext else { return }
-        await runPending(context: context, requested: true)
     }
 
     /// Whether a recording is waiting for the user to ask for its text.
@@ -177,9 +160,8 @@ enum Transcription {
 
 /// What the interface can see of a transcription in progress.
 ///
-/// While one runs in the foreground, the screen is kept awake, so a device left
-/// on the table keeps working. On the charger it runs without the screen; see
-/// `BackgroundTranscription`.
+/// While one runs, the screen is kept awake, so a device left on the table
+/// keeps working: about four minutes for an hour of interview.
 @MainActor
 @Observable
 final class TranscriptionState {

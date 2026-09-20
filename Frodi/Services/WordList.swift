@@ -34,9 +34,9 @@ enum WordList {
             return
         }
         guard let sealed = try? RecordingVault.seal(trimmed) else { return }
-        // Readable after the first unlock, so a transcription on the charger can
-        // use it. The content is ciphertext either way.
-        try? sealed.write(to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        // Read only on an unlocked device: on the settings page and when a
+        // transcription starts. The content is ciphertext either way.
+        try? sealed.write(to: url, options: [.atomic, .completeFileProtection])
         var target = url
         var values = URLResourceValues()
         values.isExcludedFromBackup = true

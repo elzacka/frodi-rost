@@ -22,10 +22,7 @@ struct FrodiApp: App {
         }
         container = resolved
         RecordingController.shared.attach(container: resolved, storageFailed: failed)
-        BackgroundTranscription.register(container: resolved)
     }
-
-    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -35,9 +32,5 @@ struct FrodiApp: App {
                 .tint(Color.Frodi.accentRecord)
         }
         .modelContainer(container)
-        // Whatever is waiting for text gets a turn on the charger.
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .background { BackgroundTranscription.schedule(context: container.mainContext) }
-        }
     }
 }
