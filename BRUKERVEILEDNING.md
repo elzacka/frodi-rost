@@ -26,7 +26,7 @@ Denne veiledningen viser hvordan du bruker appen.
 ## Ta opp
 
 Trykk på opptaksknappen nederst på skjermen. Trykk igjen for å stoppe.
-Tidtakeren over knappen viser hvor lenge opptaket har vart.
+Tidtakeren til venstre for knappen viser hvor lenge opptaket har vart.
 
 Opptaket fortsetter når skjermen låser seg og når du bytter app.
 
