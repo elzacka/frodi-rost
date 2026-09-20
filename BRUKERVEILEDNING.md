@@ -70,7 +70,8 @@ og trykk på «Lag tekst», eller åpne opptaket og trykk der.
 Appen viser i prosent hvor langt den har kommet. Blir den avbrutt, fortsetter
 den der den slapp.
 
-Teksten lages mens appen er åpen, eller mens enheten lader med skjermen låst.
+Teksten lages mens appen er åpen. Skjermen holder seg på så lenge det pågår.
+Låser du enheten, stopper appen og fortsetter når du åpner den igjen.
 
 Omtrent så lang tid tar det:
 
@@ -79,14 +80,6 @@ Omtrent så lang tid tar det:
 | 10 minutter | Under ett minutt |
 | 30 minutter | 1–2 minutter    |
 | 60 minutter | 2–4 minutter    |
-
-### Handlingen «Lag tekst» i Snarveier
-
-Handlingen lager teksten uten at appen er åpen, også for lange opptak. Legg
-den i en automatisering i appen Snarveier, for eksempel når laderen kobles
-til: Ny automatisering > Lader > Legg til handling > Fróði røst > Lag tekst.
-Den vises ikke under Handlingsknapp; der er «Start eller stopp opptak» det
-eneste valget.
 
 ### Slik lages teksten
 

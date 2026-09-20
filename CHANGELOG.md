@@ -24,9 +24,6 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   nesten stemmer med listen, rettes etterpå. «Lag ny tekst» i listen
   bruker listen på et opptak du alt har. Feltet gjøres høyere eller lavere
   ved å dra i håndtaket nederst til høyre
-- Teksten lages også mens enheten lader, med skjermen låst
-- Handlingen «Lag tekst» i appen Snarveier lager teksten uten at appen er
-  åpen, også for lange opptak. Den kan legges i en automatisering
 - Brukerveiledning, [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md), med alt om
   opptak, handlingsknappen, teksten, ordlisten, eksport og sletting
 
@@ -59,25 +56,18 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   «venter på tekst» for alltid. Filen fjernes, og raden med den
 - Med ordliste kunne modellen svare med tom tekst uten feilmelding. Rettet i
   talemotoren, som er oppdatert til argmax-oss-swift 1.1.0
-- Teksten som lages mens enheten lader, fikk ikke åpnet sin egen kopi av lyden
-  på en låst enhet, og opptaket ble merket som mislykket
 
 ### Sikkerhet
 
 - Talemotoren tar med seg to pakker i stedet for åtte. Lisenslisten følger
 
-- Nøkkelen som låser opp opptak og tekst, kan brukes av appen etter at
-  enheten har vært låst opp én gang siden omstart, også mens den er låst
-  igjen. Det er det som lar teksten lages mens enheten lader. En nøkkel laget av
-  build 5 eller 6 krever fortsatt at enheten er låst opp, og på den enheten
-  lages teksten bare mens appen er åpen
 
 ## 0.1.0 (5) – 13.09.26
 
 ### Sikkerhet
 
-- Nøkkelen som låser opp opptak og tekst, kunne bare brukes mens enheten var
-  låst opp. Endret igjen etter denne builden, se over
+- Nøkkelen som låser opp opptak og tekst, kan bare brukes mens enheten er
+  låst opp
 - «Kopier»-knappen i tekstkortet erstatter markering av teksten. Det du
   kopierer, blir på enheten og forsvinner fra utklippstavlen etter fem minutter
 - Får ikke appen tak i nøkkelen, sier den fra og ber deg låse opp enheten
