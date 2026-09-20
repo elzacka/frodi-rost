@@ -32,11 +32,10 @@ Opptaket fortsetter når skjermen låser seg og når du bytter app.
 
 Opptak har ingen tidsgrense.
 
-Får du en telefon mens du tar opp, venter opptaket og fortsetter etter
-samtalen. Alt du sa før samtalen, er lagret.
+Ved innkommende anrop pauses opptaket automatisk og fortsetter etterpå.
 
-> **Viktig:** Tar du opp en samtale, må du si fra til de andre at du tar den
-> opp, og hva du skal bruke opptaket til.
+> **Viktig:** Før du tar opp samtaler der andre er til stede, må du informere
+> om dette, hva opptaket skal brukes til og få deres samtykke.
 
 ## Handlingsknappen
 
