@@ -74,11 +74,11 @@ Teksten lages mens appen er åpen, eller mens enheten lader med skjermen låst.
 
 Omtrent så lang tid tar det:
 
-| Opptak      | Tid            |
-| ----------- | -------------- |
-| 10 minutter | 4–5 minutter   |
-| 30 minutter | 11–13 minutter |
-| 60 minutter | 22–27 minutter |
+| Opptak      | Tid             |
+| ----------- | --------------- |
+| 10 minutter | Under ett minutt |
+| 30 minutter | 1–2 minutter    |
+| 60 minutter | 2–4 minutter    |
 
 ### Handlingen «Lag tekst» i Snarveier
 
