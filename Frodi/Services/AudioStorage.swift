@@ -90,6 +90,40 @@ enum AudioStorage {
         return stem + ".m4a" + sealedSuffix
     }
 
+    /// The file a recording goes on in after an interruption: `X.1.caf` follows
+    /// `X.caf`, `X.2.caf` follows that. See `AudioRecorder.interruptionEnded`.
+    ///
+    /// The segments are one recording. The first file's name is the recording's
+    /// name everywhere: in the row, in `duration`, in `delete` and in `seal`,
+    /// which joins them into one sealed file. A continuation is never listed on
+    /// its own, so a kill between two of them still gives one row.
+    static func continuationName(for fileName: String, index: Int) -> String {
+        let stem = (fileName as NSString).deletingPathExtension
+        return "\(stem).\(index)" + pendingSuffix
+    }
+
+    static func isContinuation(_ fileName: String) -> Bool {
+        guard fileName.hasSuffix(pendingSuffix) else { return false }
+        let index = ((fileName as NSString).deletingPathExtension as NSString).pathExtension
+        return !index.isEmpty && index.allSatisfy(\.isNumber)
+    }
+
+    /// The recording's files in order: the file itself, then its continuations.
+    /// A sealed recording is one file.
+    static func segmentNames(of fileName: String) -> [String] {
+        guard fileName.hasSuffix(pendingSuffix) else { return [fileName] }
+        let prefix = (fileName as NSString).deletingPathExtension + "."
+        let names = (try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []
+        let continuations = names
+            .filter { isContinuation($0) && $0.hasPrefix(prefix) }
+            .sorted { index(of: $0) < index(of: $1) }
+        return [fileName] + continuations
+    }
+
+    private static func index(of continuation: String) -> Int {
+        Int(((continuation as NSString).deletingPathExtension as NSString).pathExtension) ?? 0
+    }
+
     /// Seals a recording that is still plaintext, and returns its new file name.
     ///
     /// The plaintext is removed only once the sealed copy is written. If sealing
@@ -110,6 +144,10 @@ enum AudioStorage {
     /// the plaintext and saving the new name on the recording; either way the
     /// next pass lands here and gets the same answer.
     ///
+    /// A recording interrupted by a call is several files, see
+    /// `continuationName`. They are joined here, and all of them go once the
+    /// sealed copy is written.
+    ///
     /// `@concurrent` for the same reason as `decryptToTemporary`: an hour of
     /// audio is many megabytes read, encoded, encrypted and written whole.
     @concurrent
@@ -120,12 +158,14 @@ enum AudioStorage {
 
         if !FileManager.default.fileExists(atPath: target.path) {
             let audio = fileName.hasSuffix(pendingSuffix)
-                ? try await encodeToAAC(source)
+                ? try await encodeToAAC(segmentNames(of: fileName))
                 : source
             defer { if audio != source { try? FileManager.default.removeItem(at: audio) } }
             try RecordingVault.seal(fileAt: audio).write(to: target, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
         }
-        try? FileManager.default.removeItem(at: source)
+        for name in segmentNames(of: fileName) {
+            try? FileManager.default.removeItem(at: directory.appendingPathComponent(name))
+        }
         protectFinished(target)
         return sealedName
     }
@@ -136,9 +176,22 @@ enum AudioStorage {
     /// `AudioRecorder.start`. Stored, it should be a quarter of that size and in
     /// the format everything else already expects. The export session streams
     /// from disk to disk, so an hour of audio never sits in memory here.
-    private static func encodeToAAC(_ source: URL) async throws -> URL {
-        let asset = AVURLAsset(url: source)
-        guard let session = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetAppleM4A) else {
+    ///
+    /// The segments go in one after the other through a composition. A segment
+    /// without an audio track, which is what an empty CAF has, is passed over;
+    /// a recording of nothing but such segments fails to export, as an empty
+    /// file did before, and the caller keeps the plaintext.
+    private static func encodeToAAC(_ segmentNames: [String]) async throws -> URL {
+        let composition = AVMutableComposition()
+        guard let track = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+            throw CocoaError(.fileWriteUnknown)
+        }
+        for name in segmentNames {
+            let asset = AVURLAsset(url: directory.appendingPathComponent(name))
+            guard let source = try await asset.loadTracks(withMediaType: .audio).first else { continue }
+            try track.insertTimeRange(try await source.load(.timeRange), of: source, at: composition.duration)
+        }
+        guard let session = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A) else {
             throw CocoaError(.fileWriteUnknown)
         }
         let target = scratchDirectory.appendingPathComponent(UUID().uuidString + ".m4a")
@@ -147,24 +200,30 @@ enum AudioStorage {
         return target
     }
 
-    /// The length of a plaintext recording, read from the file itself.
+    /// The length of a plaintext recording, read from the files themselves: the
+    /// segments of an interrupted recording added up.
     ///
-    /// Nil if the file cannot be opened. The recorder's own `currentTime` is zero
-    /// once it has stopped, so this is what `AudioRecorder.stop` trusts.
+    /// Nil if any of them cannot be opened. The recorder's own `currentTime` is
+    /// zero once it has stopped, so this is what `AudioRecorder.stop` trusts.
     static func duration(fileName: String) -> TimeInterval? {
-        guard let file = try? AVAudioFile(forReading: directory.appendingPathComponent(fileName)) else {
-            return nil
+        var total: TimeInterval = 0
+        for name in segmentNames(of: fileName) {
+            guard let file = try? AVAudioFile(forReading: directory.appendingPathComponent(name)) else {
+                return nil
+            }
+            total += Double(file.length) / file.fileFormat.sampleRate
         }
-        return Double(file.length) / file.fileFormat.sampleRate
+        return total
     }
 
-    /// Every recording file on disk, sealed or not, by file name.
+    /// Every recording on disk, sealed or not, by file name. A continuation is
+    /// part of the recording it follows and is not listed.
     ///
     /// The list is the truth about what exists; the database is a view of it.
     /// `RecordingController.reconcile` compares the two.
     static func storedFileNames() -> [String] {
         let names = (try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []
-        return names.filter { isSealed($0) || $0.hasSuffix(pendingSuffix) || $0.hasSuffix(".m4a") }
+        return names.filter { (isSealed($0) || $0.hasSuffix(pendingSuffix) || $0.hasSuffix(".m4a")) && !isContinuation($0) }
     }
 
     /// When a file was made, from the file system. Used for a recording whose row
@@ -178,7 +237,8 @@ enum AudioStorage {
     ///
     /// A sealed file goes through the vault. A file still waiting to be sealed is
     /// read as it is; that only happens while the device has not been unlocked
-    /// since the recording was stopped.
+    /// since the recording was stopped. Of an interrupted recording still
+    /// waiting, this is the part before the first call; the seal joins the rest.
     static func plaintext(fileName: String) throws -> Data {
         let stored = try Data(contentsOf: directory.appendingPathComponent(fileName))
         return isSealed(fileName) ? try RecordingVault.open(stored) : stored
@@ -245,7 +305,9 @@ enum AudioStorage {
     }
 
     static func delete(fileName: String) {
-        try? FileManager.default.removeItem(at: directory.appendingPathComponent(fileName))
+        for name in segmentNames(of: fileName) {
+            try? FileManager.default.removeItem(at: directory.appendingPathComponent(name))
+        }
         TranscriptProgress.clear(for: fileName)
     }
 

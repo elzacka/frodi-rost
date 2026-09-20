@@ -44,8 +44,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 ### Rettet
 
-- Et opptak overlever en telefonsamtale. Før ble det slettet når du stoppet
-  etterpå
+- Et opptak overlever en telefonsamtale, med alt som ble sagt før den. Før
+  ble det slettet når du stoppet etterpå
 - Et opptak overlever at appen krasjer eller blir avsluttet midt i. Lyden tas
   opp i et format som kan spilles av uansett hvor den ble avbrutt
 - Et opptak som mistet raden sin i listen, får den tilbake ved neste oppstart

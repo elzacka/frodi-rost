@@ -10,8 +10,8 @@ import Testing
 struct StorageTests {
     /// Writes a second of PCM in a CAF, the way the recorder does, into the
     /// recordings folder.
-    private func writeRecording(seconds: Double = 1) throws -> String {
-        let name = UUID().uuidString + AudioStorage.pendingSuffix
+    @discardableResult
+    private func writeRecording(seconds: Double = 1, name: String = UUID().uuidString + AudioStorage.pendingSuffix) throws -> String {
         let url = AudioStorage.directory.appendingPathComponent(name)
         let format = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: AudioRecorder.sampleRate, channels: 1, interleaved: true)!
         let file = try AVAudioFile(forWriting: url, settings: format.settings, commonFormat: .pcmFormatInt16, interleaved: true)
@@ -86,6 +86,56 @@ struct StorageTests {
         #expect(before == after)
     }
 
+    /// A call splits a recording into files, see `AudioStorage.continuationName`.
+    /// Everything that reads the recording by its first name must see all of them.
+    @Test("Fortsettelsene etter et anrop hører til opptaket")
+    func continuationsBelongToTheRecording() throws {
+        let name = try writeRecording(seconds: 1)
+        let first = AudioStorage.continuationName(for: name, index: 1)
+        let second = AudioStorage.continuationName(for: name, index: 2)
+        try writeRecording(seconds: 2, name: first)
+        try writeRecording(seconds: 0.5, name: second)
+        defer { remove(name) }
+
+        #expect(first.hasSuffix(".1.caf"))
+        #expect(AudioStorage.isContinuation(first))
+        #expect(!AudioStorage.isContinuation(name))
+        #expect(AudioStorage.segmentNames(of: name) == [name, first, second])
+        #expect(AudioStorage.sealedName(for: name) == AudioStorage.sealedName(for: first).replacingOccurrences(of: ".1.m4a", with: ".m4a"))
+
+        let stored = AudioStorage.storedFileNames()
+        #expect(stored.contains(name))
+        #expect(!stored.contains(first))
+        #expect(!stored.contains(second))
+
+        let duration = try #require(AudioStorage.duration(fileName: name))
+        #expect(abs(duration - 3.5) < 0.01)
+
+        AudioStorage.delete(fileName: name)
+        for segment in [name, first, second] {
+            #expect(!FileManager.default.fileExists(atPath: AudioStorage.directory.appendingPathComponent(segment).path))
+        }
+    }
+
+    @Test("Forseglingen setter fortsettelsene sammen til ett opptak")
+    func sealJoinsTheContinuations() async throws {
+        let name = try writeRecording(seconds: 1)
+        try writeRecording(seconds: 2, name: AudioStorage.continuationName(for: name, index: 1))
+        let sealed = try await AudioStorage.seal(fileName: name)
+        defer { remove(name, sealed) }
+
+        #expect(AudioStorage.segmentNames(of: name) == [name])
+        #expect(!FileManager.default.fileExists(atPath: AudioStorage.directory.appendingPathComponent(name).path))
+
+        let plaintext = try AudioStorage.plaintext(fileName: sealed)
+        let scratch = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".m4a")
+        try plaintext.write(to: scratch)
+        defer { try? FileManager.default.removeItem(at: scratch) }
+
+        let file = try AVAudioFile(forReading: scratch)
+        #expect(abs(Double(file.length) / file.fileFormat.sampleRate - 3) < 0.2)
+    }
+
     /// The container must outlive the context: `mainContext` does not retain it,
     /// and an insert on a context whose container is gone traps inside SwiftData.
     @MainActor
@@ -110,6 +160,23 @@ struct StorageTests {
         let row = try #require(rows.first { $0.fileName == name })
         #expect(abs(row.duration - 3) < 0.01)
         #expect(abs(row.createdAt.timeIntervalSinceNow) < 60)
+    }
+
+    /// Killed after the call and before the stop: two files, no row.
+    @MainActor
+    @Test("Et avbrutt opptak uten rad får én rad, med hele lengden")
+    func interruptedOrphanGetsOneRow() throws {
+        let name = try writeRecording(seconds: 1)
+        try writeRecording(seconds: 2, name: AudioStorage.continuationName(for: name, index: 1))
+        defer { remove(name) }
+        let container = try memoryContainer()
+        let context = container.mainContext
+
+        RecordingController.shared.reconcile(context)
+
+        let rows = try context.fetch(FetchDescriptor<Recording>()).filter { $0.fileName.hasPrefix((name as NSString).deletingPathExtension) }
+        #expect(rows.count == 1)
+        #expect(abs((rows.first?.duration ?? 0) - 3) < 0.01)
     }
 
     @MainActor

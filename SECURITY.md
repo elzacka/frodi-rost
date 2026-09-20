@@ -2,7 +2,7 @@
 
 Fróði røst records audio and transcribes it on the device. Nothing is transmitted.
 
-Last reviewed 2026-09-19.
+Last reviewed 2026-09-20.
 
 **Contents**
 
@@ -144,7 +144,7 @@ pieces rather than reopened for each.
 
 | State                       | Class                                   | Reason                                                                                                                                                                                                                                                    |
 | --------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Recording in progress       | `.completeUnlessOpen`                   | `.complete` would block writes when the screen locks, which is exactly when recordings run. The file is linear PCM in a CAF container: an AAC file killed mid-write cannot be opened, and a recording must survive a crash                                |
+| Recording in progress       | `.completeUnlessOpen`                   | `.complete` would block writes when the screen locks, which is exactly when recordings run. The file is linear PCM in a CAF container: an AAC file killed mid-write cannot be opened, and a recording must survive a crash. A call closes the file, and the recording goes on in a new one of the same class beside it (`X.1.caf` after `X.caf`); the seal joins them |
 | Stopped, awaiting seal      | `.completeUnlessOpen`, closed           | Cannot be reopened until unlock, which is also when the seal happens                                                                                                                                                                                      |
 | Sealed recording, word list | `.completeUntilFirstUserAuthentication` | Ciphertext under a key of the same class: readable on the charger with the screen locked, which background transcription needs, and unreadable before the first unlock since boot. Sealing re-encodes PCM to AAC through a scratch copy; see the last row |
 | Transcription progress      | `.completeUntilFirstUserAuthentication` | Already ciphertext. Read back by the background run                                                                                                                                                                                                       |

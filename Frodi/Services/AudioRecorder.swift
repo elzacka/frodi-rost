@@ -15,11 +15,20 @@ final class AudioRecorder {
     private(set) var state: State = .idle
     private(set) var duration: TimeInterval = 0
 
-    /// True while a call, Siri or another app holds the microphone. The recording is
-    /// paused, not stopped, and continues on its own when the interruption ends.
+    /// True while a call, Siri or another app holds the microphone. The recording
+    /// waits, and goes on by itself in a new file when the interruption ends.
     private(set) var isInterrupted = false
 
+    /// The recorder of the current segment. Nil while interrupted: iOS stops it,
+    /// and it is not reused, see `interruptionBegan`.
     private var recorder: AVAudioRecorder?
+
+    /// The length of the segments closed by interruptions so far. The recorder's
+    /// `currentTime` counts the current segment alone.
+    private var completed: TimeInterval = 0
+
+    /// How many files the recording is in so far; names the next one.
+    private var segments = 0
 
     /// The file being written right now, so a pass over the folder can leave it
     /// alone. Set before the file exists: the recorder creates it before `record()`
@@ -106,6 +115,8 @@ final class AudioRecorder {
             AudioStorage.protectWhileRecording(url)
             recorder = newRecorder
             duration = 0
+            completed = 0
+            segments = 1
             isInterrupted = false
             state = .recording
             observeInterruptions()
@@ -166,16 +177,17 @@ final class AudioRecorder {
     /// a recording and is the one exception; a file that cannot be opened is not
     /// that file, see `savedDuration`.
     func stop() -> (fileName: String, duration: TimeInterval)? {
-        guard let recorder, state == .recording else { return nil }
+        guard state == .recording, let fileName = currentFileName else { return nil }
 
         // What the recorder counted, taken before it stops and forgets. The ticker's
-        // copy covers a recorder the audio system has already invalidated.
-        let counted = max(recorder.currentTime, duration)
+        // copy covers a recorder the audio system has already invalidated, and
+        // there is no recorder at all while a call is on.
+        let counted = max(completed + (recorder?.currentTime ?? 0), duration)
 
-        recorder.stop()
+        recorder?.stop()
         stopTicker()
         stopObserving()
-        self.recorder = nil
+        recorder = nil
         currentFileName = nil
         state = .idle
         duration = 0
@@ -185,7 +197,6 @@ final class AudioRecorder {
         // from the file, which the session has no say in. The next start does.
         deactivation = Task { _ = try? await AVAudioSession.sharedInstance().deactivate(options: .notifyOthersOnDeactivation) }
 
-        let fileName = recorder.url.lastPathComponent
         let measured = AudioStorage.duration(fileName: fileName)
         guard let length = Self.savedDuration(measured: measured, counted: counted) else {
             Self.log.notice("Recording stopped: \(fileName, privacy: .public) is empty, deleted")
@@ -219,9 +230,9 @@ final class AudioRecorder {
 
     /// A call, Siri, an alarm or another app taking the microphone.
     ///
-    /// iOS pauses the recorder by itself when the interruption begins. What the app
+    /// iOS stops the recorder by itself when the interruption begins. What the app
     /// has to do is continue when it ends, and save when it cannot. Without this
-    /// the recorder stayed paused, the screen still said «recording», and the next
+    /// the recorder stayed stopped, the screen still said «recording», and the next
     /// press on stop read a length of zero. Everything said before the call was
     /// then deleted as too short.
     private func observeInterruptions() {
@@ -264,24 +275,46 @@ final class AudioRecorder {
         })
     }
 
+    /// Closes the segment. The recorder is not paused and not reused: iOS has
+    /// stopped it before this arrives, and `record()` on a stopped
+    /// `AVAudioRecorder` starts its file over. Measured on a device on
+    /// 2026-09-20: a recording of 21 s, a call, a resume, a stop 44 s later,
+    /// and a file of 44 s. The 21 s before the call were written over. What
+    /// was recorded before the call is a finished file from here on, and the
+    /// resume goes on in the next one; `AudioStorage.seal` joins them.
     private func interruptionBegan(source: AVAudioSession.DeactivationSource?) {
         guard state == .recording, let recorder, source != .app else { return }
-        Self.log.notice("Interruption began at \(recorder.currentTime, privacy: .public) s")
-        recorder.pause()
+        let position = recorder.currentTime
+        Self.log.notice("Interruption began at \(self.completed + position, privacy: .public) s")
+        recorder.stop()
+        self.recorder = nil
+        completed += position
         isInterrupted = true
     }
 
     private func interruptionEnded(recommendation: AVAudioSession.ResumptionRecommendation?) async {
-        guard state == .recording, let recorder, isInterrupted else { return }
+        guard state == .recording, isInterrupted, let fileName = currentFileName else { return }
         isInterrupted = false
         let shouldResume = recommendation == .shouldResume
         var resumed = false
-        if shouldResume, (try? await AVAudioSession.sharedInstance().activate(options: [])) == true {
-            // The activation took time, and a stop can have landed meanwhile.
-            // Then the recorder is closed and its file is being saved, and a
-            // `record()` on it would open the file again and write over it.
-            guard state == .recording, self.recorder === recorder else { return }
-            resumed = recorder.record()
+        if shouldResume, (try? await AVAudioSession.sharedInstance().activate(options: [])) == true,
+           state == .recording, currentFileName == fileName {
+            let name = AudioStorage.continuationName(for: fileName, index: segments)
+            let url = AudioStorage.directory.appendingPathComponent(name)
+            if let next = try? await Self.startRecorder(at: url) {
+                // Each activation took time, and a stop can have landed meanwhile.
+                // Then the recording is being saved without this file, and the
+                // recorder just made must not go on writing it.
+                if next.started, state == .recording, currentFileName == fileName {
+                    AudioStorage.protectWhileRecording(url)
+                    recorder = next.recorder
+                    segments += 1
+                    resumed = true
+                } else {
+                    next.recorder.stop()
+                    try? FileManager.default.removeItem(at: url)
+                }
+            }
         }
         Self.log.notice("Interruption ended, shouldResume \(shouldResume, privacy: .public), resumed \(resumed, privacy: .public)")
         if !resumed { onInterruptionEnded?() }
@@ -298,10 +331,10 @@ final class AudioRecorder {
         ticker = Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(200))
-                guard let self, let recorder = self.recorder else { return }
-                // Frozen while paused: `currentTime` holds across a pause, and the
+                guard let self else { return }
+                // Frozen while interrupted: there is no recorder then, and the
                 // display should say so rather than keep counting.
-                if !self.isInterrupted { self.duration = recorder.currentTime }
+                if let recorder = self.recorder { self.duration = self.completed + recorder.currentTime }
             }
         }
     }
