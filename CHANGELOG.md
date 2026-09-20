@@ -51,6 +51,12 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Et opptak som mistet raden sin i listen, får den tilbake ved neste oppstart
 - Et opptak som stoppes mens enheten er låst, blir tatt vare på. Før slettet
   appen det, fordi den ikke fikk lest filen og tok det for tomt
+- Opptak kunne nekte å starte, fra knappen og fra handlingsknappen, rett
+  etter at du hadde hørt på et opptak. Appen venter til avspilleren har
+  sluppet lydsystemet før den tar opp
+- Handlingsknappen venter til appen er i forgrunnen før opptaket starter
+- En opptaksfil uten lyd, etterlatt av et krasj, fikk en rad som sto som
+  «venter på transkribering» for alltid. Filen fjernes, og raden med den
 - Med ordliste kunne modellen svare med tom tekst uten feilmelding. Rettet i
   talemotoren, som er oppdatert til argmax-oss-swift 1.1.0
 - Teksten som lages mens enheten lader, fikk ikke åpnet sin egen kopi av lyden

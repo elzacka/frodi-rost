@@ -11,6 +11,7 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 ## Hva appen gjør
 
 - Tar opp lyd – også når skjermen er låst
+- Opptaket overlever en telefonsamtale, og at appen avsluttes midt i
 - Handlingsknappen starter og stopper opptak
 - Ingen tidsgrense på opptak
 - Opptak under ti minutter transkriberes når du stopper. Lengre opptak transkriberes når du ber om det, og fortsetter der de slapp ved avbrudd
@@ -94,10 +95,10 @@ Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
 | Handlingsknappen utløser intenten (App Intent), som kjører i bakgrunnen når iOS tillater det                                                                                   | `Intents/ToggleRecordingIntent.swift`                               |
 | Handlingen «Lag tekst» i Snarveier kjører transkriberingen i bakgrunnen, for eksempel fra en automatisering                                                                    | `Intents/TranscribePendingIntent.swift`                             |
 | Kontrolleren tar imot kall fra intenten og opptaksknappen, og «eier» databasen                                                                                                 | `Services/RecordingController.swift`                                |
-| Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Opptaket går derfor ikke tapt ved krasj. | `Services/AudioRecorder.swift`                                      |
-| Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad får en ny rad                                                                  | `Services/RecordingController.swift`                                |
+| Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Opptaket går derfor ikke tapt ved krasj. Tar en samtale mikrofonen, lukkes filen, og opptaket fortsetter i en ny fil ved siden av når mikrofonen er tilbake | `Services/AudioRecorder.swift`                                      |
+| Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad får en ny rad. En fil uten lyd fjernes                                          | `Services/RecordingController.swift`                                |
 | Lagringen holder filen i appens sandkasse (App Sandbox) med filvern (Data Protection), utenom sikkerhetskopiering                                                              | `Services/AudioStorage.swift`                                       |
-| Vault forsegler opptaket med en nøkkel fra Secure Enclave                                                                                                                      | `Services/RecordingVault.swift`                                     |
+| Lagringen koder filene om til AAC, setter dem sammen til ett opptak og forsegler det med en nøkkel fra Secure Enclave (Vault)                                                    | `Services/AudioStorage.swift`, `Services/RecordingVault.swift`      |
 | Transkripsjonen lager teksten i puljer med nb-whisper, som kjører inne i appen. Fremdriften lagres etter hver pulje                                                            | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift` |
 | Transcript strukturerer teksten som avsnitt med tidspunkt                                                                                                                      | `Services/Transcript.swift`                                         |
 | WordList sender ordlisten til modellen som prompt                                                                                                                              | `Services/WordList.swift`                                           |
