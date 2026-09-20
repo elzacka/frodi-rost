@@ -117,7 +117,7 @@ struct RecordingListView: View {
                 .font(.Frodi.bodyMedium)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            Text("Fróði får ikke åpnet databasen på enheten. Du kan ta opp og eksportere som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette feilen.")
+            Text("Fróði får ikke åpnet databasen på enheten. Du kan ta opp og eksportere som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt.")
                 .font(.Frodi.caption)
                 .foregroundStyle(Color.Frodi.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)

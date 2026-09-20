@@ -50,7 +50,7 @@ enum RecordingVault {
             case .keyCreationFailed(let message):
                 message
             case .keyUnavailable:
-                String(localized: "Fróði får ikke tak i nøkkelen. Lås opp enheten og prøv igjen.")
+                String(localized: "Fróði får ikke tak i nøkkelen. Lås opp enheten og prøv på nytt.")
             case .decryptionFailed:
                 String(localized: "Fróði får ikke låst opp opptaket. Det ble kryptert på en annen enhet.")
             }

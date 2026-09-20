@@ -149,7 +149,7 @@ struct RecordingDetailView: View {
                         .hiddenWhileScreenCaptured()
                 }
             } else if Transcription.awaitsRequest(recording) {
-                Text("Opptaket er langt, så Fróði lager teksten når du ber om det. Det tar en stund. La appen være åpen, eller sett enheten til lading, så fortsetter Fróði mens den lader.")
+                Text("Opptaket er langt. Trykk på «Lag tekst» når du vil ha teksten. Det tar omtrent halvparten av opptakets lengde. La appen være åpen, eller sett enheten til lading, så jobber Fróði videre med skjermen låst.")
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -297,10 +297,10 @@ struct RecordingDetailView: View {
         transcription.fraction[recording.persistentModelID]
     }
 
-    /// «Transkriberer, 43 %». The percentage is what says the work is moving.
+    /// «Lager tekst, 43 %». The percentage is what says the work is moving.
     private var progressText: String {
-        guard let fraction else { return "Transkriberer …" }
-        return "Transkriberer, \(fraction.formatted(.percent.precision(.fractionLength(0)).locale(AppLocale.norwegian)))"
+        guard let fraction else { return "Lager tekst …" }
+        return "Lager tekst, \(fraction.formatted(.percent.precision(.fractionLength(0)).locale(AppLocale.norwegian)))"
     }
 
     /// «12 minutter, 37 sekunder», the way the player already says it.

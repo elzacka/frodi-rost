@@ -26,7 +26,7 @@
     "fróði" : {
 
     },
-    "Fróði får ikke åpnet databasen på enheten. Du kan ta opp og eksportere som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt for å rette feilen." : {
+    "Fróði får ikke åpnet databasen på enheten. Du kan ta opp og eksportere som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt." : {
 
     },
     "Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger på enheten." : {
@@ -50,7 +50,7 @@
     "Opptakene lagres ikke" : {
 
     },
-    "Opptaket er langt, så Fróði lager teksten når du ber om det. Det tar en stund. La appen være åpen, eller sett enheten til lading, så fortsetter Fróði mens den lader." : {
+    "Opptaket er langt. Trykk på «Lag tekst» når du vil ha teksten. Det tar omtrent halvparten av opptakets lengde. La appen være åpen, eller sett enheten til lading, så jobber Fróði videre med skjermen låst." : {
 
     },
     "Opptaket er satt på pause og fortsetter etterpå." : {

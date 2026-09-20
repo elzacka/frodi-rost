@@ -60,7 +60,7 @@ struct RecorderBar: View {
             .minimumScaleFactor(0.7)
             .foregroundStyle(Color.Frodi.textPrimary)
             .contentTransition(.numericText())
-            .accessibilityLabel("Tid gått")
+            .accessibilityLabel("Opptakstid")
             .accessibilityValue(spoken(recorder.duration))
             .accessibilityHidden(!recorder.isRecording)
     }

@@ -50,11 +50,11 @@ struct RecordingRow: View {
     private var status: String? {
         if recording.hasTranscript { return nil }
         if recording.isTranscribing {
-            guard let fraction = transcription.fraction[recording.persistentModelID] else { return "transkriberer" }
-            return "transkriberer, \(fraction.formatted(.percent.precision(.fractionLength(0)).locale(AppLocale.norwegian)))"
+            guard let fraction = transcription.fraction[recording.persistentModelID] else { return "lager tekst" }
+            return "lager tekst, \(fraction.formatted(.percent.precision(.fractionLength(0)).locale(AppLocale.norwegian)))"
         }
         if recording.transcriptionFailed { return TranscriptionError.shortText(for: recording.failureCode) }
-        return Transcription.awaitsRequest(recording) ? "ingen tekst ennå" : "venter på transkribering"
+        return Transcription.awaitsRequest(recording) ? "ingen tekst ennå" : "venter på tekst"
     }
 
     /// VoiceOver does not read a vertical bar as a pause, so it gets its own sentence.
