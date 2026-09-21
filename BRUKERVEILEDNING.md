@@ -42,7 +42,7 @@ Knappen på venstre side av enheten starter og stopper opptak. Den finnes på
 iPhone 15 Pro og nyere.
 
 Ta det første opptaket i appen, så du får gitt tilgang til mikrofonen.
-Sett så opp knappen i Innstillinger på enheten: Handlingsknapp > Kontroller >
+Sett så opp knappen i Innstillinger på enheten: Handlingsknapp > Kontroll >
 Velg en kontroll > Fróði røst > «Start eller stopp opptak».
 
 Hold knappen inne for å starte et opptak. Hold den inne igjen for å stoppe.

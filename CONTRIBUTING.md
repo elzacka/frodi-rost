@@ -95,7 +95,8 @@ opp, og stopper hvis buildnummeret alt er brukt.
 ## Før en build lastes opp
 
 - Alle tester går grønt på simulatoren `Frodi-Test`
-- Hver ny eller endret tekst i appen er lest gjennom av et menneske
+- Hver ny eller endret tekst i appen er lest gjennom av et menneske.
+  `Scripts/string-diff.py <commit for forrige build>` skriver ut listen
 - [CHANGELOG.md](CHANGELOG.md) har en overskrift for builden
 - [TREDJEPART.md](TREDJEPART.md) og lisenslisten i appen er like. En test
   passer på det

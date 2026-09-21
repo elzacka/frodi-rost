@@ -27,7 +27,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Brukerveiledning, [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md), med alt om
   opptak, handlingsknappen, teksten, ordlisten, eksport og sletting
 - Handlingsknappen starter opptak også når enheten er låst. Du setter den
-  til kontrollen «Start eller stopp opptak» under Handlingsknapp > Kontroller.
+  til kontrollen «Start eller stopp opptak» under Handlingsknapp > Kontroll.
   Kontrollen finnes også i Kontrollsenter
 - Så lenge et opptak går, viser låseskjermen og Dynamic Island «Tar opp»,
   hvor lenge det har vart og en stoppknapp

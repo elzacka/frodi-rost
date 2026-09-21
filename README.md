@@ -60,6 +60,11 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
   -destination 'platform=iOS Simulator,name=Frodi-Test' build
 ```
 
+Mot en enhet: Appen har to bundle-ID-er, `com.Tazk.Frodi` og
+`com.Tazk.Frodi.Widgets` for widget-utvidelsen. Xcode klargjør begge selv med
+automatisk signering. Fra terminalen trenger `xcodebuild` flagget
+`-allowProvisioningUpdates` første gang.
+
 > **Viktig:** nb-whisper-small ligger ikke i git-repoet. Modellen er appens eneste talemotor, så bygget stopper med en feilmelding hvis den mangler.
 
 `fetch-model.sh` sjekker hver fil mot `Scripts/model-checksums.txt` og stopper ved avvik. Hvordan modell og pakker er låst: [SECURITY.md](SECURITY.md).
