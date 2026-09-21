@@ -8,7 +8,7 @@ struct RecordingRow: View {
     var body: some View {
         HStack(alignment: .center, spacing: Space.s3) {
             VStack(alignment: .leading, spacing: Space.s1) {
-                Text(title)
+                Text(verbatim: title)
                     .font(.Frodi.bodyMedium)
                     .monospacedDigit()
                     .foregroundStyle(Color.Frodi.textPrimary)
@@ -19,7 +19,7 @@ struct RecordingRow: View {
                             ProgressView()
                         }
 
-                        Text(status)
+                        Text(verbatim: status)
                             .font(.Frodi.meta)
                             .foregroundStyle(Color.Frodi.textSecondary)
                     }

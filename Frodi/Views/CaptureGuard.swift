@@ -29,10 +29,16 @@ struct CaptureGuard: ViewModifier {
                     IconView(.hidden, size: IconSize.notice)
                         .foregroundStyle(Color.Frodi.textSecondary)
 
-                    Text(isCaptured ? "Teksten er skjult mens skjermen tas opp." : "Teksten er skjult.")
-                        .font(.Frodi.caption)
-                        .foregroundStyle(Color.Frodi.textPrimary)
-                        .multilineTextAlignment(.center)
+                    Group {
+                        if isCaptured {
+                            Text("Teksten er skjult mens skjermen tas opp.")
+                        } else {
+                            Text("Teksten er skjult.")
+                        }
+                    }
+                    .font(.Frodi.caption)
+                    .foregroundStyle(Color.Frodi.textPrimary)
+                    .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Space.s6)

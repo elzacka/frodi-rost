@@ -66,7 +66,7 @@ struct RecorderBar: View {
 
     /// Holds its space while idle too, or the button moves the moment recording starts.
     private var timer: some View {
-        Text(recorder.isRecording ? elapsed : " ")
+        Text(verbatim: recorder.isRecording ? elapsed : " ")
             .font(.Frodi.timer)
             .monospacedDigit()
             .lineLimit(1)

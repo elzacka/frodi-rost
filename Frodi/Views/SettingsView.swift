@@ -183,7 +183,7 @@ struct SettingsView: View {
         return Button {
             textFormat = format
         } label: {
-            Text(format.label)
+            Text(verbatim: format.label)
                 .font(.Frodi.bodyMedium)
                 .foregroundStyle(chosen ? Color.Frodi.accentRecordOn : Color.Frodi.textPrimary)
                 .padding(.horizontal, Space.s4)
@@ -236,7 +236,7 @@ struct SettingsView: View {
     /// Running text in a card. `textPrimary`, not `textSecondary`: this is what
     /// the page is for. The card label above it is the secondary tone.
     private func paragraph(_ text: String) -> some View {
-        Text(text)
+        Text(verbatim: text)
             .font(.Frodi.caption)
             .foregroundStyle(Color.Frodi.textPrimary)
             .fixedSize(horizontal: false, vertical: true)
@@ -251,7 +251,7 @@ struct SettingsView: View {
     private func link(_ title: String, to url: URL) -> some View {
         Link(destination: url) {
             HStack(spacing: Space.s1) {
-                Text(title)
+                Text(verbatim: title)
                     .font(.Frodi.caption)
                     .foregroundStyle(Color.Frodi.textPrimary)
                 IconView(.external, size: IconSize.external)
@@ -330,7 +330,7 @@ struct LicensesView: View {
         Card(label) {
             ForEach(components) { component in
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(component.name)
+                    Text(verbatim: component.name)
                         .font(.Frodi.bodyMedium)
                         .foregroundStyle(Color.Frodi.textPrimary)
 
@@ -359,7 +359,7 @@ private struct Card<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Space.s3) {
-            Text(label)
+            Text(verbatim: label)
                 .font(.Frodi.eyebrow)
                 .eyebrowTracking()
                 .textCase(.uppercase)

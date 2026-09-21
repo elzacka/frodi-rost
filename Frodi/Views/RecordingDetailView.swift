@@ -90,7 +90,7 @@ struct RecordingDetailView: View {
         .alert("Kunne ikke eksportere", isPresented: .constant(exportError != nil)) {
             Button("OK") { exportError = nil }
         } message: {
-            Text(exportError ?? "").font(.Frodi.body)
+            Text(verbatim: exportError ?? "").font(.Frodi.body)
         }
         // The key is the ciphertext itself, not the recording. If the transcription
         // finishes while you are here, it changes, and the text is unlocked again.
@@ -137,7 +137,7 @@ struct RecordingDetailView: View {
                     } else {
                         ProgressView()
                     }
-                    Text(progressText)
+                    Text(verbatim: progressText)
                         .font(.Frodi.body)
                         .foregroundStyle(Color.Frodi.textSecondary)
                         .monospacedDigit()
@@ -164,7 +164,7 @@ struct RecordingDetailView: View {
                 .padding(.vertical, Space.s2)
                 .background(Color.Frodi.accentRecord, in: Capsule())
             } else if recording.transcriptionFailed {
-                Text(TranscriptionError.explanation(for: recording.failureCode))
+                Text(verbatim: TranscriptionError.explanation(for: recording.failureCode))
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -179,7 +179,7 @@ struct RecordingDetailView: View {
                 .background(Color.Frodi.accentRecord, in: Capsule())
             } else {
                 // No transcription started yet, and none has failed.
-                Text(TranscriptionError.explanation(for: nil))
+                Text(verbatim: TranscriptionError.explanation(for: nil))
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -213,7 +213,7 @@ struct RecordingDetailView: View {
                     .textCase(.uppercase)
                     .foregroundStyle(Color.Frodi.textSecondary)
 
-                Text(wordCount)
+                Text(verbatim: wordCount)
                     .font(.Frodi.meta)
                     .foregroundStyle(Color.Frodi.textSecondary)
 
@@ -274,7 +274,7 @@ struct RecordingDetailView: View {
                             player.seek(to: mark)
                             if !player.isPlaying { player.togglePlayback() }
                         } label: {
-                            Text(Transcript.mark(mark))
+                            Text(verbatim: Transcript.mark(mark))
                                 .font(.Frodi.meta)
                                 .monospacedDigit()
                                 .foregroundStyle(Color.Frodi.textSecondary)
@@ -286,7 +286,7 @@ struct RecordingDetailView: View {
                         .accessibilityLabel("Spill av fra \(spoken(mark))")
                     }
 
-                    Text(item.text)
+                    Text(verbatim: item.text)
                         .font(.Frodi.body)
                         .foregroundStyle(Color.Frodi.textPrimary)
                 }

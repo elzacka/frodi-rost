@@ -23,12 +23,12 @@ struct ChoiceSheet<Answers: View>: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Space.s4) {
-                Text(title)
+                Text(verbatim: title)
                     .font(.Frodi.title)
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .accessibilityAddTraits(.isHeader)
 
-                Text(message)
+                Text(verbatim: message)
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)

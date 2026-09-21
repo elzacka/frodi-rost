@@ -47,7 +47,7 @@ struct RecordingListView: View {
             .alert("Noe gikk galt", isPresented: .constant(errorMessage != nil)) {
                 Button("OK") { errorMessage = nil }
             } message: {
-                Text(errorMessage ?? "").font(.Frodi.body)
+                Text(verbatim: errorMessage ?? "").font(.Frodi.body)
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
@@ -196,7 +196,7 @@ struct RecordingListView: View {
         } actions: {
             if let action = textAction(for: recording) {
                 Button { action.run() } label: {
-                    Text(action.label).choiceRow(inline: true)
+                    Text(verbatim: action.label).choiceRow(inline: true)
                 }
             }
             Button { setStage(.asking, of: recording) } label: {
@@ -226,11 +226,11 @@ struct RecordingListView: View {
 
     /// «Slett» and «Behold» in one size: each is laid out over both words, so
     /// the wider one sets the width of both at every text size.
-    private func answer(_ word: LocalizedStringKey) -> some View {
+    private func answer(_ word: String) -> some View {
         ZStack {
             Text("Slett").hidden()
             Text("Behold").hidden()
-            Text(word)
+            Text(verbatim: word)
         }
     }
 
@@ -248,9 +248,9 @@ struct RecordingListView: View {
     /// after a failure, and «Lag ny tekst» for a word list written after the
     /// interview. The audio is the same, so nothing is lost that the new run
     /// does not remake.
-    private func textAction(for recording: Recording) -> (label: LocalizedStringKey, run: () -> Void)? {
+    private func textAction(for recording: Recording) -> (label: String, run: () -> Void)? {
         guard !recording.isTranscribing else { return nil }
-        let label: LocalizedStringKey = if recording.hasTranscript {
+        let label = if recording.hasTranscript {
             "Lag ny tekst"
         } else if Transcription.awaitsRequest(recording) {
             "Lag tekst"

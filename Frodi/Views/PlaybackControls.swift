@@ -19,7 +19,7 @@ struct PlaybackControls: View {
     var body: some View {
         VStack(spacing: Space.s4) {
             if case .failed(let message) = player.state {
-                Text(message)
+                Text(verbatim: message)
                     .font(.Frodi.caption)
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .multilineTextAlignment(.center)
@@ -63,9 +63,9 @@ struct PlaybackControls: View {
             // VoiceOver reads the position from the slider above, so the two numbers
             // here would only be said twice more.
             HStack(spacing: Space.s2) {
-                Text(clock(displayTime))
+                Text(verbatim: clock(displayTime))
                 Spacer(minLength: Space.s2)
-                Text("−" + clock(max(player.duration - displayTime, 0)))
+                Text(verbatim: "−" + clock(max(player.duration - displayTime, 0)))
             }
             .font(.Frodi.meta)
             .monospacedDigit()
