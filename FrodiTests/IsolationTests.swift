@@ -15,28 +15,57 @@ struct IsolationTests {
         #expect(ats == nil, "NSAppTransportSecurity er lagt inn – appen skal ikke snakke med nett i det hele tatt")
     }
 
-    /// No networking API in the app's own sources. The plist tests above guard
-    /// the configuration; this one guards the code. It reads the source tree from
-    /// the path the test was compiled at, which is on the same Mac the simulator
-    /// runs on.
+    /// No networking API in the app's own sources, the widget extension's
+    /// included. The plist tests above guard the configuration; this one guards
+    /// the code. It reads the source tree from the path the test was compiled
+    /// at, which is on the same Mac the simulator runs on.
     @Test("Ingen nettverkskode i appens kildekode")
     func noNetworkingInSources() throws {
-        let sources = URL(filePath: #filePath)
+        let root = URL(filePath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
-            .appending(path: "Frodi")
-        let enumerator = try #require(FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil))
 
         let forbidden = ["URLSession", "URLRequest", "NWConnection", "import Network"]
         var checked = 0
-        for case let url as URL in enumerator where url.pathExtension == "swift" {
-            let code = try String(contentsOf: url, encoding: .utf8)
-            for symbol in forbidden {
-                #expect(!code.contains(symbol), "\(url.lastPathComponent) bruker \(symbol)")
+        for folder in ["Frodi", "FrodiWidgets"] {
+            let sources = root.appending(path: folder)
+            let enumerator = try #require(FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil))
+            for case let url as URL in enumerator where url.pathExtension == "swift" {
+                let code = try String(contentsOf: url, encoding: .utf8)
+                for symbol in forbidden {
+                    #expect(!code.contains(symbol), "\(url.lastPathComponent) bruker \(symbol)")
+                }
+                checked += 1
             }
-            checked += 1
         }
         #expect(checked > 10, "Fant bare \(checked) kildefiler; stien til kildekoden er feil")
+    }
+
+    /// The one extension is the widget one, for the control and the Live
+    /// Activity. It runs in its own process, so it carries its own manifest:
+    /// no collection, no accessed API, no ATS exception. Anything else next to
+    /// it in PlugIns is a surface nobody reviewed.
+    @Test("Den ene utvidelsen er widget-utvidelsen, og den samler ingenting")
+    func theOnlyExtensionIsTheWidget() throws {
+        let plugIns = try #require(Bundle.main.builtInPlugInsURL)
+        // The test bundle itself is placed here while the tests run.
+        let extensions = try FileManager.default.contentsOfDirectory(at: plugIns, includingPropertiesForKeys: nil)
+            .map(\.lastPathComponent)
+            .filter { $0.hasSuffix(".appex") }
+        #expect(extensions == ["FrodiWidgets.appex"])
+
+        let widget = try #require(Bundle(url: plugIns.appending(path: "FrodiWidgets.appex")))
+        let extensionPoint = (widget.object(forInfoDictionaryKey: "NSExtension") as? [String: Any])?["NSExtensionPointIdentifier"] as? String
+        #expect(extensionPoint == "com.apple.widgetkit-extension")
+        #expect(widget.object(forInfoDictionaryKey: "NSAppTransportSecurity") == nil)
+
+        let url = try #require(widget.url(forResource: "PrivacyInfo", withExtension: "xcprivacy"))
+        let plist = try #require(
+            try PropertyListSerialization.propertyList(from: try Data(contentsOf: url), format: nil) as? [String: Any]
+        )
+        #expect(plist["NSPrivacyTracking"] as? Bool == false)
+        #expect((plist["NSPrivacyCollectedDataTypes"] as? [Any])?.isEmpty == true)
+        #expect((plist["NSPrivacyAccessedAPITypes"] as? [Any])?.isEmpty == true)
     }
 
     /// The transcript reaches the pasteboard from one button, and that button keeps

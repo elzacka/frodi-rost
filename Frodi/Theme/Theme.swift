@@ -81,6 +81,18 @@ enum RecordButton {
     static let icon: CGFloat = 30
 }
 
+// MARK: - Live Activity
+/// The recording on the Lock Screen and in the Dynamic Island. The design
+/// system describes neither; the measures are the recorder bar's, so the two
+/// surfaces say the same thing: the timer in `timer`, the stop button the size
+/// of the record button's inner circle.
+enum LiveActivity {
+    static let stop: CGFloat = RecordButton.inner
+    static let stopIcon: CGFloat = RecordButton.icon
+    /// The microphone in the compact and minimal island, beside the clock's text.
+    static let compactIcon: CGFloat = 20
+}
+
 // MARK: - Header button
 /// The info button at the right of the logo header. The design system gives no
 /// measure, so the icon is the size of the one in the system navigation bar, and

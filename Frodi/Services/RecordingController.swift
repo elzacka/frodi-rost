@@ -24,6 +24,11 @@ final class RecordingController {
         // An interruption the recording could not come back from. Same save path:
         // whatever reached the disk is the recording.
         recorder.onInterruptionEnded = { [weak self] in self?.stopAndSave() }
+        // The Live Activity's timer stops while the microphone is held elsewhere.
+        recorder.onInterruptionChanged = { [weak self] paused in
+            guard let self else { return }
+            RecordingActivity.update(elapsed: recorder.duration, isInterrupted: paused)
+        }
     }
 
     var isRecording: Bool { recorder.isRecording }
@@ -35,6 +40,9 @@ final class RecordingController {
         // Plaintext a crash left in the temporary folder. Nothing is running at
         // launch, so all of it is leftovers.
         AudioStorage.clearScratch()
+
+        // A Live Activity a crash left behind would say a recording is running.
+        RecordingActivity.end()
 
         // A recording stopped while the device was locked is still plaintext. It is
         // sealed as soon as the device is unlocked, and at launch if it already is.
@@ -48,7 +56,7 @@ final class RecordingController {
         Task { await sealPending() }
     }
 
-    /// Starts if idle, stops if running. This is what the Action Button calls.
+    /// Starts if idle, stops if running. This is what the record button calls.
     /// Returns true if a recording is now in progress.
     @discardableResult
     func toggle() async -> Bool {
@@ -56,12 +64,10 @@ final class RecordingController {
             stopAndSave()
             return false
         }
-        await AudioPlayer.shared.stop()
-        return await recorder.start()
+        return await start()
     }
 
     /// Starts recording. Returns false if the microphone could not be taken into use.
-    /// The Action Button uses the answer to decide whether it has to open the app.
     @discardableResult
     func start() async -> Bool {
         guard !recorder.isRecording else { return true }
@@ -69,11 +75,16 @@ final class RecordingController {
         // recording starts, the microphone picks up the speaker. Waited for: the
         // player gives the session up, and the recorder must not take it before.
         await AudioPlayer.shared.stop()
-        return await recorder.start()
+        guard await recorder.start() else { return false }
+        // Required by `ToggleRecordingIntent` for as long as the recording runs,
+        // and the sign on the Lock Screen that it does.
+        RecordingActivity.start()
+        return true
     }
 
     func stopAndSave() {
         guard let result = recorder.stop() else { return }
+        RecordingActivity.end()
 
         let recording = Recording(duration: result.duration, fileName: result.fileName)
 

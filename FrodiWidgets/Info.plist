@@ -19,38 +19,20 @@
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
-	<string>APPL</string>
+	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på enheten.</string>
-	<key>NSSupportsLiveActivities</key>
-	<true/>
-	<key>UIAccessibilityPerformEscapeEnabled</key>
-	<true/>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.widgetkit-extension</string>
+	</dict>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Inter-Regular.ttf</string>
 		<string>Inter-Medium.ttf</string>
-		<string>Inter-SemiBold.ttf</string>
-		<string>Skranji-Bold.ttf</string>
-	</array>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>audio</string>
-	</array>
-	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIColorName</key>
-		<string>LaunchBackground</string>
-	</dict>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 </dict>
 </plist>

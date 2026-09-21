@@ -50,6 +50,7 @@ targets:
     dependencies:
       - package: WhisperKit
         product: WhisperKit
+      - target: FrodiWidgets
     # nb-whisper is the app's only engine. A build without it must fail here,
     # not ship. The two files are the ones WhisperTranscriber.isBundled checks;
     # declared as inputs so the sandboxed script may read them.
@@ -98,11 +99,55 @@ targets:
         # recording the moment the app goes to the background, which is exactly what
         # happens when you put the device down in the car.
         UIBackgroundModes: [audio]
+        # The recording's Live Activity. Required by AudioRecordingIntent for as
+        # long as the app records, and the sign on the Lock Screen that it does.
+        NSSupportsLiveActivities: true
         NSMicrophoneUsageDescription: "Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på enheten."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         ITSAppUsesNonExemptEncryption: false
         UIAccessibilityPerformEscapeEnabled: true
+  # The control the Action Button is set to, and the Live Activity. The intent,
+  # the activity's attributes, the theme and the assets are compiled into both
+  # targets; FRODI_WIDGET marks the copy that never performs the intent.
+  FrodiWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: FrodiWidgets
+        excludes:
+          - "**/.DS_Store"
+      - path: Frodi/Shared
+      - path: Frodi/Intents
+      - path: Frodi/Theme
+      - path: Frodi/Resources/Assets.xcassets
+      - path: Frodi/Resources/Fonts/Inter-Regular.ttf
+      - path: Frodi/Resources/Fonts/Inter-Medium.ttf
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.Tazk.Frodi.Widgets
+        INFOPLIST_FILE: FrodiWidgets/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) FRODI_WIDGET"
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "Apple Development"
+        DEVELOPMENT_TEAM: 8NW62A7PRA
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
+        SUPPORTS_MACCATALYST: false
+    info:
+      path: FrodiWidgets/Info.plist
+      properties:
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        CFBundleDisplayName: "Fróði røst"
+        CFBundleLocalizations:
+          - nb
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        UIAppFonts:
+          - Inter-Regular.ttf
+          - Inter-Medium.ttf
   FrodiTests:
     type: bundle.unit-test
     platform: iOS

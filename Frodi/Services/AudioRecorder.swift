@@ -52,6 +52,10 @@ final class AudioRecorder {
     /// on disk is complete and must be saved, the same way as after a press on stop.
     var onInterruptionEnded: (() -> Void)?
 
+    /// Called with true when an interruption pauses the recording, and with false
+    /// when it goes on. `duration` is up to date at both calls.
+    var onInterruptionChanged: ((Bool) -> Void)?
+
     /// Events only, never content: when a recording starts and stops, and what
     /// interrupted it. The 19 minute recording lost on 2026-09-14 left no
     /// trace of why, and the system's own lines did not say either.
@@ -79,10 +83,10 @@ final class AudioRecorder {
             // play back without switching category afterwards.
             //
             // Non-mixable on purpose: other audio pauses while recording and resumes
-            // after, so music does not end up in the recording. It also means the
-            // session cannot be activated from the background ('!int'), but that
-            // buys nothing to give up: a recording cannot be started from the
-            // background at all, see `ToggleRecordingIntent`.
+            // after, so music does not end up in the recording. A plain background
+            // start is refused for it ('!int'); the one background start the app
+            // has goes through `AudioRecordingIntent`, which is meant to lift that
+            // refusal, see `ToggleRecordingIntent`.
             try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.defaultToSpeaker, .allowBluetoothHFP])
             // Asynchronous, as Xcode asks: activation waits for the audio daemon
             // and blocks the main thread when called on it.
@@ -289,7 +293,9 @@ final class AudioRecorder {
         recorder.stop()
         self.recorder = nil
         completed += position
+        duration = completed
         isInterrupted = true
+        onInterruptionChanged?(true)
     }
 
     private func interruptionEnded(recommendation: AVAudioSession.ResumptionRecommendation?) async {
@@ -317,7 +323,7 @@ final class AudioRecorder {
             }
         }
         Self.log.notice("Interruption ended, shouldResume \(shouldResume, privacy: .public), resumed \(resumed, privacy: .public)")
-        if !resumed { onInterruptionEnded?() }
+        if resumed { onInterruptionChanged?(false) } else { onInterruptionEnded?() }
     }
 
     private func stopObserving() {
