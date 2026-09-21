@@ -56,7 +56,8 @@ skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
   etter det
 - Ingenting under 11 px. Tidtakeren skal kunne leses på armlengdes avstand i
   en bil
-- Ikonene kommer fra Material Symbols, aldri fra SF Symbols
+- Ikonene kommer fra Material Symbols, aldri fra SF Symbols. Det ene unntaket
+  er kontrollen i Kontrollsenter, som systemet tegner fra et SF-symbol
 - Fargen `accent-knowledge` er reservert for Fróði vit og finnes ikke i
   asset-katalogen. En test passer på det
 

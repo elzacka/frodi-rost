@@ -1,6 +1,6 @@
 # Brukerveiledning for Fróði røst
 
-Oppdatert 20.09.26.
+Oppdatert 22.09.26.
 
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 Denne veiledningen viser hvordan du bruker appen.
@@ -10,7 +10,6 @@ Denne veiledningen viser hvordan du bruker appen.
 - [Ta opp](#ta-opp)
 - [Handlingsknappen](#handlingsknappen)
 - [Teksten](#teksten)
-  - [Handlingen «Lag tekst» i Snarveier](#handlingen-lag-tekst-i-snarveier)
   - [Slik lages teksten](#slik-lages-teksten)
   - [Hvis teksten mangler](#hvis-teksten-mangler)
 - [Ordliste](#ordliste)
@@ -39,20 +38,23 @@ Ved innkommende anrop pauses opptaket automatisk og fortsetter etterpå.
 
 ## Handlingsknappen
 
-Knappen på venstre side av enheten kan starte og stoppe opptak. Den finnes på
+Knappen på venstre side av enheten starter og stopper opptak. Den finnes på
 iPhone 15 Pro og nyere.
 
-Sett den opp først, i Innstillinger på enheten: Handlingsknapp > Snarvei >
-Bla ned og velg «Fróði røst – Start eller stopp opptak».
+Ta det første opptaket i appen, så du får gitt tilgang til mikrofonen.
+Sett så opp knappen i Innstillinger på enheten: Handlingsknapp > Kontroller >
+Velg en kontroll > Fróði røst > «Start eller stopp opptak».
 
 Hold knappen inne for å starte et opptak. Hold den inne igjen for å stoppe.
+Det virker også når enheten er låst, uten at du låser den opp.
 
-| Enheten&nbsp;er | Starte                     | Stoppe                  |
-| --------------- | -------------------------- | ----------------------- |
-| Låst opp        | Starter med en gang        | Stopper med en gang     |
-| Låst            | Enheten må låses opp først | Stopper uten å låse opp |
+Så lenge opptaket går, viser låseskjermen og Dynamic Island «Tar opp», hvor
+lenge det har vart og en stoppknapp. Første gang spør iOS «Vil du tillate
+løpende oppdateringer fra Fróði røst?». Svar «Tillat»; uten det stopper iOS
+opptak som handlingsknappen starter.
 
-Har du Face ID, låses enheten opp av seg selv når kameraet ser deg.
+> **Tips:** Kontrollen finnes også i Kontrollsenter, der du kan legge den til
+> selv.
 
 ## Teksten
 

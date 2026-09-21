@@ -12,7 +12,7 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 
 - Tar opp lyd, også når skjermen er låst, og så lenge du vil
 - Fortsetter etter en telefonsamtale, og tar vare på opptaket hvis appen avsluttes midt i
-- Starter og stopper med handlingsknappen
+- Starter og stopper med handlingsknappen, også når enheten er låst, og viser opptaket på låseskjermen
 - Lager tekst av opptak under ti minutter når du stopper, og av lengre opptak når du ber om det
 - Skriver bokmål med tegnsetting og stor forbokstav, også av dialekt
 - Deler teksten i avsnitt med tidspunkt du kan trykke på for å høre stedet i opptaket
@@ -91,7 +91,7 @@ Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
 
 | Steg                                                                                                                                                                           | Fil                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| Handlingsknappen utløser intenten (App Intent), som kjører i bakgrunnen når iOS tillater det                                                                                   | `Intents/ToggleRecordingIntent.swift`                               |
+| Handlingsknappen kjører intenten (App Intent) gjennom appens kontroll. Intenten starter og stopper opptak i bakgrunnen, også på låst enhet, og viser et Live Activity på låseskjermen så lenge opptaket går. Kontrollen og Live Activity-en tegnes av en widget-utvidelse | `Intents/ToggleRecordingIntent.swift`, `Services/RecordingActivity.swift`, `FrodiWidgets/` |
 | Kontrolleren tar imot kall fra intenten og opptaksknappen, og «eier» databasen                                                                                                 | `Services/RecordingController.swift`                                |
 | Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Opptaket går derfor ikke tapt ved krasj. Tar en samtale mikrofonen, lukkes filen, og opptaket fortsetter i en ny fil ved siden av når mikrofonen er tilbake | `Services/AudioRecorder.swift`                                      |
 | Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad får en ny rad. En fil uten lyd fjernes                                          | `Services/RecordingController.swift`                                |

@@ -26,6 +26,11 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   ved å dra i håndtaket nederst til høyre
 - Brukerveiledning, [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md), med alt om
   opptak, handlingsknappen, teksten, ordlisten, eksport og sletting
+- Handlingsknappen starter opptak også når enheten er låst. Du setter den
+  til kontrollen «Start eller stopp opptak» under Handlingsknapp > Kontroller.
+  Kontrollen finnes også i Kontrollsenter
+- Så lenge et opptak går, viser låseskjermen og Dynamic Island «Tar opp»,
+  hvor lenge det har vart og en stoppknapp
 
 ### Endret
 
@@ -38,6 +43,10 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Teksten i kort, bannere og meldinger står mørkere, så den er lettere å lese
 - Ikonene kommer fra Material Symbols
 - Hoppknappene i spilleren hopper ti sekunder. Tallet står inne i pilen
+- Handlingsknappen settes til en kontroll, ikke en snarvei. Snarveien
+  «Start eller stopp opptak» og Siri-frasen er borte; handlingen finnes
+  fortsatt i Snarveier-appen
+- Animasjonene følger «Reduser bevegelse» i Innstillinger på enheten
 
 ### Rettet
 
@@ -51,7 +60,6 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Opptak kunne nekte å starte, fra knappen og fra handlingsknappen, rett
   etter at du hadde hørt på et opptak. Appen venter til avspilleren har
   sluppet lydsystemet før den tar opp
-- Handlingsknappen venter til appen er i forgrunnen før opptaket starter
 - Er mikrofontilgangen avslått, står knappen «Åpne Innstillinger» under
   meldingen om det
 - En opptaksfil uten lyd, etterlatt av et krasj, fikk en rad som sto som
