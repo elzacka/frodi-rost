@@ -3,6 +3,7 @@ import SwiftUI
 
 struct RecordingListView: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query(sort: \Recording.createdAt, order: .reverse) private var recordings: [Recording]
 
     @State private var controller = RecordingController.shared
@@ -284,7 +285,7 @@ struct RecordingListView: View {
         // redrawn from an object that is gone.
         swipe = nil
         AudioStorage.delete(fileName: recording.fileName)
-        withAnimation(.spring(duration: 0.3)) {
+        withAnimation(reduceMotion ? nil : .spring(duration: 0.3)) {
             context.delete(recording)
         }
         try? context.save()

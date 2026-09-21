@@ -11,6 +11,7 @@ struct RecordingDetailView: View {
     /// What has come out so far while the transcription runs, read from its progress.
     @State private var partial: [TranscriptParagraph] = []
     @State private var showsTranscript = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var exportURLs: [URL] = []
     @State private var exportError: String?
     @State private var copied = false
@@ -203,7 +204,7 @@ struct RecordingDetailView: View {
     /// the row is open or closed.
     private var transcriptToggle: some View {
         Button {
-            withAnimation(.easeInOut(duration: 0.2)) { showsTranscript.toggle() }
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) { showsTranscript.toggle() }
         } label: {
             HStack(spacing: Space.s2) {
                 Text("Tekst")

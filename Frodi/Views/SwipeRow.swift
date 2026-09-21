@@ -28,6 +28,7 @@ struct SwipeRow<Content: View, Actions: View, Question: View>: View {
     @State private var actionsWidth: CGFloat = 0
     @State private var rowWidth: CGFloat = 0
     @State private var drag: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// The gap between the row and the first action, the same as between rows.
     private let gap = Space.s3
@@ -109,7 +110,7 @@ struct SwipeRow<Content: View, Actions: View, Question: View>: View {
             }
             .onEnded { value in
                 let landed = restingOffset + value.translation.width
-                withAnimation(.spring(duration: 0.3)) {
+                withAnimation(reduceMotion ? nil : .spring(duration: 0.3)) {
                     drag = 0
                     onStage(landed < -(actionsWidth + gap) / 2 ? .open : .closed)
                 }
