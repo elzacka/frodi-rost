@@ -18,6 +18,10 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 - Deler teksten i avsnitt med tidspunkt du kan trykke på for å høre stedet i opptaket
 - Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`, hver for seg eller sammen
 
+## Skjermbilder
+
+<a href="docs/screenshots.png"><img src="docs/screenshots.png" width="100%" alt="Fem skjermbilder av Fróði røst: Opptakslisten med handlingsknappen, et opptak med tekst delt i avsnitt med tidspunkt, ordlisten i innstillingene, sveip for å lage ny tekst, og eksportvalgene."></a>
+
 ## Modell
 
 **nb-whisper-small** fra Nasjonalbiblioteket: Tale til tekst. Bygger på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra Språkbanken og Nasjonalbibliotekets egen samling. Setter tegn og stor forbokstav selv, og skriver dialekt om til bokmål.
