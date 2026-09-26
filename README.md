@@ -20,6 +20,8 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 
 ## Skjermbilder
 
+Klikk på bildet for å se i full størrelse.
+
 <a href="docs/screenshots.png"><img src="docs/screenshots.png" width="100%" alt="Fem skjermbilder av Fróði røst: Opptakslisten med handlingsknappen, et opptak med tekst delt i avsnitt med tidspunkt, ordlisten i innstillingene, sveip for å lage ny tekst, og eksportvalgene."></a>
 
 ## Modell
