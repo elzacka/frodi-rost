@@ -33,6 +33,7 @@ struct ToggleRecordingIntent: AudioRecordingIntent, LiveActivityIntent {
         let controller = RecordingController.shared
         if controller.isRecording {
             controller.stopAndSave()
+            await controller.recorder.sessionReleased()
             return .result()
         }
         // The microphone prompt cannot be shown from the background. The first

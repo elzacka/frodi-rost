@@ -80,21 +80,9 @@ final class AudioRecorder {
 
         do {
             let session = AVAudioSession.sharedInstance()
-            // spokenAudio treats speech better than default, and playAndRecord lets us
-            // play back without switching category afterwards.
-            //
-            // Non-mixable in front: other audio pauses while recording and resumes
-            // after, so music does not end up in the recording. From the
-            // background iOS refuses a non-mixable session ('!int'), also for the
-            // control's `AudioRecordingIntent`: measured on a device 2026-09-26,
-            // while the simulator let it through. There the session ducks other
-            // audio instead, which makes it mixable; music plays on, lower, until
-            // the recording stops.
-            let inBackground = UIApplication.shared.applicationState == .background
-            var options: AVAudioSession.CategoryOptions = [.defaultToSpeaker, .allowBluetoothHFP]
-            if inBackground { options.insert(.duckOthers) }
+            let inBackground = Self.inBackground
             Self.log.notice("Starting, in background: \(inBackground, privacy: .public)")
-            try session.setCategory(.playAndRecord, mode: .spokenAudio, options: options)
+            try Self.setCategory(inBackground: inBackground)
             // Asynchronous, as Xcode asks: activation waits for the audio daemon
             // and blocks the main thread when called on it.
             guard try await session.activate(options: []) else {
@@ -135,10 +123,40 @@ final class AudioRecorder {
             return true
         } catch {
             Self.log.error("Recording did not start: \(error, privacy: .public)")
+            // The session may be active by now, and a ducking one would keep
+            // other audio low until the next stop.
+            _ = try? await AVAudioSession.sharedInstance().deactivate(options: .notifyOthersOnDeactivation)
             currentFileName = nil
             state = .failed(String(localized: "Fikk ikke tilgang til mikrofonen."))
             return false
         }
+    }
+
+    private static var inBackground: Bool { UIApplication.shared.applicationState == .background }
+
+    /// spokenAudio treats speech better than default, and playAndRecord lets us
+    /// play back without switching category afterwards.
+    ///
+    /// Non-mixable in front: other audio pauses while recording and resumes
+    /// after, so music does not end up in the recording. From the background
+    /// iOS refuses a non-mixable session ('!int'), also for the control's
+    /// `AudioRecordingIntent`: measured on a device 2026-09-26, while the
+    /// simulator let it through. There the session ducks other audio instead,
+    /// which makes it mixable; music plays on, lower, until the recording stops.
+    /// A resume after an interruption chooses again, since the app may have
+    /// gone to the background since the start.
+    private static func setCategory(inBackground: Bool) throws {
+        var options: AVAudioSession.CategoryOptions = [.defaultToSpeaker, .allowBluetoothHFP]
+        if inBackground { options.insert(.duckOthers) }
+        try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .spokenAudio, options: options)
+    }
+
+    /// Returns when the session a stop gave up is released. The control's intent
+    /// waits for it: iOS may suspend the app as soon as the intent returns, and a
+    /// release still in flight then never happens, so music ducked by a start
+    /// from the background would stay low.
+    func sessionReleased() async {
+        await deactivation?.value
     }
 
     /// Makes the recorder and starts it, off the main actor. `started` is
@@ -309,8 +327,10 @@ final class AudioRecorder {
         guard state == .recording, isInterrupted, let fileName = currentFileName else { return }
         isInterrupted = false
         let shouldResume = recommendation == .shouldResume
+        let inBackground = Self.inBackground
         var resumed = false
-        if shouldResume, (try? await AVAudioSession.sharedInstance().activate(options: [])) == true,
+        if shouldResume, (try? Self.setCategory(inBackground: inBackground)) != nil,
+           (try? await AVAudioSession.sharedInstance().activate(options: [])) == true,
            state == .recording, currentFileName == fileName {
             let name = AudioStorage.continuationName(for: fileName, index: segments)
             let url = AudioStorage.directory.appendingPathComponent(name)
@@ -329,7 +349,7 @@ final class AudioRecorder {
                 }
             }
         }
-        Self.log.notice("Interruption ended, shouldResume \(shouldResume, privacy: .public), resumed \(resumed, privacy: .public)")
+        Self.log.notice("Interruption ended, shouldResume \(shouldResume, privacy: .public), in background \(inBackground, privacy: .public), resumed \(resumed, privacy: .public)")
         if resumed { onInterruptionChanged?(false) } else { onInterruptionEnded?() }
     }
 
