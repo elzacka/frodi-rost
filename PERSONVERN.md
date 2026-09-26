@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 20.09.26.
+Sist oppdatert 26.09.26.
 
 Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 å sende til, og ingen tjeneste å spørre.
@@ -24,16 +24,18 @@ Fróði røst er laget av elzacka (Tazk).
 
 ## Hva som lagres
 
-| Hva                                          | Hvor                 | Hvor&nbsp;lenge    |
-| -------------------------------------------- | -------------------- | ------------------ |
-| Lydopptak                                    | På enheten, kryptert | Til du sletter det |
-| Tekst fra opptaket, også delvis ferdig tekst | Samme sted, kryptert | Til du sletter den |
-| Ordlisten i Innstillinger                    | Samme sted, kryptert | Til du endrer den  |
+| Hva                                          | Hvor                      | Hvor&nbsp;lenge         |
+| -------------------------------------------- | ------------------------- | ----------------------- |
+| Lydopptak                                    | På enheten, kryptert      | Til du sletter det      |
+| Tekst fra opptaket, også delvis ferdig tekst | Samme sted, kryptert      | Til du sletter den      |
+| Ordlisten i Innstillinger                    | Samme sted, kryptert      | Til du endrer den       |
+| Dato, lengde og filnavn for hvert opptak     | Samme sted, ikke kryptert | Til du sletter opptaket |
 
 Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
 
-Stopper du et opptak mens enheten er låst, krypterer Fróði det så snart du
-låser opp. Fram til da holder iOS filen låst, og ingen kan lese den.
+Stopper du et opptak mens enheten er låst, krypterer Fróði det når du har låst
+opp, senest neste gang du åpner appen. Så lenge enheten er låst, holder iOS
+filen låst, og ingen kan lese den.
 
 > **Viktig:** Tar du opp en samtale, må du si fra til de andre at du tar den
 > opp, og hva du skal bruke opptaket til. Fróði kan love at opptaket blir på
@@ -42,7 +44,12 @@ låser opp. Fram til da holder iOS filen låst, og ingen kan lese den.
 ## Skjermen
 
 Teksten skjules når skjermen tas opp eller speiles, og når du bytter app, så
-den ikke vises i appveksleren. Appen har ingen funksjonalitet som blokkerer skjermbilder.
+den ikke vises i appveksleren. Appen kan ikke hindre at noen tar skjermbilde
+av den.
+
+Mens du tar opp, viser låseskjermen og Dynamic Island at opptaket går, og hvor
+lenge det har vart. Ingenting fra selve opptaket vises der. Alle som har
+enheten i hånden, kan stoppe opptaket der.
 
 ## Kopiering
 
@@ -57,7 +64,8 @@ du eksporterer et opptak.
 
 ## Tillatelser
 
-Mikrofon. Det er alt.
+Mikrofonen og løpende oppdateringer, som viser opptaket på låseskjermen. Det
+er alt.
 
 Appen ber ikke om tilgang til talegjenkjenning. En modell inne i appen lager
 teksten. Se [SECURITY.md](SECURITY.md).

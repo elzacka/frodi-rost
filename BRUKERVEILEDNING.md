@@ -27,14 +27,19 @@ Denne veiledningen viser hvordan du bruker appen.
 Trykk på opptaksknappen nederst på skjermen. Trykk igjen for å stoppe.
 Tidtakeren til venstre for knappen viser hvor lenge opptaket har vart.
 
+Har du sagt nei til mikrofonen, trykker du på «Åpne Innstillinger» under
+meldingen i appen og slår på Mikrofon der.
+
 Opptaket fortsetter når skjermen låser seg og når du bytter app.
 
 Opptak har ingen tidsgrense.
 
-Ved innkommende anrop pauses opptaket automatisk og fortsetter etterpå.
+Tar en samtale, Siri eller en annen app mikrofonen, setter appen opptaket på
+pause. Opptaket fortsetter av seg selv når mikrofonen er ledig igjen. Får ikke
+appen mikrofonen tilbake, lagrer den det du har tatt opp.
 
-> **Viktig:** Før du tar opp samtaler der andre er til stede, må du informere
-> om dette, hva opptaket skal brukes til og få deres samtykke.
+> **Viktig:** Før du tar opp en samtale der andre er til stede, må du si fra
+> at du tar opp, fortelle hva opptaket skal brukes til og få samtykke fra dem.
 
 ## Handlingsknappen
 
@@ -105,6 +110,8 @@ for å spille av lyden derfra.
 | «lager tekst, 43 %»                           | Så langt er appen kommet                    |
 | «Fant ingen tale i dette opptaket.»           | Opptaket er stille, eller lyden er for svak |
 | «Fróði fikk ikke laget teksten denne gangen.» | Noe gikk galt. Trykk på «Prøv på nytt»      |
+
+I listen står de to siste kortere: «ingen tale» og «noe gikk galt».
 
 ## Ordliste
 

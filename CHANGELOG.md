@@ -40,7 +40,6 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   skyvebrytere. Siden har fire kort: Ordliste, Eksport,
   Fróði røst med versjon og kontakt, og Mer om appen med lenker til
   brukerveiledning, personvernerklæring og sikkerhet, og lisensene
-
 - Appen krever iOS 27.0 eller nyere
 - Teksten i kort, bannere og meldinger står mørkere, så den er lettere å lese
 - Ikonene kommer fra Material Symbols
@@ -57,6 +56,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Et opptak overlever at appen krasjer eller blir avsluttet midt i. Lyden tas
   opp i et format som kan spilles av uansett hvor den ble avbrutt
 - Et opptak som mistet raden sin i listen, får den tilbake ved neste oppstart
+- Et opptak som stoppes mens enheten er låst, krypteres og får tekst senest
+  når du åpner appen igjen. Før kunne det vente til appen startet på nytt
 - Et opptak som stoppes mens enheten er låst, blir tatt vare på. Før slettet
   appen det, fordi den ikke fikk lest filen og tok det for tomt
 - Opptak kunne nekte å starte, fra knappen og fra handlingsknappen, rett
@@ -71,7 +72,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 ### Sikkerhet
 
-- Talemotoren tar med seg to pakker i stedet for åtte. Lisenslisten følger
+- Talemotoren tar med seg to pakker i stedet for åtte. Lisenslisten er
+  oppdatert
 
 
 ## 0.1.0 (5) – 13.09.26

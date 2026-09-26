@@ -1,6 +1,6 @@
 # Fróði røst
 
-Tar opp lyd på iPhone og gjør den om til norsk tekst (transkriberer). Alt skjer på enheten.
+Tar opp lyd på iPhone og gjør den om til norsk tekst. Alt skjer på enheten.
 
 «Fróði»: Norrønt for «den kunnskapsrike». «Røst»: Stemme, viser til opptaksfunksjonen.
 
@@ -13,7 +13,7 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 - Tar opp lyd, også når skjermen er låst, og så lenge du vil
 - Fortsetter etter en telefonsamtale, og tar vare på opptaket hvis appen avsluttes midt i
 - Starter og stopper med handlingsknappen, også når enheten er låst, og viser opptaket på låseskjermen
-- Lager tekst av opptak under ti minutter når du stopper, og av lengre opptak når du ber om det
+- Lager tekst av opptak på inntil ti minutter når du stopper, og av lengre opptak når du ber om det
 - Skriver bokmål med tegnsetting og stor forbokstav, også av dialekt
 - Deler teksten i avsnitt med tidspunkt du kan trykke på for å høre stedet i opptaket
 - Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`, hver for seg eller sammen
@@ -98,20 +98,20 @@ Talemotoren kan måles mot en lydfil, med og uten ordliste. Filen bør vare over
 
 ## Arkitektur
 
-Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`.
+Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`, bortsett fra `FrodiWidgets/`.
 
 | Steg                                                                                                                                                                           | Fil                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| Handlingsknappen kjører intenten (App Intent) gjennom appens kontroll. Intenten starter og stopper opptak i bakgrunnen, også på låst enhet, og viser et Live Activity på låseskjermen så lenge opptaket går. Kontrollen og Live Activity-en tegnes av en widget-utvidelse | `Intents/ToggleRecordingIntent.swift`, `Services/RecordingActivity.swift`, `FrodiWidgets/` |
+| Handlingsknappen kjører intenten (App Intent) gjennom appens kontroll. Intenten starter og stopper opptak i bakgrunnen, også på låst enhet, og viser en Live Activity på låseskjermen så lenge opptaket går. Kontrollen og Live Activity-en tegnes av en widget-utvidelse | `Intents/ToggleRecordingIntent.swift`, `Services/RecordingActivity.swift`, `FrodiWidgets/` |
 | Kontrolleren tar imot kall fra intenten og opptaksknappen, og «eier» databasen                                                                                                 | `Services/RecordingController.swift`                                |
 | Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Opptaket går derfor ikke tapt ved krasj. Tar en samtale mikrofonen, lukkes filen, og opptaket fortsetter i en ny fil ved siden av når mikrofonen er tilbake | `Services/AudioRecorder.swift`                                      |
 | Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad får en ny rad. En fil uten lyd fjernes                                          | `Services/RecordingController.swift`                                |
 | Lagringen holder filen i appens sandkasse (App Sandbox) med filvern (Data Protection), utenom sikkerhetskopiering                                                              | `Services/AudioStorage.swift`                                       |
-| Lagringen koder filene om til AAC, setter dem sammen til ett opptak og forsegler det med en nøkkel fra Secure Enclave (Vault)                                                    | `Services/AudioStorage.swift`, `Services/RecordingVault.swift`      |
-| Transkripsjonen lager teksten i puljer med nb-whisper, som kjører inne i appen. Fremdriften lagres etter hver pulje                                                            | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift` |
+| Lagringen koder filene om til AAC, setter dem sammen til ett opptak og forsegler det med en nøkkel fra Secure Enclave (RecordingVault)                                                    | `Services/AudioStorage.swift`, `Services/RecordingVault.swift`      |
+| Transcription lager teksten i puljer med nb-whisper, som kjører inne i appen. Fremdriften lagres etter hver pulje                                                            | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift` |
 | Transcript strukturerer teksten som avsnitt med tidspunkt                                                                                                                      | `Services/Transcript.swift`                                         |
 | WordList sender ordlisten til modellen som prompt                                                                                                                              | `Services/WordList.swift`                                           |
-| Vault forsegler teksten på samme måte som lyden                                                                                                                                | `Services/RecordingVault.swift`                                     |
+| RecordingVault forsegler teksten på samme måte som lyden                                                                                                                                | `Services/RecordingVault.swift`                                     |
 | RecordingDetailView viser teksten bak et vern (CaptureGuard) som skjuler den ved skjermopptak (Screen Recording) og appbytte (App Switcher)                                    | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift`       |
 | Ved eksport dekrypterer RecordingExport filene til en midlertidig mappe, og gir dem til delingsarket (Activity View, ofte kalt Share Sheet)                                    | `Services/RecordingExport.swift`, `Views/ShareSheet.swift`          |
 
