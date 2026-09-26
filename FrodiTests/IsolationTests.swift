@@ -100,6 +100,30 @@ struct IsolationTests {
         #expect(Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") == nil)
     }
 
+    /// Memory tagging and the other runtime protections are entitlements, and
+    /// an entitlement dropped from project.yml fails nothing: the app just runs
+    /// without it. The signed executable carries them as a plist, in its
+    /// signature on a device and in a section of its own on the simulator.
+    @Test("Enhanced Security er med i signaturen, uten soft mode")
+    func enhancedSecurityIsSigned() throws {
+        let executable = try #require(Bundle.main.executableURL)
+        let binary = try Data(contentsOf: executable, options: .mappedIfSafe)
+        let key = try #require(binary.range(of: Data("com.apple.security.hardened-process".utf8)))
+        let start = try #require(binary.range(of: Data("<?xml".utf8), options: .backwards, in: 0..<key.lowerBound))
+        let end = try #require(binary.range(of: Data("</plist>".utf8), in: key.upperBound..<binary.endIndex))
+        let entitlements = try #require(
+            try PropertyListSerialization.propertyList(from: binary[start.lowerBound..<end.upperBound], format: nil) as? [String: Any]
+        )
+
+        let prefix = "com.apple.security.hardened-process"
+        #expect(entitlements[prefix] as? Bool == true)
+        #expect(entitlements["\(prefix).enhanced-security-version-string"] as? String == "2")
+        #expect(entitlements["\(prefix).platform-restrictions-string"] as? String == "2")
+        #expect(entitlements["\(prefix).dyld-ro"] as? Bool == true)
+        #expect(entitlements["\(prefix).checked-allocations"] as? Bool == true)
+        #expect(entitlements["\(prefix).checked-allocations.soft-mode"] == nil, "Soft mode logger feilen i stedet for å stoppe appen")
+    }
+
     /// The privacy manifest must say the app collects nothing and does not track.
     @Test("Personvernmanifestet erklærer ingen innsamling")
     func privacyManifestDeclaresNothing() throws {

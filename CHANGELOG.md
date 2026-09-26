@@ -10,6 +10,13 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Ordlisten retter ikke bøyde former, så «internkontrollen» blir stående når
   listen har «internkontroll»
 
+### Sikkerhet
+
+- På iPhone 17 og nyere, og på iPhone Air, bruker appen Memory Integrity
+  Enforcement, Apples minnebeskyttelse i maskinvaren. Leser eller skriver
+  appen i minne den ikke har fått tildelt, stopper enheten appen. Da kan
+  ingen bruke en slik feil til å ta over appen
+
 ## 1.0 (7) – 26.09.26
 
 ### Endret

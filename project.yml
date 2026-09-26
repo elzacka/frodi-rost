@@ -80,6 +80,21 @@ targets:
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         SUPPORTS_MACCATALYST: false
         SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: false
+    # Enhanced Security at runtime, the set Xcode's capability writes with
+    # hardware memory tagging on. No soft mode: a tag mismatch ends the process
+    # instead of being logged. Version 2 adds guard objects; pinned, so the
+    # protections are the ones measured, not whatever a later iOS calls latest.
+    # Memory tagging needs an A19 or later and does nothing on older devices.
+    # ENABLE_ENHANCED_SECURITY, the build half, stays off: it compiles the app
+    # as arm64e, WhisperKit builds as arm64 only, and the app cannot import it.
+    entitlements:
+      path: Frodi/Frodi.entitlements
+      properties:
+        com.apple.security.hardened-process: true
+        com.apple.security.hardened-process.enhanced-security-version-string: "2"
+        com.apple.security.hardened-process.platform-restrictions-string: "2"
+        com.apple.security.hardened-process.dyld-ro: true
+        com.apple.security.hardened-process.checked-allocations: true
     info:
       path: Frodi/Info.plist
       properties:
