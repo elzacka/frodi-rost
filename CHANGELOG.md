@@ -3,6 +3,13 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/nb/1.1.0/).
 Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
+## Ikke utgitt
+
+### Rettet
+
+- Ordlisten retter ikke bøyde former, så «internkontrollen» blir stående når
+  listen har «internkontroll»
+
 ## 1.0 (7) – 26.09.26
 
 ### Endret

@@ -70,4 +70,13 @@ struct WordListCorrectionTests {
     func punctuationSurvives() {
         #expect(WordList.correct("takker Sigrid Osserud, og går.", entries: entries) == "takker Sigrid Aaserud, og går.")
     }
+
+    /// The ending is Norwegian grammar, not a misspelling: the word already
+    /// holds the entry as listed.
+    @Test("En bøyd form av oppføringen røres ikke")
+    func inflectedFormsAreLeftAlone() {
+        #expect(WordList.correct("avvikene og internkontrollen", entries: ["internkontroll"]) == "avvikene og internkontrollen")
+        #expect(WordList.correct("Tazks rutiner", entries: entries) == "Tazks rutiner")
+        #expect(WordList.correct("Sigrid Aaseruds plan", entries: entries) == "Sigrid Aaseruds plan")
+    }
 }

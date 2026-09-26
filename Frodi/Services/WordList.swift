@@ -63,8 +63,11 @@ enum WordList {
     ///
     /// Conservative on purpose: nothing shorter than four letters, no more than
     /// one letter in six, never a word that is only a case away, never a word
-    /// that already equals another entry. A false replacement is worse than a
-    /// missed one, because the user cannot see it happened.
+    /// that already equals another entry, never a word that begins with the
+    /// entry. The last is Norwegian grammar: «internkontrollen» and «Tazks» hold
+    /// the entry as listed, and the ending is not a misspelling. A false
+    /// replacement is worse than a missed one, because the user cannot see it
+    /// happened.
     static func correct(_ text: String, entries: [String]) -> String {
         let entries = entries.filter { $0.count >= 4 }
         guard !entries.isEmpty else { return text }
@@ -87,7 +90,7 @@ enum WordList {
                 guard candidate.split(separator: " ").count == count,
                       !candidate.contains(where: \.isNumber),
                       !exact.contains(candidate.lowercased()),
-                      candidate.lowercased() != entry.lowercased(),
+                      !candidate.lowercased().hasPrefix(entry.lowercased()),
                       distance(candidate.lowercased(), entry.lowercased()) <= allowed(for: entry)
                 else { continue }
                 replacements.append((window.first!.range.lowerBound..<window.last!.range.upperBound, entry))

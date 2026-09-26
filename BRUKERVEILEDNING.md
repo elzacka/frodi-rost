@@ -1,6 +1,6 @@
 # Brukerveiledning for Fróði røst
 
-Oppdatert 26.09.26.
+Oppdatert 27.09.26.
 
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 Denne veiledningen viser hvordan du bruker appen.
@@ -122,7 +122,8 @@ nederst til høyre i feltet for å gjøre det høyere.
 
 Modellen henter listen før den lytter. Etterpå retter appen ord i teksten som
 nesten stemmer med et ord i listen. Ord på under fire bokstaver og tall rettes
-ikke.
+ikke. Bøyde former rettes heller ikke, så «internkontrollen» blir stående når
+listen har «internkontroll».
 
 > **Tips:** Endrer du listen etter at teksten er laget: Sveip opptaket i
 > listen mot venstre og trykk på «Lag ny tekst».
