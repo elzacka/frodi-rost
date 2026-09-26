@@ -15,6 +15,11 @@ import XCTest
 ///
 /// Measured on 2026-09-22: the press ran `ToggleRecordingIntent.perform()`
 /// in the app's process and started a recording.
+///
+/// The simulator does not enforce the device's audio rules. It starts a
+/// non-mixable session from the background, which a device refuses ('!int',
+/// 2026-09-26). A green run here says the intent is routed and performed; only
+/// a device says whether the recording starts.
 final class ScratchControlPress: XCTestCase {
     @MainActor
     func test_press() throws {
@@ -24,6 +29,29 @@ final class ScratchControlPress: XCTestCase {
         )
         XCUIApplication().launch()
         Thread.sleep(forTimeInterval: 2)
+        pressFromHomeScreen()
+    }
+
+    /// The order from the report: a recording made and stopped in the app,
+    /// then Home, then the control.
+    @MainActor
+    func test_pressAfterRecording() throws {
+        try XCTSkipUnless(
+            ProcessInfo.processInfo.environment["FRODI_SHOTS"] != nil,
+            "Verktøy. Sett FRODI_SHOTS=1 for å kjøre det."
+        )
+        let app = XCUIApplication()
+        app.launch()
+        XCTAssertTrue(app.buttons["Start opptak"].waitForExistence(timeout: 5))
+        app.buttons["Start opptak"].tap()
+        Thread.sleep(forTimeInterval: 4)
+        app.buttons["Stopp opptak"].tap()
+        Thread.sleep(forTimeInterval: 2)
+        pressFromHomeScreen()
+    }
+
+    @MainActor
+    private func pressFromHomeScreen() {
         XCUIDevice.shared.press(.home)
         Thread.sleep(forTimeInterval: 1)
 
@@ -42,12 +70,14 @@ final class ScratchControlPress: XCTestCase {
         XCUIDevice.shared.press(.home)
     }
 
+    @MainActor
     private func control(in springboard: XCUIApplication) -> XCUIElement {
         springboard.descendants(matching: .any)
             .matching(NSPredicate(format: "label CONTAINS[c] 'Start eller stopp' OR label CONTAINS[c] 'Opptak'"))
             .firstMatch
     }
 
+    @MainActor
     private func openControlCenter(_ springboard: XCUIApplication) {
         let start = springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.005))
         let end = springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.7))
@@ -55,6 +85,7 @@ final class ScratchControlPress: XCTestCase {
         Thread.sleep(forTimeInterval: 2)
     }
 
+    @MainActor
     private func addControl(_ springboard: XCUIApplication) {
         springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85)).press(forDuration: 1.5)
         let add = springboard.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'Legg til'")).firstMatch
