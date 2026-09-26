@@ -1,6 +1,6 @@
 # Brukerveiledning for Fróði røst
 
-Oppdatert 22.09.26.
+Oppdatert 26.09.26.
 
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 Denne veiledningen viser hvordan du bruker appen.
@@ -52,6 +52,10 @@ Så lenge opptaket går, viser låseskjermen og Dynamic Island «Tar opp», hvor
 lenge det har vart og en stoppknapp. Første gang spør iOS «Vil du tillate
 løpende oppdateringer fra Fróði røst?». Svar «Tillat»; uten det stopper iOS
 opptak som handlingsknappen starter.
+
+Er appen åpen når du starter et opptak, setter iOS musikk og annen lyd på
+pause til du er ferdig. Starter du opptaket med knappen mens appen ikke er
+åpen, fortsetter lyden, men lavere, til du stopper opptaket.
 
 > **Tips:** Kontrollen finnes også i Kontrollsenter, der du kan legge den til
 > selv.
