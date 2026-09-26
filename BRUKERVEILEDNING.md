@@ -130,7 +130,7 @@ ikke.
 ## Spille av
 
 Åpne et opptak i listen. Spilleren har spill av, pause og to knapper som
-hopper ti sekunder tilbake eller fram. Skyveknappen viser hvor du er i
+hopper ti sekunder tilbake eller frem. Skyveknappen viser hvor du er i
 opptaket.
 
 ## Kopiere teksten

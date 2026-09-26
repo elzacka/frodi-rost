@@ -101,7 +101,7 @@ struct PlaybackControls: View {
             skipButton(
                 Self.skipSeconds,
                 icon: .skipForward,
-                label: "Hopp 10 sekunder fram"
+                label: "Hopp 10 sekunder frem"
             )
         }
     }
