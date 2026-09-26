@@ -32,6 +32,27 @@ enum Transcription {
     @MainActor
     private static var inFlight: Set<PersistentIdentifier> = []
 
+    /// One transcription at a time. The passes at launch, unlock and activation
+    /// can reach different recordings at once; two runs would each find no model
+    /// and load it, about a gigabyte apiece, and clear each other's word list.
+    /// The turn is taken before the plaintext copy is written, so a run that
+    /// waits holds no copy it may be unable to reopen once the device locks.
+    @MainActor
+    private static var running = false
+    @MainActor
+    private static var waiting: [CheckedContinuation<Void, Never>] = []
+
+    @MainActor
+    private static func takeTurn() async {
+        guard running else { running = true; return }
+        await withCheckedContinuation { waiting.append($0) }
+    }
+
+    @MainActor
+    private static func endTurn() {
+        if waiting.isEmpty { running = false } else { waiting.removeFirst().resume() }
+    }
+
     /// Seals the recording, and transcribes it if it is short, was asked for, or
     /// `requested` says so now.
     ///
@@ -76,6 +97,14 @@ enum Transcription {
         guard var progress = progress ?? (recording.duration <= immediateLimit ? TranscriptProgress() : nil) else {
             return
         }
+
+        await takeTurn()
+        defer { endTurn() }
+        // The wait can be long. The device may have locked, or a recording
+        // started, meanwhile; either way the run waits for the next pass, and
+        // nothing is marked failed.
+        guard UIApplication.shared.isProtectedDataAvailable,
+              !RecordingController.shared.isRecording else { return }
 
         recording.isTranscribing = true
         try? context.save()

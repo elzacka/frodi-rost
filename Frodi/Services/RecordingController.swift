@@ -58,19 +58,34 @@ final class RecordingController {
         // of what it queues, «Processing queued notifications», leaves protected
         // data out. A stop on the locked device is followed by suspension, so the
         // unlock goes unseen and the recording would wait for the next launch.
-        // Coming to the front catches up, and only when plaintext is waiting, so
-        // a failed transcription is not retried at every activation.
+        // Coming to the front catches up, on everything waiting except failures:
+        // `sealPending` also retries every failed transcription, which is not
+        // worth a model run each time the app comes to the front.
         NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in
-                guard let self, self.hasPlaintextWaiting else { return }
-                await self.sealPending()
-            }
+            Task { @MainActor in await self?.catchUp() }
         }
         Task { await sealPending() }
+    }
+
+    /// Seals what is still plaintext, and goes on with every recording that has
+    /// no text and has not failed: a run the device locked on, or one that
+    /// stopped for a recording, waits for this. A failed one is left for launch
+    /// and for «Prøv på nytt». `Transcription.run` returns at once for a long
+    /// recording nobody has asked about.
+    private func catchUp() async {
+        guard UIApplication.shared.isProtectedDataAvailable,
+              let context = container?.mainContext else { return }
+
+        if hasPlaintextWaiting { reconcile(context) }
+        let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
+        for recording in recordings
+        where !AudioStorage.isSealed(recording.fileName) || (!recording.hasTranscript && !recording.transcriptionFailed) {
+            await Transcription.run(for: recording, context: context)
+        }
     }
 
     /// A finished recording not yet sealed, which is what a stop on the locked
@@ -184,7 +199,11 @@ final class RecordingController {
         }
 
         let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
-        var referenced = Set(recordings.map(\.fileName))
+        // A row's sealed name counts as known too. A seal running in another
+        // pass writes the sealed file before it removes the plaintext and renames
+        // the row, and in that moment the sealed file would look like an orphan
+        // and get a second row.
+        var referenced = Set(recordings.flatMap { [$0.fileName, AudioStorage.sealedName(for: $0.fileName)] })
 
         for recording in recordings where !onDisk.contains(recording.fileName) {
             let sealed = AudioStorage.sealedName(for: recording.fileName)
