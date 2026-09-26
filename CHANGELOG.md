@@ -3,6 +3,12 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/nb/1.1.0/).
 Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
+## 1.0 (7) – 26.09.26
+
+### Endret
+
+- Versjonen heter 1.0. Appen er ellers den samme som i build 6
+
 ## 0.1.0 (6) – 26.09.26
 
 ### Lagt til
