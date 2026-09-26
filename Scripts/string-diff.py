@@ -30,11 +30,13 @@ def literals(ref):
             text = match.group(1)
             if len(text) < 3 or text.startswith(("com.", "\\(", ".")):
                 continue
-            if re.fullmatch(r"[A-Za-z0-9_\-\.\\\(\)/:%]+", text):
+            # One capitalised word is a button or a label: «Behold», «Opptak».
+            word = re.fullmatch(r"[A-ZÆØÅ][a-zæøå]{2,}", text) is not None
+            if not word and re.fullmatch(r"[A-Za-z0-9_\-\.\\\(\)/:%]+", text):
                 continue
             if "privacy: .public" in text or text.startswith(("Recording ", "Live Activity ", "Interruption ", "Media services", "Seal of", "No container", "Empty recording")):
                 continue
-            if re.search(r"[æøåÆØÅ]", text) or (" " in text and text[0].isupper()):
+            if word or re.search(r"[æøåÆØÅ]", text) or (" " in text and text[0].isupper()):
                 found.add(text)
     return found
 
