@@ -45,7 +45,8 @@ final class RecordingController {
         RecordingActivity.end()
 
         // A recording stopped while the device was locked is still plaintext. It is
-        // sealed as soon as the device is unlocked, and at launch if it already is.
+        // sealed at the unlock if the app is running then, when the app next comes
+        // to the front, and at launch.
         NotificationCenter.default.addObserver(
             forName: UIApplication.protectedDataDidBecomeAvailableNotification,
             object: nil,
@@ -53,7 +54,29 @@ final class RecordingController {
         ) { [weak self] _ in
             Task { @MainActor in await self?.sealPending() }
         }
+        // iOS does not hold that notification for a suspended app: Apple's list
+        // of what it queues, «Processing queued notifications», leaves protected
+        // data out. A stop on the locked device is followed by suspension, so the
+        // unlock goes unseen and the recording would wait for the next launch.
+        // Coming to the front catches up, and only when plaintext is waiting, so
+        // a failed transcription is not retried at every activation.
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, self.hasPlaintextWaiting else { return }
+                await self.sealPending()
+            }
+        }
         Task { await sealPending() }
+    }
+
+    /// A finished recording not yet sealed, which is what a stop on the locked
+    /// device leaves behind. The file being recorded is not finished.
+    private var hasPlaintextWaiting: Bool {
+        AudioStorage.storedFileNames().contains { !AudioStorage.isSealed($0) && $0 != recorder.currentFileName }
     }
 
     /// Starts if idle, stops if running. This is what the record button calls.
