@@ -3,11 +3,18 @@ import Testing
 @testable import Frodi
 
 /// The one setting: names and terms the model should spell right.
+///
+/// A class, for the `deinit`: the tests run inside the app, in its container,
+/// and write the real list. Each puts back what it found, so a device or
+/// simulator that runs them keeps the list its user wrote.
 @Suite("Ordliste", .serialized)
-struct WordListTests {
+final class WordListTests {
+    private let saved = WordList.load()
+
+    deinit { WordList.save(saved) }
+
     @Test("Listen lagres forseglet og leses tilbake")
     func roundTripIsSealed() throws {
-        defer { WordList.save("") }
         WordList.save("Nordkvist AS\nHMS, Kari Berg")
         #expect(WordList.load() == "Nordkvist AS\nHMS, Kari Berg")
 
