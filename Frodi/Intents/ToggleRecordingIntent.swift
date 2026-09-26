@@ -11,7 +11,9 @@ import AVFAudio
 /// records audio, and the system runs the intent in the app's process without
 /// opening the app. The price is a Live Activity: it must start with the
 /// recording and stay for as long as the recording runs, or iOS stops the
-/// recording. `RecordingController` starts and ends it.
+/// recording. `RecordingController` starts and ends it. The session such a
+/// start opens is mixable, because iOS refuses any other from the background;
+/// see `AudioRecorder.start()`.
 ///
 /// `LiveActivityIntent` is the permission to start that activity from the
 /// background; without it an activity can only be started with the app in front.

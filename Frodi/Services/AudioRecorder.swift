@@ -1,6 +1,7 @@
 import AVFoundation
 import Observation
 import OSLog
+import UIKit
 
 @MainActor
 @Observable
@@ -82,12 +83,18 @@ final class AudioRecorder {
             // spokenAudio treats speech better than default, and playAndRecord lets us
             // play back without switching category afterwards.
             //
-            // Non-mixable on purpose: other audio pauses while recording and resumes
-            // after, so music does not end up in the recording. A plain background
-            // start is refused for it ('!int'); the one background start the app
-            // has goes through `AudioRecordingIntent`, which is meant to lift that
-            // refusal, see `ToggleRecordingIntent`.
-            try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.defaultToSpeaker, .allowBluetoothHFP])
+            // Non-mixable in front: other audio pauses while recording and resumes
+            // after, so music does not end up in the recording. From the
+            // background iOS refuses a non-mixable session ('!int'), also for the
+            // control's `AudioRecordingIntent`: measured on a device 2026-09-26,
+            // while the simulator let it through. There the session ducks other
+            // audio instead, which makes it mixable; music plays on, lower, until
+            // the recording stops.
+            let inBackground = UIApplication.shared.applicationState == .background
+            var options: AVAudioSession.CategoryOptions = [.defaultToSpeaker, .allowBluetoothHFP]
+            if inBackground { options.insert(.duckOthers) }
+            Self.log.notice("Starting, in background: \(inBackground, privacy: .public)")
+            try session.setCategory(.playAndRecord, mode: .spokenAudio, options: options)
             // Asynchronous, as Xcode asks: activation waits for the audio daemon
             // and blocks the main thread when called on it.
             guard try await session.activate(options: []) else {
