@@ -61,7 +61,7 @@ struct SwipeRow<Content: View, Actions: View, Question: View>: View {
         }
         .clipped()
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { rowWidth = $0 }
-        .animation(.spring(duration: 0.3), value: stage)
+        .animation(reduceMotion ? nil : .spring(duration: 0.3), value: stage)
     }
 
     /// What the row uncovers: its actions when open, the question when asking.
