@@ -4,10 +4,12 @@
     Scripts/string-diff.py <ref>
 
 Prints the Norwegian string literals in Frodi/ and FrodiWidgets/ that were
-removed (-) or added (+) between <ref> and the working tree. This is the
+removed (-) or added (+) between <ref> and the working tree, with the display
+name and the purpose strings iOS shows from each Info.plist. This is the
 sign-off list a build upload waits for. Log lines and identifiers are left
 out; a string that changed shows as one line removed and one added.
 """
+import plistlib
 import re
 import subprocess
 import sys
@@ -24,6 +26,10 @@ def literals(ref):
         read = lambda f: subprocess.run(["git", "show", f"{ref}:{f}"], capture_output=True, text=True).stdout
     found = set()
     for path in files.split("\n"):
+        if path.endswith("Info.plist"):
+            plist = plistlib.loads(read(path).encode())
+            found.update(value for key, value in plist.items() if key.endswith("UsageDescription") or key == "CFBundleDisplayName")
+            continue
         if not path.endswith(".swift"):
             continue
         for match in LITERAL.finditer(read(path)):
