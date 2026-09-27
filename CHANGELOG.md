@@ -3,13 +3,13 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/nb/1.1.0/).
 Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
-## Ikke utgitt
+## 1.0 (8) – 27.09.26
 
 ### Lagt til
 
 - Du kan importere lydfiler fra Filer, for eksempel m4a, mp3 og wav: Trykk på
-  ikonet med lydbølger og pluss øverst til venstre. Appen lager tekst av dem som av egne opptak,
-  og originalen blir liggende der den var
+  ikonet med lydbølger og pluss øverst til venstre. Appen lager tekst av dem
+  som av egne opptak, og originalen blir liggende der den var
 - Du kan gi et opptak et navn: Trykk på tittelen på opptakets side og velg
   «Endre navn». Navnet står over datoen i listen
 - «Om opptaket» på opptakets side viser opplysningene Fróði låste da
