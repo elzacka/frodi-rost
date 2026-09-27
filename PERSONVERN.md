@@ -42,8 +42,8 @@ lyden. For en importert fil også filnavnet, formatet, størrelsen og
 opplysningene som stod i filen, for eksempel dato og tittel. Filnavnet i
 tabellen over er appens eget, ikke navnet på filen du importerte.
 
-Oppgir filen hvor den ble tatt opp, lagrer Fróði ikke stedet. Fróði lagrer
-navnet på filen slik det er, også når det er et stedsnavn.
+Oppgir en importert fil hvor den ble tatt opp, lagrer Fróði ikke stedet.
+Fróði lagrer navnet på filen slik det er, også når det er et stedsnavn.
 
 Stopper du et opptak mens enheten er låst, krypterer Fróði det når du har låst
 opp, senest neste gang du åpner appen. Så lenge enheten er låst, holder iOS
