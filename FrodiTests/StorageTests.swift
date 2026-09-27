@@ -54,7 +54,7 @@ struct StorageTests {
     @Test("Forseglingen gjør PCM om til AAC som kan åpnes")
     func sealEncodesToAAC() async throws {
         let name = try writeRecording()
-        let sealed = try await AudioStorage.seal(fileName: name)
+        let sealed = try await AudioStorage.seal(fileName: name).name
         defer { remove(name, sealed) }
 
         #expect(sealed.hasSuffix(".m4a.enc"))
@@ -75,15 +75,30 @@ struct StorageTests {
     @Test("En forsegling som allerede finnes brukes som den er")
     func sealIsIdempotent() async throws {
         let name = try writeRecording()
-        let sealed = try await AudioStorage.seal(fileName: name)
+        let sealed = try await AudioStorage.seal(fileName: name).name
         defer { remove(name, sealed) }
 
         let before = try Data(contentsOf: AudioStorage.directory.appendingPathComponent(sealed))
-        let again = try await AudioStorage.seal(fileName: name)
+        let again = try await AudioStorage.seal(fileName: name).name
         let after = try Data(contentsOf: AudioStorage.directory.appendingPathComponent(sealed))
 
         #expect(again == sealed)
         #expect(before == after)
+    }
+
+    /// The checksum comes from the bytes the seal encrypted, so a device that
+    /// locks during the encode still gets its origin. The pass after a crash
+    /// reads it back and gets the same answer.
+    @Test("Forseglingen gir sjekksummen for lyden den forseglet")
+    func sealReturnsTheAudioChecksum() async throws {
+        let name = try writeRecording()
+        let sealed = try await AudioStorage.seal(fileName: name)
+        defer { remove(name, sealed.name) }
+
+        let expected = RecordingOrigin.checksum(try AudioStorage.plaintext(fileName: sealed.name))
+        #expect(sealed.audioSHA256 == expected)
+        #expect(try await AudioStorage.audioChecksum(fileName: sealed.name) == expected)
+        #expect(try await AudioStorage.seal(fileName: name).audioSHA256 == expected)
     }
 
     /// A call splits a recording into files, see `AudioStorage.continuationName`.
@@ -121,7 +136,7 @@ struct StorageTests {
     func sealJoinsTheContinuations() async throws {
         let name = try writeRecording(seconds: 1)
         try writeRecording(seconds: 2, name: AudioStorage.continuationName(for: name, index: 1))
-        let sealed = try await AudioStorage.seal(fileName: name)
+        let sealed = try await AudioStorage.seal(fileName: name).name
         defer { remove(name, sealed) }
 
         #expect(AudioStorage.segmentNames(of: name) == [name])
@@ -207,7 +222,7 @@ struct StorageTests {
         context.insert(row)
         try context.save()
 
-        let sealed = try await AudioStorage.seal(fileName: name)
+        let sealed = try await AudioStorage.seal(fileName: name).name
         defer { remove(name, sealed) }
 
         RecordingController.shared.reconcile(context)

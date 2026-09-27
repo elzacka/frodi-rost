@@ -20,7 +20,7 @@ struct PlaybackTests {
 
         let name = UUID().uuidString + ".m4a.enc"
         let target = AudioStorage.directory.appendingPathComponent(name)
-        try RecordingVault.seal(fileAt: source).write(to: target)
+        try RecordingVault.seal(Data(contentsOf: source)).write(to: target)
         defer { AudioStorage.delete(fileName: name) }
 
         try await body(Recording(duration: seconds, fileName: name))

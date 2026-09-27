@@ -123,7 +123,14 @@ enum AudioStorage {
         Int(((continuation as NSString).deletingPathExtension as NSString).pathExtension) ?? 0
     }
 
-    /// Seals a recording that is still plaintext, and returns its new file name.
+    /// Seals a recording that is still plaintext, and returns its new file name
+    /// with the checksum of the audio it sealed.
+    ///
+    /// The checksum is taken from the bytes on their way into the vault, not
+    /// read back: reading back needs the private key, which a device locked
+    /// between the stop and the end of the encode refuses. Only when a crash
+    /// left the sealed copy already written is it read back, and then it is nil
+    /// on a locked device.
     ///
     /// The plaintext is removed only once the sealed copy is written. If sealing
     /// fails, the plaintext stays where it is: it is `.completeUnlessOpen` and
@@ -150,23 +157,28 @@ enum AudioStorage {
     /// `@concurrent` for the same reason as `decryptToTemporary`: an hour of
     /// audio is many megabytes read, encoded, encrypted and written whole.
     @concurrent
-    static func seal(fileName: String) async throws -> String {
+    static func seal(fileName: String) async throws -> (name: String, audioSHA256: String?) {
         let source = directory.appendingPathComponent(fileName)
         let sealedName = sealedName(for: fileName)
         let target = directory.appendingPathComponent(sealedName)
 
+        let audioSHA256: String?
         if !FileManager.default.fileExists(atPath: target.path) {
             let audio = fileName.hasSuffix(pendingSuffix)
                 ? try await encodeToAAC(segmentNames(of: fileName).map { directory.appendingPathComponent($0) })
                 : source
             defer { if audio != source { try? FileManager.default.removeItem(at: audio) } }
-            try RecordingVault.seal(fileAt: audio).write(to: target, options: [.atomic, .completeFileProtection])
+            let plaintext = try Data(contentsOf: audio)
+            try RecordingVault.seal(plaintext).write(to: target, options: [.atomic, .completeFileProtection])
+            audioSHA256 = RecordingOrigin.checksum(plaintext)
+        } else {
+            audioSHA256 = try? RecordingOrigin.checksum(plaintext(fileName: sealedName))
         }
         for name in segmentNames(of: fileName) {
             try? FileManager.default.removeItem(at: directory.appendingPathComponent(name))
         }
         protectFinished(target)
-        return sealedName
+        return (sealedName, audioSHA256)
     }
 
     /// Encodes a PCM recording as AAC in an `.m4a`, in the scratch folder.

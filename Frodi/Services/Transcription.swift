@@ -77,11 +77,11 @@ enum Transcription {
         // or launch, and nothing is marked failed. See `AudioStorage.seal`.
         if !AudioStorage.isSealed(recording.fileName) {
             do {
-                recording.fileName = try await AudioStorage.seal(fileName: recording.fileName)
-                // A recording made here gets its origin at the seal, the first
-                // moment the device is sure to be unlocked. An import is sealed
-                // before it has a row and never passes here.
-                if let audioSHA256 = try? await AudioStorage.audioChecksum(fileName: recording.fileName) {
+                let sealed = try await AudioStorage.seal(fileName: recording.fileName)
+                recording.fileName = sealed.name
+                // A recording made here gets its origin at the seal. An import is
+                // sealed before it has a row and never passes here.
+                if let audioSHA256 = sealed.audioSHA256 {
                     try? recording.recordOrigin(RecordingOrigin(
                         recordingID: RecordingOrigin.recordingID(for: recording.fileName),
                         source: .recorded,

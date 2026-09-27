@@ -84,7 +84,7 @@ struct ImportTests {
         let converted = try await AudioImport.convert(Self.fixtures.appending(path: "dated-stereo.m4a"))
         let name = converted.url.lastPathComponent
         try FileManager.default.moveItem(at: converted.url, to: AudioStorage.directory.appending(path: name))
-        let sealed = try await AudioStorage.seal(fileName: name)
+        let sealed = try await AudioStorage.seal(fileName: name).name
         defer { AudioStorage.delete(fileName: sealed) }
 
         #expect(sealed == AudioStorage.sealedName(for: name))

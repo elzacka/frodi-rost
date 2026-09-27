@@ -57,10 +57,6 @@ enum RecordingVault {
     }
 
     // MARK: - Encryption
-    static func seal(fileAt url: URL) throws -> Data {
-        try seal(try Data(contentsOf: url))
-    }
-
     /// Seals text. Used for transcripts, which are often more exposing than the
     /// audio file: the text is searchable and readable at a glance.
     static func seal(_ text: String) throws -> Data {

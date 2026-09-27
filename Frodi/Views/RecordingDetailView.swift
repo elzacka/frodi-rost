@@ -71,10 +71,13 @@ struct RecordingDetailView: View {
         // word list has.
         .navigationTitle(shownTitle)
         .navigationBarTitleDisplayMode(.inline)
+        // Offered only while names are shown: the field holds the name.
         .toolbarTitleMenu {
-            Button("Endre navn") {
-                if nameDraft.isEmpty { nameDraft = recording.title() ?? "" }
-                renaming = true
+            if concealment == .none {
+                Button("Endre navn") {
+                    if nameDraft.isEmpty { nameDraft = recording.title() ?? "" }
+                    renaming = true
+                }
             }
         }
         // The field holds the name, and a name is hidden when the text is. The

@@ -18,7 +18,7 @@ struct VaultTests {
         let url = try temporaryFile(original)
         defer { try? FileManager.default.removeItem(at: url) }
 
-        let sealed = try RecordingVault.seal(fileAt: url)
+        let sealed = try RecordingVault.seal(Data(contentsOf: url))
         let opened = try RecordingVault.open(sealed)
         #expect(opened == original)
     }
@@ -30,7 +30,7 @@ struct VaultTests {
         let url = try temporaryFile(secret)
         defer { try? FileManager.default.removeItem(at: url) }
 
-        let sealed = try RecordingVault.seal(fileAt: url)
+        let sealed = try RecordingVault.seal(Data(contentsOf: url))
         #expect(sealed.range(of: secret) == nil)
         #expect(sealed.count > secret.count)
     }
@@ -43,7 +43,7 @@ struct VaultTests {
         let a = try temporaryFile(payload), b = try temporaryFile(payload)
         defer { try? FileManager.default.removeItem(at: a); try? FileManager.default.removeItem(at: b) }
 
-        #expect(try RecordingVault.seal(fileAt: a) != RecordingVault.seal(fileAt: b))
+        #expect(try RecordingVault.seal(Data(contentsOf: a)) != RecordingVault.seal(Data(contentsOf: b)))
     }
 
     @Test("Tuklet innhold blir avvist")
@@ -51,7 +51,7 @@ struct VaultTests {
         let url = try temporaryFile(Data("noe innhold her".utf8))
         defer { try? FileManager.default.removeItem(at: url) }
 
-        var sealed = try RecordingVault.seal(fileAt: url)
+        var sealed = try RecordingVault.seal(Data(contentsOf: url))
         sealed[sealed.count - 1] ^= 0xFF
 
         #expect(throws: (any Error).self) { try RecordingVault.open(sealed) }
@@ -87,7 +87,7 @@ struct FileSealingTests {
         let original = Data("et opptak som venter på forsegling".utf8)
         let name = try plaintextRecording(original)
 
-        let sealed = try await AudioStorage.seal(fileName: name)
+        let sealed = try await AudioStorage.seal(fileName: name).name
         defer { AudioStorage.delete(fileName: sealed) }
 
         #expect(sealed == name + ".enc")
@@ -106,7 +106,7 @@ struct FileSealingTests {
     @Test("Et forseglet opptak kan ikke leses mens enheten er låst", .enabled(if: !isSimulator))
     func sealedFileIsCompletelyProtected() async throws {
         let name = try plaintextRecording(Data("innhold".utf8))
-        let sealed = try await AudioStorage.seal(fileName: name)
+        let sealed = try await AudioStorage.seal(fileName: name).name
         defer { AudioStorage.delete(fileName: sealed) }
 
         let attributes = try FileManager.default.attributesOfItem(
@@ -138,7 +138,7 @@ struct FileSealingTests {
     @Test("Forsegling av en fil som mangler feiler")
     func sealingMissingFileThrows() async {
         await #expect(throws: (any Error).self) {
-            try await AudioStorage.seal(fileName: "finnes-ikke.m4a")
+            try await AudioStorage.seal(fileName: "finnes-ikke.m4a").name
         }
     }
 }
