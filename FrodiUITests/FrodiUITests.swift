@@ -37,6 +37,35 @@ final class FrodiUITests: XCTestCase {
         XCTAssertTrue(button.waitForExistence(timeout: 5), "Filvelgeren lukket seg ikke")
     }
 
+    /// A drag up that starts on a row scrolls the list. The row's own swipe is
+    /// sideways only; a gesture that took every drag left the list unscrollable
+    /// under a finger on a row. Makes short recordings until the list is taller
+    /// than the screen.
+    @MainActor
+    func test_dragOnRows_scrollsTheList() {
+        let app = XCUIApplication()
+        app.launch()
+
+        let list = app.scrollViews.firstMatch
+        let rows = list.buttons
+        let screen = app.windows.firstMatch.frame
+        var made = 0
+        while (rows.count == 0 || rows.element(boundBy: rows.count - 1).frame.maxY < screen.maxY) && made < 12 {
+            app.buttons["Start opptak"].tap()
+            XCTAssertTrue(app.buttons["Stopp opptak"].waitForExistence(timeout: 5), "Opptaket startet ikke")
+            sleep(1)
+            app.buttons["Stopp opptak"].tap()
+            XCTAssertTrue(app.buttons["Start opptak"].waitForExistence(timeout: 5))
+            made += 1
+        }
+
+        let first = rows.element(boundBy: 0)
+        let before = first.frame.minY
+        list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.8))
+            .press(forDuration: 0.05, thenDragTo: list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2)))
+        XCTAssertLessThan(first.frame.minY, before - 50, "Listen rullet ikke")
+    }
+
     /// Innstillinger is the app's only place for privacy, permissions and
     /// attribution. Apache 2.0 requires the licence list to actually be in the app.
     @MainActor
