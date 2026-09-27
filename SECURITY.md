@@ -53,9 +53,9 @@ Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0 on
 2026-09-19, by reading the controls against the code rather than by
 running MASTG. The profile is MAS-L2+P: the app holds a key that encrypts
 user data of a kind OWASP lists as high risk. Every applicable L2 and P
-control is met, with two exceptions: local authentication (AUTH-2, AUTH-3)
-and MAS-R, both under *Deliberate omissions*. MASVS-NETWORK does not apply;
-there is no transport.
+control is met, with three exceptions: local authentication (AUTH-2,
+AUTH-3), enforced updates (CODE-2) and MAS-R, all under *Deliberate
+omissions*. MASVS-NETWORK does not apply; there is no transport.
 
 ## What happens in each scenario
 
@@ -215,7 +215,9 @@ in it, so such a build cannot be archived.
 
 Picking a file that lives only in iCloud Drive makes iOS download it before
 the app reads it. That request is the file provider's, made because the user
-picked the file; the app's own code makes none.
+picked the file; the app's own code makes none. The same holds for the three
+document links under «Mer om appen» in Innstillinger: they open GitHub in
+Safari, which makes the request because the user tapped the link.
 
 > [!NOTE]
 > One qualification. WhisperKit ships with a copy of `swift-transformers`'
