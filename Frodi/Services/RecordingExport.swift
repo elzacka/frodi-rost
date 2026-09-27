@@ -125,7 +125,7 @@ enum RecordingExport {
             attributes: [.font: heading, .paragraphStyle: spaced]
         ))
         document.append(NSAttributedString(
-            string: "Lengde \(Duration.seconds(duration).formatted(exportLength)). Tatt opp med Fróði røst.\n\n",
+            string: "Lengde \(Duration.seconds(duration).formatted(exportLength)). Laget med Fróði røst.\n\n",
             attributes: [.font: meta, .foregroundColor: secondary, .paragraphStyle: spaced]
         ))
 

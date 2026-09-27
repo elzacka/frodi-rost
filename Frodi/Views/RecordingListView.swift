@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct RecordingListView: View {
     @Environment(\.modelContext) private var context
@@ -9,6 +10,10 @@ struct RecordingListView: View {
     @State private var controller = RecordingController.shared
     @State private var errorMessage: String?
     @State private var showSettings = false
+    @State private var showImporter = false
+    /// True while picked files are converted. The row appears when a file is
+    /// done; until then the button is what shows that something is happening.
+    @State private var isImporting = false
     @State private var path: [Recording] = []
     /// The one row that is swiped open or asking, if any. One at a time: a
     /// swipe on another row closes this one.
@@ -52,6 +57,16 @@ struct RecordingListView: View {
             .sheet(isPresented: $showSettings) {
                 SettingsView()
             }
+            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.audio], allowsMultipleSelection: true) { result in
+                switch result {
+                case .success(let urls) where !urls.isEmpty:
+                    Task { await importAudio(urls) }
+                case .success:
+                    break
+                case .failure(let error):
+                    errorMessage = error.localizedDescription
+                }
+            }
             .navigationDestination(for: Recording.self) { recording in
                 RecordingDetailView(recording: recording, onRetry: { await transcribe(recording) })
             }
@@ -67,8 +82,12 @@ struct RecordingListView: View {
             .padding(.horizontal, Space.s4)
             .padding(.top, Space.s2)
             .padding(.bottom, Space.s3)
-            // An overlay, not a row: the wordmark should sit in the middle of the screen,
-            // not in the middle of the space left beside the info button.
+            // Overlays, not a row: the wordmark should sit in the middle of the screen,
+            // not in the middle of the space left beside the buttons.
+            .overlay(alignment: .leading) {
+                importButton
+                    .padding(.leading, Space.s1)
+            }
             .overlay(alignment: .trailing) {
                 settingsButton
                     .padding(.trailing, Space.s1)
@@ -105,6 +124,21 @@ struct RecordingListView: View {
     private var settingsButton: some View {
         IconButton(icon: .settings, size: HeaderButton.icon, label: "Innstillinger") {
             showSettings = true
+        }
+    }
+
+    /// Brings in audio recorded elsewhere, to have it made into text. Across
+    /// from Innstillinger, so the wordmark stays in the middle.
+    @ViewBuilder
+    private var importButton: some View {
+        if isImporting {
+            ProgressView()
+                .frame(width: HeaderButton.touch, height: HeaderButton.touch)
+                .accessibilityLabel("Importerer lydfil")
+        } else {
+            IconButton(icon: .importAudio, size: HeaderButton.icon, label: "Importer lydfil") {
+                showImporter = true
+            }
         }
     }
 
@@ -271,6 +305,17 @@ struct RecordingListView: View {
     /// whose transcription was cut short goes on from where it was.
     private func transcribePending() async {
         await Transcription.runPending(context: context)
+    }
+
+    private func importAudio(_ urls: [URL]) async {
+        isImporting = true
+        let failed = await controller.importAudio(urls)
+        isImporting = false
+        guard !failed.isEmpty else { return }
+        let names = failed.map { "«\($0)»" }.formatted(.list(type: .and).locale(AppLocale.norwegian))
+        errorMessage = failed.count == 1
+            ? String(localized: "Fróði får ikke lest \(names). Filen kan være skadet eller i et format Fróði ikke kan lese.")
+            : String(localized: "Fróði får ikke lest \(names). Filene kan være skadet eller i et format Fróði ikke kan lese.")
     }
 
     private func transcribe(_ recording: Recording) async {

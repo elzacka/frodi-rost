@@ -147,6 +147,56 @@ final class RecordingController {
         }
     }
 
+    /// Brings audio files in as recordings, one after the other, and returns the
+    /// names of those that could not be read.
+    ///
+    /// The file is moved into the recordings folder and its row inserted and
+    /// saved in one main-actor step, with no suspension between: `reconcile`
+    /// must not meet the file without its row, or it would give it a second one
+    /// dated from the file system.
+    ///
+    /// Sealing and the text follow the same path as a stopped recording. A file
+    /// over the length limit waits for «Lag tekst», like a long interview.
+    func importAudio(_ urls: [URL]) async -> [String] {
+        guard let container else { return urls.map(\.lastPathComponent) }
+        let context = container.mainContext
+
+        var imported: [Recording] = []
+        var failed: [String] = []
+        for url in urls {
+            do {
+                let converted = try await AudioImport.convert(url)
+                let fileName = converted.url.lastPathComponent
+                try FileManager.default.moveItem(
+                    at: converted.url,
+                    to: AudioStorage.directory.appendingPathComponent(fileName)
+                )
+                let recording = Recording(
+                    createdAt: converted.createdAt ?? .now,
+                    duration: converted.duration,
+                    fileName: fileName
+                )
+                context.insert(recording)
+                try? context.save()
+                imported.append(recording)
+            } catch {
+                // The error, never the file name: a name can say who was interviewed.
+                let code = (error as NSError).code
+                AudioRecorder.log.error("Import failed: \(String(describing: type(of: error)), privacy: .public) \(code, privacy: .public)")
+                failed.append(url.lastPathComponent)
+            }
+        }
+        guard !imported.isEmpty else { return failed }
+
+        AudioStorage.excludeFromBackup(store: container)
+        Task {
+            for recording in imported {
+                await Transcription.run(for: recording, context: context)
+            }
+        }
+        return failed
+    }
+
     /// Seals, and then transcribes, everything that is waiting.
     ///
     /// `Transcription.run` does the sealing, so a recording sealed here gets its

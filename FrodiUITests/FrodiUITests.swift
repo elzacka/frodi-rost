@@ -19,6 +19,24 @@ final class FrodiUITests: XCTestCase {
         )
     }
 
+    /// The import button opens the system's file picker. What happens to a
+    /// picked file is `ImportTests`; the picker itself is the system's.
+    @MainActor
+    func test_importButton_opensFilePicker() {
+        let app = XCUIApplication()
+        app.launch()
+
+        let button = app.buttons["Importer lydfil"]
+        XCTAssertTrue(button.waitForExistence(timeout: 5), "Importknappen i logohodet mangler")
+        button.tap()
+
+        // The picker speaks the simulator's language, not the app's.
+        let cancel = app.buttons.matching(NSPredicate(format: "label IN %@", ["Avbryt", "Cancel"])).firstMatch
+        XCTAssertTrue(cancel.waitForExistence(timeout: 5), "Filvelgeren åpnet ikke")
+        cancel.tap()
+        XCTAssertTrue(button.waitForExistence(timeout: 5), "Filvelgeren lukket seg ikke")
+    }
+
     /// Innstillinger is the app's only place for privacy, permissions and
     /// attribution. Apache 2.0 requires the licence list to actually be in the app.
     @MainActor

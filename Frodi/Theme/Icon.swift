@@ -18,6 +18,7 @@ import SwiftUI
 /// the one bundled.
 enum Icon: String, CaseIterable {
     case settings = "instant_mix"
+    case importAudio = "audio_file"
     case close = "close"
     case back = "arrow_back_ios_new"
     case chevronRight = "chevron_right"

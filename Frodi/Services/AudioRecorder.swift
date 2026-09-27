@@ -182,7 +182,14 @@ final class AudioRecorder {
     /// recording is finished.
     @concurrent
     private static func startRecorder(at url: URL) async throws -> sending (recorder: AVAudioRecorder, started: Bool) {
-        let settings: [String: Any] = [
+        let recorder = try AVAudioRecorder(url: url, settings: fileSettings)
+        return (recorder, recorder.record())
+    }
+
+    /// The format of a recording until it is sealed. `AudioImport` writes an
+    /// imported file in the same one, so the two are the same thing on disk.
+    nonisolated static var fileSettings: [String: Any] {
+        [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVSampleRateKey: sampleRate,
             AVNumberOfChannelsKey: 1,
@@ -190,8 +197,6 @@ final class AudioRecorder {
             AVLinearPCMIsFloatKey: false,
             AVLinearPCMIsBigEndianKey: false
         ]
-        let recorder = try AVAudioRecorder(url: url, settings: settings)
-        return (recorder, recorder.record())
     }
 
     /// Stops the recording and returns the file name and length.
