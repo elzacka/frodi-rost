@@ -55,8 +55,9 @@ filen låst, og ingen kan lese den.
 Du velger selv hvilke filer Fróði får, i filvelgeren til iOS. Appen får bare
 de filene du velger, og ber ikke om noen tillatelse.
 
-Fróði lager en kopi av hver fil og krypterer den som et opptak. Originalen
-blir liggende der den var. Appen endrer den ikke og sletter den ikke.
+Fróði lagrer lyden fra hver fil i samme format som egne opptak og krypterer
+den. Originalen blir liggende der den var. Appen endrer den ikke og sletter
+den ikke.
 
 Ligger filen i iCloud Drive og ikke på enheten, laster iOS den ned før Fróði
 får den. Det er iOS som henter filen, fordi du valgte den. Fróði sender og

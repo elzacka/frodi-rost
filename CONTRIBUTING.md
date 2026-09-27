@@ -80,7 +80,7 @@ skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
   opptak fra appen
 - Opplysningene om et opptak, `RecordingOrigin`, skrives én gang og aldri
   igjen. Ikke legg til noe som skriver dem på nytt, eller som skriver dem for
-  et opptak som mangler dem. En test passer på det
+  et opptak som mangler dem. En test passer på at de ikke skrives to ganger
 - Hvert tekstfelt har autokorrektur slått av, så det brukeren skriver, ikke
   havner i tastaturets ordbok. Systemets eget felt for å gi nytt navn følger
   ikke den innstillingen, så appen har sitt eget

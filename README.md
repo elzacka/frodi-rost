@@ -18,7 +18,7 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 - Skriver bokmål med tegnsetting og stor forbokstav, også av dialekt
 - Deler teksten i avsnitt med tidspunkt du kan trykke på for å høre stedet i opptaket
 - Lar deg gi opptakene navn
-- Låser opplysningene om hvert opptak når det kommer inn i appen, med sjekksum for lyden, og sier fra hvis noe er endret utenfor appen
+- Låser opplysningene om hvert opptak når det kommer inn i appen, med sjekksum for lyden, og sier fra hvis datoen, lengden eller lyden er endret utenfor appen
 - Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`, hver for seg eller sammen. `.rtf`-filen har sjekksum for lydfilen
 
 ## Skjermbilder

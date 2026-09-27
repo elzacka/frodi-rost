@@ -55,10 +55,15 @@ av lyden.
 Fróði leser m4a, mp3, wav, aiff og de andre lydformatene iOS kan lese. Er
 lyden i stereo, tar appen med begge kanalene.
 
-Appen lager en kopi og krypterer den som et vanlig opptak. Originalen blir
-liggende der den var, og appen endrer den ikke. Opptaket får filnavnet som
-navn. Datoen er den som står i filen, hvis filen har en. Ellers får opptaket
-tidspunktet du importerte det.
+Appen lagrer lyden i samme format som opptakene sine, i mono og med den
+lydkvaliteten appen tar opp i, og krypterer den. Det holder godt for tale,
+men kan være dårligere enn originalen. Originalen blir liggende der den var,
+og appen endrer den ikke. Trenger du lyden i full kvalitet, må du ta vare på
+originalen.
+
+Opptaket får filnavnet som navn. Har filen en dato som ikke er før år 2000
+eller i fremtiden, får opptaket den datoen. Ellers får det tidspunktet du
+importerte det.
 
 Teksten lages etter samme regel som for opptak du tar i appen. Se
 [Teksten](#teksten).
@@ -172,6 +177,9 @@ eksporterer teksten som `.rtf`.
 
 Tømmer du feltet, fjerner du navnet, og listen viser datoen igjen.
 
+Et nytt navn endrer ikke det som står under «Om opptaket». For en importert
+fil står filnavnet til originalen der, og i `.rtf`-filen du eksporterer.
+
 ## Om opptaket
 
 Nederst på opptakets side står «Om opptaket». Trykk på det for å se
@@ -188,7 +196,7 @@ det «Fróði kan ikke bekrefte opplysningene om dette opptaket.» Under står
 opplysningene slik de ble låst, hvis Fróði kan lese dem.
 
 Har et opptak ikke «Om opptaket», ble det laget med en eldre versjon av
-appen.
+appen, eller appen stoppet i det øyeblikket opptaket ble lagret.
 
 En sjekksum er et fingeravtrykk av en fil. To like filer har samme sjekksum.
 På en Mac finner du sjekksummen til en fil med kommandoen
@@ -212,7 +220,7 @@ under Innstillinger i appen:
 
 | Format | Passer&nbsp;til                                                                                  |
 | ------ | ------------------------------------------------------------------------------------------------ |
-| `.rtf` | Åpnes som dokument i Word, Pages og Notater. Har overskrift, dato, sjekksum for lydfilen og tidspunkt for hvert avsnitt |
+| `.rtf` | Åpnes som dokument i Word, Pages og Notater. Har overskrift, dato, sjekksum for lydfilen og tidspunkt for hvert avsnitt. For en importert fil står også filnavnet og sjekksummen til originalen |
 | `.txt` | Ren tekst som kan limes inn hvor som helst                                                       |
 
 > **Tips:** Sjekksummen i `.rtf`-filen viser hvilken lydfil teksten hører
