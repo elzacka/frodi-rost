@@ -59,7 +59,7 @@ struct ImportTests {
             #expect(file.fileFormat.sampleRate == AudioRecorder.sampleRate)
             #expect(file.fileFormat.channelCount == 1)
             #expect(abs(converted.duration - 1.5) < 0.05)
-            #expect(converted.createdAt == ISO8601DateFormatter().date(from: "2026-09-01T10:15:00Z"))
+            #expect(converted.original.createdAt == ISO8601DateFormatter().date(from: "2026-09-01T10:15:00Z"))
         }
     }
 

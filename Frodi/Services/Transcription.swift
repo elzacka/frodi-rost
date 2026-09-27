@@ -78,6 +78,17 @@ enum Transcription {
         if !AudioStorage.isSealed(recording.fileName) {
             do {
                 recording.fileName = try await AudioStorage.seal(fileName: recording.fileName)
+                // A recording made here gets its origin at the seal, the first
+                // moment the device is sure to be unlocked. An imported one got its
+                // own at the import, and `recordOrigin` leaves that alone.
+                try? recording.recordOrigin(RecordingOrigin(
+                    recordingID: RecordingOrigin.recordingID(for: recording.fileName),
+                    source: .recorded,
+                    createdAt: recording.createdAt,
+                    duration: recording.duration,
+                    importedAt: nil,
+                    original: nil
+                ))
                 try? context.save()
             } catch {
                 // Whether the device was locked is what tells the expected deferral

@@ -4,14 +4,26 @@ struct RecordingRow: View {
     let recording: Recording
 
     @State private var transcription = TranscriptionState.shared
+    @Environment(\.concealment) private var concealment
 
     var body: some View {
         HStack(alignment: .center, spacing: Space.s3) {
             VStack(alignment: .leading, spacing: Space.s1) {
-                Text(verbatim: title)
-                    .font(.Frodi.bodyMedium)
-                    .monospacedDigit()
-                    .foregroundStyle(Color.Frodi.textPrimary)
+                if let name {
+                    Text(verbatim: name)
+                        .font(.Frodi.bodyMedium)
+                        .foregroundStyle(Color.Frodi.textPrimary)
+
+                    Text(verbatim: title)
+                        .font(.Frodi.meta)
+                        .monospacedDigit()
+                        .foregroundStyle(Color.Frodi.textSecondary)
+                } else {
+                    Text(verbatim: title)
+                        .font(.Frodi.bodyMedium)
+                        .monospacedDigit()
+                        .foregroundStyle(Color.Frodi.textPrimary)
+                }
 
                 if let status {
                     HStack(spacing: Space.s1) {
@@ -41,6 +53,14 @@ struct RecordingRow: View {
         .accessibilityLabel(spokenLabel)
     }
 
+    /// The name the user gave the recording. Six interviews on one day are six
+    /// rows with a date each; a name tells them apart. It gives way to the date
+    /// when the screen is recorded or photographed for the app switcher, as the
+    /// text does: a name often says who was interviewed.
+    private var name: String? {
+        concealment == .none ? recording.title() : nil
+    }
+
     /// Date, time and length on one line, separated by a vertical bar.
     private var title: String {
         "\(stamp) | \(length)"
@@ -59,7 +79,8 @@ struct RecordingRow: View {
 
     /// VoiceOver does not read a vertical bar as a pause, so it gets its own sentence.
     private var spokenLabel: String {
-        let spoken = "\(stamp), \(length)"
+        let dated = "\(stamp), \(length)"
+        let spoken = name.map { "\($0), \(dated)" } ?? dated
         guard let status else { return spoken }
         return "\(spoken), \(status)"
     }

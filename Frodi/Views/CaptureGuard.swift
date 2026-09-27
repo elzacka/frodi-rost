@@ -17,20 +17,17 @@ import SwiftUI
 /// container, where nothing of ours encrypts it. So the text is also hidden
 /// whenever the scene is not active, which is before that picture is taken.
 struct CaptureGuard: ViewModifier {
-    @Environment(\.scenePhase) private var scenePhase
-    @State private var isCaptured = false
-
-    private var isHidden: Bool { isCaptured || scenePhase != .active }
+    @Environment(\.concealment) private var concealment
 
     func body(content: Content) -> some View {
         Group {
-            if isHidden {
+            if concealment != .none {
                 VStack(spacing: Space.s3) {
                     IconView(.hidden, size: IconSize.notice)
                         .foregroundStyle(Color.Frodi.textSecondary)
 
                     Group {
-                        if isCaptured {
+                        if concealment == .captured {
                             Text("Teksten er skjult mens skjermen tas opp.")
                         } else {
                             Text("Teksten er skjult.")
@@ -46,12 +43,35 @@ struct CaptureGuard: ViewModifier {
                 content
             }
         }
-        .onAppear { isCaptured = Self.screenIsCaptured }
-        .onReceive(NotificationCenter.default.publisher(
-            for: UIScreen.capturedDidChangeNotification
-        )) { _ in
-            isCaptured = Self.screenIsCaptured
-        }
+    }
+}
+
+/// Why content is hidden right now, if it is: the screen is recorded or
+/// mirrored, or the scene is not active and iOS is about to photograph it for
+/// the app switcher. See `CaptureGuard` for the three cases.
+enum Concealment {
+    case none, captured, inactive
+}
+
+extension EnvironmentValues {
+    @Entry var concealment: Concealment = .none
+}
+
+/// Works out the concealment once, at the root, and hands it down. The text
+/// hides behind `CaptureGuard`; a recording's name gives way to its date.
+struct ConcealmentReader: ViewModifier {
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var isCaptured = false
+
+    func body(content: Content) -> some View {
+        content
+            .environment(\.concealment, isCaptured ? .captured : scenePhase != .active ? .inactive : .none)
+            .onAppear { isCaptured = Self.screenIsCaptured }
+            .onReceive(NotificationCenter.default.publisher(
+                for: UIScreen.capturedDidChangeNotification
+            )) { _ in
+                isCaptured = Self.screenIsCaptured
+            }
     }
 
     /// The screen the app is actually shown on.
@@ -72,5 +92,10 @@ extension View {
     /// Hides the content while the screen is being recorded or mirrored.
     func hiddenWhileScreenCaptured() -> some View {
         modifier(CaptureGuard())
+    }
+
+    /// Hands the app its concealment. Applied once, at the root.
+    func readsConcealment() -> some View {
+        modifier(ConcealmentReader())
     }
 }

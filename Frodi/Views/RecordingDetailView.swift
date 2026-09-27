@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -5,12 +6,16 @@ struct RecordingDetailView: View {
     let recording: Recording
     let onRetry: () async -> Void
 
+    @Environment(\.modelContext) private var context
+    @Environment(\.concealment) private var concealment
     @State private var player = AudioPlayer.shared
     @State private var transcription = TranscriptionState.shared
     @State private var transcript: String = ""
     /// What has come out so far while the transcription runs, read from its progress.
     @State private var partial: [TranscriptParagraph] = []
     @State private var showsTranscript = false
+    @State private var origin: OriginState = .none
+    @State private var showsOrigin = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var exportURLs: [URL] = []
     @State private var exportError: String?
@@ -50,12 +55,19 @@ struct RecordingDetailView: View {
                     PlaybackControls(recording: recording, player: player)
 
                     transcriptCard
+
+                    originCard
                 }
                 .padding(Space.s4)
             }
         }
-        .navigationTitle(title)
+        // The system's own rename: a menu on the title, and the title becomes
+        // the field. The navigation bar's title is the system's by the design
+        // file's rule, so this is the one place a name can be given without a
+        // control of the app's own.
+        .navigationTitle(name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleMenu { RenameButton() }
         .toolbarBackground(Color.Frodi.background, for: .navigationBar)
         .frodiBackButton()
         .toolbar {
@@ -104,6 +116,9 @@ struct RecordingDetailView: View {
         .task(id: fraction) {
             guard recording.isTranscribing else { partial = []; return }
             partial = TranscriptProgress.load(for: recording.fileName)?.paragraphs ?? []
+        }
+        .task(id: recording.sealedOrigin) {
+            origin = recording.origin()
         }
         .onDisappear {
             // No reason to leave the plaintext in memory afterwards.
@@ -322,5 +337,172 @@ struct RecordingDetailView: View {
         let stamp = recording.createdAt.recordingStamp
         let length = Duration.seconds(recording.duration).formatted(.time(pattern: .minuteSecond))
         return "\(stamp) | \(length)"
+    }
+
+    /// The title, and what renaming writes to. The date stands in until a name is
+    /// given, and again while the screen is recorded or photographed for the app
+    /// switcher. Leaving the date as it is, or emptying the field, names nothing.
+    private var name: Binding<String> {
+        Binding(
+            get: { concealment == .none ? recording.title() ?? title : title },
+            set: { newName in
+                try? recording.setTitle(newName == title ? nil : newName)
+                try? context.save()
+            }
+        )
+    }
+
+    // MARK: - Origin
+
+    /// What the recording was when it came into the app, as it was locked then.
+    /// Collapsed like the text: it is there for the day someone asks, not for
+    /// every visit. A recording from before origins were kept has no card.
+    @ViewBuilder
+    private var originCard: some View {
+        switch origin {
+        case .none:
+            EmptyView()
+        case .unverifiable:
+            Text("Fróði kan ikke bekrefte opplysningene om dette opptaket. De kan være endret utenfor appen.")
+                .font(.Frodi.body)
+                .foregroundStyle(Color.Frodi.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(Space.s5)
+                .background(Color.Frodi.surface, in: RoundedRectangle(cornerRadius: Radius.card))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Radius.card)
+                        .strokeBorder(Color.Frodi.recordingActive, lineWidth: 1)
+                )
+        case .verified(let origin):
+            VStack(alignment: .leading, spacing: Space.s4) {
+                originToggle
+
+                if showsOrigin {
+                    // Hidden like the text: the original's file name can say as
+                    // much as a name does.
+                    VStack(alignment: .leading, spacing: Space.s3) {
+                        ForEach(Array(facts(of: origin).enumerated()), id: \.offset) { _, fact in
+                            VStack(alignment: .leading, spacing: Space.s1) {
+                                Text(verbatim: fact.label)
+                                    .font(.Frodi.meta)
+                                    .foregroundStyle(Color.Frodi.textSecondary)
+                                Text(verbatim: fact.value)
+                                    .font(fact.label == "SHA-256" ? .Frodi.meta : .Frodi.body)
+                                    .monospacedDigit()
+                                    .foregroundStyle(Color.Frodi.textPrimary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .accessibilityElement(children: .combine)
+                        }
+                    }
+                    .hiddenWhileScreenCaptured()
+
+                    Text(origin.source == .imported
+                         ? "Fróði låste disse opplysningene da filen ble importert. Du kan gi opptaket et nytt navn, men ikke endre dem. Med sjekksummen kan du bekrefte at en fil er den samme som ble importert."
+                         : "Fróði låste disse opplysningene da opptaket ble lagret. Du kan gi opptaket et nytt navn, men ikke endre dem.")
+                        .font(.Frodi.caption)
+                        .foregroundStyle(Color.Frodi.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(Space.s5)
+            .background(Color.Frodi.surface, in: RoundedRectangle(cornerRadius: Radius.card))
+            .overlay(
+                RoundedRectangle(cornerRadius: Radius.card)
+                    .strokeBorder(Color.Frodi.border, lineWidth: 1)
+            )
+        }
+    }
+
+    private var originToggle: some View {
+        Button {
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) { showsOrigin.toggle() }
+        } label: {
+            HStack(spacing: Space.s2) {
+                Text("Om opptaket")
+                    .font(.Frodi.eyebrow)
+                    .eyebrowTracking()
+                    .textCase(.uppercase)
+                    .foregroundStyle(Color.Frodi.textSecondary)
+
+                Spacer()
+
+                IconView(showsOrigin ? .chevronUp : .chevronDown, size: IconSize.inline)
+                    .foregroundStyle(Color.Frodi.textSecondary)
+            }
+            .frame(minHeight: Disclosure.row)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Om opptaket")
+        .accessibilityHint(showsOrigin ? "Skjuler opplysningene" : "Viser opplysningene")
+    }
+
+    private struct Fact {
+        let label: String
+        let value: String
+    }
+
+    /// The origin as label and value, in the order a reader asks: when, what
+    /// file, what it was, and the checksum last.
+    private func facts(of origin: RecordingOrigin) -> [Fact] {
+        let length = Duration.seconds(origin.duration).formatted(.time(pattern: .minuteSecond))
+        guard let original = origin.original else {
+            return [
+                Fact(label: "Tatt opp", value: origin.createdAt.recordingStamp),
+                Fact(label: "Lengde", value: length)
+            ]
+        }
+        var facts = [
+            Fact(label: "Importert", value: (origin.importedAt ?? origin.createdAt).recordingStamp),
+            Fact(label: "Filnavn", value: original.name)
+        ]
+        if let created = original.createdAt {
+            facts.append(Fact(label: "Laget", value: created.recordingStamp))
+        }
+        facts.append(Fact(label: "Format", value: Self.format(of: original)))
+        facts.append(Fact(label: "Størrelse", value: Int64(original.byteCount).formatted(.byteCount(style: .file).locale(AppLocale.norwegian))))
+        facts.append(Fact(label: "Lengde", value: length))
+        for key in original.tags.keys.sorted() {
+            guard let value = original.tags[key] else { continue }
+            facts.append(Fact(label: Self.tagLabel(key), value: value))
+        }
+        facts.append(Fact(label: "SHA-256", value: original.sha256))
+        return facts
+    }
+
+    /// «MP3, 44,1 kHz, stereo».
+    nonisolated static func format(of original: RecordingOrigin.OriginalFile) -> String {
+        let rate = (original.sampleRate / 1_000).formatted(.number.precision(.fractionLength(0...1)).locale(AppLocale.norwegian))
+        let channels = switch original.channels {
+        case 1: "mono"
+        case 2: "stereo"
+        default: "\(original.channels) kanaler"
+        }
+        return "\(original.format), \(rate) kHz, \(channels)"
+    }
+
+    /// The common metadata keys a recorder or an editor writes, in Norwegian.
+    /// Anything else keeps the key the file used.
+    private static func tagLabel(_ key: String) -> String {
+        switch key {
+        case "title": "Tittel i filen"
+        case "artist": "Artist"
+        case "author": "Forfatter"
+        case "creator": "Opphav"
+        case "album": "Album"
+        case "description": "Beskrivelse"
+        case "subject": "Emne"
+        case "publisher": "Utgiver"
+        case "software": "Programvare"
+        case "make": "Produsent"
+        case "model": "Modell"
+        case "location": "Sted"
+        case "copyrights": "Opphavsrett"
+        case "language": "Språk"
+        default: key
+        }
     }
 }

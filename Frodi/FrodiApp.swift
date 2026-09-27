@@ -27,6 +27,7 @@ struct FrodiApp: App {
     var body: some Scene {
         WindowGroup {
             RecordingListView()
+                .readsConcealment()
                 // The design system defines light mode only.
                 .preferredColorScheme(.light)
                 .tint(Color.Frodi.accentRecord)

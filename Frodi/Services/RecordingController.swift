@@ -166,15 +166,31 @@ final class RecordingController {
         for url in urls {
             do {
                 let converted = try await AudioImport.convert(url)
+                // Plaintext in the scratch folder: gone at once if the import stops
+                // here, not at the next launch.
+                defer { try? FileManager.default.removeItem(at: converted.url) }
                 let fileName = converted.url.lastPathComponent
+                let now = Date.now
+                let recording = Recording(
+                    createdAt: converted.original.createdAt ?? now,
+                    duration: converted.duration,
+                    fileName: fileName
+                )
+                // Named after the file, which is how it was known before it came
+                // in. The origin is written before the file moves: an import
+                // without its origin does not happen.
+                try recording.setTitle((converted.original.name as NSString).deletingPathExtension)
+                try recording.recordOrigin(RecordingOrigin(
+                    recordingID: RecordingOrigin.recordingID(for: fileName),
+                    source: .imported,
+                    createdAt: recording.createdAt,
+                    duration: converted.duration,
+                    importedAt: now,
+                    original: converted.original
+                ))
                 try FileManager.default.moveItem(
                     at: converted.url,
                     to: AudioStorage.directory.appendingPathComponent(fileName)
-                )
-                let recording = Recording(
-                    createdAt: converted.createdAt ?? .now,
-                    duration: converted.duration,
-                    fileName: fileName
                 )
                 context.insert(recording)
                 try? context.save()

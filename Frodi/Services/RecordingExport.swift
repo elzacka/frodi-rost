@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import UIKit
 
@@ -50,6 +51,8 @@ enum RecordingExport {
             fileName: recording.fileName,
             createdAt: recording.createdAt,
             duration: recording.duration,
+            title: recording.title(),
+            origin: recording.origin().verified,
             transcript: content == .audio ? nil : try recording.transcript(),
             audio: content != .text,
             format: format
@@ -69,6 +72,8 @@ enum RecordingExport {
         fileName: String,
         createdAt: Date,
         duration: TimeInterval,
+        title: String?,
+        origin: RecordingOrigin?,
         transcript: String?,
         audio: Bool,
         format: TextFormat
@@ -80,12 +85,19 @@ enum RecordingExport {
             .appendingPathComponent("Eksport-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 
-        if audio {
-            // A recording stopped on a locked device is still PCM until the next unlock;
-            // the export then carries the format it actually has.
-            let container = fileName.hasSuffix(AudioStorage.pendingSuffix) ? "caf" : "m4a"
-            let file = folder.appendingPathComponent("frodi-\(stamp).\(container)")
-            try AudioStorage.plaintext(fileName: fileName).write(to: file, options: [.completeFileProtectionUnlessOpen])
+        // A recording stopped on a locked device is still PCM until the next unlock;
+        // the export then carries the format it actually has.
+        let container = fileName.hasSuffix(AudioStorage.pendingSuffix) ? "caf" : "m4a"
+        let audioName = "frodi-\(stamp).\(container)"
+        let wantsDocument = transcript?.isEmpty == false && format == .rtf
+        // The document names the audio by its checksum, so it is read for a text
+        // alone too. The bytes are the same at every export: the vault opens the
+        // sealed file to the same plaintext each time.
+        let audioData = audio || wantsDocument ? try AudioStorage.plaintext(fileName: fileName) : nil
+
+        if audio, let audioData {
+            let file = folder.appendingPathComponent(audioName)
+            try audioData.write(to: file, options: [.completeFileProtectionUnlessOpen])
             urls.append(file)
         }
 
@@ -93,7 +105,14 @@ enum RecordingExport {
             let file = folder.appendingPathComponent("frodi-\(stamp).\(format.rawValue)")
             let data = switch format {
             case .txt: utf8WithBOM(transcript)
-            case .rtf: try rtf(transcript, createdAt: createdAt, duration: duration)
+            case .rtf: try rtf(
+                transcript,
+                createdAt: createdAt,
+                duration: duration,
+                title: title,
+                origin: origin,
+                audio: audioData.map { (name: audioName, sha256: sha256($0)) }
+            )
             }
             try data.write(to: file, options: [.completeFileProtectionUnlessOpen])
             urls.append(file)
@@ -102,15 +121,26 @@ enum RecordingExport {
         return urls
     }
 
-    /// The text as a document: a heading, the date and the length, then the
-    /// paragraphs with their marks.
+    /// The text as a document: a heading, the date and the length, where the
+    /// recording came from, then the paragraphs with their marks.
+    ///
+    /// The checksum of the audio file ties the document to it. A reader holding
+    /// the two can check with `shasum -a 256` that the audio is the one the text
+    /// was made from, and an imported recording names its original the same way.
     ///
     /// RTF rather than `.docx` because Apple writes it natively and Word, Pages
     /// and Notes all open it with the structure intact. A `.txt` loses the
     /// heading and the paragraphs the moment it is pasted into a report; this
     /// does not. The fonts are the system's own, not the app's: the document is
     /// read on another machine, and asking for Inter there gives a fallback anyway.
-    static func rtf(_ transcript: String, createdAt: Date, duration: TimeInterval) throws -> Data {
+    static func rtf(
+        _ transcript: String,
+        createdAt: Date,
+        duration: TimeInterval,
+        title: String? = nil,
+        origin: RecordingOrigin? = nil,
+        audio: (name: String, sha256: String)? = nil
+    ) throws -> Data {
         let body = UIFont.systemFont(ofSize: 12)
         let heading = UIFont.boldSystemFont(ofSize: 16)
         let meta = UIFont.systemFont(ofSize: 10)
@@ -120,12 +150,23 @@ enum RecordingExport {
         spaced.paragraphSpacing = 8
 
         let document = NSMutableAttributedString()
+        let dated = "Opptak \(createdAt.recordingStamp)"
         document.append(NSAttributedString(
-            string: "Opptak \(createdAt.recordingStamp)\n",
+            string: "\(title ?? dated)\n",
             attributes: [.font: heading, .paragraphStyle: spaced]
         ))
+        var about = [
+            title == nil ? nil : "\(dated).",
+            "Lengde \(Duration.seconds(duration).formatted(exportLength)). Laget med Fróði røst."
+        ].compactMap(\.self)
+        if let origin, let original = origin.original {
+            about.append("Importert \((origin.importedAt ?? origin.createdAt).recordingStamp) fra \(original.name). Sjekksum for originalen (SHA-256): \(original.sha256)")
+        }
+        if let audio {
+            about.append("Sjekksum for \(audio.name) (SHA-256): \(audio.sha256)")
+        }
         document.append(NSAttributedString(
-            string: "Lengde \(Duration.seconds(duration).formatted(exportLength)). Laget med Fróði røst.\n\n",
+            string: about.joined(separator: "\n") + "\n\n",
             attributes: [.font: meta, .foregroundColor: secondary, .paragraphStyle: spaced]
         ))
 
@@ -159,6 +200,11 @@ enum RecordingExport {
     /// «sÃ¥». The file is UTF-8 either way; the three bytes tell the reader so.
     static func utf8WithBOM(_ text: String) -> Data {
         Data([0xEF, 0xBB, 0xBF]) + Data(text.utf8)
+    }
+
+    /// In hex, the way `shasum` prints it.
+    static func sha256(_ data: Data) -> String {
+        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }
 
     /// Cleans up the plaintext once sharing is done.
