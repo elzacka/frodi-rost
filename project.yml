@@ -117,7 +117,7 @@ targets:
         # The recording's Live Activity. Required by AudioRecordingIntent for as
         # long as the app records, and the sign on the Lock Screen that it does.
         NSSupportsLiveActivities: true
-        NSMicrophoneUsageDescription: "Fróði bruker mikrofonen til å ta opp det du sier. Opptakene blir liggende på enheten."
+        NSMicrophoneUsageDescription: "Fróði bruker mikrofonen til å ta opp notater og samtaler. Opptakene blir liggende på enheten."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         ITSAppUsesNonExemptEncryption: false

@@ -8,6 +8,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 ### Endret
 
 - Oppgir en importert fil hvor den ble tatt opp, lagrer Fróði ikke stedet
+- Når appen ber om tilgang til mikrofonen, står det at den tar opp notater og
+  samtaler
 
 ## 1.0 (9) – 28.09.26
 
