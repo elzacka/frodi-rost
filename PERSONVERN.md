@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 26.09.26.
+Sist oppdatert 27.09.26.
 
 Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 å sende til, og ingen tjeneste å spørre.
@@ -9,6 +9,7 @@ Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 
 - [Hvem står bak](#hvem-står-bak)
 - [Hva som lagres](#hva-som-lagres)
+- [Importerte filer](#importerte-filer)
 - [Skjermen](#skjermen)
 - [Kopiering](#kopiering)
 - [Tillatelser](#tillatelser)
@@ -24,14 +25,22 @@ Fróði røst er laget av elzacka (Tazk).
 
 ## Hva som lagres
 
-| Hva                                          | Hvor                      | Hvor&nbsp;lenge         |
-| -------------------------------------------- | ------------------------- | ----------------------- |
-| Lydopptak                                    | På enheten, kryptert      | Til du sletter det      |
-| Tekst fra opptaket, også delvis ferdig tekst | Samme sted, kryptert      | Til du sletter den      |
-| Ordlisten i Innstillinger                    | Samme sted, kryptert      | Til du endrer den       |
-| Dato, lengde og filnavn for hvert opptak     | Samme sted, ikke kryptert | Til du sletter opptaket |
+| Hva                                          | Hvor                      | Hvor&nbsp;lenge                          |
+| -------------------------------------------- | ------------------------- | ---------------------------------------- |
+| Lydopptak og lydfiler du importerer          | På enheten, kryptert      | Til du sletter opptaket                  |
+| Tekst fra opptaket, også delvis ferdig tekst | Samme sted, kryptert      | Til du sletter den                       |
+| Navnet du gir et opptak                      | Samme sted, kryptert      | Til du endrer det eller sletter opptaket |
+| «Om opptaket», se under                      | Samme sted, kryptert      | Til du sletter opptaket                  |
+| Ordlisten i Innstillinger                    | Samme sted, kryptert      | Til du endrer den                        |
+| Dato, lengde og filnavn for hvert opptak     | Samme sted, ikke kryptert | Til du sletter opptaket                  |
 
 Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
+
+«Om opptaket» er opplysningene Fróði låser når et opptak kommer inn i appen:
+Når det ble tatt opp eller importert, hvor langt det er, og en sjekksum for
+lyden. For en importert fil også filnavnet, formatet, størrelsen og
+opplysningene som stod i filen, for eksempel dato og tittel. Filnavnet i
+tabellen over er appens eget, ikke navnet på filen du importerte.
 
 Stopper du et opptak mens enheten er låst, krypterer Fróði det når du har låst
 opp, senest neste gang du åpner appen. Så lenge enheten er låst, holder iOS
@@ -41,11 +50,24 @@ filen låst, og ingen kan lese den.
 > opp, og hva du skal bruke opptaket til. Fróði kan love at opptaket blir på
 > enheten din; hva du gjør med det, er ditt ansvar.
 
+## Importerte filer
+
+Du velger selv hvilke filer Fróði får, i filvelgeren til iOS. Appen får bare
+de filene du velger, og ber ikke om noen tillatelse.
+
+Fróði lager en kopi av hver fil og krypterer den som et opptak. Originalen
+blir liggende der den var. Appen endrer den ikke og sletter den ikke.
+
+Ligger filen i iCloud Drive og ikke på enheten, laster iOS den ned før Fróði
+får den. Det er iOS som henter filen, fordi du valgte den. Fróði sender og
+henter ingenting selv.
+
 ## Skjermen
 
 Teksten skjules når skjermen tas opp eller speiles, og når du bytter app, så
-den ikke vises i appveksleren. Appen kan ikke hindre at noen tar skjermbilde
-av den.
+den ikke vises i appveksleren. Det samme gjelder «Om opptaket». Har du gitt et
+opptak et navn, viser appen datoen i stedet. Appen kan ikke hindre at noen tar
+skjermbilde av den.
 
 Mens du tar opp, viser låseskjermen og Dynamic Island at opptaket går, og hvor
 lenge det har vart. Ingenting fra selve opptaket vises der. Alle som har
@@ -65,7 +87,7 @@ du eksporterer et opptak.
 ## Tillatelser
 
 Mikrofonen og løpende oppdateringer, som viser opptaket på låseskjermen. Det
-er alt.
+er alt. Å importere en fil krever ingen tillatelse.
 
 Appen ber ikke om tilgang til talegjenkjenning. En modell inne i appen lager
 teksten. Se [SECURITY.md](SECURITY.md).

@@ -40,8 +40,9 @@ Datoer skrives 19.09.26 på norsk og 2026-09-19 på engelsk.
 
 ## Omfang
 
-Versjon 1 gjør én ting: Tar opp, og gjør lyden om til tekst. Ingen samtale,
-ingen kunnskapsbase, ingen tekst til tale. Det hører til Fróði vit eller til
+Versjon 1 gjør én ting: Gjør lyd om til tekst. Lyden kommer fra et opptak i
+appen eller fra en lydfil du importerer. Ingen samtale, ingen kunnskapsbase,
+ingen tekst til tale. Det hører til Fróði vit eller til
 senere versjoner, og legges ikke til uten at noen har bedt om det.
 
 ## Designsystem
@@ -74,6 +75,15 @@ skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
 - Et forseglet opptak har filvern `.complete`, og nøkkelen som åpner det,
   kan bare brukes mens enheten er låst opp. Ingenting i appen åpner et opptak
   på en låst enhet; ikke legg til noe som gjør det uten å løsne begge
+- En importert fil kommer forseglet inn i opptaksmappen, sammen med raden sin.
+  Legg aldri en ukryptert import der: Forseglingen ville tatt den for et
+  opptak fra appen
+- Opplysningene om et opptak, `RecordingOrigin`, skrives én gang og aldri
+  igjen. Ikke legg til noe som skriver dem på nytt, eller som skriver dem for
+  et opptak som mangler dem. En test passer på det
+- Hvert tekstfelt har autokorrektur slått av, så det brukeren skriver, ikke
+  havner i tastaturets ordbok. Systemets eget felt for å gi nytt navn følger
+  ikke den innstillingen, så appen har sitt eget
 - `versionIdentifier` i en SwiftData-modell som er tatt i bruk, endres aldri
 - Et opptak går aldri tapt. Filen på disk er opptaket; raden i listen er
   bare et bilde av den og bygges opp igjen fra filen. Det eneste som sletter

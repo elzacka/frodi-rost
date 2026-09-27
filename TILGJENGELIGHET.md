@@ -1,6 +1,6 @@
 # Tilgjengelighet i Fróði røst
 
-Oppdatert 22.09.26.
+Oppdatert 27.09.26.
 
 Appen skal oppfylle WCAG 2.2 AA. Alt her er målt eller sikret med en test,
 men det er ingen garanti. Kolonnen til høyre sier hvilken test, eller at det
@@ -14,12 +14,12 @@ ikke finnes noen.
 | Kontrast 3:1 for ikoner, kanter og aksenter | Samme utregning for opptaksknappen, kanten og fargen som viser at opptaket går                                                                                                                                                           | `ContrastTests` |
 | Teksten følger Dynamic Type                 | Alle skriftstiler i `Theme.swift` bruker `Font.custom(_:size:relativeTo:)`, så størrelsen følger innstillingen på enheten                                                                                                                | `ThemeTests`    |
 | Ingen tekst under 11 px                     | De minste stilene, `eyebrow` og `meta`, er 11 px. Tidtakeren er 32 px, lesbar på armlengdes avstand i bil                                                                                                                                | `Theme.swift`   |
-| Trefflater på minst 44 pt                   | Innstillinger-knappen, hopp-knappene i spilleren og raden som folder teksten ut er 44 pt. Opptaksknappen er 76 pt og spill av-knappen 56 pt                                                                                              | `Theme.swift`   |
-| VoiceOver                                   | Hver knapp har norsk navn. Tidtakeren leses som tid, ikke som «0:04». Tidspunktene i teksten leses som «Spill av fra 12 minutter, 37 sekunder». Opptaksknappen heter «Start opptak» og «Stopp opptak». Raden i listen leses som én enhet | Ingen test      |
-| Farge er aldri det eneste signalet          | Når opptaket går, bytter knappen ikon fra mikrofon til stopp, tidtakeren starter og VoiceOver-navnet endres. Lenker ut av appen har et ikon etter ordet                                                                                  | Ingen test      |
+| Trefflater på minst 44 pt                   | Innstillinger-knappen, importknappen, hopp-knappene i spilleren og radene som folder ut teksten og «Om opptaket» er 44 pt. Opptaksknappen er 76 pt og spill av-knappen 56 pt                                                                                              | `Theme.swift`   |
+| VoiceOver                                   | Hver knapp har norsk navn. Tidtakeren leses som tid, ikke som «0:04». Tidspunktene i teksten leses som «Spill av fra 12 minutter, 37 sekunder». Opptaksknappen heter «Start opptak» og «Stopp opptak», importknappen «Importer lydfil». Raden i listen leses som én enhet, med navnet først når opptaket har et navn | Ingen test      |
+| Farge er aldri det eneste signalet          | Når opptaket går, bytter knappen ikon fra mikrofon til stopp, tidtakeren starter og VoiceOver-navnet endres. Lenker ut av appen har et ikon etter ordet. Kan ikke Fróði bekrefte opplysningene om et opptak, står det i tekst, ikke bare som en rød kant                                                                                  | Ingen test      |
 | Sveipet har et alternativ                   | Handlingene bak et opptak i listen, «Slett» og teksthandlingen, finnes også som egendefinerte VoiceOver-handlinger på raden. Ingen trenger sveipet (WCAG 2.5.1). Spørsmålet «Sikker på at du vil slette?» står i raden, og «Slett» og «Behold» er egne knapper                                                | Ingen test      |
 | Lukk med VoiceOver-gesten                   | `UIAccessibilityPerformEscapeEnabled` er satt, så Z-gesten lukker arkene                                                                                                                                                                 | `Info.plist`    |
-| Redusert bevegelse                          | De tre animasjonene, teksten som foldes ut, raden som sveipes og raden som slettes, skjer uten animasjon når innstillingen er på                                                                                                          | Ingen test      |
+| Redusert bevegelse                          | Når innstillingen er på, folder teksten og «Om opptaket» seg ut uten animasjon, og raden som sveipes eller slettes, flytter seg uten animasjon                                                                                                          | Ingen test      |
 | Ingen tomme knapper                         | Et ikon som mangler i katalogen tegner ingenting, og knappen blir stående tom. En test laster hvert ikon                                                                                                                                 | `IconTests`     |
 
 ## Målte kontraster

@@ -5,8 +5,27 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 ## Ikke utgitt
 
+### Lagt til
+
+- Du kan importere lydfiler fra Filer, for eksempel m4a, mp3 og wav: Trykk på
+  filikonet øverst til venstre. Appen lager tekst av dem som av egne opptak,
+  og originalen blir liggende der den var
+- Du kan gi et opptak et navn: Trykk på tittelen på opptakets side og velg
+  «Endre navn». Navnet står over datoen i listen
+- «Om opptaket» på opptakets side viser opplysningene Fróði låste da
+  opptaket kom inn i appen: Når det kom inn, hvor langt det er og sjekksum for
+  lyden. For en importert fil også filnavn, format, størrelse, opplysningene
+  som stod i filen og sjekksum for originalen. Er noe endret utenfor appen,
+  sier siden fra
+- `.rtf`-filen har navnet som overskrift og sjekksum for lydfilen
+
+### Endret
+
+- Under overskriften i `.rtf`-filen står «Laget med Fróði røst»
+
 ### Rettet
 
+- Listen ruller når du drar opp eller ned på et opptak
 - Ordlisten retter ikke bøyde former, så «internkontrollen» blir stående når
   listen har «internkontroll»
 

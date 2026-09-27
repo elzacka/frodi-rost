@@ -11,12 +11,15 @@ Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
 ## Hva appen gjør
 
 - Tar opp lyd, også når skjermen er låst, og så lenge du vil
+- Importerer lydfiler, som m4a, mp3 og wav, og lager tekst av dem som av egne opptak
 - Fortsetter etter en telefonsamtale, og tar vare på opptaket hvis appen avsluttes midt i
 - Starter og stopper med handlingsknappen, også når enheten er låst, og viser opptaket på låseskjermen
 - Lager tekst av opptak på inntil ti minutter når du stopper, og av lengre opptak når du ber om det
 - Skriver bokmål med tegnsetting og stor forbokstav, også av dialekt
 - Deler teksten i avsnitt med tidspunkt du kan trykke på for å høre stedet i opptaket
-- Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`, hver for seg eller sammen
+- Lar deg gi opptakene navn
+- Låser opplysningene om hvert opptak når det kommer inn i appen, med sjekksum for lyden, og sier fra hvis noe er endret utenfor appen
+- Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`, hver for seg eller sammen. `.rtf`-filen har sjekksum for lydfilen
 
 ## Skjermbilder
 
@@ -105,13 +108,15 @@ Et opptak går gjennom disse stegene. Filene ligger under `Frodi/`, bortsett fra
 | Handlingsknappen kjører intenten (App Intent) gjennom appens kontroll. Intenten starter og stopper opptak i bakgrunnen, også på låst enhet, og viser en Live Activity på låseskjermen så lenge opptaket går. Kontrollen og Live Activity-en tegnes av en widget-utvidelse | `Intents/ToggleRecordingIntent.swift`, `Services/RecordingActivity.swift`, `FrodiWidgets/` |
 | Kontrolleren tar imot kall fra intenten og opptaksknappen, og «eier» databasen                                                                                                 | `Services/RecordingController.swift`                                |
 | Opptakeren skriver lyden fortløpende til fil som PCM (Pulse-Code Modulation), i stedet for å holde den i minnet til opptaket stoppes. Opptaket går derfor ikke tapt ved krasj. Tar en samtale mikrofonen, lukkes filen, og opptaket fortsetter i en ny fil ved siden av når mikrofonen er tilbake | `Services/AudioRecorder.swift`                                      |
+| Importen gjør om en lydfil til samme format som opptakeren skriver, og forsegler den før den kommer inn i listen                                                                  | `Services/AudioImport.swift`, `Services/AudioStorage.swift`         |
 | Ved oppstart sammenligner kontrolleren databaselisten med filmappen. En fil uten tilhørende rad får en ny rad. En fil uten lyd fjernes                                          | `Services/RecordingController.swift`                                |
 | Lagringen holder filen i appens sandkasse (App Sandbox) med filvern (Data Protection), utenom sikkerhetskopiering                                                              | `Services/AudioStorage.swift`                                       |
 | Lagringen koder filene om til AAC, setter dem sammen til ett opptak og forsegler det med en nøkkel fra Secure Enclave (RecordingVault)                                                    | `Services/AudioStorage.swift`, `Services/RecordingVault.swift`      |
 | Transcription lager teksten i puljer med nb-whisper, som kjører inne i appen. Fremdriften lagres etter hver pulje                                                            | `Services/Transcription.swift`, `Services/WhisperTranscriber.swift` |
 | Transcript strukturerer teksten som avsnitt med tidspunkt                                                                                                                      | `Services/Transcript.swift`                                         |
 | WordList sender ordlisten til modellen som prompt                                                                                                                              | `Services/WordList.swift`                                           |
-| RecordingVault forsegler teksten på samme måte som lyden                                                                                                                                | `Services/RecordingVault.swift`                                     |
+| RecordingVault forsegler teksten, navnet og opprinnelsen på samme måte som lyden                                                                                                       | `Services/RecordingVault.swift`                                     |
+| Opprinnelsen (RecordingOrigin) er opplysningene om opptaket, skrevet én gang da det kom inn. Opptakets side sjekker dem mot raden og lyden                                             | `Models/RecordingOrigin.swift`, `Models/Recording.swift`            |
 | RecordingDetailView viser teksten bak et vern (CaptureGuard) som skjuler den ved skjermopptak (Screen Recording) og appbytte (App Switcher)                                    | `Views/RecordingDetailView.swift`, `Views/CaptureGuard.swift`       |
 | Ved eksport dekrypterer RecordingExport filene til en midlertidig mappe, og gir dem til delingsarket (Activity View, ofte kalt Share Sheet)                                    | `Services/RecordingExport.swift`, `Views/ShareSheet.swift`          |
 
@@ -129,7 +134,7 @@ Appen er et personlig prosjekt. Feil og forslag meldes som issues på GitHub. Pu
 
 | Dokument                                   | Innhold                                                                |
 | ------------------------------------------ | ---------------------------------------------------------------------- |
-| [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md) | Slik tar du opp, lager tekst, bruker ordlisten, eksporterer og sletter |
+| [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md) | Slik tar du opp, importerer, lager tekst, gir navn, eksporterer og sletter |
 | [PERSONVERN.md](PERSONVERN.md)             | Hva som lagres, tillatelser, rettighetene dine, hvem som står bak      |
 | [SECURITY.md](SECURITY.md)                 | Hva som beskyttes mot hva, og hvordan melde sårbarhet                  |
 | [TILGJENGELIGHET.md](TILGJENGELIGHET.md)   | Kontrast, Dynamic Type, VoiceOver, og hva som er målt                  |

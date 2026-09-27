@@ -8,12 +8,15 @@ Denne veiledningen viser hvordan du bruker appen.
 **Innhold**
 
 - [Ta opp](#ta-opp)
+- [Importere en lydfil](#importere-en-lydfil)
 - [Handlingsknappen](#handlingsknappen)
 - [Teksten](#teksten)
   - [Slik lages teksten](#slik-lages-teksten)
   - [Hvis teksten mangler](#hvis-teksten-mangler)
 - [Ordliste](#ordliste)
 - [Spille av](#spille-av)
+- [Gi opptaket et navn](#gi-opptaket-et-navn)
+- [Om opptaket](#om-opptaket)
 - [Kopiere teksten](#kopiere-teksten)
 - [Eksportere](#eksportere)
 - [Slette](#slette)
@@ -41,6 +44,32 @@ appen mikrofonen tilbake, lagrer den det du har tatt opp.
 > **Viktig:** Før du tar opp en samtale der andre er til stede, må du si fra
 > at du tar opp, fortelle hva opptaket skal brukes til og få samtykke fra dem.
 
+## Importere en lydfil
+
+Har du tatt opp med en annen app eller en annen opptaker, kan Fróði lage tekst
+av lyden.
+
+1. Trykk på filikonet øverst til venstre.
+2. Velg én eller flere lydfiler, og trykk på «Åpne».
+
+Fróði leser m4a, mp3, wav, aiff og de andre lydformatene iOS kan lese. Er
+lyden i stereo, tar appen med begge kanalene.
+
+Appen lager en kopi og krypterer den som et vanlig opptak. Originalen blir
+liggende der den var, og appen endrer den ikke. Opptaket får filnavnet som
+navn. Datoen er den som står i filen, hvis filen har en. Ellers får opptaket
+tidspunktet du importerte det.
+
+Teksten lages etter samme regel som for opptak du tar i appen. Se
+[Teksten](#teksten).
+
+Ligger filen i iCloud Drive, laster iOS den ned før Fróði får den. Kan ikke
+Fróði lese filen, sier appen fra. Filen kan være skadet eller i et format
+appen ikke kan lese.
+
+> **Tips:** Opptak fra Taleopptak ligger ikke i Filer. Del opptaket fra
+> Taleopptak til Filer først, så kan du importere det.
+
 ## Handlingsknappen
 
 Knappen på venstre side av enheten starter og stopper opptak. Den finnes på
@@ -67,7 +96,8 @@ pause til du er ferdig. Starter du opptaket med knappen mens appen ikke er
 
 ## Teksten
 
-Hvor lenge opptaket varer, avgjør når teksten lages:
+Hvor lenge opptaket varer, avgjør når teksten lages. Det gjelder også lydfiler
+du importerer:
 
 | Opptaket&nbsp;varer | Teksten                 |
 | ------------------- | ----------------------- |
@@ -134,6 +164,37 @@ listen har «internkontroll».
 hopper ti sekunder tilbake eller frem. Skyveknappen viser hvor du er i
 opptaket.
 
+## Gi opptaket et navn
+
+Åpne opptaket og trykk på tittelen øverst. Velg «Endre navn», skriv navnet og
+trykk på «Lagre». Navnet står over datoen i listen, og som overskrift når du
+eksporterer teksten som `.rtf`.
+
+Tømmer du feltet, fjerner du navnet, og listen viser datoen igjen.
+
+## Om opptaket
+
+Nederst på opptakets side står «Om opptaket». Trykk på det for å se
+opplysningene Fróði låste da opptaket kom inn i appen:
+
+| Opptaket&nbsp;er | Opplysningene                                                                                                                                         |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tatt opp i appen | Når det ble tatt opp, hvor langt det er, og sjekksum for lyden                                                                                        |
+| Importert        | Når det ble importert, filnavn, format, størrelse, lengde, datoen og de andre opplysningene som stod i filen, og sjekksum for originalen og for lyden |
+
+Du kan gi opptaket et nytt navn, men du kan ikke endre disse opplysningene.
+Er noe endret utenfor appen, eller stemmer ikke lyden med sjekksummen, står
+det «Fróði kan ikke bekrefte opplysningene om dette opptaket.» Under står
+opplysningene slik de ble låst, hvis Fróði kan lese dem.
+
+Har et opptak ikke «Om opptaket», ble det laget med en eldre versjon av
+appen.
+
+En sjekksum er et fingeravtrykk av en fil. To like filer har samme sjekksum.
+På en Mac finner du sjekksummen til en fil med kommandoen
+`shasum -a 256 filnavn` i Terminal. Stemmer den med sjekksummen for
+originalen, er filen den samme som du importerte.
+
 ## Kopiere teksten
 
 Trykk på «Kopier» over teksten. Hele teksten kopieres, så du kan lime den inn
@@ -151,8 +212,12 @@ under Innstillinger i appen:
 
 | Format | Passer&nbsp;til                                                                                  |
 | ------ | ------------------------------------------------------------------------------------------------ |
-| `.rtf` | Åpnes som dokument i Word, Pages og Notater. Har overskrift, dato og tidspunkt for hvert avsnitt |
+| `.rtf` | Åpnes som dokument i Word, Pages og Notater. Har overskrift, dato, sjekksum for lydfilen og tidspunkt for hvert avsnitt |
 | `.txt` | Ren tekst som kan limes inn hvor som helst                                                       |
+
+> **Tips:** Sjekksummen i `.rtf`-filen viser hvilken lydfil teksten hører
+> til. Den som får begge filene, kan sjekke at lyden er den samme som ble
+> lagret i Fróði.
 
 > **Viktig:** Skal du bytte enhet: Eksporter opptakene først. Opptakene er
 > låst til enheten og kan ikke leses av en annen, heller ikke fra en
