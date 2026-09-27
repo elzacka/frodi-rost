@@ -8,7 +8,9 @@ import Testing
 /// The fixtures were made with ffmpeg on 2026-09-27: `right-channel.mp3` is two
 /// seconds of tone at 44,1 kHz with the left channel silent, and
 /// `dated-stereo.m4a` is one and a half seconds of AAC at 48 kHz in stereo, with
-/// a creation date in its metadata.
+/// a creation date in its metadata. `located.m4a`, made on 2026-09-28 with
+/// ffmpeg and passed through `AVAssetExportSession`, is one second of AAC with
+/// a title and a location, which AVFoundation writes as ISO user data (`loci`).
 @Suite("Import", .serialized)
 struct ImportTests {
     private static let fixtures = URL(filePath: #filePath)
@@ -60,6 +62,17 @@ struct ImportTests {
             #expect(file.fileFormat.channelCount == 1)
             #expect(abs(converted.duration - 1.5) < 0.05)
             #expect(converted.original.createdAt == ISO8601DateFormatter().date(from: "2026-09-01T10:15:00Z"))
+        }
+    }
+
+    @Test("Stedet som står i filen, blir ikke lagret")
+    func locationIsLeftOut() async throws {
+        let converted = try await AudioImport.convert(Self.fixtures.appending(path: "located.m4a"))
+        try removing(converted) { converted in
+            let tags = converted.original.tags
+            #expect(tags["title"] == "Testopptak")
+            #expect(tags[AVMetadataKey.commonKeyLocation.rawValue] == nil)
+            #expect(!tags.values.contains { $0.contains("59.9139") })
         }
     }
 

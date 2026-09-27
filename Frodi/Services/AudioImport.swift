@@ -196,6 +196,10 @@ enum AudioImport {
     /// m4a from most recorders carries a date; an mp3 rarely does. Artwork and
     /// other binary values are left out, and so is the date among the tags,
     /// since it has a field of its own.
+    ///
+    /// So is a location. The app asks for no location access and records none
+    /// of its own, and the origin is written once, so a place kept here would
+    /// stay until the recording is deleted.
     private static func metadata(of url: URL) async -> (createdAt: Date?, tags: [String: String]) {
         let asset = AVURLAsset(url: url)
         var createdAt: Date?
@@ -204,11 +208,13 @@ enum AudioImport {
         }
         var tags: [String: String] = [:]
         for item in (try? await asset.load(.commonMetadata)) ?? [] {
-            guard let key = item.commonKey, key != .commonKeyCreationDate, key != .commonKeyArtwork,
+            guard let key = item.commonKey, !leftOut.contains(key),
                   let value = try? await item.load(.stringValue), !value.isEmpty
             else { continue }
             tags[key.rawValue] = value
         }
         return (createdAt, tags)
     }
+
+    private static let leftOut: Set<AVMetadataKey> = [.commonKeyCreationDate, .commonKeyArtwork, .commonKeyLocation]
 }

@@ -545,7 +545,6 @@ struct RecordingDetailView: View {
         case "software": "Programvare"
         case "make": "Produsent"
         case "model": "Modell"
-        case "location": "Sted"
         case "copyrights": "Opphavsrett"
         case "language": "Språk"
         default: key

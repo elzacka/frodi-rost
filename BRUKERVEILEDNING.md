@@ -1,6 +1,6 @@
 # Brukerveiledning for Fróði røst
 
-Oppdatert 27.09.26.
+Oppdatert 28.09.26.
 
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 Denne veiledningen viser hvordan du bruker appen.
@@ -186,10 +186,10 @@ fil står filnavnet til originalen der, og i `.rtf`-filen du eksporterer.
 Nederst på opptakets side står «Om opptaket». Trykk på det for å se
 opplysningene Fróði låste da opptaket kom inn i appen:
 
-| Opptaket&nbsp;er | Opplysningene                                                                                                                                         |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tatt opp i appen | Når det ble tatt opp, hvor langt det er, og sjekksum for lyden                                                                                        |
-| Importert        | Når det ble importert, filnavn, format, størrelse, lengde, datoen og de andre opplysningene som stod i filen, og sjekksum for originalen og for lyden |
+| Opptaket&nbsp;er | Opplysningene                                                                                                                                     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tatt opp i appen | Når det ble tatt opp, hvor langt det er, og sjekksum for lyden                                                                                    |
+| Importert        | Når det ble importert, filnavn, format, størrelse, lengde, datoen og andre opplysninger som stod i filen, og sjekksum for originalen og for lyden |
 
 Du kan gi opptaket et nytt navn, men du kan ikke endre disse opplysningene.
 Er datoen eller lengden endret utenfor appen, eller stemmer ikke lyden med

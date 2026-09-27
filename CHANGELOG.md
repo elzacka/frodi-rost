@@ -3,6 +3,12 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/nb/1.1.0/).
 Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
+## Ikke utgitt
+
+### Endret
+
+- Oppgir en importert fil hvor den ble tatt opp, lagrer Fróði ikke stedet
+
 ## 1.0 (9) – 28.09.26
 
 Appen er den samme som i build 8.

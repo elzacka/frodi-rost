@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 27.09.26.
+Sist oppdatert 28.09.26.
 
 Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 å sende til, og ingen tjeneste å spørre.
@@ -39,8 +39,9 @@ Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
 «Om opptaket» er opplysningene Fróði låser når et opptak kommer inn i appen:
 Når det ble tatt opp eller importert, hvor langt det er, og en sjekksum for
 lyden. For en importert fil også filnavnet, formatet, størrelsen og
-opplysningene som stod i filen, for eksempel dato og tittel. Filnavnet i
-tabellen over er appens eget, ikke navnet på filen du importerte.
+opplysningene som stod i filen, for eksempel dato og tittel. Oppgir filen
+hvor den ble tatt opp, lagrer Fróði ikke stedet. Filnavnet i tabellen over er
+appens eget, ikke navnet på filen du importerte.
 
 Stopper du et opptak mens enheten er låst, krypterer Fróði det når du har låst
 opp, senest neste gang du åpner appen. Så lenge enheten er låst, holder iOS

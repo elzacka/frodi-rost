@@ -143,7 +143,7 @@ moment, sealed through the vault like the transcript and written once.
 | Recording          | The origin holds                                                                                                                                                                          |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Made in the app    | Its file stem, its date and length, and the SHA-256 of the audio as sealed: the bytes an export hands over as `.m4a`                                                                      |
-| Imported           | The same, the time of the import, and the file as it was picked: its name, size, codec, sample rate, channels, the creation date and common metadata it stated, and the SHA-256 of its bytes |
+| Imported           | The same, the time of the import, and the file as it was picked: its name, size, codec, sample rate, channels, the creation date and common metadata it stated, a location left out, and the SHA-256 of its bytes |
 
 It is written at the seal for a recording made here, from the bytes on their
 way into the vault, and at the import for a file brought in, before the file

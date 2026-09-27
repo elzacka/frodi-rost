@@ -55,7 +55,8 @@ struct RecordingOrigin: Codable, Equatable, Sendable {
         /// see `AudioImport.plausibleDate`.
         let createdAt: Date?
         /// The file's other metadata, by common key: title, artist, software and
-        /// the like, as text. Kept as it was, not interpreted.
+        /// the like, as text. Kept as it was, not interpreted. Never a location,
+        /// see `AudioImport.metadata`.
         let tags: [String: String]
     }
 
