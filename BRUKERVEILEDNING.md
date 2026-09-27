@@ -61,9 +61,9 @@ men kan være dårligere enn originalen. Originalen blir liggende der den var,
 og appen endrer den ikke. Trenger du lyden i full kvalitet, må du ta vare på
 originalen.
 
-Opptaket får filnavnet som navn. Har filen en dato som ikke er før år 2000
-eller i fremtiden, får opptaket den datoen. Ellers får det tidspunktet du
-importerte det.
+Opptaket får filnavnet som navn. Er datoen i filen fra år 2000 eller senere,
+og ikke mer enn et døgn frem i tid, får opptaket den datoen. Ellers får det
+tidspunktet du importerte det.
 
 Teksten lages etter samme regel som for opptak du tar i appen. Se
 [Teksten](#teksten).
@@ -191,9 +191,10 @@ opplysningene Fróði låste da opptaket kom inn i appen:
 | Importert        | Når det ble importert, filnavn, format, størrelse, lengde, datoen og de andre opplysningene som stod i filen, og sjekksum for originalen og for lyden |
 
 Du kan gi opptaket et nytt navn, men du kan ikke endre disse opplysningene.
-Er noe endret utenfor appen, eller stemmer ikke lyden med sjekksummen, står
-det «Fróði kan ikke bekrefte opplysningene om dette opptaket.» Under står
-opplysningene slik de ble låst, hvis Fróði kan lese dem.
+Er datoen eller lengden endret utenfor appen, eller stemmer ikke lyden med
+sjekksummen, står det «Fróði kan ikke bekrefte opplysningene om dette
+opptaket.» Under står opplysningene slik de ble låst, hvis Fróði kan lese
+dem.
 
 Har et opptak ikke «Om opptaket», ble det laget med en eldre versjon av
 appen, eller appen stoppet i det øyeblikket opptaket ble lagret.

@@ -15,8 +15,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - «Om opptaket» på opptakets side viser opplysningene Fróði låste da
   opptaket kom inn i appen: Når det kom inn, hvor langt det er og sjekksum for
   lyden. For en importert fil også filnavn, format, størrelse, opplysningene
-  som stod i filen og sjekksum for originalen. Er noe endret utenfor appen,
-  sier siden fra
+  som stod i filen og sjekksum for originalen. Er datoen, lengden eller lyden
+  endret utenfor appen, sier siden fra
 - `.rtf`-filen har navnet som overskrift og sjekksum for lydfilen
 
 ### Endret
