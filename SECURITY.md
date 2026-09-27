@@ -15,6 +15,7 @@ Last reviewed 2026-09-28.
 - [Origin](#origin)
 - [File protection](#file-protection)
 - [No network](#no-network)
+- [Privacy](#privacy)
 - [Dependencies](#dependencies)
 - [Build integrity](#build-integrity)
 - [Deliberate omissions](#deliberate-omissions)
@@ -49,13 +50,16 @@ The app assumes a passcode is set and iOS is not compromised.
 | Defended against     | A locked device in someone else's hands, including forensic extraction after first unlock. A copy of a backup. Another app on the device. Anyone watching the screen, or the app switcher, while a transcript is open |
 | Not defended against | A compromised OS, or an exploit chain on an unlocked device. An unlocked device in someone else's hands. A screenshot. Whatever happens to a file after export                                                        |
 
-Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0 on
-2026-09-27, by reading the controls against the code rather than by
-running MASTG. The profile is MAS-L2+P: the app holds a key that encrypts
-user data of a kind OWASP lists as high risk. Every applicable L2 and P
-control is met, with three exceptions: local authentication (AUTH-2,
-AUTH-3), enforced updates (CODE-2) and MAS-R, all under *Deliberate
-omissions*. MASVS-NETWORK does not apply; there is no transport.
+Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0, the
+latest release as of 2026-09-28, at the profiles MAS-L2 and MAS-P: the app
+holds a key that encrypts user data of a kind OWASP lists as high risk. The
+storage, crypto, authentication, platform and code controls were read
+against the code on 2026-09-27, not tested with MASTG. The four privacy
+controls were tested on 2026-09-28; see *Privacy*. Every applicable control
+is met except these, all under *Deliberate omissions*: local authentication
+(AUTH-2, AUTH-3), enforced updates (CODE-2), reproducible builds
+(MASWE-0075, under PRIVACY-3) and MAS-R. MASVS-NETWORK does not apply; there
+is no transport.
 
 ## What happens in each scenario
 
@@ -63,6 +67,7 @@ omissions*. MASVS-NETWORK does not apply; there is no transport.
 | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Device lost or stolen, locked                            | Unreadable. The sealed files are `.complete` and the key is `WhenUnlocked`: neither is available while the device is locked, rebooted or not. Dates, durations and file names in the database are not encrypted; see *File protection*                                                              |
 | Device lost, wiped or replaced                           | Every recording and transcript is gone, by design. The key exists only in that device's Secure Enclave and is never backed up. Export before changing device; see [PERSONVERN.md](PERSONVERN.md)                                                                                                   |
+| App deleted                                              | The container goes with it: recordings, texts, names, origins, the word list, the database and the two settings in `UserDefaults`. The Secure Enclave key is a keychain item, which iOS may keep after the app is gone; it opens nothing, since everything it wrapped went with the container. The app's log lines, which hold no content, stay in the system log until iOS rotates it |
 | Recording stopped while the device is locked             | Saved as plaintext under `.completeUnlessOpen`, which cannot be reopened until the device is unlocked. Sealed and transcribed at the unlock if the app is running then, otherwise when the app next comes to the front or launches. Never deleted                                                                                                                          |
 | A call, Siri or another app takes the microphone         | The file recorded so far is closed as it is. When iOS hands the microphone back, the recording goes on in a new file beside it; when it does not, what is on disk is saved. The seal joins the files into one recording. Nothing recorded before the call is written over                             |
 | Audio file imported                                      | Picked by the user in the system file picker, which gives the app that file and no other. Hashed and converted inside one coordinated read, as two passes over the file, and its metadata read afterwards; a file that lives only in iCloud Drive is downloaded by iOS' file provider first, not by the app. Converted and sealed in the temporary folder, and moved into the recordings folder sealed, together with its row: nothing of it is stored there unsealed. The original is not written to. A file Core Audio cannot read as audio is refused |
@@ -221,11 +226,35 @@ Safari, which makes the request because the user tapped the link.
 
 > [!NOTE]
 > One qualification. WhisperKit ships with a copy of `swift-transformers`'
-> `Hub` module, which contains an HTTP client. It is linked into the binary,
-> and nothing in the app calls it: the model and the tokenizer are read from
-> the bundle, never fetched. The claim is «this app makes no network requests», not
-> «this binary contains no networking code». The second would be stronger, and
-> it would be false.
+> `Hub` module, which contains an HTTP client and links the Network
+> framework. Every time the model loads, WhisperKit's tokenizer loader
+> creates a Hub client, and its constructor starts an `NWPathMonitor`: it
+> asks iOS whether the device is online and sends nothing. The client's
+> requests are never made: the model and the tokenizer are read from the
+> bundle, never fetched. The claim is «this app makes no network requests»,
+> not «this binary contains no networking code». The second would be
+> stronger, and it would be false.
+
+## Privacy
+
+MASVS 2.1.0 added four privacy controls, MASVS-PRIVACY. They were tested on
+2026-09-28 with the MASTG's static iOS privacy tests against the uploaded
+build 1.0 (9), and read against the code. Two findings are fixed in the
+source since that build: an import keeps no location from the file (see
+*Origin*), and the microphone's purpose string names notes and
+conversations.
+
+| Control                  | How the app meets it | Checked by |
+| ------------------------ | -------------------- | ---------- |
+| PRIVACY-1 Minimal access | One protected resource, the microphone, asked for at the first recording; iOS also asks once whether the Live Activity may run. Files come in through the system file picker, which gives the app each picked file and nothing else. WhisperKit, the one third-party library the app uses, runs in the app's process and gets the audio and the word list. An import keeps no location the file states | MASTG-TEST-0360 and -0362: one purpose string, one permission request in the binary (`requestRecordPermission`) and no other protected-resource API. The app's only capability entitlements are Enhanced Security's; the widget has none |
+| PRIVACY-2 No identification | No account, user ID, device identifier, advertising identifier or analytics. Recordings are named by random UUIDs, exported files by their date. An imported file is converted to PCM, so none of its metadata reaches an exported `.m4a`. The `.rtf` carries the name the user gave and, for an import, the original's file name; the guide says so | The binary references no `identifierForVendor`, `advertisingIdentifier`, App Attest or DeviceCheck. The import-to-AAC chain run on a file with a title and a location: the `.m4a` holds only the encoder's gapless-playback tag |
+| PRIVACY-3 Transparency   | [PERSONVERN.md](PERSONVERN.md), linked in the app and in the App Store listing. The privacy manifest declares no tracking, no tracking domains and no collected data, and two accessed APIs with their reasons; the widget's declares nothing. The purpose string says what is recorded and that it stays on the device | MASTG-TEST-0281: the binary names two domains, github.com for the document links and huggingface.co in the Hub client, and neither is on DuckDuckGo's tracker list. The required-reason APIs the binary imports are file timestamps and `UserDefaults`, as declared. Reproducible builds (MASWE-0075): not met, see *Deliberate omissions* |
+| PRIVACY-4 User control   | See, rename, export and delete each recording; edit the word list; withdraw microphone access in iOS Settings; delete the app. Nothing is collected, so there is no consent to withdraw | PERSONVERN.md *Rettighetene dine*, read against the app |
+
+Not tested: MASTG-TEST-0361 and -0363 hook the running app, which needs an
+instrumented build on a device; the static tests cover the same APIs. The
+App Store privacy label cannot be read through the App Store Connect API and
+was not checked.
 
 ## Dependencies
 
@@ -260,6 +289,7 @@ with it is transcription quality and bias, not exfiltration.
 | No advisory feed               | Dependencies are pinned, so an upstream fix reaches the app only when someone bumps the version. Nothing watches `argmax-oss-swift` or `swift-argument-parser` for advisories; the check is done by hand before a release             |
 | No overwrite on delete         | The file is already ciphertext, with its only key wrapped inside it, so deleted blocks are noise. iOS deletes by discarding the per-file key, and APFS is copy-on-write, so an overwrite would land on different blocks anyway |
 | No trusted timestamp           | Proving to someone else when a recording was made needs a timestamp authority, which is a network request. The origin's date is the device clock's |
+| No reproducible build          | MASWE-0075 asks that anyone can rebuild the app from source and get the published binary bit for bit. The App Store encrypts and re-signs what it serves, so a build from source cannot be compared with it. What stands in its place: the source is public, the dependencies are pinned and the model files are checked against committed checksums; see *Build integrity* |
 | Imported originals not kept    | The app keeps its converted copy and the original's SHA-256. Keeping the original as well would double the storage and the plaintext to handle; the checksum lets anyone holding the original match it |
 | No screenshot blocking         | `userDidTakeScreenshotNotification` fires after the image exists, and the undocumented `isSecureTextEntry` trick can break without warning. The app does not offer what it cannot deliver                                      |
 | No pointer authentication, no CPA2 | Enhanced Security's build setting compiles the app as arm64e, and WhisperKit builds as arm64 only, so the app cannot import it. The system frameworks the app calls are arm64e; the app's own code and WhisperKit are not. CPA2, the stronger memory tagging iOS 27 offers on A20 Pro and later, needs the arm64e.x1 architecture and is out of reach for the same reason. Memory tagging itself does not depend on arm64e and is on |
