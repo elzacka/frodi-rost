@@ -2,7 +2,7 @@
 
 Fróði røst records audio and transcribes it on the device. Nothing is transmitted.
 
-Last reviewed 2026-09-27.
+Last reviewed 2026-09-28.
 
 **Contents**
 
@@ -50,7 +50,7 @@ The app assumes a passcode is set and iOS is not compromised.
 | Not defended against | A compromised OS, or an exploit chain on an unlocked device. An unlocked device in someone else's hands. A screenshot. Whatever happens to a file after export                                                        |
 
 Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0 on
-2026-09-19, by reading the controls against the code rather than by
+2026-09-27, by reading the controls against the code rather than by
 running MASTG. The profile is MAS-L2+P: the app holds a key that encrypts
 user data of a kind OWASP lists as high risk. Every applicable L2 and P
 control is met, with three exceptions: local authentication (AUTH-2,
@@ -262,7 +262,7 @@ with it is transcription quality and bias, not exfiltration.
 | No trusted timestamp           | Proving to someone else when a recording was made needs a timestamp authority, which is a network request. The origin's date is the device clock's |
 | Imported originals not kept    | The app keeps its converted copy and the original's SHA-256. Keeping the original as well would double the storage and the plaintext to handle; the checksum lets anyone holding the original match it |
 | No screenshot blocking         | `userDidTakeScreenshotNotification` fires after the image exists, and the undocumented `isSecureTextEntry` trick can break without warning. The app does not offer what it cannot deliver                                      |
-| No pointer authentication      | Enhanced Security's build setting compiles the app as arm64e, and WhisperKit builds as arm64 only, so the app cannot import it. The system frameworks the app calls are arm64e; the app's own code and WhisperKit are not. Memory tagging does not depend on arm64e and is on |
+| No pointer authentication, no CPA2 | Enhanced Security's build setting compiles the app as arm64e, and WhisperKit builds as arm64 only, so the app cannot import it. The system frameworks the app calls are arm64e; the app's own code and WhisperKit are not. CPA2, the stronger memory tagging iOS 27 offers on A20 Pro and later, needs the arm64e.x1 architecture and is out of reach for the same reason. Memory tagging itself does not depend on arm64e and is on |
 | No Enhanced Security in the widget | The extension draws the control and the Live Activity and reads nothing but the activity's state, which the app wrote. It runs in its own process, with no access to the app's container or keys |
 
 ---
