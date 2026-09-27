@@ -3,6 +3,10 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/nb/1.1.0/).
 Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
+## 1.0 (9) – 28.09.26
+
+Appen er den samme som i build 8.
+
 ## 1.0 (8) – 27.09.26
 
 ### Lagt til
