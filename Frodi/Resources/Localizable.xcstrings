@@ -32,6 +32,9 @@
     "Fróði får ikke åpnet databasen på enheten. Du kan ta opp og eksportere som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt." : {
 
     },
+    "Fróði kan ikke bekrefte opplysningene om dette opptaket. De kan være endret utenfor appen." : {
+
+    },
     "Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger på enheten." : {
 
     },
@@ -39,6 +42,9 @@
 
     },
     "Lisenser" : {
+
+    },
+    "Om opptaket" : {
 
     },
     "Opptak og tekst" : {
@@ -62,6 +68,9 @@
     "Slett" : {
 
     },
+    "Slik ble opplysningene låst:" : {
+
+    },
     "Tekst" : {
 
     },
@@ -72,6 +81,9 @@
 
     },
     "Trykk på opptaksknappen, eller hold inne handlingsknappen på venstre side. Brukerveiledningen ligger under Innstillinger." : {
+
+    },
+    "Uten navn viser listen datoen." : {
 
     }
   },

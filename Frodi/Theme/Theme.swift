@@ -127,6 +127,30 @@ enum IconSize {
     static let external: CGFloat = 14
 }
 
+// MARK: - Icon badge
+/// The small disc that adds a meaning to an icon: the «add» on the import
+/// button's waveform. Measured as fractions of the icon's frame, so it follows
+/// the icon if the frame changes.
+///
+/// The disc is the record button in small: AccentRecord with the glyph in
+/// AccentRecordOn, since importing is the other way a recording is made. Both
+/// pairs are in `ContrastTests`: 3,25:1 against the background, 4,59:1 for the
+/// glyph on the disc.
+enum IconBadge {
+    /// 10,5 pt on the 28 pt header icon. The glyph gets the same frame, and
+    /// Material's `add` fills 58 % of it: a 6 pt plus.
+    static let diameter: CGFloat = 0.375
+    /// The gap cut out of the icon around the disc, in points. It takes a round
+    /// bite out of the waveform's fourth bar, deliberately: with the disc
+    /// clear of the bars it floated beside the icon instead of belonging to it,
+    /// and closer in it clipped a corner that read as a flaw. Rendered side by
+    /// side on 2026-09-27.
+    static let gap: CGFloat = 1.5
+    /// The disc's centre: (790, 830) on Material's 960 grid, in the corner the
+    /// waveform leaves empty under its last bar.
+    static let center = UnitPoint(x: 790.0 / 960, y: 830.0 / 960)
+}
+
 // MARK: - Playback controls
 /// The design system describes no player. The measures are derived: the play
 /// button has the same diameter as the inner circle of the record button, and the

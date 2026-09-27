@@ -8,7 +8,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 ### Lagt til
 
 - Du kan importere lydfiler fra Filer, for eksempel m4a, mp3 og wav: Trykk på
-  filikonet øverst til venstre. Appen lager tekst av dem som av egne opptak,
+  ikonet med lydbølger og pluss øverst til venstre. Appen lager tekst av dem som av egne opptak,
   og originalen blir liggende der den var
 - Du kan gi et opptak et navn: Trykk på tittelen på opptakets side og velg
   «Endre navn». Navnet står over datoen i listen

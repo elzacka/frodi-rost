@@ -136,7 +136,7 @@ struct RecordingListView: View {
                 .frame(width: HeaderButton.touch, height: HeaderButton.touch)
                 .accessibilityLabel("Importerer lydfil")
         } else {
-            IconButton(icon: .importAudio, size: HeaderButton.icon, label: "Importer lydfil") {
+            IconButton(icon: .importAudio, badge: .add, size: HeaderButton.icon, label: "Importer lydfil") {
                 showImporter = true
             }
         }

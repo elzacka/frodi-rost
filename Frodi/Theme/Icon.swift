@@ -18,7 +18,8 @@ import SwiftUI
 /// the one bundled.
 enum Icon: String, CaseIterable {
     case settings = "instant_mix"
-    case importAudio = "audio_file"
+    case importAudio = "graphic_eq"
+    case add = "add"
     case close = "close"
     case back = "arrow_back_ios_new"
     case chevronRight = "chevron_right"
@@ -35,6 +36,51 @@ enum Icon: String, CaseIterable {
     case stop = "stop_fill"
     case play = "play_arrow_fill"
     case pause = "pause_fill"
+}
+
+/// An icon with a small disc knocked out of its lower trailing corner, carrying
+/// a second icon: the waveform with its «add». The two are drawn apart and
+/// joined here rather than baked into one image, so each takes its colour from
+/// the design system's tokens; a template image can only take one.
+struct BadgedIconView: View {
+    private let icon: Icon
+    private let badge: Icon
+    private let size: CGFloat
+
+    init(_ icon: Icon, badge: Icon, size: CGFloat) {
+        self.icon = icon
+        self.badge = badge
+        self.size = size
+    }
+
+    var body: some View {
+        let disc = size * IconBadge.diameter
+        let cut = disc + 2 * IconBadge.gap
+        ZStack(alignment: .topLeading) {
+            // The gap is cut out of the icon, not painted over it in the
+            // background colour, so it holds on any surface.
+            IconView(icon, size: size)
+                .foregroundStyle(Color.Frodi.textSecondary)
+                .overlay(alignment: .topLeading) {
+                    Circle()
+                        .frame(width: cut, height: cut)
+                        .offset(x: size * IconBadge.center.x - cut / 2, y: size * IconBadge.center.y - cut / 2)
+                        .blendMode(.destinationOut)
+                }
+                .compositingGroup()
+
+            Circle()
+                .fill(Color.Frodi.accentRecord)
+                .overlay {
+                    IconView(badge, size: disc)
+                        .foregroundStyle(Color.Frodi.accentRecordOn)
+                }
+                .frame(width: disc, height: disc)
+                .offset(x: size * IconBadge.center.x - disc / 2, y: size * IconBadge.center.y - disc / 2)
+        }
+        .frame(width: size, height: size, alignment: .topLeading)
+        .accessibilityHidden(true)
+    }
 }
 
 /// An icon at a given size, coloured like the text around it.
