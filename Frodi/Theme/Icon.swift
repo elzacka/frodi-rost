@@ -19,7 +19,9 @@ import SwiftUI
 enum Icon: String, CaseIterable {
     case settings = "instant_mix"
     case importAudio = "graphic_eq"
-    case add = "add"
+    /// Google's file name, not the symbol name: an asset called `add` collides
+    /// with `UIImage.add` in the Swift symbols Xcode generates for the catalogue.
+    case add = "add_24px"
     case close = "close"
     case back = "arrow_back_ios_new"
     case chevronRight = "chevron_right"
