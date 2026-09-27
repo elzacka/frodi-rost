@@ -103,10 +103,11 @@ final class Recording {
         sealedOrigin = try RecordingVault.seal(try origin.encoded())
     }
 
-    /// The origin, checked: it opens, it decodes, and it names this recording.
+    /// The origin, checked against this row: it opens, it names this
+    /// recording, and its date and length are the row's.
     func origin() -> OriginState {
         guard let sealedOrigin else { return .none }
-        return RecordingOrigin.verify(sealedOrigin, fileName: fileName)
+        return RecordingOrigin.verify(sealedOrigin, fileName: fileName, createdAt: createdAt, duration: duration)
     }
 }
 

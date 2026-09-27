@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 import UIKit
 
@@ -52,7 +51,7 @@ enum RecordingExport {
             createdAt: recording.createdAt,
             duration: recording.duration,
             title: recording.title(),
-            origin: recording.origin().verified,
+            origin: recording.origin(),
             transcript: content == .audio ? nil : try recording.transcript(),
             audio: content != .text,
             format: format
@@ -73,7 +72,7 @@ enum RecordingExport {
         createdAt: Date,
         duration: TimeInterval,
         title: String?,
-        origin: RecordingOrigin?,
+        origin: OriginState,
         transcript: String?,
         audio: Bool,
         format: TextFormat
@@ -111,7 +110,7 @@ enum RecordingExport {
                 duration: duration,
                 title: title,
                 origin: origin,
-                audio: audioData.map { (name: audioName, sha256: sha256($0)) }
+                audio: audioData.map { (name: audioName, sha256: RecordingOrigin.checksum($0)) }
             )
             }
             try data.write(to: file, options: [.completeFileProtectionUnlessOpen])
@@ -138,7 +137,7 @@ enum RecordingExport {
         createdAt: Date,
         duration: TimeInterval,
         title: String? = nil,
-        origin: RecordingOrigin? = nil,
+        origin: OriginState = .none,
         audio: (name: String, sha256: String)? = nil
     ) throws -> Data {
         let body = UIFont.systemFont(ofSize: 12)
@@ -159,11 +158,17 @@ enum RecordingExport {
             title == nil ? nil : "\(dated).",
             "Lengde \(Duration.seconds(duration).formatted(exportLength)). Laget med Fróði røst."
         ].compactMap(\.self)
-        if let origin, let original = origin.original {
-            about.append("Importert \((origin.importedAt ?? origin.createdAt).recordingStamp) fra \(original.name). Sjekksum for originalen (SHA-256): \(original.sha256)")
+        if let original = origin.verified?.original, let importedAt = origin.verified?.importedAt {
+            about.append("Importert \(importedAt.recordingStamp) fra \(original.name). Sjekksum for originalen (SHA-256): \(original.sha256)")
         }
         if let audio {
             about.append("Sjekksum for \(audio.name) (SHA-256): \(audio.sha256)")
+        }
+        // Said in the document, not left out: a reader cannot tell a missing
+        // line from one that was held back.
+        let audioDiffers = origin.verified.flatMap { origin in audio.map { $0.sha256 != origin.audioSHA256 } } ?? false
+        if origin.isDoubtful || audioDiffers {
+            about.append("Fróði kan ikke bekrefte opplysningene om dette opptaket. De kan være endret utenfor appen.")
         }
         document.append(NSAttributedString(
             string: about.joined(separator: "\n") + "\n\n",
@@ -200,11 +205,6 @@ enum RecordingExport {
     /// «sÃ¥». The file is UTF-8 either way; the three bytes tell the reader so.
     static func utf8WithBOM(_ text: String) -> Data {
         Data([0xEF, 0xBB, 0xBF]) + Data(text.utf8)
-    }
-
-    /// In hex, the way `shasum` prints it.
-    static func sha256(_ data: Data) -> String {
-        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }
 
     /// Cleans up the plaintext once sharing is done.

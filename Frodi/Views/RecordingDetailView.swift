@@ -14,6 +14,8 @@ struct RecordingDetailView: View {
     /// What has come out so far while the transcription runs, read from its progress.
     @State private var partial: [TranscriptParagraph] = []
     @State private var showsTranscript = false
+    @State private var renaming = false
+    @State private var nameDraft = ""
     @State private var origin: OriginState = .none
     @State private var showsOrigin = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -61,13 +63,38 @@ struct RecordingDetailView: View {
                 .padding(Space.s4)
             }
         }
-        // The system's own rename: a menu on the title, and the title becomes
-        // the field. The navigation bar's title is the system's by the design
-        // file's rule, so this is the one place a name can be given without a
-        // control of the app's own.
-        .navigationTitle(name)
+        // A menu on the title, as the system renames things. Not the system's
+        // own `RenameButton`: its field keeps autocorrection and predictive
+        // text on whatever the view says (measured 2026-09-27), and a name
+        // typed there would enter the keyboard's learned dictionary, outside
+        // the sandbox and in backups. The field below has them off, as the
+        // word list has.
+        .navigationTitle(shownTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarTitleMenu { RenameButton() }
+        .toolbarTitleMenu {
+            Button("Endre navn") {
+                if nameDraft.isEmpty { nameDraft = recording.title() ?? "" }
+                renaming = true
+            }
+        }
+        // The field holds the name, and a name is hidden when the text is. The
+        // draft is kept; «Endre navn» opens it again.
+        .onChange(of: concealment) { _, now in
+            if now != .none { renaming = false }
+        }
+        .alert("Endre navn", isPresented: $renaming) {
+            TextField("Navn", text: $nameDraft)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.sentences)
+            Button("Avbryt", role: .cancel) { nameDraft = "" }
+            Button("Lagre") {
+                try? recording.setTitle(nameDraft)
+                try? context.save()
+                nameDraft = ""
+            }
+        } message: {
+            Text("Uten navn viser listen datoen.")
+        }
         .toolbarBackground(Color.Frodi.background, for: .navigationBar)
         .frodiBackButton()
         .toolbar {
@@ -119,6 +146,14 @@ struct RecordingDetailView: View {
         }
         .task(id: recording.sealedOrigin) {
             origin = recording.origin()
+        }
+        // The audio is checked against its origin when the details are opened,
+        // not on every visit: it means reading and hashing the whole file.
+        .task(id: showsOrigin) {
+            guard showsOrigin, origin.verified != nil,
+                  let checksum = try? await AudioStorage.audioChecksum(fileName: recording.fileName)
+            else { return }
+            origin = origin.matching(audioChecksum: checksum)
         }
         .onDisappear {
             // No reason to leave the plaintext in memory afterwards.
@@ -339,81 +374,85 @@ struct RecordingDetailView: View {
         return "\(stamp) | \(length)"
     }
 
-    /// The title, and what renaming writes to. The date stands in until a name is
-    /// given, and again while the screen is recorded or photographed for the app
-    /// switcher. Leaving the date as it is, or emptying the field, names nothing.
-    private var name: Binding<String> {
-        Binding(
-            get: { concealment == .none ? recording.title() ?? title : title },
-            set: { newName in
-                try? recording.setTitle(newName == title ? nil : newName)
-                try? context.save()
-            }
-        )
+    /// The name, or the date until one is given. The date stands in again while
+    /// the screen is recorded or photographed for the app switcher.
+    private var shownTitle: String {
+        concealment == .none ? recording.title() ?? title : title
     }
 
     // MARK: - Origin
 
     /// What the recording was when it came into the app, as it was locked then.
     /// Collapsed like the text: it is there for the day someone asks, not for
-    /// every visit. A recording from before origins were kept has no card.
+    /// every visit. A recording from before origins were kept has no card. A
+    /// doubt is never collapsed.
     @ViewBuilder
     private var originCard: some View {
         switch origin {
         case .none:
             EmptyView()
         case .unverifiable:
-            Text("Fróði kan ikke bekrefte opplysningene om dette opptaket. De kan være endret utenfor appen.")
-                .font(.Frodi.body)
-                .foregroundStyle(Color.Frodi.textPrimary)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(Space.s5)
-                .background(Color.Frodi.surface, in: RoundedRectangle(cornerRadius: Radius.card))
-                .overlay(
-                    RoundedRectangle(cornerRadius: Radius.card)
-                        .strokeBorder(Color.Frodi.recordingActive, lineWidth: 1)
-                )
+            doubtCard(showing: nil)
+        case .mismatched(let locked):
+            doubtCard(showing: locked)
         case .verified(let origin):
             VStack(alignment: .leading, spacing: Space.s4) {
                 originToggle
 
                 if showsOrigin {
-                    // Hidden like the text: the original's file name can say as
-                    // much as a name does.
-                    VStack(alignment: .leading, spacing: Space.s3) {
-                        ForEach(Array(facts(of: origin).enumerated()), id: \.offset) { _, fact in
-                            VStack(alignment: .leading, spacing: Space.s1) {
-                                Text(verbatim: fact.label)
-                                    .font(.Frodi.meta)
-                                    .foregroundStyle(Color.Frodi.textSecondary)
-                                Text(verbatim: fact.value)
-                                    .font(fact.label == "SHA-256" ? .Frodi.meta : .Frodi.body)
-                                    .monospacedDigit()
-                                    .foregroundStyle(Color.Frodi.textPrimary)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                            .accessibilityElement(children: .combine)
-                        }
-                    }
-                    .hiddenWhileScreenCaptured()
+                    factList(origin)
 
                     Text(origin.source == .imported
-                         ? "Fróði låste disse opplysningene da filen ble importert. Du kan gi opptaket et nytt navn, men ikke endre dem. Med sjekksummen kan du bekrefte at en fil er den samme som ble importert."
-                         : "Fróði låste disse opplysningene da opptaket ble lagret. Du kan gi opptaket et nytt navn, men ikke endre dem.")
+                         ? "Fróði låste disse opplysningene da filen ble importert. Du kan gi opptaket et nytt navn, men ikke endre dem. Med sjekksummene kan du bekrefte at en fil er originalen, og at lyden du eksporterer, er den samme som ble lagret."
+                         : "Fróði låste disse opplysningene da opptaket ble lagret. Du kan gi opptaket et nytt navn, men ikke endre dem. Med sjekksummen kan du bekrefte at lyden du eksporterer, er den samme som ble lagret.")
                         .font(.Frodi.caption)
                         .foregroundStyle(Color.Frodi.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(Space.s5)
-            .background(Color.Frodi.surface, in: RoundedRectangle(cornerRadius: Radius.card))
-            .overlay(
-                RoundedRectangle(cornerRadius: Radius.card)
-                    .strokeBorder(Color.Frodi.border, lineWidth: 1)
-            )
+            .originCardStyle(border: Color.Frodi.border)
         }
+    }
+
+    /// The details cannot be confirmed. When the origin itself opened, what was
+    /// locked is shown under the warning: that is the record the list's date,
+    /// length or audio no longer agrees with.
+    private func doubtCard(showing locked: RecordingOrigin?) -> some View {
+        VStack(alignment: .leading, spacing: Space.s4) {
+            Text("Fróði kan ikke bekrefte opplysningene om dette opptaket. De kan være endret utenfor appen.")
+                .font(.Frodi.body)
+                .foregroundStyle(Color.Frodi.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let locked {
+                Text("Slik ble opplysningene låst:")
+                    .font(.Frodi.caption)
+                    .foregroundStyle(Color.Frodi.textPrimary)
+                factList(locked)
+            }
+        }
+        .originCardStyle(border: Color.Frodi.recordingActive)
+    }
+
+    /// Hidden like the text: the original's file name can say as much as a
+    /// name does.
+    private func factList(_ origin: RecordingOrigin) -> some View {
+        VStack(alignment: .leading, spacing: Space.s3) {
+            ForEach(Array(facts(of: origin).enumerated()), id: \.offset) { _, fact in
+                VStack(alignment: .leading, spacing: Space.s1) {
+                    Text(verbatim: fact.label)
+                        .font(.Frodi.meta)
+                        .foregroundStyle(Color.Frodi.textSecondary)
+                    Text(verbatim: fact.value)
+                        .font(fact.isChecksum ? .Frodi.meta : .Frodi.body)
+                        .monospacedDigit()
+                        .foregroundStyle(Color.Frodi.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .accessibilityElement(children: .combine)
+            }
+        }
+        .hiddenWhileScreenCaptured()
     }
 
     private var originToggle: some View {
@@ -443,16 +482,19 @@ struct RecordingDetailView: View {
     private struct Fact {
         let label: String
         let value: String
+        var isChecksum = false
     }
 
     /// The origin as label and value, in the order a reader asks: when, what
     /// file, what it was, and the checksum last.
     private func facts(of origin: RecordingOrigin) -> [Fact] {
         let length = Duration.seconds(origin.duration).formatted(.time(pattern: .minuteSecond))
+        let audio = Fact(label: "Sjekksum for lyden (SHA-256)", value: origin.audioSHA256, isChecksum: true)
         guard let original = origin.original else {
             return [
                 Fact(label: "Tatt opp", value: origin.createdAt.recordingStamp),
-                Fact(label: "Lengde", value: length)
+                Fact(label: "Lengde", value: length),
+                audio
             ]
         }
         var facts = [
@@ -469,7 +511,8 @@ struct RecordingDetailView: View {
             guard let value = original.tags[key] else { continue }
             facts.append(Fact(label: Self.tagLabel(key), value: value))
         }
-        facts.append(Fact(label: "SHA-256", value: original.sha256))
+        facts.append(Fact(label: "Sjekksum for originalen (SHA-256)", value: original.sha256, isChecksum: true))
+        facts.append(audio)
         return facts
     }
 
@@ -504,5 +547,18 @@ struct RecordingDetailView: View {
         case "language": "Språk"
         default: key
         }
+    }
+}
+
+private extension View {
+    /// The surface card the page's other cards use, with the border given.
+    func originCardStyle(border: Color) -> some View {
+        frame(maxWidth: .infinity, alignment: .leading)
+            .padding(Space.s5)
+            .background(Color.Frodi.surface, in: RoundedRectangle(cornerRadius: Radius.card))
+            .overlay(
+                RoundedRectangle(cornerRadius: Radius.card)
+                    .strokeBorder(border, lineWidth: 1)
+            )
     }
 }

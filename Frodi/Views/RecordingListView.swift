@@ -307,15 +307,26 @@ struct RecordingListView: View {
         await Transcription.runPending(context: context)
     }
 
+    /// The files that failed are counted, not named: the message can stand in
+    /// the app switcher's picture, and a file name can say who was interviewed.
+    /// The ones that came in are in the list under their own names. A file that
+    /// is not readable audio gets the reason; anything else gets another try.
     private func importAudio(_ urls: [URL]) async {
         isImporting = true
         let failed = await controller.importAudio(urls)
         isImporting = false
         guard !failed.isEmpty else { return }
-        let names = failed.map { "«\($0)»" }.formatted(.list(type: .and).locale(AppLocale.norwegian))
-        errorMessage = failed.count == 1
-            ? String(localized: "Fróði får ikke lest \(names). Filen kan være skadet eller i et format Fróði ikke kan lese.")
-            : String(localized: "Fróði får ikke lest \(names). Filene kan være skadet eller i et format Fróði ikke kan lese.")
+        let unreadable = failed.allSatisfy { $0 == .unreadable }
+        errorMessage = switch (urls.count == 1, unreadable) {
+        case (true, true):
+            String(localized: "Fróði får ikke lest filen. Den kan være skadet eller i et format Fróði ikke kan lese.")
+        case (true, false):
+            String(localized: "Fróði fikk ikke importert filen. Prøv på nytt.")
+        case (false, true):
+            String(localized: "Fróði får ikke lest \(failed.count) av \(urls.count) filer. De kan være skadet eller i et format Fróði ikke kan lese.")
+        case (false, false):
+            String(localized: "Fróði fikk ikke importert \(failed.count) av \(urls.count) filer. Prøv på nytt.")
+        }
     }
 
     private func transcribe(_ recording: Recording) async {

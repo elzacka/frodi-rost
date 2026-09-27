@@ -13,6 +13,7 @@ struct OriginTests {
 
     /// Whole seconds: the origin stores dates as ISO 8601.
     private let date = Date(timeIntervalSince1970: 1_789_000_000)
+    private let audio = String(repeating: "b", count: 64)
 
     private func origin(for fileName: String, duration: TimeInterval = 42) -> RecordingOrigin {
         RecordingOrigin(
@@ -20,9 +21,14 @@ struct OriginTests {
             source: .recorded,
             createdAt: date,
             duration: duration,
+            audioSHA256: audio,
             importedAt: nil,
             original: nil
         )
+    }
+
+    private func sealed(_ origin: RecordingOrigin) throws -> Data {
+        try RecordingVault.seal(try origin.encoded())
     }
 
     @Test("Id-en er filnavnet uten endelser, forseglet eller ikke")
@@ -31,12 +37,11 @@ struct OriginTests {
         #expect(RecordingOrigin.recordingID(for: "ABC.m4a.enc") == "ABC")
     }
 
-    @Test("Opprinnelsen åpnes og stemmer etter forseglingen har gitt filen nytt navn")
-    func originSurvivesTheSeal() throws {
-        let recording = Recording(createdAt: date, duration: 42, fileName: "ABC.caf")
-        let written = origin(for: "ABC.caf")
+    @Test("Opprinnelsen åpnes og stemmer med raden")
+    func originMatchesItsRow() throws {
+        let recording = Recording(createdAt: date, duration: 42, fileName: "ABC.m4a.enc")
+        let written = origin(for: "ABC.m4a.enc")
         try recording.recordOrigin(written)
-        recording.fileName = "ABC.m4a.enc"
         #expect(recording.origin() == .verified(written))
     }
 
@@ -51,16 +56,39 @@ struct OriginTests {
 
     @Test("En endret byte gjør opprinnelsen ubekreftet")
     func tamperingShows() throws {
-        var sealed = try RecordingVault.seal(try origin(for: "ABC.m4a.enc").encoded())
-        sealed[sealed.count - 1] ^= 0x01
-        #expect(RecordingOrigin.verify(sealed, fileName: "ABC.m4a.enc") == .unverifiable)
+        var blob = try sealed(origin(for: "ABC.m4a.enc"))
+        blob[blob.count - 1] ^= 0x01
+        #expect(RecordingOrigin.verify(blob, fileName: "ABC.m4a.enc", createdAt: date, duration: 42) == .unverifiable)
     }
 
     @Test("En opprinnelse flyttet til et annet opptak blir ubekreftet")
     func movedOriginShows() throws {
-        let sealed = try RecordingVault.seal(try origin(for: "ABC.m4a.enc").encoded())
-        #expect(RecordingOrigin.verify(sealed, fileName: "ABC.m4a.enc") == .verified(origin(for: "ABC.m4a.enc")))
-        #expect(RecordingOrigin.verify(sealed, fileName: "XYZ.m4a.enc") == .unverifiable)
+        let blob = try sealed(origin(for: "ABC.m4a.enc"))
+        #expect(RecordingOrigin.verify(blob, fileName: "ABC.m4a.enc", createdAt: date, duration: 42) == .verified(origin(for: "ABC.m4a.enc")))
+        #expect(RecordingOrigin.verify(blob, fileName: "XYZ.m4a.enc", createdAt: date, duration: 42) == .unverifiable)
+    }
+
+    /// The list's date and length are plain fields in the database. The origin
+    /// is what they are checked against.
+    @Test("En endret dato eller lengde i raden gjør opprinnelsen ubekreftet")
+    func changedRowShows() throws {
+        let recording = Recording(createdAt: date, duration: 42, fileName: "ABC.m4a.enc")
+        try recording.recordOrigin(origin(for: "ABC.m4a.enc"))
+
+        recording.createdAt = date.addingTimeInterval(-86_400)
+        #expect(recording.origin() == .mismatched(origin(for: "ABC.m4a.enc")))
+        #expect(recording.origin().isDoubtful)
+
+        recording.createdAt = date
+        recording.duration = 12
+        #expect(recording.origin() == .mismatched(origin(for: "ABC.m4a.enc")))
+    }
+
+    @Test("Lyd som ikke er den opprinnelsen ble skrevet for, blir ubekreftet")
+    func swappedAudioShows() {
+        let state = OriginState.verified(origin(for: "ABC.m4a.enc"))
+        #expect(state.matching(audioChecksum: audio) == state)
+        #expect(state.matching(audioChecksum: String(repeating: "c", count: 64)) == .mismatched(origin(for: "ABC.m4a.enc")))
     }
 
     @Test("Et opptak uten opprinnelse har ingen")
@@ -104,7 +132,7 @@ struct OriginTests {
         let original = converted.original
         #expect(original.name == "right-channel.mp3")
         #expect(original.byteCount == bytes.count)
-        #expect(original.sha256 == RecordingExport.sha256(bytes))
+        #expect(original.sha256 == RecordingOrigin.checksum(bytes))
         #expect(original.format == "MP3")
         #expect(original.sampleRate == 44_100)
         #expect(original.channels == 2)
@@ -121,6 +149,41 @@ struct OriginTests {
         #expect(converted.original.tags["creationDate"] == nil)
     }
 
+    @Test("Bare en troverdig dato fra filen daterer opptaket")
+    func onlyAPlausibleDateDatesTheRow() {
+        let now = date
+        #expect(AudioImport.plausibleDate(now.addingTimeInterval(-3_600), now: now) == now.addingTimeInterval(-3_600))
+        #expect(AudioImport.plausibleDate(Date(timeIntervalSince1970: 0), now: now) == nil)
+        #expect(AudioImport.plausibleDate(now.addingTimeInterval(7 * 86_400), now: now) == nil)
+        #expect(AudioImport.plausibleDate(nil, now: now) == nil)
+    }
+
+    /// An import reaches the recordings folder sealed, and its checksum is the
+    /// checksum of what the vault opens it to: what an export hands over.
+    @Test("En import forsegles før den flyttes inn, med sjekksum for lyden")
+    func importIsSealedFirst() async throws {
+        let converted = try await AudioImport.convert(Self.fixtures.appending(path: "dated-stereo.m4a"))
+        defer { try? FileManager.default.removeItem(at: converted.url) }
+        let sealed = try await AudioStorage.sealImport(converted.url)
+        defer { try? FileManager.default.removeItem(at: sealed.url) }
+
+        #expect(AudioStorage.isSealed(sealed.url.lastPathComponent))
+        #expect(sealed.url.deletingLastPathComponent() == AudioStorage.scratchDirectory)
+        let opened = try RecordingVault.open(try Data(contentsOf: sealed.url))
+        #expect(RecordingOrigin.checksum(opened) == sealed.audioSHA256)
+    }
+
+    private func rtfText(origin: OriginState, audio: (name: String, sha256: String)?) throws -> String {
+        let data = try RecordingExport.rtf(
+            "Teksten.", createdAt: date, duration: 5, title: "Intervju Aall", origin: origin, audio: audio
+        )
+        return try NSAttributedString(
+            data: data,
+            options: [.documentType: NSAttributedString.DocumentType.rtf],
+            documentAttributes: nil
+        ).string
+    }
+
     @Test("RTF-en har navnet, opprinnelsen og sjekksummen for lydfilen")
     func rtfCarriesNameAndChecksums() throws {
         let original = RecordingOrigin.OriginalFile(
@@ -129,22 +192,26 @@ struct OriginTests {
         )
         let origin = RecordingOrigin(
             recordingID: "ABC", source: .imported, createdAt: date, duration: 5,
-            importedAt: date, original: original
+            audioSHA256: audio, importedAt: date, original: original
         )
-        let audio = Data("lyd".utf8)
-        let data = try RecordingExport.rtf(
-            "Teksten.", createdAt: date, duration: 5, title: "Intervju Aall",
-            origin: origin, audio: (name: "frodi-x.m4a", sha256: RecordingExport.sha256(audio))
-        )
-        let text = try NSAttributedString(
-            data: data,
-            options: [.documentType: NSAttributedString.DocumentType.rtf],
-            documentAttributes: nil
-        ).string
+        let text = try rtfText(origin: .verified(origin), audio: (name: "frodi-x.m4a", sha256: audio))
 
         #expect(text.hasPrefix("Intervju Aall\n"))
         #expect(text.contains("Opptak \(date.recordingStamp)."))
         #expect(text.contains("fra Intervju.mp3. Sjekksum for originalen (SHA-256): \(original.sha256)"))
-        #expect(text.contains("Sjekksum for frodi-x.m4a (SHA-256): \(SHA256.hash(data: audio).map { String(format: "%02x", $0) }.joined())"))
+        #expect(text.contains("Sjekksum for frodi-x.m4a (SHA-256): \(audio)"))
+        #expect(!text.contains("kan ikke bekrefte"))
+    }
+
+    @Test("RTF-en sier fra når opplysningene ikke kan bekreftes")
+    func rtfSaysWhenItCannotConfirm() throws {
+        let swapped = try rtfText(
+            origin: .verified(origin(for: "ABC.m4a.enc")),
+            audio: (name: "frodi-x.m4a", sha256: String(repeating: "c", count: 64))
+        )
+        #expect(swapped.contains("Fróði kan ikke bekrefte opplysningene om dette opptaket."))
+
+        let broken = try rtfText(origin: .unverifiable, audio: nil)
+        #expect(broken.contains("Fróði kan ikke bekrefte opplysningene om dette opptaket."))
     }
 }

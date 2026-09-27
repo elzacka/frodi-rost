@@ -147,51 +147,61 @@ final class RecordingController {
         }
     }
 
-    /// Brings audio files in as recordings, one after the other, and returns the
-    /// names of those that could not be read.
+    /// Why an import did not happen: the file is not audio Core Audio can read,
+    /// or something else went wrong on the way, such as iOS not handing over a
+    /// file it holds only in iCloud Drive while the device is offline.
+    enum ImportFailure {
+        case unreadable, other
+    }
+
+    /// Brings audio files in as recordings, one after the other, and returns
+    /// why each one that did not come in failed.
     ///
-    /// The file is moved into the recordings folder and its row inserted and
-    /// saved in one main-actor step, with no suspension between: `reconcile`
-    /// must not meet the file without its row, or it would give it a second one
-    /// dated from the file system.
+    /// Each file is converted and sealed in the scratch folder, then moved into
+    /// the recordings folder with its row inserted and saved in one main-actor
+    /// step, with no suspension between: `reconcile` must not meet the file
+    /// without its row, or it would give it a second one. An import therefore
+    /// never waits unsealed where a recording made here would, and never gets an
+    /// origin that says it was recorded here.
     ///
-    /// Sealing and the text follow the same path as a stopped recording. A file
-    /// over the length limit waits for «Lag tekst», like a long interview.
-    func importAudio(_ urls: [URL]) async -> [String] {
-        guard let container else { return urls.map(\.lastPathComponent) }
+    /// The text follows the same path as a stopped recording. A file over the
+    /// length limit waits for «Lag tekst», like a long interview.
+    func importAudio(_ urls: [URL]) async -> [ImportFailure] {
+        guard let container else { return urls.map { _ in .other } }
         let context = container.mainContext
 
         var imported: [Recording] = []
-        var failed: [String] = []
+        var failed: [ImportFailure] = []
         for url in urls {
             do {
                 let converted = try await AudioImport.convert(url)
-                // Plaintext in the scratch folder: gone at once if the import stops
-                // here, not at the next launch.
+                // Plaintext and ciphertext in the scratch folder: gone at once if
+                // the import stops here, not at the next launch.
                 defer { try? FileManager.default.removeItem(at: converted.url) }
-                let fileName = converted.url.lastPathComponent
+                let sealed = try await AudioStorage.sealImport(converted.url)
+                defer { try? FileManager.default.removeItem(at: sealed.url) }
+
+                let fileName = sealed.url.lastPathComponent
                 let now = Date.now
                 let recording = Recording(
-                    createdAt: converted.original.createdAt ?? now,
+                    createdAt: AudioImport.plausibleDate(converted.original.createdAt, now: now) ?? now,
                     duration: converted.duration,
                     fileName: fileName
                 )
-                // Named after the file, which is how it was known before it came
-                // in. The origin is written before the file moves: an import
-                // without its origin does not happen.
+                // Named after the file, which is how it was known before it came in.
                 try recording.setTitle((converted.original.name as NSString).deletingPathExtension)
                 try recording.recordOrigin(RecordingOrigin(
                     recordingID: RecordingOrigin.recordingID(for: fileName),
                     source: .imported,
                     createdAt: recording.createdAt,
                     duration: converted.duration,
+                    audioSHA256: sealed.audioSHA256,
                     importedAt: now,
                     original: converted.original
                 ))
-                try FileManager.default.moveItem(
-                    at: converted.url,
-                    to: AudioStorage.directory.appendingPathComponent(fileName)
-                )
+                let target = AudioStorage.directory.appendingPathComponent(fileName)
+                try FileManager.default.moveItem(at: sealed.url, to: target)
+                AudioStorage.protectFinished(target)
                 context.insert(recording)
                 try? context.save()
                 imported.append(recording)
@@ -199,7 +209,7 @@ final class RecordingController {
                 // The error, never the file name: a name can say who was interviewed.
                 let code = (error as NSError).code
                 AudioRecorder.log.error("Import failed: \(String(describing: type(of: error)), privacy: .public) \(code, privacy: .public)")
-                failed.append(url.lastPathComponent)
+                failed.append(error is AudioImport.Failure ? .unreadable : .other)
             }
         }
         guard !imported.isEmpty else { return failed }

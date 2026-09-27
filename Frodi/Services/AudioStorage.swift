@@ -157,7 +157,7 @@ enum AudioStorage {
 
         if !FileManager.default.fileExists(atPath: target.path) {
             let audio = fileName.hasSuffix(pendingSuffix)
-                ? try await encodeToAAC(segmentNames(of: fileName))
+                ? try await encodeToAAC(segmentNames(of: fileName).map { directory.appendingPathComponent($0) })
                 : source
             defer { if audio != source { try? FileManager.default.removeItem(at: audio) } }
             try RecordingVault.seal(fileAt: audio).write(to: target, options: [.atomic, .completeFileProtection])
@@ -180,13 +180,13 @@ enum AudioStorage {
     /// without an audio track, which is what an empty CAF has, is passed over;
     /// a recording of nothing but such segments fails to export, as an empty
     /// file did before, and the caller keeps the plaintext.
-    private static func encodeToAAC(_ segmentNames: [String]) async throws -> URL {
+    private static func encodeToAAC(_ segments: [URL]) async throws -> URL {
         let composition = AVMutableComposition()
         guard let track = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             throw CocoaError(.fileWriteUnknown)
         }
-        for name in segmentNames {
-            let asset = AVURLAsset(url: directory.appendingPathComponent(name))
+        for segment in segments {
+            let asset = AVURLAsset(url: segment)
             guard let source = try await asset.loadTracks(withMediaType: .audio).first else { continue }
             try track.insertTimeRange(try await source.load(.timeRange), of: source, at: composition.duration)
         }
@@ -197,6 +197,30 @@ enum AudioStorage {
         try await session.export(to: target, as: .m4a)
         setProtection(.completeUnlessOpen, on: target)
         return target
+    }
+
+    /// Seals an imported file where it lies, in the scratch folder, and returns
+    /// the sealed copy beside it with the checksum of the audio it holds.
+    ///
+    /// An import reaches the recordings folder sealed or not at all. A plain
+    /// file there would be taken for a recording made here, by `reconcile` and
+    /// by the seal, and given an origin that says so. The caller moves the
+    /// sealed copy in and writes its row in one step.
+    @concurrent
+    static func sealImport(_ pcm: URL) async throws -> (url: URL, audioSHA256: String) {
+        let target = scratchDirectory.appendingPathComponent(sealedName(for: pcm.lastPathComponent))
+        let audio = try await encodeToAAC([pcm])
+        defer { try? FileManager.default.removeItem(at: audio) }
+        let plaintext = try Data(contentsOf: audio)
+        try RecordingVault.seal(plaintext).write(to: target, options: [.atomic, .completeFileProtection])
+        return (target, RecordingOrigin.checksum(plaintext))
+    }
+
+    /// The checksum of a recording's audio as an export hands it over: the
+    /// sealed file opened. `@concurrent` for the same reason as the seal.
+    @concurrent
+    static func audioChecksum(fileName: String) async throws -> String {
+        RecordingOrigin.checksum(try plaintext(fileName: fileName))
     }
 
     /// The length of a plaintext recording, read from the files themselves: the

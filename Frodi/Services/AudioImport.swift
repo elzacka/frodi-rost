@@ -104,9 +104,20 @@ enum AudioImport {
                 count += block.count
             }
             byteCount = count
-            sha256 = hasher.finalize().map { String(format: "%02x", $0) }.joined()
+            sha256 = hasher.finalize().hex
         }
     }
+
+    /// The date to file an import under, if the file's own is believable: from
+    /// 2000 up to a day ahead of now, for a clock in another time zone. Some
+    /// recorders write zero, which reads as 1904 or 1970. The origin keeps the
+    /// date the file stated either way.
+    static func plausibleDate(_ date: Date?, now: Date) -> Date? {
+        guard let date, date >= earliest, date <= now.addingTimeInterval(24 * 60 * 60) else { return nil }
+        return date
+    }
+
+    private static let earliest = Date(timeIntervalSince1970: 946_684_800)
 
     /// The codec as a reader knows it.
     private static func name(of format: AudioFormatID) -> String {
