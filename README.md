@@ -29,7 +29,7 @@ Klikk på bildet for å se i full størrelse.
 
 ## Modell
 
-**nb-whisper-small** fra Nasjonalbiblioteket: Tale til tekst. Bygger på OpenAIs Whisper, videretrent på 66 000 timer norsk tale fra Språkbanken og Nasjonalbibliotekets egen samling. Setter tegn og stor forbokstav selv, og skriver dialekt om til bokmål.
+**nb-whisper-small** fra Nasjonalbiblioteket: Tale til tekst. Bygger på OpenAIs Whisper og er videretrent på 66 000 timer norsk tale fra Språkbanken og Nasjonalbibliotekets egen samling. Setter tegn og stor forbokstav selv og skriver dialekt om til bokmål.
 
 Modellen følger med appen og kjører på enheten. Gratis i bruk, ingen kobling til eksterne tjenester.
 

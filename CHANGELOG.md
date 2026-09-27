@@ -182,7 +182,7 @@ Første build.
 - Et opptak kan vare i inntil ti minutter. Nedtellingen står ved siden av
   tidtakeren mens du tar opp
 - Gjør norsk tale om til tekst med nb-whisper fra Nasjonalbiblioteket, som
-  kjører i appen. Modellen setter tegn og store bokstaver selv, og skriver
+  kjører i appen. Modellen setter tegn og store bokstaver selv og skriver
   dialekt om til bokmål
 - Spill av opptaket, med pause, hopp på femten sekunder hver vei og en
   skyveknapp som viser og setter posisjonen

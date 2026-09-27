@@ -50,7 +50,7 @@ Har du tatt opp med en annen app eller en annen opptaker, kan Fróði lage tekst
 av lyden.
 
 1. Trykk på filikonet øverst til venstre.
-2. Velg én eller flere lydfiler, og trykk på «Åpne».
+2. Velg én eller flere lydfiler og trykk på «Åpne».
 
 Fróði leser m4a, mp3, wav, aiff og de andre lydformatene iOS kan lese. Er
 lyden i stereo, tar appen med begge kanalene.
@@ -124,7 +124,7 @@ Omtrent så lang tid tar det:
 ### Slik lages teksten
 
 Modellen nb-whisper-small fra Nasjonalbiblioteket er innebygd i appen og
-kjører på enheten. Den setter tegn og store bokstaver selv, og skriver dialekt
+kjører på enheten. Den setter tegn og store bokstaver selv og skriver dialekt
 om til bokmål.
 
 > **Tips:** Du trenger ikke si «punktum» eller «komma».

@@ -110,7 +110,7 @@ i appen.
 | Rettighet  | Slik&nbsp;gjør&nbsp;du&nbsp;det                                                                                                                           |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Innsyn     | Åpne opptaket i appen                                                                                                                                     |
-| Eksportere | Trykk på delingsikonet, og velg opptaket, teksten eller begge. Lyden kommer som `.m4a`, teksten som `.txt` eller `.rtf`, det du har valgt i Innstillinger |
+| Eksportere | Trykk på delingsikonet og velg opptaket, teksten eller begge. Lyden kommer som `.m4a`, teksten som `.txt` eller `.rtf`, det du har valgt i Innstillinger |
 | Sletting   | Sveip opptaket i listen mot venstre, trykk på «Slett», og på «Slett» igjen når raden spør                                                                 |
 
 > **Viktig:** Sletter du appen, forsvinner alt. Det skjer med én gang, og du
