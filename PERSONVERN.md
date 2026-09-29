@@ -33,11 +33,11 @@ Fróði røst er laget av elzacka (Tazk). Skriv til **hei@tazk.no**.
 | Ordlisten i Innstillinger                    | Samme sted, kryptert      | Til du endrer den                        |
 | Dato, lengde og filnavn for hvert opptak     | Samme sted, ikke kryptert | Til du sletter opptaket                  |
 
-Ingen konto. Ingen bruker-ID. Ingen bruksstatistikk.
+Ingen brukerkonto. Ingen sporing. Ingen bruksstatistikk.
 
-«Om opptaket» er opplysningene Fróði låser når et opptak kommer inn i appen:
-Når det ble tatt opp eller importert, hvor langt det er, og en sjekksum for
-lyden. Filnavnet i tabellen over er appens eget, ikke navnet på filen du
+Under «Om opptaket» ser du opplysningene Fróði låser når et opptak eller en
+lydfil kommer inn i appen: Når lyden ble tatt opp eller importert, hvor lenge
+den varer, og en sjekksum for den. Filnavnet i tabellen over er appens eget, ikke navnet på filen du
 importerte.
 
 Stopper du et opptak mens enheten er låst, krypterer Fróði det når du har låst
@@ -46,18 +46,18 @@ filen låst, og ingen kan lese den.
 
 ## Importerte filer
 
-Du velger selv hvilke filer Fróði får, i filvelgeren til iOS. Appen får bare
+Du velger selv hvilke filer Fróði får, via filvelgeren i iOS. Appen får bare
 de filene du velger, og ber ikke om noen tillatelse. Originalen blir liggende
 der den var. Appen endrer den ikke og sletter den ikke.
 
 Fróði lagrer filnavnet, formatet, størrelsen og opplysningene som stod i
 filen, for eksempel dato og tittel. De står under «Om opptaket». Filnavnet
-lagres slik det er, også når det er et stedsnavn. Oppgir filen hvor den ble tatt opp,
-lagrer Fróði ikke stedet.
+lagres slik det er. Oppgir filen hvor den ble tatt opp (metadata), lagrer ikke
+Fróði stedet.
 
 Ligger filen i iCloud Drive og ikke på enheten, laster iOS den ned før Fróði
-får den. Det er iOS som henter filen, fordi du valgte den. Fróði sender og
-henter ingenting selv.
+får den. Det er iOS som henter filen, fordi du valgte den. Fróði verken
+sender eller henter noe selv.
 
 ## Skjermen
 
@@ -66,8 +66,8 @@ du bytter app, så de ikke vises i appveksleren. Har du gitt et opptak et navn,
 viser appen datoen i stedet. Appen kan ikke hindre at noen tar skjermbilde av
 den.
 
-Mens du tar opp, viser låseskjermen og Dynamic Island at opptaket går, og hvor
-lenge det har vart. Ingenting fra selve opptaket vises der. Alle som har
+Mens du tar opp, viser låseskjermen og Dynamic Island at opptaket pågår, og
+hvor lenge det har vart. Ingenting fra selve opptaket vises der. Alle som har
 enheten i hånden, kan stoppe opptaket der.
 
 ## Kopiering
@@ -82,8 +82,8 @@ eksporterer et opptak.
 
 ## Tillatelser
 
-Mikrofonen og løpende oppdateringer, som viser opptaket på låseskjermen. Det
-er alt.
+Mikrofonen og løpende oppdateringer, som viser på låseskjermen at opptaket
+pågår. Det er alt.
 
 Appen ber ikke om tilgang til talegjenkjenning. En modell inne i appen lager
 teksten. Se [SECURITY.md](SECURITY.md).

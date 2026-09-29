@@ -29,27 +29,31 @@ Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten
 Trykk på opptaksknappen nederst på skjermen. Trykk igjen for å stoppe.
 Tidtakeren til venstre for knappen viser hvor lenge opptaket har vart.
 
-Har du sagt nei til mikrofonen, trykker du på «Åpne Innstillinger» under
-meldingen i appen og slår på Mikrofon der.
+Har du sagt nei til at appen skal få tilgang til mikrofonen, trykker du på
+«Åpne Innstillinger» under meldingen i appen og slår på Mikrofon der.
 
 Opptaket fortsetter når skjermen låser seg og når du bytter app, og det har
 ingen tidsgrense.
 
-Tar en samtale, Siri eller en annen app mikrofonen, setter appen opptaket på
-pause. Opptaket fortsetter av seg selv når mikrofonen er ledig igjen. Får ikke
-appen mikrofonen tilbake, lagrer den det du har tatt opp.
+Tar en samtale, Siri eller en annen app over mikrofonen, setter appen opptaket
+på pause. Opptaket fortsetter av seg selv når mikrofonen er ledig igjen. Får
+ikke appen mikrofonen tilbake, lagrer den det du har tatt opp.
 
 > **Viktig:** Før du tar opp en samtale der andre er til stede, må du si fra
 > at du tar opp, fortelle hva opptaket skal brukes til og få samtykke fra dem.
 
 ## Importere en lydfil
 
-Har du tatt opp med en annen app eller en annen opptaker, kan Fróði lage tekst
-av lyden.
+Fróði kan lage tekst av lydfiler med norsk tale, uansett hvilken app eller
+opptaker de kommer fra:
 
 1. Trykk på «Importer lydfil», ikonet med lydbølger og pluss øverst til
    venstre.
 2. Velg én eller flere lydfiler og trykk på «Åpne».
+
+> **Obs:** Resultatet avhenger av hvor lett det er å høre hva som blir sagt. En
+> podkastepisode gir en mer presis tekst enn for eksempel et YouTube-klipp der
+> flere snakker i munnen på hverandre.
 
 Fróði leser m4a, mp3, wav, aiff og de andre lydformatene iOS kan lese. Er
 lyden i stereo, tar appen med begge kanalene.
@@ -68,7 +72,7 @@ Teksten lages etter samme regel som for opptak du tar i appen. Se
 Kan ikke Fróði lese filen, sier appen fra. Filen kan være skadet eller i et
 format appen ikke kan lese.
 
-> **Tips:** Opptak fra Taleopptak ligger ikke i Filer. Del opptaket fra
+> **Obs:** Opptak fra Taleopptak ligger ikke i Filer. Del opptaket fra
 > Taleopptak til Filer først, så kan du importere det.
 
 ## Handlingsknappen
