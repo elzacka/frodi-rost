@@ -2,7 +2,7 @@
 
 Fróði røst records audio and transcribes it on the device. Nothing is transmitted.
 
-Last reviewed 2026-09-28.
+Last reviewed 2026-09-29.
 
 **Contents**
 
@@ -35,11 +35,12 @@ Include reproduction steps and impact. You will get an acknowledgement within
 
 | Build                       | In&nbsp;scope                                      |
 | --------------------------- | -------------------------------------------------- |
-| The latest TestFlight build | Yes                                                |
+| The latest App Store build  | Yes                                                |
 | Earlier builds              | Only if the finding still reproduces on the latest |
 
-Nothing is on the App Store yet. Every uploaded build is listed in
-[CHANGELOG.md](CHANGELOG.md) with what changed in it.
+Every uploaded build is listed in [CHANGELOG.md](CHANGELOG.md) with what
+changed in it, and the one on the App Store is marked there. The App Store
+serves the app in Norway only.
 
 ## Threat model
 
@@ -285,7 +286,7 @@ with it is transcription quality and bias, not exfiltration.
 | No auto-lock while transcribing | A transcription keeps the screen awake, so the device does not lock itself for as long as it runs: about four minutes for an hour of interview on an iPhone 17 Pro. Locking would suspend the run; what is done is saved, and it goes on when the app is next in front |
 | No certificate pinning         | There is no transport                                                                                                                                                                                                          |
 | No jailbreak detection (MAS-R) | The threat model assumes iOS is not compromised, and a check that a compromised OS can lie to adds nothing. The source is public instead, for audit                                                                            |
-| No forced update               | Checking would need a network request. TestFlight expires builds on its own; an organisation that needs a minimum version enforces it through MDM                                                                              |
+| No forced update               | Checking would need a network request. The App Store installs updates by itself where automatic updates are on; an organisation that needs a minimum version enforces it through MDM                                                                              |
 | No advisory feed               | Dependencies are pinned, so an upstream fix reaches the app only when someone bumps the version. Nothing watches `argmax-oss-swift` or `swift-argument-parser` for advisories; the check is done by hand before a release             |
 | No overwrite on delete         | The file is already ciphertext, with its only key wrapped inside it, so deleted blocks are noise. iOS deletes by discarding the per-file key, and APFS is copy-on-write, so an overwrite would land on different blocks anyway |
 | No trusted timestamp           | Proving to someone else when a recording was made needs a timestamp authority, which is a network request. The origin's date is the device clock's |

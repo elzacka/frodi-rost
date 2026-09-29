@@ -6,7 +6,7 @@ Tar opp lyd på iPhone og gjør den om til norsk tekst. Alt skjer på enheten.
 
 ## Status
 
-Foreløpig i TestFlight, ikke App Store ennå. Bare tilgjengelig i Norge.
+Versjon 1.0 ligger i [App Store](https://apps.apple.com/no/app/fr%C3%B3%C3%B0i-r%C3%B8st/id6811368089). Appen er bare tilgjengelig i Norge.
 
 ## Hva appen gjør
 

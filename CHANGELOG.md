@@ -13,6 +13,7 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 ## 1.0 (9) – 28.09.26
 
+Den første versjonen i App Store, godkjent av Apple 28.09.26.
 Appen er den samme som i build 8.
 
 ## 1.0 (8) – 27.09.26
