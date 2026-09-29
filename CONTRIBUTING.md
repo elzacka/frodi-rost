@@ -47,8 +47,8 @@ senere versjoner, og legges ikke til uten at noen har bedt om det.
 
 ## Designsystem
 
-Tokenene i `Frodi/Theme/Theme.swift` er den eneste kilden til farger,
-skrift, avstand og hjørner. Visningene bruker tokenene, aldri tall direkte.
+Visningene henter farger, skrift, avstand og hjørner fra tokenene i
+`Frodi/Theme/Theme.swift`, aldri fra tall direkte.
 
 - Bare lys modus. Designsystemet har ingen mørk palett
 - Tekst på en aksentflate bruker `-on`-varianten, aldri ren svart eller hvit
@@ -108,8 +108,6 @@ opp, og stopper hvis buildnummeret alt er brukt.
 - Hver ny eller endret tekst i appen er lest gjennom av et menneske.
   `Scripts/string-diff.py <commit for forrige build>` skriver ut listen
 - [CHANGELOG.md](CHANGELOG.md) har en overskrift for builden
-- [TREDJEPART.md](TREDJEPART.md) og lisenslisten i appen er like. En test
-  passer på det
 
 ---
 

@@ -1,6 +1,6 @@
 # Tredjepartslisenser
 
-Oppdatert 26.09.26.
+Oppdatert 29.09.26.
 
 Listen i appen, under Innstillinger > Mer om appen > Lisenser, har de samme
 navnene og lisensene som denne filen. Versjonene under Kode er de som står i
@@ -15,9 +15,7 @@ tre ikke stemmer overens.
 | CoreML-konvertering      | Barrymanalow        | Apache 2.0 | https://huggingface.co/Barrymanalow/nb-whisper-coreml |
 | Tokenizer, whisper-small | OpenAI              | Apache 2.0 | https://huggingface.co/openai/whisper-small           |
 
-Modellen og tokenizeren hentes fra faste versjoner. Versjonene står i
-`Scripts/fetch-model.sh`, og sjekksummen for hver fil i
-`Scripts/model-checksums.txt`.
+Versjonene av modellen og tokenizeren står i `Scripts/fetch-model.sh`.
 
 ## Kode
 
