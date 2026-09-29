@@ -21,12 +21,6 @@ Versjon 1.0 ligger i [App Store](https://apps.apple.com/no/app/fr%C3%B3%C3%B0i-r
 - Låser opplysningene om hvert opptak når det kommer inn i appen, med sjekksum for lyden, og sier fra hvis datoen, lengden eller lyden er endret utenfor appen
 - Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`, hver for seg eller sammen. `.rtf`-filen har sjekksum for lydfilen
 
-## Skjermbilder
-
-Klikk på bildet for å se i full størrelse.
-
-<a href="docs/screenshots.png"><img src="docs/screenshots.png" width="100%" alt="Fem skjermbilder av Fróði røst: Opptakslisten med handlingsknappen, et opptak med tekst delt i avsnitt med tidspunkt, ordlisten i innstillingene, sveip for å lage ny tekst, og eksportvalgene."></a>
-
 ## Modell
 
 **nb-whisper-small** fra Nasjonalbiblioteket: Tale til tekst. Bygger på OpenAIs Whisper og er videretrent på 66 000 timer norsk tale fra Språkbanken og Nasjonalbibliotekets egen samling. Setter tegn og stor forbokstav selv og skriver dialekt om til bokmål.
