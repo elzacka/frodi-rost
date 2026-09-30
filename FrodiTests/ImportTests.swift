@@ -68,7 +68,7 @@ struct ImportTests {
     @Test("Stedet som står i filen, blir ikke lagret")
     func locationIsLeftOut() async throws {
         let converted = try await AudioImport.convert(Self.fixtures.appending(path: "located.m4a"))
-        try removing(converted) { converted in
+        removing(converted) { converted in
             let tags = converted.original.tags
             #expect(tags["title"] == "Testopptak")
             #expect(tags[AVMetadataKey.commonKeyLocation.rawValue] == nil)
