@@ -57,7 +57,7 @@ struct ContrastTests {
     /// One pair is deliberately left out: the record button's change from
     /// accent-record to recording-active is 1.50:1. Colour is not the only signal.
     /// The icon switches from `mic.fill` to `stop.fill`, the timer starts, and the
-    /// VoiceOver label changes. See dev_only/CLAUDE.md.
+    /// VoiceOver label changes. See dev_only/DECISIONS.md.
     @Test("Grafiske element når 3:1", arguments: [
         ("RecordingActive", "Background"),
         ("Surface", "RecordingActive"),
