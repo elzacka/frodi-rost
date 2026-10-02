@@ -63,12 +63,9 @@ struct RecordingDetailView: View {
                 .padding(Space.s4)
             }
         }
-        // A menu on the title, as the system renames things. Not the system's
-        // own `RenameButton`: its field keeps autocorrection and predictive
-        // text on whatever the view says (measured 2026-09-27), and a name
-        // typed there would enter the keyboard's learned dictionary, outside
-        // the sandbox and in backups. The field below has them off, as the
-        // word list has.
+        // A menu on the title, as the system renames things. Not the system's `RenameButton`: its field keeps autocorrection and
+        // predictive text on whatever the view says (measured 2026-09-27), so a typed name would enter the keyboard's learned dictionary,
+        // outside the sandbox and in backups. The field below has them off, as the word list has.
         .navigationTitle(shownTitle)
         .navigationBarTitleDisplayMode(.inline)
         // Offered only while names are shown: the field holds the name.
@@ -247,14 +244,9 @@ struct RecordingDetailView: View {
         )
     }
 
-    /// The text is collapsed when you enter the page.
-    ///
-    /// A ten-minute recording is several screens of text, and then you scroll a
-    /// long way to get back to the player. The word count is in the row, so you
-    /// can see the whole recording came through without opening the text.
-    ///
-    /// Export takes the text from the recording itself and does not care whether
-    /// the row is open or closed.
+    /// The text is collapsed when you enter the page: a ten-minute recording is several screens, a long scroll back to the player.
+    /// The word count in the row shows the whole recording came through. Export takes the text from the recording itself,
+    /// open or closed.
     private var transcriptToggle: some View {
         Button {
             withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) { showsTranscript.toggle() }
@@ -284,13 +276,8 @@ struct RecordingDetailView: View {
     }
 
     /// Copies the whole text, and only to this device.
-    ///
-    /// The text used to be selectable, which gave the system copy menu. That menu
-    /// writes to the general pasteboard with Universal Clipboard on, so a
-    /// transcript would travel to every Mac and iPad on the same Apple account,
-    /// in an app whose premise is that nothing leaves the device. A button of our
-    /// own can say `localOnly`, and give the text a lifetime so it does not sit on
-    /// the pasteboard for the next app to read an hour later.
+    /// The text is not selectable: the system copy menu uses the general pasteboard, so Universal Clipboard sends it to all the user's Macs and iPads.
+    /// Our own button says `localOnly` and sets an expiry, so the text does not sit on the pasteboard for the next app to read.
     private var copyButton: some View {
         Button(copied ? "Kopiert" : "Kopier") {
             UIPasteboard.general.setItems(
@@ -312,12 +299,8 @@ struct RecordingDetailView: View {
         .accessibilityHint("Kopierer hele teksten. Den blir bare på denne enheten.")
     }
 
-    /// The text as paragraphs, each opened by the time it was said at.
-    ///
-    /// The mark is a button: it moves the player there, which is what a mark is
-    /// for. A reader checking a quote against the audio should not have to scrub
-    /// for it. The number is shown, not only spoken, so it serves the sighted
-    /// reader too.
+    /// The text as paragraphs, each opened by the time it was said at. The mark is a button that moves the player there, so a reader
+    /// checking a quote need not scrub. The number is shown, not only spoken, so it serves the sighted reader too.
     private func paragraphs(_ items: [(mark: TimeInterval?, text: String)]) -> some View {
         VStack(alignment: .leading, spacing: Space.s3) {
             ForEach(Array(items.enumerated()), id: \.offset) { _, item in
@@ -385,10 +368,8 @@ struct RecordingDetailView: View {
 
     // MARK: - Origin
 
-    /// What the recording was when it came into the app, as it was locked then.
-    /// Collapsed like the text: it is there for the day someone asks, not for
-    /// every visit. A recording from before origins were kept has no card. A
-    /// doubt is never collapsed.
+    /// What the recording was when it came into the app, as locked then. Collapsed like the text: it is for the day someone asks.
+    /// A recording from before origins were kept has no card. A doubt is never collapsed.
     @ViewBuilder
     private var originCard: some View {
         switch origin {

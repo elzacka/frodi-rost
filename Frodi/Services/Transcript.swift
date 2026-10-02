@@ -7,13 +7,8 @@ struct TranscriptParagraph: Codable, Equatable, Sendable {
     var text: String
 }
 
-/// The text as it is stored and shown: paragraphs, each opened by the time it
-/// starts at, «[12:37] …». An hour of interview is not one block of text; the
-/// marks are what let a reader find the passage in the audio behind a line.
-///
-/// The format is text, not a structure, on purpose. The sealed transcript stays a
-/// string, so nothing about what is stored changed shape, and a transcript made
-/// before the marks existed is one paragraph with no mark, which reads as it did.
+/// The text as stored and shown: paragraphs, each opened by the time it starts at, «[12:37] …», so a reader can find the passage in the audio.
+/// Text, not a structure, on purpose: the sealed transcript stays a string, and one made before the marks existed is one paragraph with no mark.
 enum Transcript {
     /// «[m:ss] text», paragraphs separated by a blank line. A single paragraph
     /// carries no mark; it can only start at the beginning.
@@ -59,18 +54,9 @@ enum Transcript {
     }
 }
 
-/// Where a transcription has got to, kept on disk so it can go on from there.
-///
-/// A recording of an hour takes long enough that the app will be suspended
-/// before it is done, and a transcription that starts over each time never
-/// finishes. So after every piece the paragraphs so far and the position reached
-/// are written here, sealed through the vault like the text itself. The file
-/// lives beside the recording, named by the recording's stem, since the
-/// recording's own name changes when it is sealed.
-///
-/// The file also carries a decision: its existence means the transcription was
-/// asked for. A long recording is not transcribed until the user says so, and
-/// `begin` is how that is remembered across a launch.
+/// Transcription progress on disk, to resume: an hour-long recording outlasts the time before suspension, and a restart never finishes.
+/// Written sealed through the vault after each piece, named by the recording's stem (its own name changes when sealed).
+/// Existence means the user asked for it (long recordings wait); `begin` keeps that across launches.
 struct TranscriptProgress: Codable, Sendable {
     var position: TimeInterval = 0
     var paragraphs: [TranscriptParagraph] = []

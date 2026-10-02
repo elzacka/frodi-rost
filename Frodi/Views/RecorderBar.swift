@@ -9,11 +9,9 @@ struct RecorderBar: View {
 
     var body: some View {
         VStack(spacing: Space.s3) {
-            // The numbers sit beside the button, not above it. Above the button the bar
-            // grew so tall that the list of recordings disappeared behind it.
-            //
-            // Both sides take the same space, so the button stays centred no matter how
-            // wide the numbers are.
+            // The numbers sit beside the button: above it the bar grew so tall that the list of recordings disappeared
+            // behind it.
+            // Both sides take the same space, so the button stays centred however wide the numbers are.
             HStack(spacing: Space.s4) {
                 timer
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -116,11 +114,8 @@ struct RecorderBar: View {
         recorder.state == .denied ? Color.Frodi.border : Color.Frodi.accentRecord
     }
 
-    /// Denied access gives an outlined button, not a filled grey one.
-    ///
-    /// The fill was the border colour. Once border became dark enough to be a
-    /// visible edge, the filled button was darker than the live one and read as
-    /// switched on. An outline says «nothing here» without shouting.
+    /// Denied access gives an outlined button, not a filled grey one: with the border colour dark enough to be a
+    /// visible edge, a filled one read as switched on. An outline says «nothing here» without shouting.
     private var innerColor: Color {
         switch recorder.state {
         case .recording: Color.Frodi.recordingActive

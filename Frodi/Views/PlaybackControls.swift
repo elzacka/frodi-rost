@@ -36,10 +36,8 @@ struct PlaybackControls: View {
             RoundedRectangle(cornerRadius: Radius.card)
                 .strokeBorder(Color.Frodi.border, lineWidth: 1)
         )
-        // Not while a recording runs: readying the player sets the session to
-        // playback, which has no input, and the microphone would go out from
-        // under the recorder. The page opens with the controls disabled, and
-        // the player is readied when the recording stops.
+        // Not while a recording runs: readying the player sets the session to playback, which has no input, and the microphone would go out
+        // from under the recorder. The page opens with the controls disabled; the player is readied when the recording stops.
         .task(id: controller.isRecording) {
             guard !controller.isRecording else { return }
             await player.prepare(recording)
@@ -125,9 +123,7 @@ struct PlaybackControls: View {
         .accessibilityAddTraits(.isButton)
     }
 
-    /// The arrow says the direction, the number inside it says how far.
-    ///
-    /// The number is part of the glyph, so `skipSeconds` and the icons are held
+    /// The arrow says the direction, the number inside it how far. The number is part of the glyph, so `skipSeconds` and the icons are held
     /// together by `IconTests`, not by the layout: change one, change the other.
     private func skipButton(_ offset: TimeInterval, icon: Icon, label: String) -> some View {
         Button {

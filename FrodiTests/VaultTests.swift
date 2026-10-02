@@ -64,10 +64,8 @@ struct VaultTests {
     }
 }
 
-/// A recording is plaintext from the moment it is stopped until it is sealed.
-/// Sealing renames it, removes the plaintext and leaves a file that can only be
-/// read through the vault. Nothing here may delete a recording: if sealing
-/// fails, the plaintext stays and is retried.
+/// A recording is plaintext from stop until sealed; sealing renames it, removes the plaintext, leaves a file readable only through the vault.
+/// Nothing here may delete a recording: if sealing fails, the plaintext stays and is retried.
 @Suite("Forsegling av opptak")
 struct FileSealingTests {
     private func plaintextRecording(_ contents: Data) throws -> String {
@@ -101,8 +99,7 @@ struct FileSealingTests {
 
     /// The finished file is class A: unreadable while the device is locked.
     ///
-    /// Device only. The simulator has no data protection and answers `nil` for the
-    /// attribute, so there the test would fail without meaning anything.
+    /// Device only: the simulator has no data protection and answers `nil`, so the test would fail meaninglessly.
     @Test("Et forseglet opptak kan ikke leses mens enheten er låst", .enabled(if: !isSimulator))
     func sealedFileIsCompletelyProtected() async throws {
         let name = try plaintextRecording(Data("innhold".utf8))

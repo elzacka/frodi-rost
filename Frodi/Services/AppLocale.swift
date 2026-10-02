@@ -1,11 +1,8 @@
 import Foundation
 
 /// Fróði transcribes Norwegian Bokmål and nothing else.
-///
-/// The language is deliberately hardcoded, not taken from `Locale.current`. If the
-/// device is set to English, the app must still produce Norwegian Bokmål.
-///
-/// `nb` is Bokmål. `nn` is Nynorsk and must never be used here.
+/// Deliberately hardcoded, not `Locale.current`: with the device in English the app must still produce Bokmål.
+/// `nb` is Bokmål; `nn` is Nynorsk and must never be used here.
 enum AppLocale {
     static let norwegian = Locale(identifier: "nb-NO")
 

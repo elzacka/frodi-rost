@@ -15,10 +15,9 @@ struct IsolationTests {
         #expect(ats == nil, "NSAppTransportSecurity er lagt inn – appen skal ikke snakke med nett i det hele tatt")
     }
 
-    /// No networking API in the app's own sources, the widget extension's
-    /// included. The plist tests above guard the configuration; this one guards
-    /// the code. It reads the source tree from the path the test was compiled
-    /// at, which is on the same Mac the simulator runs on.
+    /// No networking API in the app's own sources, the widget extension's included; the plist tests guard
+    /// configuration, this guards code. It reads the source tree from the path the test was compiled at (same Mac as
+    /// the simulator).
     @Test("Ingen nettverkskode i appens kildekode")
     func noNetworkingInSources() throws {
         let root = URL(filePath: #filePath)
@@ -41,10 +40,8 @@ struct IsolationTests {
         #expect(checked > 10, "Fant bare \(checked) kildefiler; stien til kildekoden er feil")
     }
 
-    /// The one extension is the widget one, for the control and the Live
-    /// Activity. It runs in its own process, so it carries its own manifest:
-    /// no collection, no accessed API, no ATS exception. Anything else next to
-    /// it in PlugIns is a surface nobody reviewed.
+    /// The one extension is the widget one (control, Live Activity). It runs in its own process, so it carries its own
+    /// manifest: no collection, no accessed API, no ATS exception. Anything else in PlugIns is an unreviewed surface.
     @Test("Den ene utvidelsen er widget-utvidelsen, og den samler ingenting")
     func theOnlyExtensionIsTheWidget() throws {
         let plugIns = try #require(Bundle.main.builtInPlugInsURL)
@@ -89,10 +86,9 @@ struct IsolationTests {
         }
     }
 
-    /// `audio` is the only background mode the app should have: a recording
-    /// goes on after the screen locks, and nothing else runs without the app in
-    /// front. Any other mode would open the door to work that can reach the
-    /// network, and a background task would need the key on a locked device.
+    /// `audio` is the only background mode: a recording goes on after the screen locks, nothing else runs without the
+    /// app in front. Any other mode could reach the network, and a background task would need the key on a locked
+    /// device.
     @Test("Bare lyd kjører i bakgrunnen")
     func onlyAudioRunsInBackground() {
         let modes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") as? [String] ?? []
@@ -100,10 +96,9 @@ struct IsolationTests {
         #expect(Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") == nil)
     }
 
-    /// Memory tagging and the other runtime protections are entitlements, and
-    /// an entitlement dropped from project.yml fails nothing: the app just runs
-    /// without it. The signed executable carries them as a plist, in its
-    /// signature on a device and in a section of its own on the simulator.
+    /// Memory tagging and the other runtime protections are entitlements, and one dropped from project.yml fails
+    /// nothing. The signed executable carries them as a plist: in its signature on a device, in a section of its own on
+    /// the simulator.
     @Test("Enhanced Security er med i signaturen, uten soft mode")
     func enhancedSecurityIsSigned() throws {
         let executable = try #require(Bundle.main.executableURL)
@@ -137,10 +132,9 @@ struct IsolationTests {
         #expect((plist["NSPrivacyTrackingDomains"] as? [Any])?.isEmpty == true)
     }
 
-    /// The required-reason APIs the app uses, and no others. Apple rejects an
-    /// upload that uses one without declaring it, and nothing before the upload
-    /// says so. File timestamps for `AudioStorage.creationDate`, user defaults
-    /// for the export format and the word list field's height.
+    /// The required-reason APIs the app uses, and no others: Apple rejects an upload using one undeclared, and nothing
+    /// earlier says so. File timestamps for `AudioStorage.creationDate`; user defaults for the export format and the
+    /// word list field's height.
     @Test("Personvernmanifestet erklærer akkurat de API-ene appen bruker")
     func privacyManifestDeclaresTheAccessedAPIs() throws {
         let url = try #require(Bundle.main.url(forResource: "PrivacyInfo", withExtension: "xcprivacy"))

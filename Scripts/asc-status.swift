@@ -1,14 +1,8 @@
 #!/usr/bin/env swift
 
-// Prints what App Store Connect actually holds for Fróði røst, so the
-// live version is never guessed from the repo. Run before touching
-// MARKETING_VERSION or CURRENT_PROJECT_VERSION.
-//
-//   swift Scripts/asc-status.swift
-//
-// Credentials, both outside the repo:
-//   ~/.appstoreconnect/private_keys/AuthKey_<KEYID>.p8   (key id read from the filename)
-//   ~/.appstoreconnect/issuer_id                          (or the ASC_ISSUER_ID environment variable)
+// Prints what App Store Connect holds for Fróði røst, so the live version is not guessed. Run before touching
+// MARKETING_VERSION or CURRENT_PROJECT_VERSION: `swift Scripts/asc-status.swift`. Credentials, both outside the repo:
+// ~/.appstoreconnect/private_keys/AuthKey_<KEYID>.p8 (key id from filename), ~/.appstoreconnect/issuer_id or ASC_ISSUER_ID.
 
 import CryptoKit
 import Foundation

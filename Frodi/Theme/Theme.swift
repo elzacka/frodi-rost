@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// The design system in code. The values here are the only ones to use: no
-/// custom colours, spacings or radii out in the views.
+/// The design system in code: the only source of colours, spacings and radii; no custom values in views.
 ///
 /// Source: dev_only/designsystem/frodi-designsystem.html
 
@@ -21,11 +20,8 @@ extension Color {
         /// A recording is in progress.
         static let recordingActive = Color("RecordingActive")
 
-        // Two text colours, and no third. Running text is `textPrimary`
-        // (16,25:1 on Surface); the text that accompanies it, labels and
-        // status lines, is `textSecondary` (5,65:1). No opacity blend: a
-        // blend is a third tone in everything but name, and `ContrastTests`
-        // measures the step between the two.
+        // Two text colours, no third. Running text is `textPrimary` (16,25:1 on Surface); labels and status lines are
+        // `textSecondary` (5,65:1). No opacity blend: it is a third tone in all but name; `ContrastTests` measures the step.
 
         // accent-knowledge (#2E9C82) is reserved for the knowledge feature and is
         // therefore not here yet. Add it when that feature is built.
@@ -39,9 +35,7 @@ extension Font {
         static let display = custom("Skranji-Bold", size: 26, relativeTo: .largeTitle)
         /// Inter 600. Screen titles.
         ///
-        /// Skranji is a display face and is kept to the logo. Titles such as «Ingen
-        /// opptak ennå» must be readable quickly, also with large text and in a car,
-        /// and WCAG 2.2 AA applies.
+        /// Skranji is kept to the logo: «Ingen opptak ennå» must read fast at large text and in a car (WCAG 2.2 AA).
         static let title = custom("Inter-SemiBold", size: 20, relativeTo: .title2)
         /// Inter 500, tracked. Small labels above a section.
         static let eyebrow = custom("Inter-Medium", size: 11, relativeTo: .caption2)
@@ -82,10 +76,8 @@ enum RecordButton {
 }
 
 // MARK: - Live Activity
-/// The recording on the Lock Screen and in the Dynamic Island. The design
-/// system describes neither; the measures are the recorder bar's, so the two
-/// surfaces say the same thing: the timer in `timer`, the stop button the size
-/// of the record button's inner circle.
+/// Lock Screen and Dynamic Island recording. Measures are the recorder bar's (timer in `timer`, stop button = record button's
+/// inner circle) so both surfaces match; the design system describes neither.
 enum LiveActivity {
     static let stop: CGFloat = RecordButton.inner
     static let stopIcon: CGFloat = RecordButton.icon
@@ -94,9 +86,7 @@ enum LiveActivity {
 }
 
 // MARK: - Header button
-/// The info button at the right of the logo header. The design system gives no
-/// measure, so the icon is the size of the one in the system navigation bar, and
-/// the hit area is set to the 44 pt minimum.
+/// Info button right of the logo header. No design-system measure: icon size as in the system navigation bar, hit area 44 pt minimum.
 enum HeaderButton {
     /// The glyph fills 75 × 67 % of the frame: 21 × 18,7 pt.
     static let icon: CGFloat = 28
@@ -104,16 +94,8 @@ enum HeaderButton {
 }
 
 // MARK: - Icons
-/// Icon sizes, in points.
-///
-/// Material Symbols are drawn on a 24 × 24 grid and scaled to these. The measures live
-/// here for the same reason as the rest of the design system: a number at the
-/// call site never gets changed along with the others.
-///
-/// The numbers are frames, not glyphs. Material leaves generous padding inside
-/// its grid, so each frame was set to give the same visible glyph as the SF
-/// Symbol the design was drawn with: a chevron 7 × 12 pt, a close cross 15 pt,
-/// and so on. The measurements are in the design file under Ikoner.
+/// Icon sizes in points: frames, not glyphs, for Material Symbols (24 × 24 grid). Material pads its grid, so each frame gives
+/// the visible glyph of the SF Symbol drawn in the design (chevron 7 × 12 pt, close cross 15 pt); see design file, Ikoner.
 enum IconSize {
     /// Chevrons in rows and cards, in line with the caption beside them.
     static let inline: CGFloat = 24
@@ -128,23 +110,14 @@ enum IconSize {
 }
 
 // MARK: - Icon badge
-/// The small disc that adds a meaning to an icon: the «add» on the import
-/// button's waveform. Measured as fractions of the icon's frame, so it follows
-/// the icon if the frame changes.
-///
-/// The disc is the record button in small: AccentRecord with the glyph in
-/// AccentRecordOn, since importing is the other way a recording is made. Both
-/// pairs are in `ContrastTests`: 3,25:1 against the background, 4,59:1 for the
-/// glyph on the disc.
+/// Small disc adding a meaning to an icon (the «add» on the import waveform), sized as fractions of the icon's frame.
+/// AccentRecord disc, glyph in AccentRecordOn (import is the other way to record); `ContrastTests`: 3,25:1 vs background, 4,59:1 glyph.
 enum IconBadge {
     /// 10,5 pt on the 28 pt header icon. The glyph gets the same frame, and
     /// Material's `add` fills 58 % of it: a 6 pt plus.
     static let diameter: CGFloat = 0.375
-    /// The gap cut out of the icon around the disc, in points. It takes a round
-    /// bite out of the waveform's fourth bar, deliberately: with the disc
-    /// clear of the bars it floated beside the icon instead of belonging to it,
-    /// and closer in it clipped a corner that read as a flaw. Rendered side by
-    /// side on 2026-09-27.
+    /// Gap cut out of the icon around the disc, in points. The round bite out of the fourth bar is deliberate: clear of the bars the
+    /// disc floated beside the icon, closer it clipped a corner that read as a flaw.
     static let gap: CGFloat = 1.5
     /// The disc's centre: (790, 830) on Material's 960 grid, in the corner the
     /// waveform leaves empty under its last bar.
@@ -152,9 +125,7 @@ enum IconBadge {
 }
 
 // MARK: - Playback controls
-/// The design system describes no player. The measures are derived: the play
-/// button has the same diameter as the inner circle of the record button, and the
-/// skip buttons are 44 pt, the minimum hit area.
+/// No player in the design system; measures derived: play = record button's inner circle, skip buttons 44 pt (minimum hit area).
 enum PlayerControl {
     static let play: CGFloat = 56
     static let playIcon: CGFloat = 30
@@ -177,9 +148,7 @@ enum ChoiceRow {
 }
 
 // MARK: - Word list field
-/// The design system describes no resizable field. The one in the Ordliste card
-/// has a grip in its lower right corner that drags it taller or shorter, so a
-/// long list is read in a tall field and a short one does not hold the page.
+/// No resizable field in the design system. The Ordliste field has a lower-right grip that drags it taller or shorter, so a long list reads in a tall field and a short one does not hold the page.
 enum WordListField {
     /// Three lines of body text with the insets. Where the field starts, and
     /// the least the grip allows.

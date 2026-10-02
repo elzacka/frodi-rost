@@ -1,21 +1,8 @@
 import SwiftUI
 
-/// Hides content while the screen is being recorded or mirrored.
-///
-/// iOS offers no way to prevent a screenshot. `userDidTakeScreenshot` arrives
-/// only after the picture is taken, and the trick with a hidden
-/// `isSecureTextEntry` field is undocumented and can stop working without
-/// notice. So we do not pretend to stop screenshots.
-///
-/// Screen recording and mirroring are different: `isCaptured` is a supported
-/// API, and it lasts over time. While it is on, a recording running in the
-/// background can capture the text without you thinking about it. So we hide
-/// it instead.
-///
-/// The app switcher is the third case. When the app leaves the foreground, iOS
-/// photographs the screen for the switcher and keeps the picture in the app's
-/// container, where nothing of ours encrypts it. So the text is also hidden
-/// whenever the scene is not active, which is before that picture is taken.
+/// Hides content while the screen is recorded or mirrored (`isCaptured`), and whenever the scene is not active.
+/// Screenshots cannot be stopped: `userDidTakeScreenshot` fires after the picture, the `isSecureTextEntry` trick is undocumented.
+/// Inactive: iOS stores the app-switcher picture in the container, unencrypted by us, so hide before it is taken.
 struct CaptureGuard: ViewModifier {
     @Environment(\.concealment) private var concealment
 
@@ -74,12 +61,8 @@ struct ConcealmentReader: ViewModifier {
             }
     }
 
-    /// The screen the app is actually shown on.
-    ///
-    /// `UIScreen.main` is deprecated in iOS 26 because an app can be shown on
-    /// several screens. So we take the screen from the scene the app is in. If
-    /// there is no scene, the app is not visible, and then there is nothing to
-    /// hide.
+    /// The screen the app is shown on. `UIScreen.main` is deprecated in iOS 26 (several screens), so take it from the
+    /// app's scene; no scene means the app is not visible and there is nothing to hide.
     @MainActor
     private static var screenIsCaptured: Bool {
         let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }

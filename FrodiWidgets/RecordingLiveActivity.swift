@@ -3,12 +3,8 @@ import AppIntents
 import SwiftUI
 import WidgetKit
 
-/// A running recording on the Lock Screen and in the Dynamic Island.
-///
-/// Designed for the car: the device lies on the pad and is read at a glance,
-/// so the banner is the recorder bar's recording state and nothing else. The
-/// eyebrow says what is happening, the timer how long, and the one button
-/// stops. The stop button runs the same intent as the control, in the app.
+/// A running recording on the Lock Screen and in the Dynamic Island, designed for the car: read at a glance, so only the recorder bar's
+/// recording state. Eyebrow says what, timer how long, one button stops (the same intent as the control, in the app).
 struct RecordingLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: RecordingAttributes.self) { context in

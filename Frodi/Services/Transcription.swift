@@ -2,41 +2,29 @@ import Foundation
 import SwiftData
 import UIKit
 
-/// One place that turns recordings into text, so the interface and the Action
-/// Button handle errors the same way.
-///
-/// The engine is nb-whisper, bundled and run by WhisperKit, so everything
-/// happens inside the app's own container. There is no other engine.
+/// One place that turns recordings into text, so the interface and the Action Button handle errors the same way.
+/// The engine is bundled nb-whisper via WhisperKit, all inside the app's container; there is no other engine.
 enum Transcription {
     /// Kept alive between recordings. The model takes several seconds to load.
     @MainActor
     private static let whisper = WhisperTranscriber()
 
-    /// Up to this length a recording is transcribed as soon as it is stopped. A
-    /// longer one waits until the user asks: an hour of interview is minutes at
-    /// full load, and the next interview needs that battery. The app decides by
-    /// length; the user decides when. `TranscriptProgress.begin` is how the asking
-    /// is remembered.
+    /// Up to this length a recording is transcribed when stopped; a longer one waits until the user asks (an hour of
+    /// interview is minutes at full load, and the next interview needs that battery). `TranscriptProgress.begin` remembers the asking.
     static let immediateLimit: TimeInterval = 10 * 60
 
     /// The same number as BRUKERVEILEDNING.md states it; `DocumentTests` holds
     /// the two together.
     static var immediateMinutes: Int { Int(immediateLimit / 60) }
 
-    /// Recordings being worked on right now.
-    ///
-    /// Launch and unlock each start a pass over the pending recordings, and the
-    /// list starts its own at launch. Whichever reaches a recording first does the
-    /// work; the others skip it. The flag on the recording cannot serve here: it is
-    /// saved to disk and would be stale after a crash.
+    /// Recordings being worked on right now. Launch, unlock and the list each start a pass; whichever reaches a
+    /// recording first does it, the others skip. The flag on the recording cannot serve: it is saved to disk, stale after a crash.
     @MainActor
     private static var inFlight: Set<PersistentIdentifier> = []
 
-    /// One transcription at a time. The passes at launch, unlock and activation
-    /// can reach different recordings at once; two runs would each find no model
-    /// and load it, about a gigabyte apiece, and clear each other's word list.
-    /// The turn is taken before the plaintext copy is written, so a run that
-    /// waits holds no copy it may be unable to reopen once the device locks.
+    /// One transcription at a time: passes at launch, unlock and activation can overlap, and two runs would each load the model
+    /// (about 1 GB apiece) and clear each other's word list. The turn is taken before the plaintext copy is written,
+    /// so a waiting run holds no copy it may be unable to reopen once the device locks.
     @MainActor
     private static var running = false
     @MainActor
@@ -53,19 +41,9 @@ enum Transcription {
         if waiting.isEmpty { running = false } else { waiting.removeFirst().resume() }
     }
 
-    /// Seals the recording, and transcribes it if it is short, was asked for, or
-    /// `requested` says so now.
-    ///
-    /// The transcription goes piece by piece and writes its progress after each,
-    /// so a run cut short by a suspension, a crash or a new recording goes on from
-    /// where it was. It stops by itself when a recording starts: the microphone
-    /// must not compete with the model for the device.
-    ///
-    /// Nothing here can succeed on a locked device: the plaintext to seal is
-    /// closed `.completeUnlessOpen`, the sealed audio is `.complete`, and the key
-    /// is `WhenUnlocked`. A stop from the Action Button on a locked device reaches
-    /// this through `stopAndSave`; the work waits for the unlock pass, and nothing
-    /// is marked failed, because nothing has.
+    /// Seals the recording, and transcribes it if short, asked for, or `requested`.
+    /// Writes progress after each piece so an interrupted run resumes; stops itself when a recording starts (mic vs model).
+    /// Locked device: plaintext `.completeUnlessOpen`, audio `.complete`, key `WhenUnlocked`, so work waits for unlock and nothing is marked failed.
     @MainActor
     static func run(for recording: Recording, context: ModelContext, requested: Bool = false) async {
         guard UIApplication.shared.isProtectedDataAvailable else { return }
@@ -170,13 +148,9 @@ enum Transcription {
         try? context.save()
     }
 
-    /// Everything that is waiting: plaintext to seal, short recordings without
-    /// text, and long ones the user has asked for. Called at launch, on unlock,
-    /// and after a recording stops, which is when a paused transcription can go on.
-    ///
-    /// A recording the model already found no speech in is left alone. The same
-    /// audio gives the same answer, and a whisper run per silent recording at
-    /// every launch adds up. «Prøv på nytt» behind the row still works.
+    /// Everything waiting: plaintext to seal, short recordings without text, long ones the user asked for.
+    /// Called at launch, on unlock, after a recording stops. Skips a recording the model found no speech in: same audio, same
+    /// answer, and a run per silent one at every launch adds up. «Prøv på nytt» still works.
     @MainActor
     static func runPending(context: ModelContext) async {
         let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
@@ -202,8 +176,7 @@ enum Transcription {
 }
 
 /// What the interface can see of a transcription in progress.
-///
-/// While one runs, the screen is kept awake, so a device left on the table
+/// The screen is kept awake while one runs, so a device left on the table
 /// keeps working: about four minutes for an hour of interview.
 @MainActor
 @Observable

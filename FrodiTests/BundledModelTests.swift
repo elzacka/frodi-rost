@@ -2,12 +2,9 @@ import Foundation
 import Testing
 @testable import Frodi
 
-/// The model sits as a folder reference. Flatten it and the two config.json
-/// files collide, and WhisperKit cannot find the tokenizer. These tests catch
-/// exactly that regression.
-///
-/// The model is the app's only engine, so a build without it is a broken build:
-/// the suite fails rather than skips. `Scripts/fetch-model.sh` is the fix.
+/// The model sits as a folder reference. Flatten it and the two config.json files collide, and WhisperKit cannot find
+/// the tokenizer. The model is the app's only engine, so a build without it is broken: the suite fails rather than
+/// skips (`Scripts/fetch-model.sh`).
 @Suite("Modell i pakken")
 struct BundledModelTests {
     @Test("Modell og tokenizer peker begge et sted")

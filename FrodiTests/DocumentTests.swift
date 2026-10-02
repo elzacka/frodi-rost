@@ -2,10 +2,8 @@ import Foundation
 import Testing
 @testable import Frodi
 
-/// The published documents and the app make the same claims. Each claim used
-/// to be written in two places with nothing binding them, which is how copies
-/// drift. These tests read the documents from the repository, so they run on
-/// the Mac the simulator runs on, like `IsolationTests`.
+/// The published documents and the app make the same claims; these tests bind them (copies otherwise drift).
+/// They read the documents from the repository, so they run on the Mac the simulator runs on, like `IsolationTests`.
 @MainActor
 @Suite("Dokumentene og appen sier det samme")
 struct DocumentTests {

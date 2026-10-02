@@ -2,20 +2,9 @@ import Foundation
 import Testing
 @testable import Frodi
 
-/// Runs the bundled model over a real file, piece by piece. Needs the model in
-/// the build and a fixture on disk, so it is a tool as much as a test:
-///
-/// ```bash
-/// say -v Nora -f tekst.txt -o tekst.aiff
-/// afconvert -f m4af -d aac@16000 -c 1 tekst.aiff tekst.m4a
-/// TEST_RUNNER_FRODI_FIXTURE=/full/path/tekst.m4a xcodebuild ... \
-///   -only-testing:FrodiTests/PiecewiseTranscriptionTests test
-/// ```
-///
-/// Prints the pieces, the words and the peak memory, so a change to the piece
-/// length or the seam can be measured rather than guessed at. The resume
-/// test needs a fixture longer than one piece, `pieceLength`. With
-/// `FRODI_WORDS` set, that text is the word list for the whole-file run.
+/// Runs the bundled model piece by piece over a real file (`FRODI_FIXTURE`); prints pieces, words, peak memory.
+/// Resume test needs a fixture longer than `pieceLength`. `FRODI_WORDS`: word list for the whole-file run.
+/// Fixture and run command: README, *Verktøy og målinger*.
 @Suite("Transkribering i stykker", .serialized)
 struct PiecewiseTranscriptionTests {
     private static var fixture: URL? {
@@ -44,10 +33,7 @@ struct PiecewiseTranscriptionTests {
     }
 
     /// The whole file, in pieces that end where the file ends, with the memory it took.
-    ///
-    /// With `FRODI_WORDS` set, that text is the word list for the run, and the
-    /// output says which of its entries came through. That is the check that
-    /// the prompt reaches this model at all.
+    /// With `FRODI_WORDS` set, that text is the word list and the output says which entries came through: proves the prompt reaches this model.
     @MainActor
     @Test("Hele filen kommer gjennom, stykke for stykke", .enabled(if: enabled))
     func wholeFile() async throws {

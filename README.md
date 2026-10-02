@@ -63,6 +63,12 @@ automatisk signering. Fra terminalen trenger `xcodebuild` flagget
 
 > **Viktig:** nb-whisper-small ligger ikke i git-repoet. Modellen er appens eneste talemotor, så bygget stopper med en feilmelding hvis den mangler. `fetch-model.sh` henter den og stopper hvis en fil ikke stemmer med `Scripts/model-checksums.txt`.
 
+Ny modellversjon: Endre `MODEL_REVISION` eller `TOKENIZER_REVISION` i `Scripts/fetch-model.sh`, tøm `Frodi/Resources/Model` og kjør skriptet. Det henter filene og stopper fordi sjekksummene ikke stemmer. Gå gjennom de nye filene og lag sjekksumlisten på nytt:
+
+```bash
+(cd Frodi/Resources/Model && find . -type f | sort | xargs shasum -a 256) > Scripts/model-checksums.txt
+```
+
 ## Test
 
 Appen har sin egen simulator, `Frodi-Test`. Start den først, og vent til den er klar.
@@ -82,7 +88,39 @@ xcodebuild -project Frodi.xcodeproj -scheme Frodi \
 
 Uten `-collect-test-diagnostics never` venter xcodebuild ti minutter på en diagnoserapport som aldri kommer, etter at testene er ferdige. Med det tar kjøringen under ett minutt.
 
-Talemotoren kan måles mot en lydfil på over tre minutter, med og uten ordliste. Se toppen av `FrodiTests/PiecewiseTranscriptionTests.swift`.
+### Verktøy og målinger
+
+Disse testene kjører bare når en miljøvariabel er satt. `xcodebuild` sender bare variabler med prefikset `TEST_RUNNER_` videre, og testen ser dem uten prefikset.
+
+Mål talemotoren mot en lydfil på over tre minutter, med og uten ordliste (`FRODI_WORDS`):
+
+```bash
+say -v Nora -f tekst.txt -o tekst.aiff
+afconvert -f m4af -d aac@16000 -c 1 tekst.aiff tekst.m4a
+TEST_RUNNER_FRODI_FIXTURE=/full/sti/tekst.m4a xcodebuild -project Frodi.xcodeproj -scheme Frodi \
+  -destination 'platform=iOS Simulator,name=Frodi-Test' \
+  -only-testing:FrodiTests/PiecewiseTranscriptionTests test
+```
+
+`ScratchPlaybackShot` og `ScratchChoiceShot` tar skjermbilder. `ScratchControlPress` trykker på appens kontroll i Kontrollsenter, og loggen viser hvilken prosess som utførte handlingen. For skjermbildene bytter du ut testnavnet og hopper over `log show`:
+
+```bash
+TEST_RUNNER_FRODI_SHOTS=1 xcodebuild -project Frodi.xcodeproj -scheme Frodi \
+  -destination 'platform=iOS Simulator,name=Frodi-Test' \
+  -collect-test-diagnostics never \
+  -only-testing:FrodiUITests/ScratchControlPress test
+xcrun simctl spawn Frodi-Test log show --last 3m \
+  --predicate 'subsystem == "com.Tazk.Frodi" OR (process == "chronod" AND eventMessage CONTAINS "control action")'
+```
+
+Drep appen midt i et opptak og se om filen som blir igjen, kan åpnes. Testen etterlater med vilje en opptaksfil uten rad i databasen:
+
+```bash
+TEST_RUNNER_FRODI_KILL=1 xcodebuild -project Frodi.xcodeproj -scheme Frodi \
+  -destination 'platform=iOS Simulator,name=Frodi-Test' \
+  -only-testing:FrodiUITests/ScratchKillMidRecording test
+afinfo "$(xcrun simctl get_app_container booted com.Tazk.Frodi data)"/Documents/Opptak/*.caf
+```
 
 ## Arkitektur
 

@@ -4,36 +4,16 @@ import Security
 import os
 
 /// Encrypts recordings with a key that never leaves this device.
-///
-/// Why this on top of iOS' own file protection: Apple describes
-/// `isExcludedFromBackup` as guidance to the system, not a guarantee. If a copy
-/// gets out anyway, it is unreadable without the key, and the key exists only
-/// inside the Secure Enclave on this device.
-///
-/// Structure:
-/// - A P-256 key is created in the Secure Enclave and never leaves it.
-/// - Every recording gets its own random AES-256 key.
-/// - The audio is sealed with AES-GCM, and the AES key is wrapped by the Enclave key.
-///
-/// The price is that recordings cannot be read by another device. That is what
-/// export is for: see `RecordingExport`.
+/// On top of iOS file protection, as `isExcludedFromBackup` is only guidance: a leaked copy is unreadable without the Enclave key.
+/// A P-256 Secure Enclave key wraps a random AES-256 key per recording (AES-GCM seal). Other devices cannot read recordings: see `RecordingExport`.
 enum RecordingVault {
-    // The prefix is `no.` while the bundle ID is `com.Tazk.Frodi`. That is not a
-    // mistake to fix: the tag is the address of the key in the Secure Enclave, not
-    // an identifier iOS cares about. Change it and the app cannot find the key
-    // again, and every recording already sealed on the device becomes unreadable.
-    // It is private and shown nowhere.
+    // The prefix is `no.` while the bundle ID is `com.Tazk.Frodi`: not a mistake. The tag is the key's address in the Secure Enclave;
+    // change it and the app cannot find the key, and every sealed recording becomes unreadable.
     private static let keyTag = "no.Tazk.Frodi.vault.v1".data(using: .utf8)!
 
-    /// The public half of the Enclave key, as X9.63 bytes, once it has been read.
-    ///
-    /// Sealing needs only the public key, and the public key is not secret. The
-    /// private key, by contrast, lives in the keychain under `WhenUnlocked`, which
-    /// refuses it while the device is locked. A transcription can outlast the
-    /// screen, and its text is sealed the moment it finishes, so the seal must not
-    /// depend on the lock state. It does not: every path that seals has opened
-    /// something first in the same process, and that is when the public key is
-    /// kept.
+    /// The public half of the Enclave key (X9.63 bytes), once read.
+    /// Sealing needs only this; the private key is `WhenUnlocked`, refused on a locked device, yet a transcription can outlast the screen.
+    /// That works because every path that seals has opened something first in this process, which is when this is kept.
     private static let publicKeyBytes = OSAllocatedUnfairLock<Data?>(initialState: nil)
 
     enum VaultError: LocalizedError {
@@ -150,12 +130,8 @@ enum RecordingVault {
         return key
     }
 
-    /// Fetches the key, or creates it the first time.
-    ///
-    /// Only a key that does not exist is created. Any other refusal from the
-    /// keychain, such as the device being locked, is an error: creating a second
-    /// key under the same tag would leave everything sealed under the first one
-    /// unreadable for good.
+    /// Fetches the key, or creates it the first time. Only a missing key is created; any other keychain refusal (e.g. locked) is an
+    /// error: a second key under the same tag would make everything sealed under the first unreadable for good.
     private static func enclaveKey() throws -> SecKey {
         if let existing = try loadKey() { return existing }
         return try createKey()
@@ -181,14 +157,9 @@ enum RecordingVault {
     }
 
     private static func createKey() throws -> SecKey {
-        // whenUnlockedThisDeviceOnly: the private key is used only to open, and
-        // every path that opens runs on an unlocked device, because the audio it
-        // starts from is `.complete` and `Transcription.run` does not start while
-        // the device is locked. Sealing needs only the public key, which is kept in
-        // memory once seen, so a seal does not need the keychain at all. The looser
-        // afterFirstUnlock would let a seized, locked, once-unlocked device use the
-        // key; nothing in the app needs that. The class is fixed at creation and
-        // the app does not rotate keys. ThisDeviceOnly keeps it out of backups.
+        // whenUnlockedThisDeviceOnly: the private key only opens, and every opening path runs unlocked (`.complete` audio;
+        // `Transcription.run` waits for unlock). Sealing uses the public key. Looser afterFirstUnlock would let a seized, locked,
+        // once-unlocked device use the key. Class fixed at creation, no rotation. ThisDeviceOnly keeps it out of backups.
         var accessError: Unmanaged<CFError>?
         guard let access = SecAccessControlCreateWithFlags(
             nil,

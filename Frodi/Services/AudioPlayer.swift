@@ -2,11 +2,8 @@ import AVFoundation
 import Observation
 
 /// Plays a recording.
-///
-/// The audio is decrypted into memory, never to disk. `AudioStorage.withDecrypted`
-/// puts the plaintext in a temporary file, which is right for export and for
-/// transcription, but would leave the whole recording unlocked on disk for as
-/// long as playback lasts. `AVAudioPlayer(data:)` avoids that entirely.
+/// Audio is decrypted into memory, never to disk: `AudioStorage.withDecrypted` writes a plaintext temp file (right for export and
+/// transcription) that would leave the recording unlocked on disk for the whole playback. `AVAudioPlayer(data:)` avoids that.
 @MainActor
 @Observable
 final class AudioPlayer {
@@ -68,11 +65,8 @@ final class AudioPlayer {
     }
 
     /// Decrypts the recording and readies a player for it, off the main actor.
-    ///
-    /// The decryption is tens of megabytes for a long recording, and
-    /// `prepareToPlay()` configures the audio session synchronously, which Xcode
-    /// flags as a hang risk on the main thread. The category is set here for the
-    /// same reason: setting it while the session is active blocks too.
+    /// Decryption is tens of megabytes, and `prepareToPlay()` configures the audio session synchronously (Xcode flags a main-thread hang risk).
+    /// The category is set here for the same reason: setting it while the session is active blocks too.
     @concurrent
     private static func makePlayer(fileName: String) async throws -> sending AVAudioPlayer {
         let audio = try AudioStorage.plaintext(fileName: fileName)
@@ -111,16 +105,9 @@ final class AudioPlayer {
         seek(to: player.currentTime + offset)
     }
 
-    /// Releases both the audio and the audio session. Called when the detail page
-    /// closes, and before a new recording starts.
-    ///
-    /// Returns once the session is given up, and the recorder must wait for
-    /// that. Measured on a device on 2026-09-20: fired off and not waited for,
-    /// the deactivation landed between the recorder's activation and its
-    /// `record()`, the audio queue was built on an inactive session with no
-    /// input route, and `record()` answered false at every press until the
-    /// timing happened to fall the other way. The player being idle makes no
-    /// difference; the deactivation is sent either way.
+    /// Releases the audio and the audio session, when the detail page closes and before a new recording starts.
+    /// Returns once the session is given up; the recorder must wait for it. Else the deactivation lands between the recorder's activation and
+    /// `record()`: no input route, `record()` returns false (device, 2026-09-20). Sent even if the player is idle.
     func stop() async {
         stopTicker()
         player?.stop()

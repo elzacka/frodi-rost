@@ -1,25 +1,9 @@
 import CryptoKit
 import Foundation
 
-/// What a recording was when it came into the app, written once and sealed.
-///
-/// The name the user gives a recording can change; this cannot. It is written
-/// once, the moment the audio is sealed, and `Recording.recordOrigin` refuses a
-/// second write. It is sealed through `RecordingVault` like the text, which
-/// gives two things: it cannot be read off the device, and a change to the
-/// stored bytes makes it fail to open rather than open wrong.
-///
-/// It is tied to its recording three ways. It names the recording's file stem,
-/// so an origin moved onto another row does not match there. It holds the date
-/// and length, which `verify` compares with the row's own, so the list's plain
-/// fields cannot be changed without the page saying so. And it holds the
-/// checksum of the sealed audio, which the recording page compares with the
-/// audio on disk when the details are opened, so another sealed file swapped in
-/// under the same name does not pass either.
-///
-/// What it cannot give is proof to anyone else. The date comes from the
-/// device's clock, and the checksum of an imported original says which file
-/// came in, not that the file is what it claims. See SECURITY.md.
+/// What a recording was on arrival; written once, sealed (`Recording.recordOrigin` refuses a second write).
+/// Sealed via `RecordingVault`: unreadable off-device, tamper-evident. Bound to file stem, date, length, audio checksum.
+/// Not proof to others: the date is the device clock, an imported checksum names the file, not its authenticity. See SECURITY.md.
 struct RecordingOrigin: Codable, Equatable, Sendable {
     enum Source: String, Codable, Sendable {
         case recorded, imported
@@ -82,11 +66,9 @@ struct RecordingOrigin: Codable, Equatable, Sendable {
         return try decoder.decode(RecordingOrigin.self, from: data)
     }
 
-    /// Opens a sealed origin and checks it against the row it hangs on: the same
-    /// recording, the same date to the second, the same length. A key the locked
-    /// device refuses is not a sign of tampering, and gives nothing rather than a
-    /// warning. The audio is checked separately, see `OriginState.matching`,
-    /// since that means reading the whole file.
+    /// Opens a sealed origin and checks it against its row: same recording, same date to the second, same length. A key the
+    /// locked device refuses is not tampering and gives nothing, not a warning. The audio is checked separately
+    /// (`OriginState.matching`) since that reads the whole file.
     static func verify(_ sealed: Data, fileName: String, createdAt: Date, duration: TimeInterval) -> OriginState {
         let data: Data
         do {

@@ -26,10 +26,8 @@ struct PrivacyTests {
         #expect(modes?.contains("audio") == true)
     }
 
-    /// `ToggleRecordingIntent` is an `AudioRecordingIntent`, and iOS stops a
-    /// recording started that way unless a Live Activity runs beside it. Without
-    /// this key the activity cannot be requested, and the Action Button would
-    /// start a recording that ends at once.
+    /// `ToggleRecordingIntent` is an `AudioRecordingIntent`: iOS stops a recording started that way unless a Live Activity runs beside it.
+    /// Without this key the activity cannot be requested and the Action Button would start a recording that ends at once.
     @Test("Opptakets Live Activity er slått på")
     func liveActivitiesEnabled() {
         #expect(Bundle.main.object(forInfoDictionaryKey: "NSSupportsLiveActivities") as? Bool == true)

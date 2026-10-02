@@ -1,16 +1,9 @@
 import Foundation
 import UIKit
 
-/// Exports a recording for further use.
-///
-/// Export is a deliberate action, not an open door. The files are encrypted at
-/// rest and unlocked only at the moment you ask. The plaintext goes into the
-/// temporary directory and is cleaned up after sharing.
-///
-/// Sharing goes through iOS' own share sheet. Where the files go is your choice
-/// there: Files on the device and AirDrop keep them local, Mail, Messages and
-/// iCloud Drive do not. Fróði uploads nothing itself, and has no network code
-/// to do it with.
+/// Exports a recording. Deliberate: files are encrypted at rest and unlocked on request; plaintext goes to the
+/// temporary directory and is cleaned up after sharing. The iOS share sheet lets the user choose: Files and AirDrop
+/// stay local, Mail, Messages and iCloud Drive do not. Fróði uploads nothing and has no network code.
 enum RecordingExport {
     /// What goes to the share sheet. Chosen where the export is made: a note
     /// pasted into a message wants the text alone, an interview sent to a
@@ -37,10 +30,8 @@ enum RecordingExport {
         var label: String { ".\(rawValue)" }
     }
 
-    /// Writes audio and text to temporary files ready for sharing.
-    ///
-    /// The recording is a SwiftData object and cannot be passed to another thread.
-    /// So we pull the values out here and pass only those.
+    /// Writes audio and text to temporary files ready for sharing. The recording is a SwiftData object and cannot cross
+    /// threads, so only extracted values are passed.
     static func prepare(
         _ recording: Recording,
         content: Content = .both,
@@ -58,14 +49,9 @@ enum RecordingExport {
         )
     }
 
-    /// Reading, decrypting and writing a whole audio file takes time that grows
-    /// with the length of the recording. An hour of audio is about 30 MB, and all
-    /// three steps take the whole file at once.
-    ///
-    /// `@concurrent` keeps it off the main thread. Without it, it lands there:
-    /// `SWIFT_APPROACHABLE_CONCURRENCY` makes a `nonisolated async` function inherit
-    /// the caller's actor, and here the view calls. Measured 2026-09-09: the
-    /// interface froze until the share sheet came up.
+    /// Reading, decrypting and writing a whole audio file is slow for long recordings. `@concurrent` keeps it off the
+    /// main thread: `SWIFT_APPROACHABLE_CONCURRENCY` would run a `nonisolated async` function on the caller's actor
+    /// (the view), which froze the interface until the share sheet came up (measured 2026-09-09).
     @concurrent
     private static func write(
         fileName: String,
@@ -120,18 +106,9 @@ enum RecordingExport {
         return urls
     }
 
-    /// The text as a document: a heading, the date and the length, where the
-    /// recording came from, then the paragraphs with their marks.
-    ///
-    /// The checksum of the audio file ties the document to it. A reader holding
-    /// the two can check with `shasum -a 256` that the audio is the one the text
-    /// was made from, and an imported recording names its original the same way.
-    ///
-    /// RTF rather than `.docx` because Apple writes it natively and Word, Pages
-    /// and Notes all open it with the structure intact. A `.txt` loses the
-    /// heading and the paragraphs the moment it is pasted into a report; this
-    /// does not. The fonts are the system's own, not the app's: the document is
-    /// read on another machine, and asking for Inter there gives a fallback anyway.
+    /// The text as a document: heading, date, length, origin, then paragraphs with marks. The audio checksum ties it to
+    /// the audio (`shasum -a 256`); an imported recording names its original likewise. RTF, not `.docx`: Apple writes
+    /// it natively and Word, Pages and Notes keep the structure. System fonts: another machine falls back from Inter.
     static func rtf(
         _ transcript: String,
         createdAt: Date,
@@ -199,10 +176,8 @@ enum RecordingExport {
         .units(allowed: [.hours, .minutes, .seconds], width: .abbreviated).locale(AppLocale.norwegian)
     }
 
-    /// Writes the text as UTF-8 with a byte order mark.
-    ///
-    /// Without the BOM many readers guess that a `.txt` is Latin-1, and «så» becomes
-    /// «sÃ¥». The file is UTF-8 either way; the three bytes tell the reader so.
+    /// Writes the text as UTF-8 with a byte order mark. Without the BOM many readers guess Latin-1 and «så» becomes
+    /// «sÃ¥».
     static func utf8WithBOM(_ text: String) -> Data {
         Data([0xEF, 0xBB, 0xBF]) + Data(text.utf8)
     }

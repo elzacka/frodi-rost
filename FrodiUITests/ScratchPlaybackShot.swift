@@ -1,17 +1,7 @@
 import XCTest
 
-/// A tool, not a test. It takes a screenshot of the detail screen and checks
-/// nothing, yet cost 13 seconds in every single test run.
-///
-/// It now runs only when asked. The `TEST_RUNNER_` prefix is what xcodebuild
-/// requires to pass a variable on to the test process; the app sees it as
-/// `FRODI_SHOTS`:
-///
-/// ```bash
-/// TEST_RUNNER_FRODI_SHOTS=1 xcodebuild -project Frodi.xcodeproj -scheme Frodi \
-/// -destination 'platform=iOS Simulator,name=Frodi-Test' \
-/// -only-testing:FrodiUITests/ScratchPlaybackShot test
-/// ```
+/// A tool, not a test: screenshots the detail screen, checks nothing; runs only with `FRODI_SHOTS` (13 s per run
+/// otherwise). Run command: README, *Verktøy og målinger*.
 final class ScratchPlaybackShot: XCTestCase {
     @MainActor
     func test_shot() throws {

@@ -1,17 +1,8 @@
 import SwiftUI
 
-/// A question with a few answers, as a sheet from the bottom.
-///
-/// The system's confirmation dialog is what this replaces. On iPhone it comes
-/// up as a popover with an arrow pointing at the row it was asked from, in the
-/// system's own face and colours, wherever the row happens to be. Nothing in
-/// it is ours. This is the same question in the app's tokens: a title, a
-/// sentence, the answers as rows, and «Avbryt» under them. It sizes itself to
-/// what it holds, so a two-answer question does not get a half-screen sheet.
-///
-/// The answers stand under each other, never side by side. That is the design
-/// system's rule for a message card, and it holds here for the same reason:
-/// two buttons in one line are read as one control with two halves.
+/// A question with a few answers, as a bottom sheet in the app's tokens: title, sentence, answers as rows, «Avbryt» under them.
+/// Replaces the system confirmation dialog (a popover with an arrow, system face and colours). Sizes to content.
+/// Answers stand under each other, never side by side (message-card rule): two buttons in a line read as one control.
 struct ChoiceSheet<Answers: View>: View {
     let title: String
     let message: String
@@ -71,15 +62,9 @@ struct ChoiceSheet<Answers: View>: View {
 }
 
 extension View {
-    /// One answer in a `ChoiceSheet`, or one action behind a `SwipeRow`: a row
-    /// in the shape of a list row, applied to the label of the button. In the
-    /// sheet it takes the full width; `inline`, it takes the width of its word
-    /// and the height of the row it stands behind.
-    ///
-    /// The destructive one is outlined and written in `recordingActive`, the
-    /// red the design system reserves for where something is lost. Outlined,
-    /// not filled: there is no `-on` colour for red, and an outline says
-    /// «careful» without shouting. 5,48:1 on Surface, so the word is readable.
+    /// One answer in a `ChoiceSheet`, or one action behind a `SwipeRow`: a list-row-shaped button label; full width in the sheet, `inline` fits its word.
+    /// The destructive one is outlined in `recordingActive` (red reserved for loss), not filled: red has no `-on` colour, and an outline
+    /// says «careful» without shouting. 5,48:1 on Surface.
     func choiceRow(destructive: Bool = false, inline: Bool = false) -> some View {
         font(.Frodi.bodyMedium)
             .foregroundStyle(destructive ? Color.Frodi.recordingActive : Color.Frodi.textPrimary)

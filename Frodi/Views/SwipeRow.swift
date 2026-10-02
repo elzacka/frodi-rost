@@ -8,17 +8,9 @@ enum SwipeStage: Equatable {
     case asking
 }
 
-/// A list row that slides left to show what can be done with it, where it is.
-///
-/// The actions stand behind the row at its trailing edge, and the swipe
-/// uncovers them: the row's own shape moves and nothing is laid over the list.
-/// An action that has to ask first asks in the same place. The row slides all
-/// the way out, and the question with its answers takes the width behind it.
-/// One mechanism for the reveal and for the question, so the way from the
-/// swipe to the answer is one component in one design.
-///
-/// The stage belongs to the list, not the row, so that one row is open at a
-/// time and a deleted row takes its stage with it.
+/// A list row that slides left to show its actions behind it at the trailing edge; nothing is laid over the list.
+/// An action that must ask first asks in the same place: the row slides fully out and the question takes the width behind it.
+/// The stage belongs to the list, not the row, so one row is open at a time and a deleted row takes its stage with it.
 struct SwipeRow<Content: View, Actions: View, Question: View>: View {
     let stage: SwipeStage
     let onStage: (SwipeStage) -> Void
@@ -113,16 +105,9 @@ struct SwipeRow<Content: View, Actions: View, Question: View>: View {
     }
 }
 
-/// A pan that begins only when the finger moves more sideways than up or down.
-///
-/// A vertical movement is the list's scroll, and must never be ours. SwiftUI's
-/// `DragGesture` cannot decline a touch: attached to a row inside a
-/// `ScrollView`, it took every drag that started on a row, and the list did not
-/// scroll under a finger on a row at all (measured 2026-09-27). A UIKit pan can
-/// decline in `gestureRecognizerShouldBegin`, and the scroll view gets the touch.
-///
-/// Measured in window space: the row moves under the finger, and a pan
-/// measured in the row's own space would move with it.
+/// A pan that begins only when the finger moves more sideways than up or down; vertical is the list's scroll.
+/// `DragGesture` cannot decline a touch: in a `ScrollView` it took every drag on a row and the list did not scroll (2026-09-27).
+/// UIKit pans decline in `gestureRecognizerShouldBegin`. Window space: row space would move with the row.
 private struct HorizontalPan: UIGestureRecognizerRepresentable {
     let isEnabled: Bool
     let onChanged: (CGFloat) -> Void

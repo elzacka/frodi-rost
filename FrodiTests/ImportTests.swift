@@ -4,13 +4,8 @@ import Testing
 @testable import Frodi
 
 /// An imported file becomes what the recorder writes, whatever it came in as.
-///
-/// The fixtures were made with ffmpeg on 2026-09-27: `right-channel.mp3` is two
-/// seconds of tone at 44,1 kHz with the left channel silent, and
-/// `dated-stereo.m4a` is one and a half seconds of AAC at 48 kHz in stereo, with
-/// a creation date in its metadata. `located.m4a`, made on 2026-09-28 with
-/// ffmpeg and passed through `AVAssetExportSession`, is one second of AAC with
-/// a title and a location, which AVFoundation writes as ISO user data (`loci`).
+/// Fixtures (ffmpeg): `right-channel.mp3` 2 s tone 44,1 kHz, left silent; `dated-stereo.m4a` 1,5 s AAC 48 kHz stereo with creation date;
+/// `located.m4a` (via `AVAssetExportSession`) 1 s AAC with title and location as ISO user data (`loci`).
 @Suite("Import", .serialized)
 struct ImportTests {
     private static let fixtures = URL(filePath: #filePath)

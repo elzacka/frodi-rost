@@ -39,11 +39,9 @@ final class AudioRecorder {
     private var ticker: Task<Void, Never>?
     private var observers: [any NSObjectProtocol] = []
 
-    /// The session being given up after a stop. The next start waits for it:
-    /// a deactivation still in flight when the session is activated again
-    /// lands between the activation and `record()`, and `record()` then fails.
-    /// Seen on a device on 2026-09-20 with the player's deactivation; the
-    /// recorder's own is the same call on the same session.
+    /// The session given up after a stop; the next start waits for it.
+    /// A deactivation still in flight lands between activation and `record()`, which then fails
+    /// (device, 2026-09-20; the player's deactivation is the same call on the same session).
     private var deactivation: Task<Void, Never>?
 
     var isRecording: Bool { state == .recording }
@@ -97,11 +95,8 @@ final class AudioRecorder {
 
             let (newRecorder, started) = try await Self.startRecorder(at: url)
             guard started else {
-                // What iOS answers when an app tries to begin recording in the
-                // background: cannotStartRecording, reported here as false. The
-                // session is active and the recorder may have created the file;
-                // both are cleaned up, or the next launch would find an empty
-                // recording and other apps' audio would stay interrupted.
+                // iOS refuses to begin recording in the background (cannotStartRecording, reported as false). The session is active and
+                // the file may exist: clean up both, or the next launch finds an empty recording and other apps' audio stays interrupted.
                 Self.log.error("Recording did not start: record() returned false")
                 _ = try? await session.deactivate(options: .notifyOthersOnDeactivation)
                 try? FileManager.default.removeItem(at: url)
@@ -134,52 +129,24 @@ final class AudioRecorder {
 
     private static var inBackground: Bool { UIApplication.shared.applicationState == .background }
 
-    /// spokenAudio treats speech better than default, and playAndRecord lets us
-    /// play back without switching category afterwards.
-    ///
-    /// Non-mixable in front: other audio pauses while recording and resumes
-    /// after, so music does not end up in the recording. From the background
-    /// iOS refuses a non-mixable session ('!int'), also for the control's
-    /// `AudioRecordingIntent`: measured on a device 2026-09-26, while the
-    /// simulator let it through. There the session ducks other audio instead,
-    /// which makes it mixable; music plays on, lower, until the recording stops.
-    /// A resume after an interruption chooses again, since the app may have
-    /// gone to the background since the start.
+    /// spokenAudio suits speech; playAndRecord allows playback without a category switch.
+    /// Non-mixable in the foreground, so other audio pauses and stays out of the recording. From the background iOS refuses it ('!int'),
+    /// also for `AudioRecordingIntent` (device 2026-09-26; simulator allows it); there it ducks others (mixable). A resume chooses again.
     private static func setCategory(inBackground: Bool) throws {
         var options: AVAudioSession.CategoryOptions = [.defaultToSpeaker, .allowBluetoothHFP]
         if inBackground { options.insert(.duckOthers) }
         try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .spokenAudio, options: options)
     }
 
-    /// Returns when the session a stop gave up is released. The control's intent
-    /// waits for it: iOS may suspend the app as soon as the intent returns, and a
-    /// release still in flight then never happens, so music ducked by a start
-    /// from the background would stay low.
+    /// Returns when the session a stop gave up is released. The control's intent waits for it: iOS may suspend the app once
+    /// the intent returns and a release in flight never happens, leaving music ducked by a background start low.
     func sessionReleased() async {
         await deactivation?.value
     }
 
-    /// Makes the recorder and starts it, off the main actor. `started` is
-    /// false when iOS refuses to start recording.
-    ///
-    /// `record()` activates the session on its own, synchronously, even when it
-    /// is already active, and Xcode flags that as a hang risk on the main thread.
-    /// Measured 2026-09-19 with a probe around each step.
-    ///
-    /// The recorder comes back even when it did not start, so that it is
-    /// released on the main actor and not on this thread. A device crashed on
-    /// 2026-09-19 with an Objective-C weak-reference fatal right after
-    /// `record()` had returned false here; the same failure released on the
-    /// main thread on 2026-09-16 and did not. Suspected, not proven: the
-    /// simulator cannot make `record()` fail the way a device does.
-    ///
-    /// Linear PCM in a CAF container, not AAC in an MPEG-4 one. Measured on
-    /// 2026-09-14: an app killed mid-recording leaves an `.m4a` that cannot be
-    /// opened at all, because the index is written at close. CAF with AAC opens
-    /// but has no packets, for the same reason. Only PCM has no table to write,
-    /// so a kill at any point leaves every frame playable. The file is about
-    /// 115 MB an hour, and `AudioStorage.seal` turns it into AAC once the
-    /// recording is finished.
+    /// Starts the recorder off the main actor (`record()` activates the session synchronously: hang risk); `started` false if refused
+    /// Returned even unstarted, to release it on the main actor: off-main release crashed a device (ObjC weak-ref; suspected).
+    /// PCM CAF, not AAC: after a kill m4a/CAF-AAC are unplayable (index at close). ~115 MB/h; `seal` makes AAC
     @concurrent
     private static func startRecorder(at url: URL) async throws -> sending (recorder: AVAudioRecorder, started: Bool) {
         let recorder = try AVAudioRecorder(url: url, settings: fileSettings)
@@ -200,16 +167,8 @@ final class AudioRecorder {
     }
 
     /// Stops the recording and returns the file name and length.
-    ///
-    /// The length is read from the file, not from the recorder. `currentTime` is
-    /// zero once the recorder has stopped, and it stops by itself after an
-    /// interruption or a reset of the audio system. The file is the truth either
-    /// way.
-    ///
-    /// Nothing is deleted here. A recording is the user's, and the only thing that
-    /// removes one is the user asking for it. A file with no frames at all is not
-    /// a recording and is the one exception; a file that cannot be opened is not
-    /// that file, see `savedDuration`.
+    /// Length is read from the file: `currentTime` is zero once stopped, also after an interruption or audio reset. Nothing is deleted
+    /// (only the user removes a recording) except a file with no frames; an unopenable file is not that, see `savedDuration`.
     func stop() -> (fileName: String, duration: TimeInterval)? {
         guard state == .recording, let fileName = currentFileName else { return nil }
 
@@ -239,44 +198,28 @@ final class AudioRecorder {
         }
         Self.log.notice("Recording stopped: \(fileName, privacy: .public), measured \(measured.map { String($0) } ?? "unreadable", privacy: .public) s, counted \(counted, privacy: .public) s")
 
-        // The file is closed now, and stays `.completeUnlessOpen` until
-        // `Transcription.run` seals it. Sealing is not done here: it has to read the
-        // closed file back, and that fails while the device is locked, which is
-        // exactly when the Action Button stops a recording in the car. It used to
-        // be done here, and the failure deleted the recording.
+        // File stays `.completeUnlessOpen` until `Transcription.run` seals it. Not sealed here: sealing reads the closed file back,
+        // which fails while the device is locked (Action Button stop in the car); the unlock pass seals it instead.
         return (fileName, length)
     }
 
-    /// The length to save, or nil when the file is empty and should go.
-    ///
-    /// `measured` is the file's own length, nil when the file could not be opened.
-    /// The two are not the same case. A closed `.completeUnlessOpen` file cannot be
-    /// reopened while the device is locked, which is where a recording stops
-    /// whenever the Action Button stops it in the car, or an interruption ends
-    /// without the microphone coming back. Until 2026-09-15 nil was treated
-    /// as empty, and the recording was deleted. Now the recorder's own count stands
-    /// in; the file replaces it when it is sealed, if it is still zero. Only a file
-    /// that opened and holds no frames is deleted.
+    /// The length to save, or nil when the file is empty and should go. `measured` is nil when the file could not be opened.
+    /// A closed `.completeUnlessOpen` file cannot be reopened while locked (Action Button stop, interruption ending), so the
+    /// recorder's count stands in until seal replaces it, if still zero. Only an opened file with no frames is deleted.
     nonisolated static func savedDuration(measured: TimeInterval?, counted: TimeInterval) -> TimeInterval? {
         guard let measured else { return counted }
         return measured > 0 ? measured : nil
     }
 
-    /// A call, Siri, an alarm or another app taking the microphone.
-    ///
-    /// iOS stops the recorder by itself when the interruption begins. What the app
-    /// has to do is continue when it ends, and save when it cannot. Without this
-    /// the recorder stayed stopped, the screen still said «recording», and the next
-    /// press on stop read a length of zero. Everything said before the call was
-    /// then deleted as too short.
+    /// A call, Siri, an alarm or another app taking the microphone. iOS stops the recorder itself; the app must continue when it
+    /// ends and save when it cannot. Otherwise the screen says «recording» on a stopped recorder and stop reads length zero,
+    /// deleting everything said before the call as too short.
     private func observeInterruptions() {
         let center = NotificationCenter.default
         let session = AVAudioSession.sharedInstance()
 
-        // iOS 27 split the old interruption notification in two: the session going
-        // inactive, with who did it, and the system's advice on resuming once the
-        // interruption is over. `stop()` deactivates the session itself; that one
-        // carries `.app` and is not an interruption.
+        // iOS 27 splits the interruption notification in two: the session going inactive (with who did it) and the system's resume
+        // advice. `stop()` deactivates the session itself; that one carries `.app` and is not an interruption.
         observers.append(center.addObserver(
             forName: AVAudioSession.didBecomeInactiveNotification,
             object: session,
@@ -309,13 +252,9 @@ final class AudioRecorder {
         })
     }
 
-    /// Closes the segment. The recorder is not paused and not reused: iOS has
-    /// stopped it before this arrives, and `record()` on a stopped
-    /// `AVAudioRecorder` starts its file over. Measured on a device on
-    /// 2026-09-20: a recording of 21 s, a call, a resume, a stop 44 s later,
-    /// and a file of 44 s. The 21 s before the call were written over. What
-    /// was recorded before the call is a finished file from here on, and the
-    /// resume goes on in the next one; `AudioStorage.seal` joins them.
+    /// Closes the segment; the recorder is not paused or reused: iOS already stopped it, and `record()` on a stopped
+    /// `AVAudioRecorder` restarts its file (device 2026-09-20: 21 s, call, resume, 44 s more gave a 44 s file). The recording so far
+    /// is a finished file; the resume goes on in the next, and `AudioStorage.seal` joins them.
     private func interruptionBegan(source: AVAudioSession.DeactivationSource?) {
         guard state == .recording, let recorder, source != .app else { return }
         let position = recorder.currentTime

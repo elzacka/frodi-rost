@@ -30,20 +30,16 @@ final class FrodiUITests: XCTestCase {
         XCTAssertTrue(button.waitForExistence(timeout: 5), "Importknappen i logohodet mangler")
         button.tap()
 
-        // The picker speaks the simulator's language, not the app's. It is a
-        // remote view: the app's own tree shows an empty overlay until the
-        // picker's controls arrive, 10 to 14 s after the tap on the iOS 27
-        // simulator, so the wait is long. It still fails if the picker never opens.
+        // The picker speaks the simulator's language, not the app's. It is a remote view: the app's tree shows an empty overlay until its
+        // controls arrive, 10 to 14 s after the tap on the iOS 27 simulator, so the wait is long. It still fails if the picker never opens.
         let cancel = app.buttons.matching(NSPredicate(format: "label IN %@", ["Avbryt", "Cancel"])).firstMatch
         XCTAssertTrue(cancel.waitForExistence(timeout: 30), "Filvelgeren åpnet ikke")
         cancel.tap()
         XCTAssertTrue(button.waitForExistence(timeout: 5), "Filvelgeren lukket seg ikke")
     }
 
-    /// A drag up that starts on a row scrolls the list. The row's own swipe is
-    /// sideways only; a gesture that took every drag left the list unscrollable
-    /// under a finger on a row. Makes short recordings until the list is taller
-    /// than the screen.
+    /// A drag up that starts on a row scrolls the list. The row's own swipe is sideways only; a gesture taking every drag would leave
+    /// the list unscrollable under a finger on a row. Makes short recordings until the list is taller than the screen.
     @MainActor
     func test_dragOnRows_scrollsTheList() {
         let app = XCUIApplication()
@@ -115,10 +111,8 @@ final class FrodiUITests: XCTestCase {
         XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "Opptaket forsvant etter «Behold»")
     }
 
-    /// The back button is the app's own, and UIKit switches the swipe from the
-    /// left edge off for a screen that hides the system's. `PopGestureKeeper`
-    /// switches it back on; this is what tells if an iOS release breaks that.
-    /// Lisenser is the screen used because it needs no recording to reach.
+    /// The back button is the app's own, and UIKit switches off the left-edge swipe for a screen that hides the system's.
+    /// `PopGestureKeeper` switches it back on; this tells if an iOS release breaks that. Lisenser is used: no recording needed to reach it.
     @MainActor
     func test_swipeFromLeftEdge_popsTheScreen() {
         let app = XCUIApplication()

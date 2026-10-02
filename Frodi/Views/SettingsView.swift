@@ -1,15 +1,8 @@
 import SwiftUI
 
-/// Innstillinger: the two things you can set, what the app is, and the
-/// documents. Opens as a sheet from the settings button in the logo header. A
-/// sheet, not a new page, because you should return to the list where you
-/// left it.
-///
-/// Settings first, since they are what the title promises. Then the card that
-/// says what the app is, with the version and the address, and last the
-/// documents: how to use the app, privacy, security, accessibility and the
-/// licences. The prose lives in the documents; the page links to them rather
-/// than repeating them.
+/// Settings: the two things you can set, what the app is, and the documents, as a sheet so you return to the list as you left it.
+/// Order: settings, the card with version and address, then the documents (use, privacy, security, accessibility, licences).
+/// The prose lives in the documents; the page links to them rather than repeating them.
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -65,10 +58,8 @@ struct SettingsView: View {
         }
     }
 
-    /// One document per reader: the user, the privacy-minded, the security
-    /// reviewer, and the licence holders. The three links open on GitHub in
-    /// Safari; the licences are a screen in the app, since Apache 2.0 requires
-    /// the attribution to be in the app itself.
+    /// One document per reader: user, privacy-minded, security reviewer, licence holders. Three links open on GitHub in Safari;
+    /// the licences are an in-app screen, since Apache 2.0 requires the attribution in the app itself.
     private var documents: some View {
         Card("Mer om appen") {
             link("Brukerveiledning", to: Self.userGuide)
@@ -78,13 +69,9 @@ struct SettingsView: View {
         }
     }
 
-    /// Names the model should spell right: the field is where a user types
-    /// them once, and every transcription reads them.
-    ///
-    /// A `TextEditor` with a fixed height, not a text field that grows with its
-    /// content: the height is the user's to set, by the grip in the lower right
-    /// corner, and the text scrolls inside it. The cards below follow the
-    /// field's height through the layout, so nothing overlaps as it grows.
+    /// Names the model should spell right: typed once, read by every transcription.
+    /// A `TextEditor` of fixed height, not a growing text field: the user sets the height with the lower-right grip, the text scrolls inside.
+    /// The cards below follow the field's height through the layout, so nothing overlaps as it grows.
     private var wordList: some View {
         Card("Ordliste") {
             paragraph("Skriv inn navn og ord modellen kan bomme på. Skill dem med komma.")
@@ -125,12 +112,9 @@ struct SettingsView: View {
         }
     }
 
-    /// The lower right corner of the field. Drag it to make the field taller or
-    /// shorter; under VoiceOver it is adjustable, one touch target per step.
-    /// High priority, or the scroll view takes the vertical drag for itself.
-    /// Measured in global space: the grip moves down with every point the
-    /// field grows, so in its own space the finger would seem to move back
-    /// and the field would shrink again, frame after frame.
+    /// The field's lower right corner: drag to resize; adjustable under VoiceOver, one touch target per step. High priority, or the
+    /// scroll view takes the vertical drag. Measured in global space: the grip moves with every point the field grows, so in its
+    /// own space the finger would seem to move back and the field would shrink again, frame after frame.
     private var grip: some View {
         IconView(.resize, size: WordListField.grip)
             .foregroundStyle(Color.Frodi.textSecondary)
@@ -243,10 +227,8 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// A link out of the app, at the same size and in the same tone as the text
-    /// around it. The mark is `open_in_new` after the word, small and in the
-    /// secondary tone: it says the document opens outside the app, which the
-    /// chevron on the row below does not, and it is a mark that is not colour.
+    /// A link out of the app, same size and tone as the surrounding text. The small secondary `open_in_new` mark after the word says
+    /// the document opens outside the app, which the row chevron does not, and is not colour alone.
     /// The icon is hidden from VoiceOver; the link trait already says «lenke».
     private func link(_ title: String, to url: URL) -> some View {
         Link(destination: url) {
@@ -264,10 +246,7 @@ struct SettingsView: View {
 }
 
 /// The attribution Apache 2.0 requires, in the app and not only in the repo.
-///
-/// The same names and licences as TREDJEPART.md, which also carries versions
-/// and links. `DocumentTests` fails if the two lists, or `Package.resolved`,
-/// disagree.
+/// Same names and licences as TREDJEPART.md (which also has versions and links); `DocumentTests` fails if the two lists or `Package.resolved` disagree.
 struct LicensesView: View {
     struct Component: Identifiable {
         let name: String

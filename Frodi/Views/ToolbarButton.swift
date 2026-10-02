@@ -1,11 +1,7 @@
 import SwiftUI
 
-/// An `IconButton` in the navigation bar.
-///
-/// iOS draws its own bar buttons on a piece of glass with a rim, in the tint
-/// colour. The header's settings button has none of that, and the buttons in
-/// the bars should look like it, not like the system's. So the item drops the
-/// shared background, and the button is the same one the header uses.
+/// An `IconButton` in the navigation bar. iOS draws bar buttons on glass with a rim; the header's settings button has none
+/// and bar buttons should match it. So the item drops the shared background and uses the header's button.
 struct ToolbarButton: ToolbarContent {
     let icon: Icon
     let label: String
@@ -21,11 +17,8 @@ struct ToolbarButton: ToolbarContent {
 }
 
 /// The back button, drawn by the app so it matches the others in the bar.
-///
-/// The system's sits on glass and cannot be told to stand on nothing: neither
-/// the bar's tint nor `UIBarButtonItem.appearance()` reaches it, and the
-/// latter aborts. So the screen hides it and puts its own in the same place,
-/// and `PopGestureKeeper` keeps the swipe from the left edge working.
+/// The system's sits on glass: neither the bar's tint nor `UIBarButtonItem.appearance()` reaches it, and the latter aborts.
+/// So the screen hides it and draws its own; `PopGestureKeeper` keeps the left-edge swipe working.
 private struct BackButton: ViewModifier {
     @Environment(\.dismiss) private var dismiss
 
@@ -45,14 +38,9 @@ extension View {
     }
 }
 
-/// Keeps the swipe from the left edge alive on a screen that hides its back
-/// button.
-///
-/// UIKit turns the pop gesture off for such a screen: the gesture asks its
-/// delegate, the navigation controller, and the answer is no. This puts a
-/// delegate of its own in that place which says yes whenever there is a
-/// screen to go back to and no transition is already running. Measured on the
-/// simulator: without it the swipe does nothing, with it the screen pops.
+/// Keeps the swipe from the left edge alive on a screen that hides its back button.
+/// UIKit turns the pop gesture off there: its delegate, the navigation controller, answers no. This installs a delegate that
+/// says yes when there is a screen to go back to and no transition is running. Without it the swipe does nothing (simulator).
 private struct PopGestureKeeper: UIViewControllerRepresentable {
     func makeCoordinator() -> Coordinator { Coordinator() }
 

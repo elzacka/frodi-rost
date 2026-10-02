@@ -2,20 +2,9 @@ import AVFoundation
 import CryptoKit
 import Foundation
 
-/// Brings an audio file from outside the app in as a recording.
-///
-/// The file is converted to what the recorder itself writes: linear PCM at
-/// 16 kHz, mono, in a CAF, see `AudioRecorder.fileSettings`. From there it is a
-/// recording like any other: `AudioStorage.seal` encodes and encrypts it, and
-/// `Transcription.run` makes the text. One format on disk means one path
-/// through the seal, playback, export and the length rule, and an hour takes
-/// the same room and memory whatever it came in as. The original is left where
-/// it was, untouched.
-///
-/// Anything Core Audio reads comes in: m4a, mp3, wav, aiff, caf. Stereo is mixed
-/// down, not cut to the left channel: an interview recorded with one microphone
-/// per speaker has one speaker per channel. Measured on 2026-09-27: a voice on
-/// the right channel alone came out silent without the mix.
+/// Imports an audio file as a recording in the recorder's format (`AudioRecorder.fileSettings`: 16 kHz mono PCM CAF).
+/// One format means one path through seal, playback, export and the length rule. The original stays untouched.
+/// Stereo is mixed down, not left-only: one speaker per channel (2026-09-27: a right-only voice was silent without it).
 enum AudioImport {
     struct Converted: Sendable {
         /// The converted file, in the scratch folder until the caller moves it in.
@@ -35,14 +24,9 @@ enum AudioImport {
     /// mp3 took 2,6 seconds and 17 MB.
     private static let chunk: AVAudioFrameCount = 65_536
 
-    /// Converts the file the user picked into the scratch folder, and reads what
-    /// it was before the conversion: its name, size, checksum, format and
-    /// metadata.
-    ///
-    /// The URL comes from the file picker and is security-scoped. The read is
-    /// coordinated, which is what makes a file provider hand over a file it
-    /// holds only in the cloud: iCloud Drive downloads it first. Nothing is
-    /// written to the original.
+    /// Converts the picked file into the scratch folder and reads its name, size, checksum, format and metadata. The URL is
+    /// security-scoped; the read is coordinated so a file provider hands over a cloud-only file (iCloud Drive downloads it).
+    /// Nothing is written to the original.
     @concurrent
     static func convert(_ source: URL) async throws -> Converted {
         let scoped = source.startAccessingSecurityScopedResource()
@@ -108,10 +92,8 @@ enum AudioImport {
         }
     }
 
-    /// The date to file an import under, if the file's own is believable: from
-    /// 2000 up to a day ahead of now, for a clock in another time zone. Some
-    /// recorders write zero, which reads as 1904 or 1970. The origin keeps the
-    /// date the file stated either way.
+    /// The date to file an import under, if the file's own is believable: 2000 up to a day ahead of now (other time zone).
+    /// Some recorders write zero (1904 or 1970). The origin keeps the date the file stated either way.
     static func plausibleDate(_ date: Date?, now: Date) -> Date? {
         guard let date, date >= earliest, date <= now.addingTimeInterval(24 * 60 * 60) else { return nil }
         return date
@@ -192,14 +174,9 @@ enum AudioImport {
         return Double(written) / AudioRecorder.sampleRate
     }
 
-    /// The creation date and the common metadata, as the file states them. An
-    /// m4a from most recorders carries a date; an mp3 rarely does. Artwork and
-    /// other binary values are left out, and so is the date among the tags,
-    /// since it has a field of its own.
-    ///
-    /// So is a location. The app asks for no location access and records none
-    /// of its own, and the origin is written once, so a place kept here would
-    /// stay until the recording is deleted.
+    /// The creation date and common metadata as the file states them; artwork, other binary values and the date tag are left out.
+    /// A location is left out too: the app asks for no location access and records none, and the origin is written once,
+    /// so a kept place would stay until the recording is deleted.
     private static func metadata(of url: URL) async -> (createdAt: Date?, tags: [String: String]) {
         let asset = AVURLAsset(url: url)
         var createdAt: Date?

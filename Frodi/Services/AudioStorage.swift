@@ -3,10 +3,8 @@ import Foundation
 import SwiftData
 
 /// Where the audio files live, and how they are protected.
-///
-/// Two things are governed from here, and they pull in opposite directions:
-/// the recording must be writable while the screen is locked, and the finished
-/// file must not be readable while the screen is locked.
+/// The recording must be writable while the screen is locked; the finished file must not be readable while it is
+/// locked.
 enum AudioStorage {
     /// The suffix of a sealed recording. A file without it is plaintext that is
     /// still waiting to be sealed; see `seal(fileName:)`.
@@ -27,12 +25,8 @@ enum AudioStorage {
         return base
     }
 
-    /// Plaintext that exists only while a job runs: transcription and export.
-    ///
-    /// One folder, so it can be emptied at launch. Each job removes its own files
-    /// in a `defer`, but a `defer` does not run if the process is killed, and a
-    /// transcription can take minutes. Whatever a crash leaves behind is removed
-    /// by `clearScratch()` the next time the app starts.
+    /// Plaintext that exists only while a job runs (transcription, export), in one folder so `clearScratch()` empties
+    /// it at launch: a `defer` does not run if the process is killed mid-transcription.
     static var scratchDirectory: URL {
         if !FileManager.default.fileExists(atPath: scratchURL.path) {
             try? FileManager.default.createDirectory(
@@ -53,21 +47,14 @@ enum AudioStorage {
         try? FileManager.default.removeItem(at: scratchURL)
     }
 
-    /// Protection while the recording runs.
-    ///
-    /// `completeUnlessOpen` lets a file that is already open keep being written
-    /// after the screen locks. With `complete` the recording would have stopped the
-    /// moment the device locked, which is exactly in the car, the whole point.
+    /// Protection while the recording runs. `completeUnlessOpen` keeps an open file writable after the screen locks;
+    /// with `complete` the recording would stop when the device locks (in the car).
     static func protectWhileRecording(_ url: URL) {
         setProtection(.completeUnlessOpen, on: url)
     }
 
-    /// Protection once the recording is sealed.
-    ///
-    /// The file is closed now, and `complete` is right: the content cannot be read
-    /// while the device is locked, not even by something with physical access.
-    /// Everything that opens it runs on an unlocked device; the key that opens it
-    /// has the matching class. See `RecordingVault.createKey`.
+    /// Protection once sealed. The file is closed, so `complete` applies: unreadable on a locked device, even with
+    /// physical access. The key has the matching class, see `RecordingVault.createKey`.
     static func protectFinished(_ url: URL) {
         setProtection(.complete, on: url)
         excludeFromBackup(url)
@@ -89,13 +76,9 @@ enum AudioStorage {
         return stem + ".m4a" + sealedSuffix
     }
 
-    /// The file a recording goes on in after an interruption: `X.1.caf` follows
-    /// `X.caf`, `X.2.caf` follows that. See `AudioRecorder.interruptionEnded`.
-    ///
-    /// The segments are one recording. The first file's name is the recording's
-    /// name everywhere: in the row, in `duration`, in `delete` and in `seal`,
-    /// which joins them into one sealed file. A continuation is never listed on
-    /// its own, so a kill between two of them still gives one row.
+    /// The file a recording continues in after an interruption: `X.1.caf` follows `X.caf`. See
+    /// `AudioRecorder.interruptionEnded`. The segments are one recording under the first file's name (row, `duration`,
+    /// `delete`, `seal`, which joins them); never listed alone, so a kill between two still gives one row.
     static func continuationName(for fileName: String, index: Int) -> String {
         let stem = (fileName as NSString).deletingPathExtension
         return "\(stem).\(index)" + pendingSuffix
@@ -123,39 +106,9 @@ enum AudioStorage {
         Int(((continuation as NSString).deletingPathExtension as NSString).pathExtension) ?? 0
     }
 
-    /// Seals a recording that is still plaintext, and returns its new file name
-    /// with the checksum of the audio it sealed.
-    ///
-    /// The checksum is taken from the bytes on their way into the vault, not
-    /// read back: reading back needs the private key, which a device locked
-    /// between the stop and the end of the encode refuses. Only when a crash
-    /// left the sealed copy already written is it read back, and then it is nil
-    /// on a locked device.
-    ///
-    /// The plaintext is removed only once the sealed copy is written. If sealing
-    /// fails, the plaintext stays where it is: it is `.completeUnlessOpen` and
-    /// closed, so it cannot be read while the device is locked, and the caller
-    /// tries again at the next unlock. Deleting it would lose the recording, and a
-    /// delay is the lesser harm.
-    ///
-    /// Failing here is the expected outcome when the Action Button stops a
-    /// recording on a locked device. A `.completeUnlessOpen` file cannot be
-    /// reopened once closed until the device is unlocked, and a `.complete` file
-    /// cannot be created at all. The Secure Enclave key would have been available,
-    /// but the file classes are not. See `RecordingController.sealPending()`.
-    ///
-    /// A sealed copy that already exists is taken as finished: it is written
-    /// atomically, so it is either whole or absent. That covers a crash between
-    /// writing the copy and removing the plaintext, and a crash between removing
-    /// the plaintext and saving the new name on the recording; either way the
-    /// next pass lands here and gets the same answer.
-    ///
-    /// A recording interrupted by a call is several files, see
-    /// `continuationName`. They are joined here, and all of them go once the
-    /// sealed copy is written.
-    ///
-    /// `@concurrent` for the same reason as `decryptToTemporary`: an hour of
-    /// audio is many megabytes read, encoded, encrypted and written whole.
+    /// Seals a plaintext recording. The checksum is taken from the bytes going in: reading back needs the private key,
+    /// refused on a locked device. Plaintext goes only after the atomic sealed copy exists (an existing copy counts as
+    /// done); failure, expected when the Action Button stops it locked, retries at unlock.
     @concurrent
     static func seal(fileName: String) async throws -> (name: String, audioSHA256: String?) {
         let source = directory.appendingPathComponent(fileName)
@@ -181,17 +134,9 @@ enum AudioStorage {
         return (sealedName, audioSHA256)
     }
 
-    /// Encodes a PCM recording as AAC in an `.m4a`, in the scratch folder.
-    ///
-    /// The recording is written as PCM so a crash cannot take it; see
-    /// `AudioRecorder.start`. Stored, it should be a quarter of that size and in
-    /// the format everything else already expects. The export session streams
-    /// from disk to disk, so an hour of audio never sits in memory here.
-    ///
-    /// The segments go in one after the other through a composition. A segment
-    /// without an audio track, which is what an empty CAF has, is passed over;
-    /// a recording of nothing but such segments fails to export, as an empty
-    /// file did before, and the caller keeps the plaintext.
+    /// Encodes a PCM recording as AAC in an `.m4a` in the scratch folder, streamed disk to disk. Segments are composed
+    /// in order; one without an audio track (an empty CAF) is skipped, and if all are empty the export fails and the
+    /// caller keeps the plaintext.
     private static func encodeToAAC(_ segments: [URL]) async throws -> URL {
         let composition = AVMutableComposition()
         guard let track = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
@@ -211,13 +156,9 @@ enum AudioStorage {
         return target
     }
 
-    /// Seals an imported file where it lies, in the scratch folder, and returns
-    /// the sealed copy beside it with the checksum of the audio it holds.
-    ///
-    /// An import reaches the recordings folder sealed or not at all. A plain
-    /// file there would be taken for a recording made here, by `reconcile` and
-    /// by the seal, and given an origin that says so. The caller moves the
-    /// sealed copy in and writes its row in one step.
+    /// Seals an imported file in the scratch folder; returns the sealed copy and the audio checksum. An import reaches
+    /// the recordings folder sealed or not at all: a plain file there would be taken by `reconcile` and the seal for a
+    /// recording made here. The caller moves the copy in and writes its row in one step.
     @concurrent
     static func sealImport(_ pcm: URL) async throws -> (url: URL, audioSHA256: String) {
         let target = scratchDirectory.appendingPathComponent(sealedName(for: pcm.lastPathComponent))
@@ -235,11 +176,8 @@ enum AudioStorage {
         RecordingOrigin.checksum(try plaintext(fileName: fileName))
     }
 
-    /// The length of a plaintext recording, read from the files themselves: the
-    /// segments of an interrupted recording added up.
-    ///
-    /// Nil if any of them cannot be opened. The recorder's own `currentTime` is
-    /// zero once it has stopped, so this is what `AudioRecorder.stop` trusts.
+    /// The length of a plaintext recording, summed over its segments from the files; nil if any cannot be opened. The
+    /// recorder's `currentTime` is zero once stopped, so `AudioRecorder.stop` trusts this.
     static func duration(fileName: String) -> TimeInterval? {
         var total: TimeInterval = 0
         for name in segmentNames(of: fileName) {
@@ -251,11 +189,8 @@ enum AudioStorage {
         return total
     }
 
-    /// Every recording on disk, sealed or not, by file name. A continuation is
-    /// part of the recording it follows and is not listed.
-    ///
-    /// The list is the truth about what exists; the database is a view of it.
-    /// `RecordingController.reconcile` compares the two.
+    /// Every recording on disk, sealed or not, by file name; continuations are not listed. The disk is the truth about
+    /// what exists; the database is a view of it (`RecordingController.reconcile`).
     static func storedFileNames() -> [String] {
         let names = (try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []
         return names.filter { (isSealed($0) || $0.hasSuffix(pendingSuffix) || $0.hasSuffix(".m4a")) && !isContinuation($0) }
@@ -268,21 +203,15 @@ enum AudioStorage {
         return attributes?[.creationDate] as? Date
     }
 
-    /// The audio of a recording, unlocked.
-    ///
-    /// A sealed file goes through the vault. A file still waiting to be sealed is
-    /// read as it is; that only happens while the device has not been unlocked
-    /// since the recording was stopped. Of an interrupted recording still
-    /// waiting, this is the part before the first call; the seal joins the rest.
+    /// The audio of a recording, unlocked. A sealed file goes through the vault; an unsealed one is read as is (only
+    /// before the first unlock after stopping), and for an interrupted one that is the part before the first call.
     static func plaintext(fileName: String) throws -> Data {
         let stored = try Data(contentsOf: directory.appendingPathComponent(fileName))
         return isSealed(fileName) ? try RecordingVault.open(stored) : stored
     }
 
-    /// Runs a job with the recording temporarily decrypted.
-    ///
-    /// The plaintext lives only as long as the job, in the temporary directory, and
-    /// is deleted however the job ends.
+    /// Runs a job with the recording temporarily decrypted; the plaintext lives in the temporary directory and is
+    /// deleted however the job ends.
     static func withDecrypted<T>(
         fileName: String,
         _ body: (URL) async throws -> T
@@ -293,22 +222,9 @@ enum AudioStorage {
         return try await body(temporary)
     }
 
-    /// Unlocks the audio file and puts the plaintext in a temporary file.
-    ///
-    /// `@concurrent` keeps the reading, decrypting and writing off the main thread.
-    /// Without it they land there: `SWIFT_APPROACHABLE_CONCURRENCY` makes a
-    /// `nonisolated async` function inherit the caller's actor, and
-    /// `Transcription.run` calls from the main actor. All three steps take the whole
-    /// file at once, and an hour of audio is about 30 MB.
-    ///
-    /// `.completeUnlessOpen`: `write` closes the file, the engine opens it again
-    /// on the unlocked device the run starts on, and holds it across the pieces.
-    /// A held-open file of this class stays readable if the screen locks
-    /// meanwhile, so a run the user locks the screen on goes on until iOS
-    /// suspends the app, and its progress is saved piece by piece.
-    ///
-    /// `body` stays with the caller. The engine is bound to the main actor and must
-    /// still be called from there.
+    /// Unlocks the audio into a temp file. `@concurrent`: `SWIFT_APPROACHABLE_CONCURRENCY` would run it on the main
+    /// actor (`Transcription.run` calls from there) with an hour of audio read whole. `.completeUnlessOpen`: the
+    /// held-open file stays readable after the screen locks. `body` stays with the caller (main-actor engine).
     @concurrent
     private static func decryptToTemporary(fileName: String) async throws -> URL {
         let audio = try plaintext(fileName: fileName)
@@ -318,13 +234,9 @@ enum AudioStorage {
         return temporary
     }
 
-    /// Keeps the database out of the iCloud backup.
-    ///
-    /// The text in it is sealed, so what would otherwise travel is metadata: dates,
-    /// lengths and file names. Little, but none of it belongs in a backup. Set at
-    /// every launch, for the same reason as the recordings folder, and again after
-    /// the first save: SQLite creates `-wal` and `-shm` on the first write, and a
-    /// flag set on a file that does not exist yet sets nothing.
+    /// Keeps the database out of the iCloud backup: its text is sealed, but dates, lengths and file names would travel.
+    /// Set at every launch and again after the first save, since SQLite creates `-wal` and `-shm` on the first write
+    /// and a flag on a missing file sets nothing.
     static func excludeFromBackup(store container: ModelContainer) {
         for configuration in container.configurations {
             let url = configuration.url
@@ -351,12 +263,9 @@ enum AudioStorage {
         )
     }
 
-    /// Keeps the recordings out of the iCloud backup.
-    ///
-    /// Apple calls this guidance to the system, not a guarantee, and the flag can be
-    /// reset by file operations. So we set it again every time a file is finished.
-    /// For a guarantee, the content has to be encrypted with a key that does not
-    /// exist outside this device.
+    /// Keeps the recordings out of the iCloud backup. Apple treats this as guidance, not a guarantee, and file
+    /// operations can reset it, so it is set again whenever a file is finished. A guarantee needs content encrypted
+    /// with a key that never leaves the device.
     private static func excludeFromBackup(_ url: URL) {
         var target = url
         var values = URLResourceValues()

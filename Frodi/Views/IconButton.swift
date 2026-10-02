@@ -1,11 +1,7 @@
 import SwiftUI
 
-/// A button that is an icon and nothing else: no fill, no frame, in the tone
-/// of every other icon, on the 44 pt target the design system asks for.
-///
-/// The settings button in the logo header and the buttons in the navigation
-/// bars are all this. The record button is the one button with a fill of its
-/// own. VoiceOver needs the name the icon does not write.
+/// A button that is an icon and nothing else: no fill, no frame, the tone of every other icon, on the 44 pt target the design system asks for.
+/// Used by the header settings button and navigation bars; the record button alone has a fill. VoiceOver needs the name the icon does not write.
 struct IconButton: View {
     let icon: Icon
     /// A second icon on a disc in the corner, which says what the button adds

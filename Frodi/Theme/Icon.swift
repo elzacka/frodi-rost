@@ -1,21 +1,8 @@
 import SwiftUI
 
-/// The icons in the app, taken from Material Symbols.
-///
-/// Material Symbols is drawn by Google and Apache 2.0 licensed. The files live in
-/// the asset catalogue as SVG with vector data preserved, so they are sharp at
-/// every size. `template` makes the colour come from `foregroundStyle`, so an
-/// icon follows the design system's text colours instead of having its own.
-///
-/// Why not SF Symbols: they are Apple's, and the app should look like itself.
-/// The price is that the icons no longer follow the text size automatically, but
-/// they did not before either, since every call already set a fixed size.
-///
-/// One style, Outlined, at weight 400 and optical size 24. Two fills are in use:
-/// unfilled for everything that is frame and navigation, filled for the buttons
-/// that sit on a coloured surface, where an outline would vanish. The raw value
-/// is Google's own name for the symbol, with `_fill` where the filled variant is
-/// the one bundled.
+/// The icons, from Material Symbols (Apache 2.0), bundled as vector SVG; `template` takes the colour from
+/// `foregroundStyle`. Not SF Symbols, so the app looks like itself. Outlined, weight 400, optical size 24; filled only
+/// on coloured surfaces. The raw value is Google's symbol name, `_fill` where the filled variant is bundled.
 enum Icon: String, CaseIterable {
     case settings = "instant_mix"
     case importAudio = "graphic_eq"
@@ -40,10 +27,9 @@ enum Icon: String, CaseIterable {
     case pause = "pause_fill"
 }
 
-/// An icon with a small disc knocked out of its lower trailing corner, carrying
-/// a second icon: the waveform with its «add». The two are drawn apart and
-/// joined here rather than baked into one image, so each takes its colour from
-/// the design system's tokens; a template image can only take one.
+/// An icon with a small disc knocked out of its lower trailing corner, carrying a second icon (the waveform with its
+/// «add»). Drawn apart and joined here so each takes its colour from the design tokens; a template image takes only
+/// one.
 struct BadgedIconView: View {
     private let icon: Icon
     private let badge: Icon
@@ -85,11 +71,8 @@ struct BadgedIconView: View {
     }
 }
 
-/// An icon at a given size, coloured like the text around it.
-///
-/// The size is given in points and comes from the measures in `Theme`, never as a
-/// number at the call site. The icon is square: Material Symbols are drawn on a
-/// 24 × 24 grid, and a square frame keeps them aligned with each other.
+/// An icon at a given size, coloured like the surrounding text. The size comes from the measures in `Theme`, never a
+/// number at the call site; the frame is square because Material Symbols sit on a 24 × 24 grid.
 struct IconView: View {
     private let icon: Icon
     private let size: CGFloat

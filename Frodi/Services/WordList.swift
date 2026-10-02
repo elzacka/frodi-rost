@@ -1,17 +1,8 @@
 import Foundation
 
-/// Names and terms the model should know: companies, people, abbreviations.
-///
-/// Whisper takes a short text before it starts listening and leans towards
-/// spelling what it hears the way that text does. It adds nothing to the
-/// transcript; it settles how an ambiguous sound is written. A surname it has
-/// never seen comes out as two words or an invented one; the same surname in
-/// the list comes out right. In an interview those are the words that matter.
-///
-/// This is the app's one setting. It is stored sealed through the vault, like
-/// the text: the names of a user's clients are as exposing as anything said
-/// about them. `UserDefaults` would have put them in the iCloud backup in the
-/// clear.
+/// Names and terms the model should know. Whisper takes a short text before listening and spells ambiguous sounds like
+/// it; it adds nothing to the transcript. The app's one setting, sealed through the vault like the text: client names
+/// are as exposing as anything said, and `UserDefaults` would put them in the iCloud backup in the clear.
 enum WordList {
     /// The `UserDefaults` key for the height of the field in Innstillinger. A
     /// height is not personal data, so it does not go through the vault.
@@ -51,23 +42,9 @@ enum WordList {
             .filter { !$0.isEmpty }
     }
 
-    /// Spells the listed names the way the list does, where the model nearly did.
-    ///
-    /// The prompt is a bias, not a rule: measured on 2026-09-14, it fixed
-    /// «Osserud» to «Aaserud» and left «Norgkvist» for «Nordkvist» and «TASK» for
-    /// «Tazk» every time. Those are one or two letters off, and the user has said
-    /// what the word is. So the finished text is compared against the list, whole
-    /// words only, and a word within a small edit distance of an entry becomes
-    /// the entry. A multi-word entry is matched as a unit, so «Maskin» on its own
-    /// never touches «maskinen».
-    ///
-    /// Conservative on purpose: nothing shorter than four letters, no more than
-    /// one letter in six, never a word that is only a case away, never a word
-    /// that already equals another entry, never a word that begins with the
-    /// entry. The last is Norwegian grammar: «internkontrollen» and «Tazks» hold
-    /// the entry as listed, and the ending is not a misspelling. A false
-    /// replacement is worse than a missed one, because the user cannot see it
-    /// happened.
+    /// Corrects near-misses of listed names (the prompt is a bias). Whole words, small edit distance, multi-word
+    /// entries whole. Skips words under four letters, over one letter in six off, case-only differences, other entries,
+    /// and words beginning with an entry (Norwegian endings: «Tazks»). A wrong swap is invisible: worse than a miss.
     static func correct(_ text: String, entries: [String]) -> String {
         let entries = entries.filter { $0.count >= 4 }
         guard !entries.isEmpty else { return text }

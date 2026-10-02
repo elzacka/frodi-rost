@@ -12,21 +12,15 @@ final class Recording {
     /// next version.
     var fileName: String = ""
 
-    /// The text is sealed the same way as the audio.
-    ///
-    /// A transcript is often more exposing than the audio file. It is searchable,
-    /// readable at a glance, and can be copied without being played. Protecting the
-    /// audio and leaving the text in the clear would be locking the door and leaving
-    /// the window open.
+    /// The text is sealed like the audio: a transcript is often more exposing, being searchable, readable at a glance
+    /// and copyable without playing it.
     var sealedTranscript: Data?
 
     var transcriptionFailed: Bool = false
 
-    /// Set at the start and cleared at the end of `Transcription.run`, which is the
-    /// only place that saves while the flag is true. If the app crashes in the middle
-    /// of an attempt without anything else having saved in between, the next launch
-    /// reads the flag as `false` from disk, and `transcribePending()` picks the
-    /// recording up again without it being stuck as «transkriberer».
+    /// Set at the start and cleared at the end of `Transcription.run`, the only place that saves while it is true.
+    /// After a crash mid-attempt the next launch reads `false` from disk, so `transcribePending()` retries instead of
+    /// leaving the recording stuck as «transkriberer».
     var isTranscribing: Bool = false
 
     /// Why the text is missing. Without this the app says «fant ingen tale» even when

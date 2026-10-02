@@ -1,25 +1,8 @@
 import XCTest
 
-/// A tool, not a test. It adds the app's control to Kontrollsenter on the
-/// simulator if it is not there, presses it, and leaves the log to say which
-/// process performed the intent. Gated like the screenshot tools:
-///
-/// ```bash
-/// TEST_RUNNER_FRODI_SHOTS=1 xcodebuild -project Frodi.xcodeproj -scheme Frodi \
-/// -destination 'platform=iOS Simulator,name=Frodi-Test' \
-/// -collect-test-diagnostics never \
-/// -only-testing:FrodiUITests/ScratchControlPress test
-/// xcrun simctl spawn Frodi-Test log show --last 3m \
-///   --predicate 'subsystem == "com.Tazk.Frodi" OR (process == "chronod" AND eventMessage CONTAINS "control action")'
-/// ```
-///
-/// Measured on 2026-09-22: the press ran `ToggleRecordingIntent.perform()`
-/// in the app's process and started a recording.
-///
-/// The simulator does not enforce the device's audio rules. It starts a
-/// non-mixable session from the background, which a device refuses ('!int',
-/// 2026-09-26). A green run here says the intent is routed and performed; only
-/// a device says whether the recording starts.
+/// Tool, not a test: adds and presses the app's Kontrollsenter control on the simulator (`FRODI_SHOTS`); the log
+/// shows which process ran the intent. Green proves routing only: the simulator allows a non-mixable background
+/// session a device refuses ('!int'). Run command and log query: README, *Verktøy og målinger*.
 final class ScratchControlPress: XCTestCase {
     @MainActor
     func test_press() throws {

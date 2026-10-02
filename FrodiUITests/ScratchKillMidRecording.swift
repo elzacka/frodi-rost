@@ -1,19 +1,8 @@
 import XCTest
 
-/// Experiment, not a test: starts a recording and kills the app three seconds in.
-/// Whether the file left behind can be opened is checked from outside:
-///
-/// ```bash
-/// TEST_RUNNER_FRODI_KILL=1 xcodebuild -project Frodi.xcodeproj -scheme Frodi \
-///   -destination 'platform=iOS Simulator,name=Frodi-Test' \
-///   -only-testing:FrodiUITests/ScratchKillMidRecording test
-/// afinfo "$(xcrun simctl get_app_container booted com.Tazk.Frodi data)"/Documents/Opptak/*.caf
-/// ```
-///
-/// Measured on 2026-09-14: an `.m4a` left this way cannot be opened, a
-/// CAF with AAC opens with zero packets, and PCM in a CAF plays every frame.
-/// That is why the recorder writes PCM. Skipped unless `FRODI_KILL` is set,
-/// since it leaves an orphan behind on purpose.
+/// Experiment, not a test: kills the app 3 s into a recording; skipped unless `FRODI_KILL` (leaves an orphan).
+/// Measured 2026-09-14: a killed .m4a is unopenable, CAF-AAC has 0 packets, PCM in CAF plays every frame: why PCM.
+/// Run command: README, *Verktøy og målinger*.
 final class ScratchKillMidRecording: XCTestCase {
     @MainActor
     func test_killMidRecording() throws {

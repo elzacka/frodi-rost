@@ -3,11 +3,9 @@ import Observation
 import SwiftData
 import UIKit
 
-/// Owns the recording, and is what both the interface and the Action Button talk to.
+/// Owns the recording; the interface and the Action Button both talk to it.
 ///
-/// It has to be shared because an App Intent runs without access to SwiftUI. Had
-/// the recorder lived in a view, the Action Button could not stop a recording
-/// already in progress.
+/// Shared because an App Intent runs without SwiftUI: with the recorder in a view, the Action Button could not stop a recording.
 @MainActor
 @Observable
 final class RecordingController {
@@ -54,13 +52,9 @@ final class RecordingController {
         ) { [weak self] _ in
             Task { @MainActor in await self?.sealPending() }
         }
-        // iOS does not hold that notification for a suspended app: Apple's list
-        // of what it queues, «Processing queued notifications», leaves protected
-        // data out. A stop on the locked device is followed by suspension, so the
-        // unlock goes unseen and the recording would wait for the next launch.
-        // Coming to the front catches up, on everything waiting except failures:
-        // `sealPending` also retries every failed transcription, which is not
-        // worth a model run each time the app comes to the front.
+        // iOS does not queue the unlock notification for a suspended app («Processing queued notifications» omits protected data)
+        // and a stop on the locked device ends in suspension: the recording waits for next launch. Foreground catches up on all
+        // waiting except failures: `sealPending` retries every failed transcription, not worth a model run per foreground.
         NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification,
             object: nil,
@@ -71,11 +65,9 @@ final class RecordingController {
         Task { await sealPending() }
     }
 
-    /// Seals what is still plaintext, and goes on with every recording that has
-    /// no text and has not failed: a run the device locked on, or one that
-    /// stopped for a recording, waits for this. A failed one is left for launch
-    /// and for «Prøv på nytt». `Transcription.run` returns at once for a long
-    /// recording nobody has asked about.
+    /// Seals what is still plaintext, then continues every recording with no text that has not failed (one the device locked on, or
+    /// one stopped for a recording). Failed ones wait for launch and «Prøv på nytt». `Transcription.run` returns at once for a long
+    /// recording nobody asked about.
     private func catchUp() async {
         guard UIApplication.shared.isProtectedDataAvailable,
               let context = container?.mainContext else { return }
@@ -154,18 +146,9 @@ final class RecordingController {
         case unreadable, other
     }
 
-    /// Brings audio files in as recordings, one after the other, and returns
-    /// why each one that did not come in failed.
-    ///
-    /// Each file is converted and sealed in the scratch folder, then moved into
-    /// the recordings folder with its row inserted and saved in one main-actor
-    /// step, with no suspension between: `reconcile` must not meet the file
-    /// without its row, or it would give it a second one. An import therefore
-    /// never waits unsealed where a recording made here would, and never gets an
-    /// origin that says it was recorded here.
-    ///
-    /// The text follows the same path as a stopped recording. A file over the
-    /// length limit waits for «Lag tekst», like a long interview.
+    /// Brings audio files in as recordings, one by one; returns why each failure failed.
+    /// Converted and sealed in scratch, then moved in with its row in one main-actor step, no suspension: `reconcile` would add a second row.
+    /// Never unsealed, never origin-tagged as recorded here. Text as for a stopped recording; over the length limit: «Lag tekst».
     func importAudio(_ urls: [URL]) async -> [ImportFailure] {
         guard let container else { return urls.map { _ in .other } }
         let context = container.mainContext
@@ -223,13 +206,9 @@ final class RecordingController {
         return failed
     }
 
-    /// Seals, and then transcribes, everything that is waiting.
-    ///
-    /// `Transcription.run` does the sealing, so a recording sealed here gets its
-    /// text in the same pass, and the list's own pass at launch cannot collide
-    /// with this one. The check on protected data is what makes the launch case
-    /// safe: an App Intent can launch the app in the background with the device
-    /// locked, and the attempt would fail anyway.
+    /// Seals, then transcribes, everything waiting. `Transcription.run` does the sealing, so one pass sees the text and the launch pass
+    /// cannot collide with it. Its protected-data check keeps launch safe: an App Intent can launch the app in the background with the
+    /// device locked, where the attempt would fail anyway.
     func sealPending() async {
         guard UIApplication.shared.isProtectedDataAvailable,
               let context = container?.mainContext else { return }
@@ -238,30 +217,9 @@ final class RecordingController {
         await Transcription.runPending(context: context)
     }
 
-    /// Makes the list agree with the disk.
-    ///
-    /// The file is the recording; the row is what the list knows about it. The
-    /// two come apart when the app dies between writing one and the other: killed
-    /// while recording, before `stopAndSave` ran; a database that fell back to
-    /// memory, so the rows vanished at the next launch; a crash inside the seal,
-    /// after the plaintext was removed and before the new name was saved. In every
-    /// case the audio is intact and nothing was looking for it.
-    ///
-    /// Two repairs. A sealed file whose row still carries the plaintext name gets
-    /// the row pointed at it. A file no row knows gets a row, dated from the file.
-    /// The duration of a sealed orphan is unknown until it is opened, and that is
-    /// left to the transcription, which opens it anyway.
-    ///
-    /// The file being recorded right now has no row yet by design, and is skipped:
-    /// the unlock pass runs while the car recording is still going.
-    ///
-    /// A plaintext file that opens and holds no frames is not a recording, the
-    /// same rule `AudioRecorder.stop` applies. The recorder creates the file
-    /// before `record()` can refuse, and a crash in between leaves it. It gets
-    /// no row, and a row it already has goes with it: the seal cannot encode an
-    /// empty file, so the row would say «venter på transkribering» for good and
-    /// the seal would fail at every launch. Measured on 2026-09-19: an empty
-    /// CAF is what gives the export session's -11800 with -12780 underneath.
+    /// Reconciles list and disk: repoints a row still named plaintext at its sealed file; a row-less file gets one, dated from the file.
+    /// Skips the file being recorded now (no row by design). A plaintext file with no frames (as in `AudioRecorder.stop`) gets no row
+    /// and loses its row: the seal cannot encode it (-11800/-12780) and would fail every launch.
     func reconcile(_ context: ModelContext) {
         var onDisk = Set(AudioStorage.storedFileNames())
         if let current = recorder.currentFileName { onDisk.remove(current) }
@@ -275,10 +233,8 @@ final class RecordingController {
         }
 
         let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
-        // A row's sealed name counts as known too. A seal running in another
-        // pass writes the sealed file before it removes the plaintext and renames
-        // the row, and in that moment the sealed file would look like an orphan
-        // and get a second row.
+        // A row's sealed name counts as known too: a seal in another pass writes the sealed file before removing the plaintext and
+        // renaming the row, and the sealed file would look like an orphan and get a second row.
         var referenced = Set(recordings.flatMap { [$0.fileName, AudioStorage.sealedName(for: $0.fileName)] })
 
         for recording in recordings where !onDisk.contains(recording.fileName) {

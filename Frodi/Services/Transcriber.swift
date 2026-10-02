@@ -1,17 +1,11 @@
 import Foundation
 
-/// The gateway to speech to text. Everything that turns audio into text goes
-/// through this, so the engine can be swapped without the rest of the app noticing.
-///
-/// Bound to the main actor because WhisperKit is not `Sendable` and therefore
-/// cannot cross an actor boundary. The engines do the actual work on their own threads.
+/// The gateway to speech to text: all audio-to-text goes through it, so the engine can be swapped.
+/// Main actor because WhisperKit is not `Sendable` and cannot cross an actor boundary; the engines work on their own threads.
 @MainActor
 protocol Transcriber {
-    /// Turns the audio from `start` to the end into paragraphs, a piece at a time.
-    ///
-    /// After each piece the paragraphs found in it and the position reached are
-    /// handed to `piece`. Returning false stops the transcription there; what has
-    /// been handed over is kept, and a later call from that position goes on.
+    /// Turns audio from `start` to the end into paragraphs, a piece at a time. After each piece, its paragraphs and the position reached go to
+    /// `piece`; returning false stops there, what was handed over is kept, and a later call from that position continues.
     func transcribe(
         fileURL: URL,
         from start: TimeInterval,

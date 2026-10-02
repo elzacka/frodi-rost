@@ -3,12 +3,9 @@ import Testing
 import UIKit
 @testable import Frodi
 
-/// WCAG 2.2 AA is a requirement, not a goal: 4.5:1 for ordinary text, 3:1 for
-/// icons and other graphical elements.
+/// WCAG 2.2 AA is a requirement: 4.5:1 for ordinary text, 3:1 for icons and graphical elements.
 ///
-/// The test exists because the fault sat there for half a year without being
-/// seen. `TextSecondary` was at 3.92:1 against surface, which looks right on
-/// screen and is impossible to spot by eye. Only arithmetic catches it.
+/// Only arithmetic catches faults: `TextSecondary` sat at 3.92:1 against surface, which looks right on screen.
 @Suite("Kontrast")
 struct ContrastTests {
     /// Relative luminance as WCAG defines it.
@@ -47,17 +44,9 @@ struct ContrastTests {
         )
     }
 
-    /// Icons, borders and surfaces that carry meaning without text.
-    ///
-    /// The accent is here because `.tint` colours the back button, the export icon
-    /// and the player slider: icons with no text beside them. The border is here
-    /// because it is the edge around cards and rows, and the dividers in the header
-    /// and above the recorder bar.
-    ///
-    /// One pair is deliberately left out: the record button's change from
-    /// accent-record to recording-active is 1.50:1. Colour is not the only signal.
-    /// The icon switches from `mic.fill` to `stop.fill`, the timer starts, and the
-    /// VoiceOver label changes. See dev_only/DECISIONS.md.
+    /// Icons, borders and surfaces that carry meaning without text: the accent (`.tint`: back button, export icon, player slider) and the border.
+    /// Left out deliberately: record button accent-record to recording-active, 1.50:1. Colour is not the only signal: icon mic.fill to
+    /// stop.fill, timer starts, VoiceOver label changes. See dev_only/DECISIONS.md.
     @Test("Grafiske element når 3:1", arguments: [
         ("RecordingActive", "Background"),
         ("Surface", "RecordingActive"),
@@ -74,15 +63,8 @@ struct ContrastTests {
         )
     }
 
-    /// Secondary text, the labels and status lines beside running text, has to
-    /// read as quieter than the text it accompanies, and the difference has to
-    /// be visible. Running text is `TextPrimary` and secondary text is
-    /// `TextSecondary`, which measures 2,88:1 between them. The ratio is a
-    /// stand-in for «visibly lighter», not a WCAG requirement: the rules say
-    /// nothing about two text colours on the same surface. 2,5 is the floor, so
-    /// the tones can be tuned without the step quietly disappearing.
-    ///
-    /// Each tone meets AA on its own: both pairs are in `textMeetsAA` above.
+    /// Secondary text must read visibly quieter than running text (`TextPrimary` vs `TextSecondary`, 2,88:1 apart). The ratio stands in for
+    /// «visibly lighter», not a WCAG rule; 2,5 is the floor so tuning cannot make the step vanish. Each tone meets AA alone: see `textMeetsAA`.
     @Test("Sekundær tekst skiller seg synlig fra brødteksten")
     func secondaryIsVisiblyLighterThanBody() throws {
         let measured = try Self.ratio("TextSecondary", on: "TextPrimary")

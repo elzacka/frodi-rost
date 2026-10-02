@@ -53,10 +53,8 @@ struct RecordingRow: View {
         .accessibilityLabel(spokenLabel)
     }
 
-    /// The name the user gave the recording. Six interviews on one day are six
-    /// rows with a date each; a name tells them apart. It gives way to the date
-    /// when the screen is recorded or photographed for the app switcher, as the
-    /// text does: a name often says who was interviewed.
+    /// The name the user gave the recording; it tells apart six interviews on one day. It gives way to the date when the screen is
+    /// recorded or photographed for the app switcher, as the text does: a name often says who was interviewed.
     private var name: String? {
         concealment == .none ? recording.title() : nil
     }

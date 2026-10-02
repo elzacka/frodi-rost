@@ -2,18 +2,9 @@ import AVFoundation
 import Foundation
 import WhisperKit
 
-/// nb-whisper from the National Library, run inside the app.
-///
-/// The difference from Apple's engine is not whether the audio leaves the device,
-/// which it does in neither case, but where it is processed. Apple's model runs
-/// in a system process outside the app's container. This one runs inside it.
-///
-/// The model and the tokenizer live in the app bundle. `WhisperKit` would
-/// otherwise fetch them from Hugging Face on first run, and the app would have
-/// had network access. Both paths are therefore given explicitly.
-/// Bound to the main actor because `WhisperKit` is not `Sendable`. It therefore
-/// cannot cross an actor boundary without Swift 6 flagging it. WhisperKit does
-/// the actual work on its own threads, so this does not block the interface.
+/// nb-whisper from the National Library, run inside the app, not in Apple's system process outside the container.
+/// Model and tokenizer are bundled, both paths explicit: otherwise `WhisperKit` fetches them from Hugging Face (network).
+/// Main actor because `WhisperKit` is not `Sendable`; it works on its own threads, so the interface is not blocked.
 @MainActor
 final class WhisperTranscriber: Transcriber {
     private var whisper: WhisperKit?
@@ -21,11 +12,8 @@ final class WhisperTranscriber: Transcriber {
     /// The word list as tokens, for the transcription running right now.
     private var promptTokens: [Int]?
 
-    /// Loads the model if it is not already loaded.
-    ///
-    /// It deliberately returns nothing: `WhisperKit` is not `Sendable`, and handing
-    /// it out of an isolated method is exactly what Swift 6 stops. So it stays
-    /// here, and all the work happens in this class.
+    /// Loads the model if it is not already loaded. Returns nothing: `WhisperKit` is not `Sendable`, and Swift 6
+    /// stops handing it out of an isolated method, so it stays in this class.
     private func load() async throws {
         guard whisper == nil else { return }
 
@@ -49,13 +37,9 @@ final class WhisperTranscriber: Transcriber {
         whisper = try await WhisperKit(config)
     }
 
-    /// How much audio goes through the model in one call.
-    ///
-    /// Memory grows with the length of a single call, about 60 MB a minute on the
-    /// simulator on top of the model itself, and a ten minute call was the longest
-    /// that survived there. Three minutes keeps a call well inside that, and makes
-    /// the piece the unit of progress: what is saved when the app is suspended,
-    /// and what is lost at most when it is.
+    /// How much audio goes through the model in one call: three minutes.
+    /// Memory grows about 60 MB a minute on the simulator on top of the model; ten minutes was the longest that survived there.
+    /// The piece is also the unit of progress: what is saved, and the most lost, when the app is suspended.
     nonisolated static let pieceLength: TimeInterval = 3 * 60
 
     /// A piece is not cut at exactly `pieceLength` but at the quietest moment in the
@@ -72,10 +56,8 @@ final class WhisperTranscriber: Transcriber {
         try await load()
         guard let whisper else { throw TranscriptionError.modelMissing }
 
-        // Opened once and kept open across the pieces, so the file is read
-        // through one handle however long the run takes; see
-        // `AudioStorage.decryptToTemporary` for the class that lets the open
-        // itself succeed on a locked device.
+        // Opened once and kept open across the pieces: one handle however long the run takes. See
+        // `AudioStorage.decryptToTemporary` for the file class that lets the open succeed on a locked device.
         let file = try AudioPieces(url: fileURL)
         let duration = file.duration
         var position = start
@@ -156,18 +138,9 @@ final class WhisperTranscriber: Transcriber {
         return quietest
     }
 
-    /// Retries a piece by splitting it in two.
-    ///
-    /// The model sometimes answers a window full of speech with only the end marker.
-    /// The piece then comes back empty, and the text used to get a hole nobody could
-    /// see: the recording was as long as before, but the last thing said was gone.
-    /// No decoder setting fixes it: measured on 2026-09-10, higher
-    /// temperature, `usePrefillPrompt: false` and `suppressBlank` all gave exactly
-    /// the same empty answer on the same 15 seconds.
-    ///
-    /// Two halves are a different input than one whole window, and that is enough:
-    /// the same audio gave full text once it was split. We keep splitting as long as
-    /// a half is still silent and long enough for there to be speech in it.
+    /// Retries an empty piece by splitting it in two; halves are a different input than one window.
+    /// The model sometimes answers speech with only the end marker. No decoder setting fixes it (2026-09-10): a higher temperature,
+    /// `usePrefillPrompt: false`, `suppressBlank` all failed alike. Split again while a half is silent and long enough for speech.
     private func retry(in audio: [Float], from start: Double, to end: Double) async -> String {
         guard let whisper, end - start >= Self.shortestRetry else { return "" }
 
@@ -227,18 +200,9 @@ final class WhisperTranscriber: Transcriber {
             usePrefillPrompt: true,
             skipSpecialTokens: true,
             withoutTimestamps: true,
-            // Without this only the first half minute comes through.
-            //
-            // Whisper hears 30 seconds at a time. Without chunking, WhisperKit runs every
-            // window through the same decoder, and from window two onward nothing comes
-            // out. Measured 2026-09-09 on a recording of 3 minutes 3 seconds: 86 of
-            // 516 words. With .vad every chunk is its own run, and 512 words came out.
-            //
-            // The chunker looks for a pause to cut on. If it finds none, engine noise in
-            // a car for instance, it cuts at 30 seconds instead. That is exactly what makes
-            // the text complete, so a recording without pauses loses nothing by it.
-            //
-            // A piece being retried is already split, and must not be split again.
+            // Without this only the first half minute comes through: without chunking every window after the first yields nothing
+            // (2026-09-09, 3 min 3 s: 86 of 516 words; with .vad 512). It cuts at a pause, else at 30 s, so pause-free audio loses nothing.
+            // Not for a piece being retried: it is already split.
             chunkingStrategy: chunked ? .vad : nil
         )
     }
@@ -252,12 +216,8 @@ final class WhisperTranscriber: Transcriber {
     nonisolated static let tokenizerFiles = ["tokenizer.json", "tokenizer_config.json"]
 
     /// Whether both tokenizer files are in the bundle.
-    ///
-    /// `download: false` governs the model folder only. When the tokenizer cannot
-    /// be read locally, WhisperKit falls back to fetching it from Hugging Face
-    /// without consulting that flag; `ModelUtilities.loadTokenizer` in 1.1.0. So the app checks for the files itself,
-    /// before WhisperKit is ever created, and a build missing one of them reports
-    /// the model as missing rather than reach for the network.
+    /// `download: false` covers the model folder only; WhisperKit 1.1.0 (`ModelUtilities.loadTokenizer`) fetches an unreadable
+    /// tokenizer from Hugging Face regardless. So check before creating it: a missing file reports the model missing, no network.
     nonisolated static var tokenizerIsComplete: Bool {
         guard let folder = tokenizerFolder?.appendingPathComponent("models/openai/whisper-small") else {
             return false
@@ -278,12 +238,9 @@ final class WhisperTranscriber: Transcriber {
     }
 }
 
-/// An audio file held open for the length of a transcription, read a piece at a time.
-///
-/// `@unchecked Sendable` because `AVAudioFile` is not marked, and the reads have
-/// to happen off the main actor: three minutes of audio is about 11 MB as `Float`
-/// and does not belong there. The reads are sequential, one piece after the
-/// other from one caller, which is what makes the assertion hold.
+/// An audio file held open for a transcription, read a piece at a time.
+/// `@unchecked Sendable` because `AVAudioFile` is not marked; reads must be off the main actor (3 minutes is about 11 MB as `Float`)
+/// and sequential from one caller, which is what makes the assertion hold.
 final class AudioPieces: @unchecked Sendable {
     private let file: AVAudioFile
     let duration: TimeInterval

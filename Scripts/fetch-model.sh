@@ -1,23 +1,7 @@
 #!/bin/bash
-# Fetches nb-whisper-small as CoreML, and the Whisper tokenizer.
-#
-# The model is not in git; it is nearly half a gigabyte. Run this script once
-# after cloning, before you build.
-#
-# Both repositories are fetched at a fixed revision, and every file is checked
-# against Scripts/model-checksums.txt before the script reports success. A CoreML
-# model is parsed by the system and runs inside the app's process, so what ends
-# up in the bundle has to be exactly what was reviewed, not whatever the
-# repository serves on the day.
-#
-# To move to a newer revision: change MODEL_REVISION or TOKENIZER_REVISION,
-# delete Frodi/Resources/Model, run the script (it fetches, then fails on the
-# checksums), review the new files, and regenerate the list with
-#   (cd Frodi/Resources/Model && find . -type f | sort | xargs shasum -a 256) > Scripts/model-checksums.txt
-#
-# Sources:
-# model:      https://huggingface.co/Barrymanalow/nb-whisper-coreml (apache-2.0)
-# tokenizer:  https://huggingface.co/openai/whisper-small (apache-2.0)
+# Gets nb-whisper-small CoreML and the Whisper tokenizer; run once after cloning (not in git, ~0.5 GB).
+# Pinned revisions, checked against Scripts/model-checksums.txt: CoreML runs in-process, so bundle only reviewed files.
+# New revision and regenerating the checksums: README, *Bygg*.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

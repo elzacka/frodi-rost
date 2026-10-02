@@ -105,10 +105,8 @@ struct RecordingListView: View {
                 .font(.Frodi.display)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            // The second half of the app name, not a subtitle. Inter, not Skranji: the
-            // display face is hard to read at small sizes, and the eyebrow style is made
-            // for this. Together the header reads «fróði røst», which is the name of the
-            // app.
+            // The second half of the app name, «fróði røst», not a subtitle. Inter, not Skranji: the display
+            // face is hard to read at small sizes, and the eyebrow style is made for this.
             Text("røst")
                 .font(.Frodi.eyebrow)
                 .eyebrowTracking()
@@ -143,9 +141,7 @@ struct RecordingListView: View {
     }
 
     /// The database could not be opened, so the app runs on memory.
-    ///
-    /// Without this message the recordings would vanish on restart with nothing to
-    /// say why. A silent failure is worse than a visible one.
+    /// Without this message recordings would vanish on restart with nothing to say why.
     private var storageWarning: some View {
         VStack(alignment: .leading, spacing: Space.s2) {
             Text("Opptakene lagres ikke")
@@ -204,17 +200,9 @@ struct RecordingListView: View {
         .scrollContentBackground(.hidden)
     }
 
-    /// One recording, with what can be done to it behind a swipe to the left:
-    /// the text action that applies, and «Slett». Deleting asks first, in the
-    /// row: one tap is one tap too few for something that cannot be undone,
-    /// and the recording and its text go together.
-    ///
-    /// VoiceOver has no swipe, so the same actions hang on the row as custom
-    /// actions.
-    ///
-    /// The row opens the recording from a tap gesture, not from a
-    /// `NavigationLink`: a button counts a drag that ends inside it as a tap,
-    /// so the swipe would open the recording instead of the actions.
+    /// One recording; the text action that applies and «Slett» sit behind a swipe left. Delete asks first, in the row (no undo, text goes too).
+    /// VoiceOver has no swipe, so they are custom actions too. Opens from a tap gesture, not a `NavigationLink`:
+    /// a button counts a drag ending inside it as a tap, so the swipe would open the recording.
     private func row(_ recording: Recording) -> some View {
         SwipeRow(stage: stage(of: recording), onStage: { setStage($0, of: recording) }) {
             RecordingRow(recording: recording)
@@ -277,11 +265,8 @@ struct RecordingListView: View {
         swipe = stage == .closed ? nil : Swipe(recording: recording, stage: stage)
     }
 
-    /// The one text action a recording can take, or none while it transcribes:
-    /// «Lag tekst» for a long recording that waits to be asked, «Prøv på nytt»
-    /// after a failure, and «Lag ny tekst» for a word list written after the
-    /// interview. The audio is the same, so nothing is lost that the new run
-    /// does not remake.
+    /// The one text action a recording can take, or none while it transcribes: «Lag tekst» for a long recording waiting
+    /// to be asked, «Prøv på nytt» after a failure, «Lag ny tekst» for a word list written after the interview.
     private func textAction(for recording: Recording) -> (label: String, run: () -> Void)? {
         guard !recording.isTranscribing else { return nil }
         let label = if recording.hasTranscript {
@@ -307,10 +292,9 @@ struct RecordingListView: View {
         await Transcription.runPending(context: context)
     }
 
-    /// The files that failed are counted, not named: the message can stand in
-    /// the app switcher's picture, and a file name can say who was interviewed.
-    /// The ones that came in are in the list under their own names. A file that
-    /// is not readable audio gets the reason; anything else gets another try.
+    /// Failed files are counted, not named: the message can show in the app switcher's picture, and a file name can say
+    /// who was interviewed. Imported ones are listed under their own names. A file that is not readable audio gets the
+    /// reason; anything else gets another try.
     private func importAudio(_ urls: [URL]) async {
         isImporting = true
         let failed = await controller.importAudio(urls)

@@ -1,12 +1,8 @@
 import XCTest
 
-/// A tool, not a test, like `ScratchPlaybackShot`: pictures of the swiped
-/// row, the question in it, the export sheet and the Eksport card in
-/// Innstillinger. Runs only with `TEST_RUNNER_FRODI_SHOTS=1`.
-///
-/// The export sheet only comes up for a recording with text, and a silent
-/// simulator recording has none. To picture it, force the question in
-/// `RecordingDetailView` for the run, and put it back.
+/// A tool, not a test, like `ScratchPlaybackShot`: pictures of the swiped row, its question, the export sheet and the Eksport
+/// card in Innstillinger. Runs only with `TEST_RUNNER_FRODI_SHOTS=1`. The export sheet needs a recording with text; a silent
+/// simulator recording has none: force the question in `RecordingDetailView` for the run, then put it back.
 final class ScratchChoiceShot: XCTestCase {
     @MainActor
     func test_shot() throws {

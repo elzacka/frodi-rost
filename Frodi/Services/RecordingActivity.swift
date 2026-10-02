@@ -1,14 +1,9 @@
 import ActivityKit
 import Foundation
 
-/// The Live Activity that stands for a running recording on the Lock Screen
-/// and in the Dynamic Island. The widget extension draws it; this starts,
-/// updates and ends it.
-///
-/// Not decoration: `AudioRecordingIntent` requires a Live Activity for as
-/// long as the app records, and iOS stops a recording that has none. It is
-/// also the answer to the car: a glance at the locked device says the
-/// recording is running and how long it has run, and the button on it stops.
+/// The Live Activity for a running recording on the Lock Screen and in the Dynamic Island; the widget extension draws
+/// it, this starts, updates and ends it. Required: `AudioRecordingIntent` demands one for as long as the app records,
+/// and iOS stops a recording that has none. It also shows on a locked device that recording runs, with a stop button.
 @MainActor
 enum RecordingActivity {
     static func start() {
