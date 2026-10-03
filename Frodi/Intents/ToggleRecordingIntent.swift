@@ -6,7 +6,7 @@ import AVFAudio
 /// `LiveActivityIntent` starts it from the background; the session must be mixable, see `AudioRecorder.start()`.
 struct ToggleRecordingIntent: AudioRecordingIntent, LiveActivityIntent {
     static let title: LocalizedStringResource = "Start eller stopp opptak"
-    static let description = IntentDescription("Starter et opptak i Fróði, eller stopper det som går.")
+    static let description = IntentDescription("Starter et opptak i Fróði eller stopper det som går.")
 
     @MainActor
     func perform() async throws -> some IntentResult {

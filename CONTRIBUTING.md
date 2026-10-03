@@ -53,7 +53,7 @@ Visningene henter farger, skrift, avstand og hjørner fra tokenene i
 - Bare lys modus. Designsystemet har ingen mørk palett
 - Tekst på en aksentflate bruker `-on`-varianten, aldri ren svart eller hvit
 - Skriften følger Dynamic Type gjennom `Font.custom(_:size:relativeTo:)`.
-  Aldri `.custom(_:size:)` alene, for det fryser teksten. En test leter
+  Aldri `.custom(_:size:)` alene, for da følger ikke teksten innstillingen. En test leter
   etter det
 - Ingenting under 11 px. Tidtakeren skal kunne leses på armlengdes avstand i
   en bil
@@ -64,17 +64,17 @@ Visningene henter farger, skrift, avstand og hjørner fra tokenene i
 
 ## Regler som ikke fravikes
 
-- Ingen nettverkskode. Ingen `URLSession`, ingen SDK-er, ingen analyse, ingen
-  krasjrapportering. En test leter etter det
+- Ingen nettverkskode. Ingen `URLSession`, ingen SDK-er, ingen bruksstatistikk,
+  ingen krasjrapportering. En test leter etter det
 - Tale går gjennom nb-whisper i appen, og ingenting annet. Aldri
   `SFSpeechRecognizer`: Den viser en dialog fra Apple om at taledata sendes
   til Apple, og dialogen kan ikke slås av. `NSSpeechRecognitionUsageDescription`
   skal ikke inn i Info.plist. En test passer på det
-- Filstier lagres som filnavn, aldri som absolutte adresser. Sandkassens
-  sti endres ved oppdatering
-- Et forseglet opptak har filvern `.complete`, og nøkkelen som åpner det,
-  kan bare brukes mens enheten er låst opp. Ingenting i appen åpner et opptak
-  på en låst enhet; ikke legg til noe som gjør det uten å løsne begge
+- Filer lagres med filnavn, aldri med absolutt sti. Stien til appens mappe
+  endres når appen oppdateres
+- Et forseglet opptak har filbeskyttelsen `.complete`, og nøkkelen som åpner
+  det, kan bare brukes mens enheten er låst opp. Ingenting i appen åpner et
+  opptak på en låst enhet. Ikke legg til noe som gjør det, uten å endre begge
 - En importert fil kommer forseglet inn i opptaksmappen, sammen med raden sin.
   Legg aldri en ukryptert import der: Forseglingen ville tatt den for et
   opptak fra appen
@@ -85,12 +85,12 @@ Visningene henter farger, skrift, avstand og hjørner fra tokenene i
   havner i tastaturets ordbok. Systemets eget felt for å gi nytt navn følger
   ikke den innstillingen, så appen har sitt eget
 - `versionIdentifier` i en SwiftData-modell som er tatt i bruk, endres aldri
-- Et opptak går aldri tapt. Filen på disk er opptaket; raden i listen er
-  bare et bilde av den og bygges opp igjen fra filen. Det eneste som sletter
-  lyd, er brukeren, etter et spørsmål
-- Ingen modus. Det appen gjør ulikt for et kort notat og et intervju på en
-  time, avgjør den ut fra det den kan se, først og fremst lengden, ikke ut
-  fra en bryter
+- Et opptak går aldri tapt. Filen på disk er opptaket, og raden i listen
+  bygges opp igjen fra filen. Bare brukeren sletter lyd, og bare etter å ha
+  bekreftet det
+- Ingen modus. Appen avgjør selv hva den gjør ulikt for et kort notat og et
+  intervju på en time, ut fra det den kan se, først og fremst lengden. Ingen
+  bryter
 - Skriv «intervju», aldri «revisjon», i tekst brukeren leser
 - Ingen emoji, verken i kode, commit-meldinger eller grensesnitt
 - Bare iPhone, bare stående, bare Norge. Ikke legg til engelsk grensesnitt
@@ -104,7 +104,7 @@ opp, og stopper hvis buildnummeret alt er brukt.
 
 ## Før en build lastes opp
 
-- Alle tester går grønt på simulatoren `Frodi-Test`
+- Alle tester består på simulatoren `Frodi-Test`
 - Hver ny eller endret tekst i appen er lest gjennom av et menneske.
   `Scripts/string-diff.py <commit for forrige build>` skriver ut listen
 - [CHANGELOG.md](CHANGELOG.md) har en overskrift for builden

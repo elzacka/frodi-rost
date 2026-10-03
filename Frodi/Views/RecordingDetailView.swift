@@ -93,7 +93,7 @@ struct RecordingDetailView: View {
                 nameDraft = ""
             }
         } message: {
-            Text("Uten navn viser listen datoen.")
+            Text("Listen viser datoen hvis feltet er tomt.")
         }
         .toolbarBackground(Color.Frodi.background, for: .navigationBar)
         .frodiBackButton()
@@ -200,7 +200,7 @@ struct RecordingDetailView: View {
                         .hiddenWhileScreenCaptured()
                 }
             } else if Transcription.awaitsRequest(recording) {
-                Text("Opptaket er langt. Trykk på «Lag tekst» når du vil ha teksten. En time med opptak tar noen minutter. Hold appen åpen imens.")
+                Text("Opptaket er langt. Trykk på «Lag tekst» når du vil ha teksten. Det tar noen minutter å lage tekst av en time med opptak. Hold appen åpen imens.")
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)

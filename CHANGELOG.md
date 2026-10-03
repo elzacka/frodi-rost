@@ -13,8 +13,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   samtaler
 - «Om opptaket» forklarer med enklere ord hva en sjekksum er, og hvilken fil
   hver sjekksum hører til
-- Brukerveiledningen, personvernerklæringen og «Om opptaket» sier det
-  viktigste først i hver setning
+- Tekstene i appen, brukerveiledningen og personvernerklæringen er skrevet
+  om til mer naturlig norsk, med det viktigste først i hver setning
 
 ### Rettet
 
@@ -55,8 +55,8 @@ Appen er den samme som i build 8.
 ### Sikkerhet
 
 - På iPhone 17 og nyere, og på iPhone Air, bruker appen Memory Integrity
-  Enforcement, Apples minnebeskyttelse i maskinvaren. Leser eller skriver
-  appen i minne den ikke har fått tildelt, stopper enheten appen. Da kan
+  Enforcement, Apples minnebeskyttelse i maskinvaren. Enheten stopper appen
+  hvis appen leser eller skriver i minne den ikke har fått tildelt. Da kan
   ingen bruke en slik feil til å ta over appen
 
 ## 1.0 (7) – 26.09.26
@@ -69,9 +69,9 @@ Appen er den samme som i build 8.
 
 ### Lagt til
 
-- Et opptak kan vare så lenge du vil. Grensen på ti minutter er borte
-- Teksten deles i avsnitt med tidspunkt. Trykk på tidspunktet for å høre
-  stedet i opptaket
+- Et opptak kan vare så lenge du vil
+- Teksten deles i avsnitt med tidspunkt. Trykk på tidspunktet for å spille av
+  derfra
 - Appen lager teksten når du ber om den hvis opptaket er over ti minutter, og
   viser hvor langt den har kommet. Den fortsetter der den slapp neste gang
   hvis noe avbryter den
@@ -84,7 +84,7 @@ Appen er den samme som i build 8.
 - Ordliste i Innstillinger: Navn og ord Fróði bør kjenne, som firmaer, personer
   og forkortelser. Modellen får listen før den lytter, og ord i teksten som
   nesten stemmer med listen, rettes etterpå. «Lag ny tekst» i listen
-  bruker listen på et opptak du alt har. Feltet gjøres høyere eller lavere
+  bruker listen på et opptak du alt har. Du gjør feltet høyere eller lavere
   ved å dra i håndtaket nederst til høyre
 - Brukerveiledning, [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md), med alt om
   opptak, handlingsknappen, teksten, ordlisten, eksport og sletting
@@ -98,7 +98,7 @@ Appen er den samme som i build 8.
 
 ### Endret
 
-- Siden bak knappen i logohodet heter «Innstillinger». Knappen viser tre
+- Siden bak knappen ved logoen øverst heter «Innstillinger». Knappen viser tre
   skyvebrytere. Siden har fire kort: Ordliste, Eksport,
   Fróði røst med versjon og kontakt, og Mer om appen med lenker til
   brukerveiledning, personvernerklæring og sikkerhet, og lisensene
@@ -106,29 +106,29 @@ Appen er den samme som i build 8.
 - Teksten i kort, bannere og meldinger står mørkere, så den er lettere å lese
 - Ikonene kommer fra Material Symbols
 - Hoppknappene i spilleren hopper ti sekunder. Tallet står inne i pilen
-- Handlingsknappen settes til en kontroll, ikke en snarvei. Snarveien
-  «Start eller stopp opptak» og Siri-frasen er borte; handlingen finnes
-  fortsatt i Snarveier-appen
+- Handlingsknappen settes til en kontroll, ikke en snarvei. Handlingen
+  «Start eller stopp opptak» finnes i Snarveier-appen, uten egen snarvei og
+  uten Siri-frase
 - Animasjonene følger «Reduser bevegelse» i Innstillinger på enheten
 
 ### Rettet
 
-- Et opptak overlever en telefonsamtale, med alt som ble sagt før den. Før
-  ble det slettet når du stoppet etterpå
-- Et opptak overlever at appen krasjer eller blir avsluttet midt i. Lyden tas
-  opp i et format som kan spilles av uansett hvor den ble avbrutt
+- Et opptak går ikke tapt når du får en telefonsamtale, heller ikke det som
+  ble sagt før samtalen
+- Et opptak går ikke tapt hvis appen krasjer eller blir avsluttet midt i.
+  Lyden tas opp i et format som kan spilles av uansett hvor den ble avbrutt
 - Et opptak som mistet raden sin i listen, får den tilbake ved neste oppstart
 - Et opptak som stoppes mens enheten er låst, krypteres og får tekst senest
-  når du åpner appen igjen. Før kunne det vente til appen startet på nytt
-- Et opptak som stoppes mens enheten er låst, blir tatt vare på. Før slettet
-  appen det, fordi den ikke fikk lest filen og tok det for tomt
-- Opptak kunne nekte å starte, fra knappen og fra handlingsknappen, rett
+  når du åpner appen igjen
+- Et opptak som stoppes mens enheten er låst, blir tatt vare på, også når
+  appen ikke får lest filen med en gang
+- Opptak startet av og til ikke, fra knappen eller fra handlingsknappen, rett
   etter at du hadde hørt på et opptak. Appen venter til avspilleren har
   sluppet lydsystemet før den tar opp
 - Knappen «Åpne Innstillinger» står under meldingen om at mikrofontilgangen
   er avslått
-- En opptaksfil uten lyd, etterlatt av et krasj, fikk en rad som sto som
-  «venter på tekst» for alltid. Filen fjernes, og raden med den
+- En tom opptaksfil etter et krasj fikk en rad som sto som «venter på tekst»
+  for alltid. Appen fjerner filen og raden
 - Med ordliste kunne modellen svare med tom tekst uten feilmelding. Rettet i
   talemotoren, som er oppdatert til argmax-oss-swift 1.1.0
 
@@ -157,25 +157,25 @@ Appen er den samme som i build 8.
 
 ### Sikkerhet
 
-- Et opptak som stoppes mens enheten er låst, krypteres så snart du låser opp.
-  Før ble det slettet
+- Et opptak som stoppes mens enheten er låst, krypteres så snart du låser opp
 - Teksten skjules også når du bytter app, så den ikke havner i bildet iOS tar
   til appveksleren
-- Midlertidige filer fra en avbrutt transkribering ryddes ved neste oppstart
+- Appen sletter midlertidige filer ved neste oppstart hvis den ble avbrutt
+  mens den laget tekst
 - Databasens hjelpefiler holdes utenfor sikkerhetskopien fra første lagring
 - Modellen og kodepakkene er låst til faste versjoner, og skriptet som henter
-  modellen sjekker hver fil mot en liste med sjekksummer
+  modellen, sjekker hver fil mot en liste med sjekksummer
 - Appen sjekker selv at begge tokenizer-filene finnes før WhisperKit startes,
   så en ufullstendig modell aldri utløser en nedlasting
-- WhisperKit skriver ikke lenger til loggen
+- WhisperKit skriver ikke til loggen
 
 ### Rettet
 
-- Opptak uten tale transkriberes ikke på nytt ved hver oppstart
+- Appen prøver ikke å lage tekst av opptak uten tale på nytt ved hver oppstart
 
 ### Endret
 
-- Personvern-kortet forteller hva som skjer med et opptak som stoppes mens
+- Personvernkortet forteller hva som skjer med et opptak som stoppes mens
   enheten er låst
 
 ## 0.1.0 (3) – 12.09.26
@@ -192,7 +192,7 @@ Appen er den samme som i build 8.
 
 - Siden bak info-knappen heter «Info», ikke «Om»
 - Handlingsknappen beskrives slik iOS 26 gjør det: Hold inne, ikke trykk
-- Personvern-kortet lenker til PERSONVERN.md og SECURITY.md
+- Personvernkortet lenker til PERSONVERN.md og SECURITY.md
 
 ## 0.1.0 (1) – 12.09.26
 
@@ -200,18 +200,18 @@ Første build.
 
 ### Lagt til
 
-- Ta opp lyd, også når skjermen er av
+- Tar opp lyd, også når skjermen er av
 - Den fysiske handlingsknappen på venstre side starter og stopper opptak
 - Et opptak kan vare i inntil ti minutter. Nedtellingen står ved siden av
   tidtakeren mens du tar opp
 - Gjør norsk tale om til tekst med nb-whisper fra Nasjonalbiblioteket, som
   kjører i appen. Modellen setter tegn og store bokstaver selv og skriver
   dialekt om til bokmål
-- Spill av opptaket, med pause, hopp på femten sekunder hver vei og en
+- Spiller av opptaket, med pause, hopp på femten sekunder hver vei og en
   skyveknapp som viser og setter posisjonen
-- Eksporter lyd som `.m4a` og tekst som `.txt`
-- Krypter opptak og tekst med en nøkkel som aldri forlater enheten
-- Skjul teksten mens skjermen tas opp eller speiles
-- App-ikon og logo i Skranji, ikoner fra Heroicons
-- Om-siden bak info-knappen i logohodet: Hva appen gjør, personvern,
+- Eksporterer lyd som `.m4a` og tekst som `.txt`
+- Krypterer opptak og tekst med en nøkkel som aldri forlater enheten
+- Skjuler teksten mens skjermen tas opp eller speiles
+- Appikon og logo i Skranji, ikoner fra Heroicons
+- Om-siden bak info-knappen ved logoen øverst: Hva appen gjør, personvern,
   mikrofontilgang, hvilken språkmodell som kjører, lisenser og versjon

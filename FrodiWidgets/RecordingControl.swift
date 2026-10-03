@@ -15,6 +15,6 @@ struct RecordingControl: ControlWidget {
             }
         }
         .displayName("Start eller stopp opptak")
-        .description("Starter et opptak i Fróði, eller stopper det som går.")
+        .description("Starter et opptak i Fróði eller stopper det som går.")
     }
 }

@@ -73,14 +73,14 @@ Appen sier fra hvis den ikke kan lese filen. Filen kan være skadet eller i et
 format appen ikke kan lese.
 
 > **Obs:** Opptak fra Taleopptak ligger ikke i Filer. Del opptaket fra
-> Taleopptak til Filer først, så kan du importere det.
+> Taleopptak og velg «Lagre i Filer». Da kan du importere det.
 
 ## Handlingsknappen
 
 Knappen på venstre side av enheten starter og stopper opptak. Den finnes på
 iPhone 15 Pro og nyere.
 
-Ta det første opptaket i appen, så du får gitt tilgang til mikrofonen.
+Ta det første opptaket i appen. Da spør den om tilgang til mikrofonen.
 Sett så opp knappen i Innstillinger på enheten: Handlingsknapp > Kontroll >
 Velg en kontroll > Fróði røst > «Start eller stopp opptak».
 
@@ -89,7 +89,7 @@ Det virker også når enheten er låst, uten at du låser den opp.
 
 Så lenge opptaket går, viser låseskjermen og Dynamic Island «Tar opp», hvor
 lenge det har vart og en stoppknapp. Første gang spør iOS «Vil du tillate
-løpende oppdateringer fra Fróði røst?». Svar «Tillat»; uten det stopper iOS
+løpende oppdateringer fra Fróði røst?». Svar «Tillat». Ellers stopper iOS
 opptak som handlingsknappen starter.
 
 Hvis appen er åpen når du starter et opptak, setter iOS musikk og annen lyd
@@ -109,12 +109,12 @@ Hvor lenge opptaket varer, avgjør når teksten lages:
 | Over 10 minutter    | Lages når du ber om det |
 
 Lange opptak står som «ingen tekst ennå» i listen. Sveip opptaket mot venstre
-og trykk på «Lag tekst», eller åpne opptaket og trykk der.
+og trykk på «Lag tekst» eller åpne opptaket og trykk der.
 
 Appen viser i prosent hvor langt den har kommet. Den fortsetter der den
 slapp hvis noe avbryter den.
 
-Teksten lages mens appen er åpen. Skjermen holder seg på så lenge det pågår.
+Teksten lages mens appen er åpen. Skjermen slukker ikke så lenge det pågår.
 Appen stopper hvis du låser enheten, og fortsetter når du åpner den igjen.
 
 Omtrent så lang tid tar det:

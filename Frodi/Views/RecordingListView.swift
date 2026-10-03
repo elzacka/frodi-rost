@@ -172,7 +172,7 @@ struct RecordingListView: View {
                 .font(.Frodi.title)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            Text("Trykk på opptaksknappen, eller hold inne handlingsknappen på venstre side. Brukerveiledningen ligger under Innstillinger.")
+            Text("Trykk på opptaksknappen eller hold inne handlingsknappen på venstre side. Brukerveiledningen ligger under Innstillinger.")
                 .font(.Frodi.caption)
                 .foregroundStyle(Color.Frodi.textPrimary)
                 .multilineTextAlignment(.center)
