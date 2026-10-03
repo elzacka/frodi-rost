@@ -4,6 +4,15 @@ Formatet følger [Keep a Changelog](https://keepachangelog.com/nb/1.1.0/).
 Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 Listen starter med den første versjonen i App Store.
 
+## Ikke utgitt
+
+### Endret
+
+- Avansert bytter person der en setning slutter, så korte ordbiter ikke havner
+  hos feil person
+- Listen og opptaket viser «finner ut hvem som sa hva» mens Avansert setter
+  navn på personene
+
 ## 1.1.0 (11) – 04.10.26
 
 ### Endret

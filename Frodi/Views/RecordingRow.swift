@@ -68,6 +68,7 @@ struct RecordingRow: View {
     private var status: String? {
         if recording.hasTranscript { return nil }
         if recording.isTranscribing {
+            if transcription.findingSpeakers.contains(recording.persistentModelID) { return "finner ut hvem som sa hva" }
             guard let fraction = transcription.fraction[recording.persistentModelID] else { return "lager tekst" }
             return "lager tekst, \(fraction.formatted(.percent.precision(.fractionLength(0)).locale(AppLocale.norwegian)))"
         }

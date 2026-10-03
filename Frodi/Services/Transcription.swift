@@ -142,6 +142,8 @@ enum Transcription {
                 // whole file, is counted as it begins, and a recording whose pass ended the app twice gets no third.
                 progress.speakerAttempts = tries + 1
                 progress.save(for: fileName)
+                TranscriptionState.shared.labelling(id, true)
+                defer { TranscriptionState.shared.labelling(id, false) }
                 if let turns = try? await Speakers.turns(in: url) {
                     progress.paragraphs = Speakers.label(progress.paragraphs, turns: turns) {
                         WordList.correct($0, entries: entries)
@@ -207,6 +209,8 @@ final class TranscriptionState {
 
     /// How far each running transcription has got, 0 to 1.
     private(set) var fraction: [PersistentIdentifier: Double] = [:]
+    /// Texts whose words are all there and whose speakers are being found: the text looks done and is not.
+    private(set) var findingSpeakers: Set<PersistentIdentifier> = []
 
     fileprivate func began(_ id: PersistentIdentifier, fraction: Double) {
         self.fraction[id] = fraction
@@ -215,6 +219,10 @@ final class TranscriptionState {
 
     fileprivate func update(_ id: PersistentIdentifier, fraction: Double) {
         self.fraction[id] = fraction
+    }
+
+    fileprivate func labelling(_ id: PersistentIdentifier, _ on: Bool) {
+        if on { findingSpeakers.insert(id) } else { findingSpeakers.remove(id) }
     }
 
     fileprivate func ended(_ id: PersistentIdentifier) {

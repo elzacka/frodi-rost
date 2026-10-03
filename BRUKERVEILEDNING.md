@@ -128,12 +128,13 @@ lyden derfra.
 
 ### Hvis teksten mangler
 
-| Det&nbsp;står                                 | Det&nbsp;betyr                              |
-| --------------------------------------------- | ------------------------------------------- |
-| «venter på tekst»                             | Teksten er i kø og lages snart              |
-| «lager tekst, 43 %»                           | Så langt er appen kommet                    |
-| «Fant ingen tale i dette opptaket.»           | Opptaket er stille, eller lyden er for svak |
-| «Fróði fikk ikke laget teksten denne gangen.» | Noe gikk galt. Trykk på «Prøv på nytt»      |
+| Det&nbsp;står                                 | Det&nbsp;betyr                                |
+| --------------------------------------------- | --------------------------------------------- |
+| «venter på tekst»                             | Teksten er i kø og lages snart                |
+| «lager tekst, 43 %»                           | Så langt er appen kommet                      |
+| «finner ut hvem som sa hva»                   | Ordene er klare, og Avansert setter navn på   |
+| «Fant ingen tale i dette opptaket.»           | Opptaket er stille, eller lyden er for svak   |
+| «Fróði fikk ikke laget teksten denne gangen.» | Noe gikk galt. Trykk på «Prøv på nytt»        |
 
 I listen står de to siste kortere: «ingen tale» og «noe gikk galt».
 

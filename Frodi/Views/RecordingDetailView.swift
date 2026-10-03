@@ -395,8 +395,9 @@ struct RecordingDetailView: View {
         transcription.fraction[recording.persistentModelID]
     }
 
-    /// «Lager tekst, 43 %». The percentage is what says the work is moving.
+    /// «Lager tekst, 43 %». The percentage is what says the work is moving. In Avansert the last seconds find the speakers.
     private var progressText: String {
+        if transcription.findingSpeakers.contains(recording.persistentModelID) { return "Finner ut hvem som sa hva …" }
         guard let fraction else { return "Lager tekst …" }
         return "Lager tekst, \(fraction.formatted(.percent.precision(.fractionLength(0)).locale(AppLocale.norwegian)))"
     }

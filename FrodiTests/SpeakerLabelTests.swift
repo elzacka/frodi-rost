@@ -166,4 +166,29 @@ struct SpeakerLabelTests {
     func oldLocationTag() {
         #expect(RecordingDetailView.tagLabel("location") == "Sted")
     }
+
+    private func words(_ texts: [String]) -> [TimedWord] {
+        texts.enumerated().map { TimedWord(start: Double($0.offset) * 0.3, end: Double($0.offset) * 0.3 + 0.25, text: " " + $0.element) }
+    }
+
+    /// From the press interview: the change landed after «er», inside the interviewer's question.
+    @Test("Et skifte midt i en setning flyttes til setningens slutt")
+    func changeMovesToSentenceEnd() {
+        let text = ["ser", "at", "det", "er", "7000", "nordmenn", "igjen...", "Det", "er", "stort."]
+        let voices = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+        #expect(Speakers.smoothed(voices, words: words(text)) == [0, 0, 0, 0, 0, 0, 0, 1, 1, 1])
+    }
+
+    @Test("Et ord eller to mellom to biter av samme stemme blir hos den")
+    func scrapJoinsItsNeighbours() {
+        let text = ["Det", "er", "fantastisk.", "Støtte", "i", "dag", "er", "kjekt."]
+        let voices = [0, 0, 0, 0, 1, 0, 0, 0]
+        #expect(Speakers.smoothed(voices, words: words(text)) == [0, 0, 0, 0, 0, 0, 0, 0])
+    }
+
+    @Test("Et skifte ved setningsslutt står der det står")
+    func changeAtSentenceEndStays() {
+        let text = ["Velkommen.", "Tusen", "takk."]
+        #expect(Speakers.smoothed([0, 1, 1], words: words(text)) == [0, 1, 1])
+    }
 }
