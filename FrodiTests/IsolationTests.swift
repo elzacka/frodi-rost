@@ -40,6 +40,23 @@ struct IsolationTests {
         #expect(checked > 10, "Fant bare \(checked) kildefiler; stien til kildekoden er feil")
     }
 
+    /// SpeakerKit fetches its model unless told not to. `Speakers.config` tells it; SpeakerKit made anywhere else
+    /// would start from the library's defaults.
+    @Test("Bare Speakers lager SpeakerKit")
+    func speakerKitOnlyThroughSpeakers() throws {
+        let sources = URL(filePath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "Frodi")
+        let enumerator = try #require(FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil))
+        for case let url as URL in enumerator where url.pathExtension == "swift" && url.lastPathComponent != "Speakers.swift" {
+            let code = try String(contentsOf: url, encoding: .utf8)
+            for symbol in ["SpeakerKit(", "PyannoteConfig(", "ModelDownloadConfig("] {
+                #expect(!code.contains(symbol), "\(url.lastPathComponent) lager \(symbol)) selv")
+            }
+        }
+    }
+
     /// The one extension is the widget one (control, Live Activity). It runs in its own process, so it carries its own
     /// manifest: no collection, no accessed API, no ATS exception. Anything else in PlugIns is an unreviewed surface.
     @Test("Den ene utvidelsen er widget-utvidelsen, og den samler ingenting")

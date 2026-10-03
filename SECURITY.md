@@ -130,7 +130,7 @@ The app makes no network requests and sends no telemetry. `IsolationTests` fails
 
 The model loads with `download: false` and explicit local paths. That flag does not cover the tokenizer, which WhisperKit fetches from Hugging Face when it cannot read it locally; the app therefore checks both tokenizer files before creating WhisperKit, and a build phase fails a build without the model.
 
-The speaker model (SpeakerKit, speaker diarization) has one configuration, `Speakers.config`: the bundled folder and `download: false`. With a local folder SpeakerKit never calls its downloader. `BundledModelTests` checks that configuration and loads and runs the model from the bundle with it.
+The speaker model (SpeakerKit, speaker diarization) has one configuration, `Speakers.config`: the bundled folder and `download: false`. With a local folder SpeakerKit never calls its downloader. `BundledModelTests` runs that configuration with Hugging Face replaced by a closed port, so a configuration that would fetch fails the test; `IsolationTests` fails if SpeakerKit is created anywhere else.
 
 Two requests happen because the user asked for them: iOS downloads a picked file that lives only in iCloud Drive, and Safari opens the four document links in Innstillinger.
 

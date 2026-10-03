@@ -1,3 +1,4 @@
+import ArgmaxCore
 import Foundation
 import SpeakerKit
 import Testing
@@ -42,14 +43,25 @@ struct BundledModelTests {
         #expect(Speakers.isBundled)
     }
 
-    /// The app's promise is no network. SpeakerKit downloads by default; the app's one configuration must
-    /// point at the bundle with downloads off, and the bundled files must be enough to load and run.
+    /// The app's promise is no network, and SpeakerKit downloads by default. The test runs the app's one configuration
+    /// with Hugging Face swapped for a closed local port: any attempt to fetch makes it throw, so a configuration that
+    /// would reach the network fails here instead of in use.
     @Test("Talermodellen henter aldri fra nett")
     func speakerModelNeverDownloads() async throws {
         let config = try #require(Speakers.config)
         #expect(!config.download)
         #expect(config.modelDownloadConfig.modelFolder == Speakers.modelFolder?.path)
 
+        let real = config.modelDownloadConfig
+        config.modelDownloadConfig = ModelDownloadConfig(
+            downloadBase: real.downloadBase,
+            modelRepo: real.modelRepo,
+            modelToken: real.modelToken,
+            modelFolder: real.modelFolder,
+            useBackgroundSession: real.useBackgroundSession,
+            endpoint: "https://127.0.0.1:9",
+            revision: real.revision
+        )
         let speakers = try await SpeakerKit(config)
         _ = try await speakers.diarize(audioArray: [Float](repeating: 0, count: 16_000 * 5))
     }
