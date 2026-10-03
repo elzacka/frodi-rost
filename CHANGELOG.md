@@ -4,7 +4,7 @@ Formatet følger [Keep a Changelog](https://keepachangelog.com/nb/1.1.0/).
 Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 Listen starter med den første versjonen i App Store.
 
-## Ikke utgitt
+## 1.1.0 (10) – 03.10.26
 
 ### Lagt til
 
