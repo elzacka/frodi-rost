@@ -23,10 +23,10 @@
     "Bare teksten" : {
 
     },
-    "Behold" : {
+    "fróði" : {
 
     },
-    "fróði" : {
+    "Fróði endrer navnet overalt i teksten. Gi to personer samme navn hvis det er samme person." : {
 
     },
     "Fróði får ikke åpnet filen der navn, tekst og «Om opptaket» lagres. Det som er lagret der fra før, vises ikke. Du kan ta opp og eksportere som vanlig, og lyden blir liggende på enheten. Navn og tekst du lager nå, forsvinner når du lukker appen. Ikke slett appen: Da forsvinner opptakene også. Skriv til hei@tazk.no." : {
@@ -44,13 +44,16 @@
     "Lisenser" : {
 
     },
+    "Listen viser datoen hvis feltet er tomt." : {
+
+    },
+    "Navn og tekst blir ikke lagret" : {
+
+    },
     "Om opptaket" : {
 
     },
     "Opptak og tekst" : {
-
-    },
-    "Navn og tekst blir ikke lagret" : {
 
     },
     "Opptaket er langt. Det tar noen minutter å lage tekst av en time med opptak. Hold appen åpen imens." : {
@@ -59,13 +62,7 @@
     "Opptaket er satt på pause og fortsetter når mikrofonen er ledig igjen." : {
 
     },
-    "Person %lld" : {
-
-    },
     "røst" : {
-
-    },
-    "Vil du slette opptaket?" : {
 
     },
     "Slett" : {
@@ -84,9 +81,6 @@
 
     },
     "Trykk på opptaksknappen nederst. Brukerveiledningen under Innstillinger viser hvordan du tar opp med handlingsknappen." : {
-
-    },
-    "Listen viser datoen hvis feltet er tomt." : {
 
     }
   },

@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Settings: the three things you can set, what the app is, and the documents, as a sheet so you return to the list as you left it.
-/// Order: settings, the card with version and address, then the documents (use, privacy, accessibility, security, licences).
+/// Order: settings, the card with version and address, then the documents (use, privacy, security, licences).
 /// The prose lives in the documents; the page links to them rather than repeating them.
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -61,13 +61,12 @@ struct SettingsView: View {
         }
     }
 
-    /// One document per reader: user, privacy-minded, accessibility, security reviewer, licence holders. Four links open on GitHub
+    /// One document per reader: user, privacy-minded, security reviewer, licence holders. Three links open on GitHub
     /// in Safari; the licences are an in-app screen, since the licences require their texts in the app itself.
     private var documents: some View {
         Card("Mer om appen") {
             link("Brukerveiledning", to: Self.userGuide)
             link("Personvernerklæring", to: Self.privacyPolicy)
-            link("Tilgjengelighet", to: Self.accessibility)
             // SECURITY.md is written for security reviewers, in English; the label says so before the tap.
             link("Sikkerhet (engelsk)", to: Self.securityPolicy)
             licenses
@@ -154,7 +153,7 @@ struct SettingsView: View {
     /// Avansert adds who said what.
     private var mode: some View {
         Card("Tekstmodus") {
-            paragraph("Avansert viser også hvem som sa hva. Det blir mest riktig når én person snakker om gangen.")
+            paragraph("Avansert viser hvem som sa hva (diarization).")
 
             // Stacked when one line cannot hold both, as at the largest text sizes.
             ViewThatFits(in: .horizontal) {
@@ -229,7 +228,6 @@ struct SettingsView: View {
     // that goes online, and only when you tap.
     private static let userGuide = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/BRUKERVEILEDNING.md")!
     private static let privacyPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/PERSONVERN.md")!
-    private static let accessibility = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/TILGJENGELIGHET.md")!
     private static let securityPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/SECURITY.md")!
 
     private static var versionNumber: String {
