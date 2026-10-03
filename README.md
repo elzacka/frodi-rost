@@ -21,13 +21,18 @@ Versjon 1.0 ligger i [App Store](https://apple.co/4ryiAk4). Appen finnes bare i 
 
 [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md) viser hvordan.
 
-## Modell
+## Modeller
 
 [nb-whisper-small](https://huggingface.co/NbAiLab/nb-whisper-small) fra
 Nasjonalbiblioteket. Modellen bygger på OpenAIs Whisper og er videretrent på
 66 000 timer norsk tale fra Språkbanken og Nasjonalbibliotekets egen samling.
 Appen bruker en CoreML-versjon av modellen, laget av Barrymanalow. Modellen
-følger med appen og kjører på enheten. Kilder og lisenser: [TREDJEPART.md](TREDJEPART.md).
+følger med appen og kjører på enheten.
+
+Talermodellen [pyannote community-1](https://huggingface.co/pyannote/speaker-diarization-community-1)
+finner ut hvem som sa hva (speaker diarization). Appen bruker Argmax'
+CoreML-versjon gjennom SpeakerKit. Også denne modellen følger med appen.
+Kilder og lisenser: [TREDJEPART.md](TREDJEPART.md).
 
 ## Krav
 
@@ -40,7 +45,7 @@ For å bygge appen:
 
 - Xcode 27.0 med iOS 27.0 SDK
 - xcodegen
-- 467 MB ledig plass til modellen
+- 478 MB ledig plass til modellene
 
 ## Bygg
 
@@ -51,8 +56,8 @@ xcodegen generate
 open Frodi.xcodeproj
 ```
 
-> **Viktig:** nb-whisper-small ligger ikke i git-repoet. Bygget stopper med en
-> feilmelding hvis modellen mangler. `fetch-model.sh` henter den og stopper
+> **Viktig:** Modellene ligger ikke i git-repoet. Bygget stopper med en
+> feilmelding hvis en av dem mangler. `fetch-model.sh` henter dem og stopper
 > hvis en fil ikke stemmer med `Scripts/model-checksums.txt`. Skriptet
 > forklarer også hvordan du bytter modellversjon.
 
@@ -137,7 +142,7 @@ Visningene når aldri talemotoren direkte. Alt går gjennom protokollen `Transcr
 
 ## Lisens
 
-Kode: MIT, se [LICENSE](LICENSE). Modell, pakker, ikoner og fonter har egne
+Kode: MIT, se [LICENSE](LICENSE). Modeller, pakker, ikoner og fonter har egne
 lisenser, se [TREDJEPART.md](TREDJEPART.md).
 
 ## Bidrag
@@ -153,6 +158,6 @@ Appen er et personlig prosjekt. Meld feil og forslag som issues på GitHub. Les
 | [PERSONVERN.md](PERSONVERN.md) | Hva som lagres, tillatelser, rettighetene dine, hvem som står bak |
 | [SECURITY.md](SECURITY.md) | Hva som beskyttes mot hva, og hvordan du melder en sårbarhet |
 | [TILGJENGELIGHET.md](TILGJENGELIGHET.md) | Hva som er gjort for VoiceOver, tekststørrelse og kontrast |
-| [TREDJEPART.md](TREDJEPART.md) | Modell, kode, ikoner og fonter, med versjoner og lisenser |
+| [TREDJEPART.md](TREDJEPART.md) | Modeller, kode, ikoner og fonter, med versjoner og lisenser |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Navn, språk, designsystem og reglene for endringer |
 | [CHANGELOG.md](CHANGELOG.md) | Hva som er endret i hver versjon |

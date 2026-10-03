@@ -249,7 +249,7 @@ struct SettingsView: View {
     }
 }
 
-/// The attribution and licence texts MIT, Apache 2.0 and OFL require, in the app and not only in the repo.
+/// The attribution and licence texts MIT, Apache 2.0, CC BY and OFL require, in the app and not only in the repo.
 /// Same names and licences as TREDJEPART.md (which also has versions and links); `DocumentTests` fails if the two lists or `Package.resolved` disagree.
 struct LicensesView: View {
     struct Component: Identifiable, Hashable {
@@ -265,7 +265,9 @@ struct LicensesView: View {
     static let model = [
         Component(name: "nb-whisper-small", origin: "Nasjonalbiblioteket", license: "Apache 2.0", text: "Apache-2.0"),
         Component(name: "CoreML-konvertering", origin: "Barrymanalow", license: "Apache 2.0", text: "Apache-2.0"),
-        Component(name: "Tokenizer, whisper-small", origin: "OpenAI", license: "Apache 2.0", text: "Apache-2.0")
+        Component(name: "Tokenizer, whisper-small", origin: "OpenAI", license: "Apache 2.0", text: "Apache-2.0"),
+        Component(name: "Talermodell, community-1", origin: "pyannote", license: "CC BY 4.0", text: "CC-BY-4.0"),
+        Component(name: "CoreML-konvertering, talermodell", origin: "Argmax", license: "CC BY 4.0", text: "CC-BY-4.0")
     ]
 
     /// The packages Xcode resolves, by their identity in `Package.resolved`.
@@ -297,7 +299,7 @@ struct LicensesView: View {
 
             ScrollView {
                 VStack(spacing: Space.s4) {
-                    group("Modell", Self.model)
+                    group("Modeller", Self.model)
                     group("Kode", Self.code + Self.embedded)
                     group("Ikoner", Self.icons)
                     group("Fonter", Self.fonts)

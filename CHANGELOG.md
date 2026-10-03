@@ -13,6 +13,7 @@ Listen starter med den første versjonen i App Store.
 - Innstillinger lenker til «Tilgjengelighet». Lenken til sikkerhetsdokumentet
   heter «Sikkerhet (engelsk)»
 - `.rtf`-filen sier at teksten er laget automatisk og kan inneholde feil
+- Lisenser viser talermodellen som finner ut hvem som sa hva i et opptak
 
 ### Endret
 

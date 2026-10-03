@@ -130,6 +130,8 @@ The app makes no network requests and sends no telemetry. `IsolationTests` fails
 
 The model loads with `download: false` and explicit local paths. That flag does not cover the tokenizer, which WhisperKit fetches from Hugging Face when it cannot read it locally; the app therefore checks both tokenizer files before creating WhisperKit, and a build phase fails a build without the model.
 
+The speaker model (SpeakerKit, speaker diarization) has one configuration, `Speakers.config`: the bundled folder and `download: false`. With a local folder SpeakerKit never calls its downloader. `BundledModelTests` checks that configuration and loads and runs the model from the bundle with it.
+
 Two requests happen because the user asked for them: iOS downloads a picked file that lives only in iCloud Drive, and Safari opens the four document links in Innstillinger.
 
 > [!NOTE]
@@ -154,9 +156,9 @@ Not tested: MASTG-TEST-0361 and -0363, which hook the running app on a device. T
 
 ## Build integrity
 
-What a fresh clone builds is what was reviewed. WhisperKit, the `WhisperKit` product of `argmax-oss-swift`, is pinned to one version and brings one package, `swift-argument-parser`, plus its own copy of `swift-transformers`' Hub and Tokenizers sources. `Package.resolved` is committed; versions and licences are in [TREDJEPART.md](TREDJEPART.md), which a test keeps in step.
+What a fresh clone builds is what was reviewed. WhisperKit and SpeakerKit, two products of `argmax-oss-swift`, are pinned to one version and bring one package, `swift-argument-parser`, plus its own copy of `swift-transformers`' Hub and Tokenizers sources. `Package.resolved` is committed; versions and licences are in [TREDJEPART.md](TREDJEPART.md), which a test keeps in step.
 
-The model is a third-party CoreML conversion of nb-whisper-small, fetched at a fixed revision and checked against `Scripts/model-checksums.txt`. The checksums prove the files are the ones measured on 2026-09-07, not that they are benign. Since the model never touches the network, what could be wrong with it is transcription quality and bias, not exfiltration.
+The model is a third-party CoreML conversion of nb-whisper-small, fetched at a fixed revision and checked against `Scripts/model-checksums.txt`. The speaker model, Argmax's CoreML conversion of pyannote community-1, is fetched and checked the same way. The checksums prove the files are the ones measured on 2026-09-07, not that they are benign. Since the model never touches the network, what could be wrong with it is transcription quality and bias, not exfiltration.
 
 ## Deliberate omissions
 

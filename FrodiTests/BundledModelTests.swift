@@ -1,4 +1,5 @@
 import Foundation
+import SpeakerKit
 import Testing
 @testable import Frodi
 
@@ -34,5 +35,22 @@ struct BundledModelTests {
         }
         #expect(WhisperTranscriber.tokenizerFiles == ["tokenizer.json", "tokenizer_config.json"])
         #expect(WhisperTranscriber.tokenizerIsComplete)
+    }
+
+    @Test("Talermodellen ligger der SpeakerKit leter")
+    func speakerModelIsBundled() {
+        #expect(Speakers.isBundled)
+    }
+
+    /// The app's promise is no network. SpeakerKit downloads by default; the app's one configuration must
+    /// point at the bundle with downloads off, and the bundled files must be enough to load and run.
+    @Test("Talermodellen henter aldri fra nett")
+    func speakerModelNeverDownloads() async throws {
+        let config = try #require(Speakers.config)
+        #expect(!config.download)
+        #expect(config.modelDownloadConfig.modelFolder == Speakers.modelFolder?.path)
+
+        let speakers = try await SpeakerKit(config)
+        _ = try await speakers.diarize(audioArray: [Float](repeating: 0, count: 16_000 * 5))
     }
 }

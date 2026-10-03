@@ -50,9 +50,11 @@ targets:
     dependencies:
       - package: WhisperKit
         product: WhisperKit
+      - package: WhisperKit
+        product: SpeakerKit
       - target: FrodiWidgets
-    # nb-whisper is the app's only engine. A build without it must fail here,
-    # not ship. The two files are the ones WhisperTranscriber.isBundled checks;
+    # A build without nb-whisper or the speaker model must fail here, not ship.
+    # The first two files are the ones WhisperTranscriber.isBundled checks;
     # declared as inputs so the sandboxed script may read them.
     preBuildScripts:
       - name: Check bundled model
@@ -60,10 +62,11 @@ targets:
         inputFiles:
           - $(SRCROOT)/Frodi/Resources/Model/nb-whisper-small/config.json
           - $(SRCROOT)/Frodi/Resources/Model/tokenizer/models/openai/whisper-small/tokenizer.json
+          - $(SRCROOT)/Frodi/Resources/Model/speakerkit/speaker_embedder/pyannote-v3/W8A16/SpeakerEmbedder.mlmodelc/weights/weight.bin
         script: |
-          for f in "$SCRIPT_INPUT_FILE_0" "$SCRIPT_INPUT_FILE_1"; do
+          for f in "$SCRIPT_INPUT_FILE_0" "$SCRIPT_INPUT_FILE_1" "$SCRIPT_INPUT_FILE_2"; do
             if [ ! -f "$f" ]; then
-              echo "error: nb-whisper is not in the build: $f is missing. Run Scripts/fetch-model.sh"
+              echo "error: a model is not in the build: $f is missing. Run Scripts/fetch-model.sh"
               exit 1
             fi
           done

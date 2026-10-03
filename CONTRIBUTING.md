@@ -54,7 +54,8 @@ Visningene henter farger, skrift, avstand og hjørner fra tokenene i
 
 - Ingen nettverkskode. Ingen `URLSession`, ingen SDK-er, ingen bruksstatistikk,
   ingen krasjrapportering. En test leter etter det
-- Tale går gjennom nb-whisper i appen, og ingenting annet. Aldri
+- Tale går gjennom nb-whisper i appen, og ingenting annet. Talermodellen
+  (SpeakerKit) finner bare ut hvem som sa hva, den lager ikke tekst. Aldri
   `SFSpeechRecognizer`: Den viser en dialog fra Apple om at taledata sendes
   til Apple, og dialogen kan ikke slås av. `NSSpeechRecognitionUsageDescription`
   skal ikke inn i Info.plist. En test passer på det

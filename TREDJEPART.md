@@ -5,15 +5,20 @@ Oppdatert 03.10.26.
 Den samme listen står i appen under Innstillinger > Mer om appen > Lisenser.
 Trykk på en rad der for å lese hele lisensteksten.
 
-## Modell
+## Modeller
 
-| Hva                      | Opphav              | Lisens     | Lenke                                                 |
-| ------------------------ | ------------------- | ---------- | ----------------------------------------------------- |
-| nb-whisper-small         | Nasjonalbiblioteket | Apache 2.0 | https://huggingface.co/NbAiLab/nb-whisper-small       |
-| CoreML-konvertering      | Barrymanalow        | Apache 2.0 | https://huggingface.co/Barrymanalow/nb-whisper-coreml |
-| Tokenizer, whisper-small | OpenAI              | Apache 2.0 | https://huggingface.co/openai/whisper-small           |
+| Hva                              | Opphav              | Lisens     | Lenke                                                           |
+| -------------------------------- | ------------------- | ---------- | --------------------------------------------------------------- |
+| nb-whisper-small                 | Nasjonalbiblioteket | Apache 2.0 | https://huggingface.co/NbAiLab/nb-whisper-small                 |
+| CoreML-konvertering              | Barrymanalow        | Apache 2.0 | https://huggingface.co/Barrymanalow/nb-whisper-coreml           |
+| Tokenizer, whisper-small         | OpenAI              | Apache 2.0 | https://huggingface.co/openai/whisper-small                     |
+| Talermodell, community-1         | pyannote            | CC BY 4.0  | https://huggingface.co/pyannote/speaker-diarization-community-1 |
+| CoreML-konvertering, talermodell | Argmax              | CC BY 4.0  | https://huggingface.co/argmaxinc/speakerkit-coreml              |
 
-Versjonene av modellen og tokenizeren står i `Scripts/fetch-model.sh`.
+Talermodellen finner ut hvem som sa hva i et opptak (på engelsk: speaker
+diarization). Fróði bruker den uendret, slik Argmax har konvertert den.
+
+Versjonene av modellene og tokenizeren står i `Scripts/fetch-model.sh`.
 
 ## Kode
 
