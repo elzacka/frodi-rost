@@ -83,8 +83,8 @@ lenge det har vart og en stoppknapp. Første gang spør iOS «Vil du tillate
 løpende oppdateringer fra Fróði røst?». Svar «Tillat». Ellers stopper iOS
 opptak som handlingsknappen starter.
 
-iOS setter musikk og annen lyd på pause mens du tar opp. Hvis du starter med knappen
-mens appen ikke er åpen, fortsetter lyden, men lavere.
+iOS setter musikk og annen lyd på pause mens du tar opp. Hvis du starter med
+knappen mens appen ikke er åpen, fortsetter lyden, men lavere.
 
 ## Teksten
 

@@ -141,7 +141,7 @@ Two requests happen because the user asked for them: iOS downloads a picked file
 
 ## Privacy
 
-The four MASVS-PRIVACY controls were tested on 2026-09-28 with the MASTG's static iOS privacy tests against build 1.0 (9) and read against the code. The table describes the code. Build 1.0 (9) keeps the location an imported file states in its origin, and its purpose string does not say what is recorded; both are fixed in the source (CHANGELOG.md, *Ikke utgitt*).
+The four MASVS-PRIVACY controls were tested on 2026-09-28 with the MASTG's static iOS privacy tests against build 1.0 (9) and read against the code. The table describes the code. Build 1.0 (9) keeps the location an imported file states in its origin, and its purpose string says «det du sier», not that conversations with others are recorded; both are fixed in the source (CHANGELOG.md, *Ikke utgitt*).
 
 | Control | How the app meets it | Checked by |
 | --- | --- | --- |
