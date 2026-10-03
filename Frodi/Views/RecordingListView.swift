@@ -140,15 +140,15 @@ struct RecordingListView: View {
         }
     }
 
-    /// The database could not be opened, so the app runs on memory.
-    /// Without this message recordings would vanish on restart with nothing to say why.
+    /// The database could not be opened, so the app runs on memory. The audio stays on disk and
+    /// `reconcile` lists it again at launch; names, texts and origins do not survive a restart.
     private var storageWarning: some View {
         VStack(alignment: .leading, spacing: Space.s2) {
-            Text("Opptakene lagres ikke")
+            Text("Navn og tekst blir ikke lagret")
                 .font(.Frodi.bodyMedium)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            Text("Fróði får ikke åpnet databasen på enheten. Du kan ta opp og eksportere som vanlig, men alt forsvinner når du lukker appen. Installer appen på nytt.")
+            Text("Fróði får ikke åpnet databasen. Du kan ta opp og eksportere som vanlig, og lyden blir liggende på enheten. Navn, tekst og «Om opptaket» forsvinner når du lukker appen. Ikke slett appen: Da forsvinner opptakene også. Skriv til hei@tazk.no.")
                 .font(.Frodi.caption)
                 .foregroundStyle(Color.Frodi.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -172,7 +172,7 @@ struct RecordingListView: View {
                 .font(.Frodi.title)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            Text("Trykk på opptaksknappen eller hold inne handlingsknappen på venstre side. Brukerveiledningen ligger under Innstillinger.")
+            Text("Trykk på opptaksknappen nederst. Brukerveiledningen under Innstillinger viser hvordan du tar opp med handlingsknappen.")
                 .font(.Frodi.caption)
                 .foregroundStyle(Color.Frodi.textPrimary)
                 .multilineTextAlignment(.center)

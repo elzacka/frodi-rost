@@ -66,7 +66,7 @@ final class FrodiUITests: XCTestCase {
     }
 
     /// Innstillinger is the app's only place for privacy, permissions and
-    /// attribution. Apache 2.0 requires the licence list to actually be in the app.
+    /// attribution. The licences require their texts to actually be in the app.
     @MainActor
     func test_about_opensAndReachesLicenses() {
         let app = XCUIApplication()
@@ -78,7 +78,12 @@ final class FrodiUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Lisenser"].waitForExistence(timeout: 5), "Innstillinger åpnet ikke")
         app.buttons["Lisenser"].tap()
 
-        XCTAssertTrue(app.staticTexts["argmax-oss-swift"].waitForExistence(timeout: 5), "Lisenslisten mangler")
+        let row = app.buttons.containing(NSPredicate(format: "label BEGINSWITH 'argmax-oss-swift'")).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "Lisenslisten mangler")
+        row.tap()
+
+        let text = app.staticTexts.containing(NSPredicate(format: "label CONTAINS 'Permission is hereby granted'")).firstMatch
+        XCTAssertTrue(text.waitForExistence(timeout: 5), "Lisensteksten åpnet ikke")
     }
 
     /// A swipe to the left shows what can be done with a recording, and «Slett»

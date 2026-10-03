@@ -11,6 +11,10 @@ Last reviewed 2026-09-29.
 - [Threat model](#threat-model)
 - [What happens in each scenario](#what-happens-in-each-scenario)
 - [What is in use](#what-is-in-use)
+- [Background](#background)
+- [Logging](#logging)
+- [Memory safety](#memory-safety)
+- [Attack surface](#attack-surface)
 - [Encryption](#encryption)
 - [Origin](#origin)
 - [File protection](#file-protection)
@@ -54,11 +58,12 @@ latest release as of 2026-09-28, at the profiles MAS-L2 and MAS-P: the app
 holds a key that encrypts user data of a kind OWASP lists as high risk. The
 storage, crypto, authentication, platform and code controls were read
 against the code on 2026-09-27, not tested with MASTG. The four privacy
-controls were tested on 2026-09-28; see *Privacy*. Every applicable control
-is met except these, all under *Deliberate omissions*: local authentication
-(AUTH-2, AUTH-3), enforced updates (CODE-2), reproducible builds
-(MASWE-0075, under PRIVACY-3) and MAS-R. MASVS-NETWORK does not apply; there
-is no transport.
+controls were tested on 2026-09-28; see *Privacy*.
+
+Every applicable control is met except these, all under *Deliberate
+omissions*: local authentication (AUTH-2, AUTH-3), enforced updates (CODE-2),
+reproducible builds (MASWE-0075, under PRIVACY-3) and MAS-R. MASVS-NETWORK
+does not apply; there is no transport.
 
 ## What happens in each scenario
 
@@ -96,10 +101,10 @@ The sections below explain the choices.
 | File protection            | `.completeUnlessOpen` while recording and while awaiting the seal; `.complete` once sealed. Full table under *File protection*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `AudioStorage`                                                           |
 | Backup                     | `isExcludedFromBackup` on the recordings folder, on every sealed file, on the word list and on the SwiftData store (`.store`, `-wal`, `-shm`). Re-applied at launch, on every folder access and after the first save                                                                                                                                                                                                                                                                                                                                                                                                                                     | `AudioStorage`, `RecordingController`, `WordList`                        |
 | Transport                  | None. No `URLSession`, no ATS exceptions. See *No network* | `Info.plist`, `IsolationTests` |
-| Background                 | `UIBackgroundModes` is `audio`, so a recording goes on after the screen locks. The control can start a recording without the app in front: the system launches the app in the background to perform `ToggleRecordingIntent`, and the recording then runs as any other. Transcription needs the key, and the key needs an unlocked device: a stop from the control on an unlocked device starts it in the background, and it runs until iOS suspends the app. After a stop on a locked device it waits                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `Info.plist`, `IsolationTests`                                           |
+| Background | `UIBackgroundModes` is `audio`; the control starts a recording without the app in front. See *Background* | `Info.plist`, `IsolationTests` |
 | Permissions                | `NSMicrophoneUsageDescription` only. `NSSpeechRecognitionUsageDescription` is absent, and tested absent                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `Info.plist`, `PrivacyTests`                                             |
 | Speech to text             | nb-whisper, bundled, run by WhisperKit inside the app's own process. There is no other engine. The tokenizer's network fallback and its mitigation are under *No network*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `Transcription`, `WhisperTranscriber`                                    |
-| Logging                    | WhisperKit runs with `verbose: false` and `logLevel: .none`. The app writes recording events to the unified log — start and whether it came from the background, stop and its length, interruptions, a deferred seal and whether the device was locked at the time, an empty file removed, a Live Activity that did not start, a recording with no database to save to, an import that failed, by error type and code — and never content: no audio, no text, no word list, no name, and not the name of an imported file. File names are UUIDs. The log stays on the device and is read only with it connected to a Mac                                                                                                                                                                                                                                                                                              | `AudioRecorder.log`, `WhisperTranscriber` |
+| Logging | No content in any log. See *Logging* | `AudioRecorder.log`, `WhisperTranscriber` |
 | Privacy manifest           | No tracking, no tracking domains, no collected data. Two accessed APIs: file timestamps, reason C617.1, and `UserDefaults`, reason CA92.1, for the export format and the word list field's height. A test asserts that set exactly                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | `PrivacyInfo.xcprivacy`, `IsolationTests`                                |
 | Screen capture             | Transcript, word list and origin are hidden, and a name gives way to the date, while `UIScreen.isCaptured` is true and while the scene is not active. The state is read once, at the app's root, so every view follows one reading | `CaptureGuard`, `ConcealmentReader` |
 | Keyboard                   | Autocorrection and predictive text are off in both text fields, the word list and the rename field, so typed names stay out of the keyboard's learned dictionary, which lives outside the sandbox and in backups. The rename is the app's own field: the system's title editor keeps autocorrection on. The dictation key belongs to the system keyboard and follows the device's dictation settings | `SettingsView`, `RecordingDetailView` |
@@ -107,9 +112,74 @@ The sections below explain the choices.
 | Export                     | Decrypted on demand into the temporary directory, handed to the system share sheet, removed when the sheet closes. The RTF names the audio file with its SHA-256, and an imported recording's original with its own, and says so in the document when the origin cannot be confirmed                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `RecordingExport`, `ShareSheet`                                          |
 | Export compliance          | `ITSAppUsesNonExemptEncryption` is `false`. The only cryptography is Apple's CryptoKit and the Secure Enclave                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `project.yml`                                                            |
 | Compiler                   | `SWIFT_STRICT_CONCURRENCY: complete`, `SWIFT_APPROACHABLE_CONCURRENCY: true`, `SWIFT_VERSION: 6`, `ENABLE_USER_SCRIPT_SANDBOXING: true`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `project.yml`                                                            |
-| Memory safety              | Enhanced Security entitlements on the app: hardware memory tagging (`checked-allocations`) without soft mode, so a tag mismatch ends the process instead of being logged; guard objects on freed memory (`enhanced-security-version-string` 2); read-only platform memory (`dyld-ro`); runtime restrictions on loaded libraries and Mach messages (`platform-restrictions-string` 2). Memory tagging needs an A19 chip or later, iPhone 17 and iPhone Air onward; older devices get the rest. A test reads the entitlements from the signed executable. In the app's process on an iPhone 17 Pro, a read one byte past an allocation and a read after free both stop with `EXC_ARM_MTE_TAG_FAULT` | `project.yml`, `Frodi.entitlements`, `IsolationTests`                  |
+| Memory safety | Enhanced Security entitlements, hardware memory tagging on A19 and later. See *Memory safety* | `project.yml`, `Frodi.entitlements`, `IsolationTests` |
 | Build integrity            | WhisperKit pinned to an exact version, `Package.resolved` committed, model files fetched at a fixed revision and checked against a committed checksum list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `project.yml`, `Scripts/fetch-model.sh`, `Scripts/model-checksums.txt`   |
-| Attack surface kept closed | No URL schemes, document types, Handoff, Spotlight indexing or app group. Files come in only through the system file picker, limited to audio types, with a security-scoped URL to each picked file for the length of the import. One extension, `FrodiWidgets` (see *Isolation*); a test checks it is the only one. One App Intent, `ToggleRecordingIntent`, an `AudioRecordingIntent`. The Action Button's control, the Live Activity's stop button and the Shortcuts app run it in the app's process, without confirmation once microphone access is granted, because a confirmation would defeat the button while driving. The compensating controls are the orange microphone indicator and the Live Activity, which iOS requires for as long as the recording runs. No App Shortcut, so Siri has no phrase for it | `Info.plist`, `ToggleRecordingIntent`, `IsolationTests` |
+| Attack surface kept closed | No URL schemes, document types or app group; one extension, one App Intent. See *Attack surface* | `Info.plist`, `ToggleRecordingIntent`, `IsolationTests` |
+
+## Background
+
+`UIBackgroundModes` is `audio`, so a recording goes on after the screen locks.
+The control can start a recording without the app in front: the system launches
+the app in the background to perform `ToggleRecordingIntent`, and the recording
+then runs as any other. Transcription needs the key, and the key needs an
+unlocked device.
+
+A stop from the control on an unlocked device starts transcription in the
+background, and it runs until iOS suspends the app. After a stop on a locked
+device it waits.
+
+## Logging
+
+WhisperKit runs with `verbose: false` and `logLevel: .none`. The app writes
+these recording events to the unified log:
+
+- start, and whether it came from the background
+- stop, and the recording's length
+- interruptions
+- a deferred seal, and whether the device was locked at the time
+- an empty file removed
+- a Live Activity that did not start
+- a recording with no database to save to
+- an import that failed, by error type and code
+
+It never logs content: no audio, no text, no word list, no name, and not the
+name of an imported file. File names are UUIDs. The log stays on the device
+and is read only with it connected to a Mac.
+
+## Memory safety
+
+Enhanced Security entitlements on the app:
+
+- hardware memory tagging (`checked-allocations`) without soft mode, so a tag
+  mismatch ends the process instead of being logged
+- guard objects on freed memory (`enhanced-security-version-string` 2)
+- read-only platform memory (`dyld-ro`)
+- runtime restrictions on loaded libraries and Mach messages
+  (`platform-restrictions-string` 2)
+
+Memory tagging needs an A19 chip or later, iPhone 17 and iPhone Air onward;
+older devices get the rest. A test reads the entitlements from the signed
+executable.
+
+In the app's process on an iPhone 17 Pro, a read one byte past an allocation
+and a read after free both stop with `EXC_ARM_MTE_TAG_FAULT`.
+
+## Attack surface
+
+No URL schemes, document types, Handoff, Spotlight indexing or app group. Files
+come in only through the system file picker, limited to audio types, with a
+security-scoped URL to each picked file for the length of the import. One
+extension, `FrodiWidgets` (see *Isolation*); a test checks it is the only one.
+
+One App Intent, `ToggleRecordingIntent`, an `AudioRecordingIntent`. The Action
+Button's control, the Live Activity's stop button and the Shortcuts app run it
+in the app's process, without confirmation once microphone access is granted,
+because a confirmation would defeat the button while driving.
+
+The compensating
+controls are the orange microphone indicator and the Live Activity, which iOS
+requires for as long as the recording runs. No App Shortcut, so Siri has no
+phrase for it.
 
 ## Encryption
 
@@ -154,7 +224,9 @@ not open. It names its recording's file stem, so an origin moved onto
 another row does not match there. And its date, length and audio checksum
 are compared with the row and the audio on disk: the date and length every
 time the recording page opens, the audio when «Om opptaket» is opened, since
-that reads the whole file. On any mismatch the page says the details cannot
+that reads the whole file.
+
+On any mismatch the page says the details cannot
 be confirmed, and shows what was locked when the origin itself opened. An RTF
 export says the same in the document. `OriginTests` covers each case, and a
 row's date changed with `sqlite3` in the store was caught on the simulator.
@@ -173,7 +245,9 @@ after the fact: an origin written later would vouch for a past it never saw.
 For the same reason, a crash in the one moment after the seal has removed the
 plaintext and before the row takes the sealed name leaves that recording
 without an origin: `reconcile` points the row at the sealed file, and nothing
-seals it again. An import has the same window between moving its sealed file
+seals it again.
+
+An import has the same window between moving its sealed file
 in and saving its row: if the app dies there, or the save fails, `reconcile`
 gives the file a row with no origin and no name.
 
@@ -206,14 +280,16 @@ manifest that declares collected data, or `URLSession`, `URLRequest`,
 The model is bundled and loaded with `download: false` and explicit local
 paths, so a missing model fails rather than fetches. That flag does not cover
 the tokenizer: WhisperKit falls back to Hugging Face when it cannot read
-the tokenizer locally. The app therefore checks that both tokenizer files
+the tokenizer locally.
+
+The app therefore checks that both tokenizer files
 exist before it creates WhisperKit, and reports the model as missing if
 either is absent. A build phase fails the build itself when the model is not
 in it, so such a build cannot be archived.
 
 Picking a file that lives only in iCloud Drive makes iOS download it before
 the app reads it. That request is the file provider's, made because the user
-picked the file; the app's own code makes none. The same holds for the three
+picked the file; the app's own code makes none. The same holds for the four
 document links under «Mer om appen» in Innstillinger: they open GitHub in
 Safari, which makes the request because the user tapped the link.
 
@@ -267,7 +343,9 @@ repositories serve on the day. The model is a third-party CoreML conversion
 of nb-whisper-small, not published by the National Library. The checksums
 guarantee that the files are the ones measured on 2026-09-07; they do
 not guarantee that the files are benign, since a weights file cannot be read
-for intent. Because the model never touches the network, what could be wrong
+for intent.
+
+Because the model never touches the network, what could be wrong
 with it is transcription quality and bias, not exfiltration.
 
 ## Deliberate omissions
@@ -275,7 +353,7 @@ with it is transcription quality and bias, not exfiltration.
 | Omission                       | Reason                                                                                                                                                                                                                         |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | No app-level lock              | The device lock already applies: a locked device must be unlocked before anything recorded can be played or read. A second lock, inside the app, would be one more obstacle in the car                                         |
-| No auto-lock while transcribing | A transcription keeps the screen awake, so the device does not lock itself for as long as it runs: about four minutes for an hour of interview on an iPhone 17 Pro. Locking would suspend the run; what is done is saved, and it goes on when the app is next in front |
+| No auto-lock while transcribing | A transcription keeps the screen awake, so the device does not lock itself for as long as it runs: three to five minutes for an hour of speech on an iPhone 17 Pro. Locking would suspend the run; what is done is saved, and it goes on when the app is next in front |
 | No certificate pinning         | There is no transport                                                                                                                                                                                                          |
 | No jailbreak detection (MAS-R) | The threat model assumes iOS is not compromised, and a check that a compromised OS can lie to adds nothing. The source is public instead, for audit                                                                            |
 | No forced update               | Checking would need a network request. The App Store installs updates by itself where automatic updates are on; an organisation that needs a minimum version enforces it through MDM                                                                              |

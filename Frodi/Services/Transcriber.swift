@@ -52,7 +52,7 @@ enum TranscriptionError: LocalizedError {
     static func explanation(for code: String?) -> String {
         switch code {
         case "modelMissing":
-            String(localized: "Språkmodellen mangler i appen. Installer appen på nytt.")
+            String(localized: "Språkmodellen mangler i appen. Skriv til hei@tazk.no.")
         case "empty":
             String(localized: "Fant ingen tale i dette opptaket.")
         case "other":

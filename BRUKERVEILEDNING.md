@@ -39,8 +39,10 @@ Appen setter opptaket på pause hvis en samtale, Siri eller en annen app tar
 over mikrofonen. Opptaket fortsetter av seg selv når mikrofonen er ledig igjen.
 Appen lagrer det du har tatt opp, også hvis den ikke får mikrofonen tilbake.
 
-> **Viktig:** Før du tar opp en samtale der andre er til stede, må du si fra
-> at du tar opp, fortelle hva opptaket skal brukes til og få samtykke fra dem.
+> **Viktig:** Det er lov å ta opp en samtale du selv er med i. Si likevel fra
+> til de andre at du tar opp, og hva opptaket skal brukes til.
+> Personvernreglene kan avgjøre hva du får gjøre med opptaket etterpå, for
+> eksempel om du kan dele det.
 
 ## Importere en lydfil
 
@@ -62,9 +64,8 @@ Appen lagrer lyden i mono, i samme kvalitet som egne opptak. Det holder godt
 for tale, men kan være dårligere enn originalen. Ta vare på originalen hvis
 du trenger lyden i full kvalitet.
 
-Opptaket får filnavnet som navn. Det får datoen i filen hvis den er fra år
-2000 eller senere og ikke mer enn et døgn frem i tid. Ellers får det
-tidspunktet du importerte det.
+Opptaket får filnavnet som navn og datoen som står i filen. Det får
+tidspunktet du importerte det hvis filen ikke har en dato som kan stemme.
 
 Teksten lages etter samme regel som for opptak du tar i appen. Se
 [Teksten](#teksten).
@@ -115,15 +116,16 @@ Appen viser i prosent hvor langt den har kommet. Den fortsetter der den
 slapp hvis noe avbryter den.
 
 Teksten lages mens appen er åpen. Skjermen slukker ikke så lenge det pågår.
-Appen stopper hvis du låser enheten, og fortsetter når du åpner den igjen.
+Fróði tar pause hvis du låser enheten, og fortsetter når du åpner appen igjen.
 
-Omtrent så lang tid tar det:
+Omtrent så lang tid tar det på iPhone 17 Pro. Eldre modeller bruker lengre
+tid.
 
-| Opptak      | Tid             |
-| ----------- | --------------- |
+| Opptak      | Tid              |
+| ----------- | ---------------- |
 | 10 minutter | Under ett minutt |
-| 30 minutter | 1–2 minutter    |
-| 60 minutter | 2–4 minutter    |
+| 30 minutter | 1–3 minutter     |
+| 60 minutter | 3–5 minutter     |
 
 ### Slik lages teksten
 
@@ -132,6 +134,9 @@ kjører på enheten. Den setter tegn og store bokstaver selv og skriver dialekt
 om til bokmål.
 
 > **Tips:** Du trenger ikke si «punktum» eller «komma».
+
+Teksten er ikke ordrett: Modellen skriver dialekt og muntlige former om til
+bokmål, og den kan høre feil. Sjekk sitater mot lyden.
 
 Teksten deles i avsnitt. Hvert avsnitt har et tidspunkt. Trykk på tidspunktet
 for å spille av lyden derfra.
@@ -199,7 +204,8 @@ appen stoppet i det øyeblikket opptaket ble lagret.
 En sjekksum er en rekke tall og bokstaver som regnes ut fra innholdet i en
 fil. To like filer har samme sjekksum, og sjekksummen blir en annen hvis noen
 endrer filen. På en Mac finner du sjekksummen til en fil med kommandoen
-`shasum -a 256 filnavn` i Terminal. Filen er den samme som du importerte hvis
+`shasum -a 256 filnavn` i Terminal. På Windows bruker du kommandoen
+`Get-FileHash filnavn` i PowerShell. Filen er den samme som du importerte hvis
 den har samme sjekksum som originalen.
 
 ## Kopiere teksten
@@ -233,7 +239,7 @@ Sveip opptaket i listen mot venstre og trykk på «Slett». Appen spør «Sikker
 at du vil slette?» i samme rad. Trykk på «Slett» igjen, eller på «Behold».
 Da er opptaket og teksten borte fra enheten, og du kan ikke angre.
 
-> **Viktig:** Alt forsvinner hvis du sletter appen.
+> **Viktig:** Alle opptak og all tekst forsvinner hvis du sletter appen.
 
 ## Personvern
 

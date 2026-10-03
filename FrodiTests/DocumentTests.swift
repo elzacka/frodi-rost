@@ -42,6 +42,16 @@ struct DocumentTests {
         }
     }
 
+    /// MIT, Apache 2.0 and OFL ask for the licence text itself, not only its name.
+    /// Each row in Lisenser opens a text that ships in the app and names its licence.
+    @Test("Hver rad i Lisenser har lisensteksten sin i appen")
+    func licenceTextsShip() {
+        for component in LicensesView.allComponents {
+            let text = LicenseTextView.paragraphs(of: component.text).joined(separator: " ")
+            #expect(text.localizedCaseInsensitiveContains("licen"), "Lisensteksten til \(component.name) mangler i appen")
+        }
+    }
+
     /// Every package Xcode resolved is attributed, nothing is attributed that is
     /// no longer resolved, and the version and link in TREDJEPART.md are the ones
     /// in `Package.resolved`. The day argmax-oss-swift pulls in a third package, this fails.

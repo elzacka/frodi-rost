@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Settings: the two things you can set, what the app is, and the documents, as a sheet so you return to the list as you left it.
-/// Order: settings, the card with version and address, then the documents (use, privacy, security, accessibility, licences).
+/// Order: settings, the card with version and address, then the documents (use, privacy, accessibility, security, licences).
 /// The prose lives in the documents; the page links to them rather than repeating them.
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -58,13 +58,15 @@ struct SettingsView: View {
         }
     }
 
-    /// One document per reader: user, privacy-minded, security reviewer, licence holders. Three links open on GitHub in Safari;
-    /// the licences are an in-app screen, since Apache 2.0 requires the attribution in the app itself.
+    /// One document per reader: user, privacy-minded, accessibility, security reviewer, licence holders. Four links open on GitHub
+    /// in Safari; the licences are an in-app screen, since the licences require their texts in the app itself.
     private var documents: some View {
         Card("Mer om appen") {
             link("Brukerveiledning", to: Self.userGuide)
             link("Personvernerklæring", to: Self.privacyPolicy)
-            link("Sikkerhet", to: Self.securityPolicy)
+            link("Tilgjengelighet", to: Self.accessibility)
+            // SECURITY.md is written for security reviewers, in English; the label says so before the tap.
+            link("Sikkerhet (engelsk)", to: Self.securityPolicy)
             licenses
         }
     }
@@ -83,6 +85,7 @@ struct SettingsView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .accessibilityLabel("Ordliste")
+                .accessibilityHint("Skill ordene med komma")
                 .padding(Space.s2)
                 .frame(height: fieldHeight)
                 .background(Color.Frodi.background, in: RoundedRectangle(cornerRadius: Radius.control))
@@ -207,6 +210,7 @@ struct SettingsView: View {
     // that goes online, and only when you tap.
     private static let userGuide = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/BRUKERVEILEDNING.md")!
     private static let privacyPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/PERSONVERN.md")!
+    private static let accessibility = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/TILGJENGELIGHET.md")!
     private static let securityPolicy = URL(string: "https://github.com/elzacka/frodi-rost/blob/main/SECURITY.md")!
 
     private static var versionNumber: String {
@@ -245,42 +249,44 @@ struct SettingsView: View {
     }
 }
 
-/// The attribution Apache 2.0 requires, in the app and not only in the repo.
+/// The attribution and licence texts MIT, Apache 2.0 and OFL require, in the app and not only in the repo.
 /// Same names and licences as TREDJEPART.md (which also has versions and links); `DocumentTests` fails if the two lists or `Package.resolved` disagree.
 struct LicensesView: View {
-    struct Component: Identifiable {
+    struct Component: Identifiable, Hashable {
         let name: String
         let origin: String
         let license: String
+        /// The text file in `Resources/Licenses`, without `.txt`: the project's own file where it has one.
+        let text: String
 
         var id: String { name }
     }
 
     static let model = [
-        Component(name: "nb-whisper-small", origin: "Nasjonalbiblioteket", license: "Apache 2.0"),
-        Component(name: "CoreML-konvertering", origin: "Barrymanalow", license: "Apache 2.0"),
-        Component(name: "Tokenizer, whisper-small", origin: "OpenAI", license: "Apache 2.0")
+        Component(name: "nb-whisper-small", origin: "Nasjonalbiblioteket", license: "Apache 2.0", text: "Apache-2.0"),
+        Component(name: "CoreML-konvertering", origin: "Barrymanalow", license: "Apache 2.0", text: "Apache-2.0"),
+        Component(name: "Tokenizer, whisper-small", origin: "OpenAI", license: "Apache 2.0", text: "Apache-2.0")
     ]
 
     /// The packages Xcode resolves, by their identity in `Package.resolved`.
     static let code = [
-        Component(name: "argmax-oss-swift", origin: "Argmax", license: "MIT"),
-        Component(name: "swift-argument-parser", origin: "Apple", license: "Apache 2.0")
+        Component(name: "argmax-oss-swift", origin: "Argmax", license: "MIT", text: "argmax-oss-swift-LICENSE"),
+        Component(name: "swift-argument-parser", origin: "Apple", license: "Apache 2.0", text: "swift-argument-parser-LICENSE")
     ]
 
     /// Source that ships inside argmax-oss-swift rather than as a package of its
     /// own. Apache 2.0 asks for attribution whichever way the code arrives.
     static let embedded = [
-        Component(name: "swift-transformers", origin: "Hugging Face", license: "Apache 2.0")
+        Component(name: "swift-transformers", origin: "Hugging Face", license: "Apache 2.0", text: "argmax-oss-swift-NOTICES")
     ]
 
     static let icons = [
-        Component(name: "Material Symbols", origin: "Google", license: "Apache 2.0")
+        Component(name: "Material Symbols", origin: "Google", license: "Apache 2.0", text: "Apache-2.0")
     ]
 
     static let fonts = [
-        Component(name: "Skranji", origin: "Font Diner", license: "SIL Open Font License 1.1"),
-        Component(name: "Inter", origin: "Rasmus Andersson", license: "SIL Open Font License 1.1")
+        Component(name: "Skranji", origin: "Font Diner", license: "SIL Open Font License 1.1", text: "Skranji-OFL"),
+        Component(name: "Inter", origin: "Rasmus Andersson", license: "SIL Open Font License 1.1", text: "Inter-OFL")
     ]
 
     static var allComponents: [Component] { model + code + embedded + icons + fonts }
@@ -308,19 +314,68 @@ struct LicensesView: View {
     private func group(_ label: String, _ components: [Component]) -> some View {
         Card(label) {
             ForEach(components) { component in
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: component.name)
-                        .font(.Frodi.bodyMedium)
-                        .foregroundStyle(Color.Frodi.textPrimary)
+                NavigationLink {
+                    LicenseTextView(component: component)
+                } label: {
+                    HStack(spacing: Space.s2) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(verbatim: component.name)
+                                .font(.Frodi.bodyMedium)
+                                .foregroundStyle(Color.Frodi.textPrimary)
 
-                    Text("\(component.origin) · \(component.license)")
-                        .font(.Frodi.meta)
-                        .foregroundStyle(Color.Frodi.textSecondary)
+                            Text("\(component.origin) · \(component.license)")
+                                .font(.Frodi.meta)
+                                .foregroundStyle(Color.Frodi.textSecondary)
+                        }
+                        Spacer()
+                        IconView(.chevronRight, size: IconSize.inline)
+                            .foregroundStyle(Color.Frodi.textSecondary)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: ChoiceRow.height, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .buttonStyle(.plain)
                 .accessibilityElement(children: .combine)
+                .accessibilityHint("Viser lisensteksten")
             }
         }
+    }
+}
+
+/// One licence text, as the project ships it. Hard-wrapped lines are joined so
+/// the text follows the screen width and Dynamic Type; blank lines stay paragraph breaks.
+struct LicenseTextView: View {
+    let component: LicensesView.Component
+
+    static func paragraphs(of file: String) -> [String] {
+        guard let url = Bundle.main.url(forResource: file, withExtension: "txt"),
+              let text = try? String(contentsOf: url, encoding: .utf8) else { return [] }
+        return text.replacingOccurrences(of: "\r\n", with: "\n")
+            .components(separatedBy: "\n\n")
+            .map { $0.split(separator: "\n").map { $0.trimmingCharacters(in: .whitespaces) }.joined(separator: " ") }
+            .filter { !$0.isEmpty }
+    }
+
+    var body: some View {
+        ZStack {
+            Color.Frodi.background.ignoresSafeArea()
+
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: Space.s3) {
+                    ForEach(Array(Self.paragraphs(of: component.text).enumerated()), id: \.offset) { _, paragraph in
+                        Text(verbatim: paragraph)
+                            .font(.Frodi.caption)
+                            .foregroundStyle(Color.Frodi.textPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding(Space.s4)
+            }
+        }
+        .navigationTitle(component.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Color.Frodi.background, for: .navigationBar)
+        .frodiBackButton()
     }
 }
 

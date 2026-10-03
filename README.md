@@ -2,7 +2,7 @@
 
 Tar opp lyd på iPhone og gjør den om til norsk tekst. Alt skjer på enheten.
 
-«Fróði»: Norrønt for «den kunnskapsrike». «Røst»: Stemme, fordi appen tar opp tale.
+«Fróði»: Norrønt for «den kunnskapsrike». «røst»: Stemme, fordi appen tar opp tale.
 
 ## Status
 
@@ -18,7 +18,7 @@ Versjon 1.0 ligger i [App Store](https://apple.co/4ryiAk4). Appen finnes bare i 
 - Skriver bokmål med tegnsetting og stor forbokstav, også når du snakker dialekt
 - Deler teksten i avsnitt med tidspunkt du kan trykke på for å spille av derfra
 - Gir opptakene navnet du velger
-- Lagrer opplysningene om hvert opptak så de ikke kan endres, og sier fra hvis noen har endret dem utenfor appen
+- Låser opplysningene om hvert opptak og sier fra hvis de er endret utenfor appen
 - Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`
 
 [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md) viser hvordan.

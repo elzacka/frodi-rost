@@ -133,7 +133,7 @@ enum RecordingExport {
         ))
         var about = [
             title == nil ? nil : "\(dated).",
-            "Lengde \(Duration.seconds(duration).formatted(exportLength)). Laget med Fróði røst."
+            "Lengde \(Duration.seconds(duration).formatted(exportLength)). Teksten er laget automatisk med Fróði røst og kan inneholde feil."
         ].compactMap(\.self)
         if let original = origin.verified?.original, let importedAt = origin.verified?.importedAt {
             about.append("Importert \(importedAt.recordingStamp) fra \(original.name). Sjekksum for originalen (SHA-256): \(original.sha256)")

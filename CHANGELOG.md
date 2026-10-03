@@ -5,6 +5,15 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 ## Ikke utgitt
 
+### Lagt til
+
+- Under Lisenser i Innstillinger kan du trykke på en rad og lese hele
+  lisensteksten
+- Innstillinger har en lenke til «Tilgjengelighet». Lenken til
+  sikkerhetsdokumentet heter «Sikkerhet (engelsk)», fordi dokumentet er på
+  engelsk
+- `.rtf`-filen sier at teksten er laget automatisk og kan inneholde feil
+
 ### Endret
 
 - Fróði lagrer ikke stedet der en importert fil ble tatt opp, selv om filen
@@ -15,11 +24,16 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   hver sjekksum hører til
 - Tekstene i appen, brukerveiledningen og personvernerklæringen er skrevet
   om til mer naturlig norsk, med det viktigste først i hver setning
+- Når listen er tom, står det at brukerveiledningen under Innstillinger viser
+  hvordan du tar opp med handlingsknappen
 
 ### Rettet
 
 - Knappene du får frem ved å sveipe et opptak, er like store på alle opptak,
   også på opptak med navn
+- Hvis Fróði ikke får åpnet databasen, sier meldingen at lyden blir liggende
+  på enheten, og at du ikke skal slette appen
+- Hvis språkmodellen mangler, ber meldingen deg skrive til hei@tazk.no
 
 ## 1.0 (9) – 28.09.26
 
@@ -56,8 +70,8 @@ Appen er den samme som i build 8.
 
 - På iPhone 17 og nyere, og på iPhone Air, bruker appen Memory Integrity
   Enforcement, Apples minnebeskyttelse i maskinvaren. Enheten stopper appen
-  hvis appen leser eller skriver i minne den ikke har fått tildelt. Da kan
-  ingen bruke en slik feil til å ta over appen
+  hvis appen leser eller skriver i minne den ikke har fått tildelt. Det gjør
+  det mye vanskeligere å bruke en slik feil til å ta over appen
 
 ## 1.0 (7) – 26.09.26
 

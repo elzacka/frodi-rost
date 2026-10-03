@@ -31,13 +31,14 @@ Fróði røst er laget av elzacka (Tazk). Skriv til **hei@tazk.no**.
 | Navnet du gir et opptak                      | Samme sted, kryptert      | Til du endrer det eller sletter opptaket |
 | «Om opptaket», se under                      | Samme sted, kryptert      | Til du sletter opptaket                  |
 | Ordlisten i Innstillinger                    | Samme sted, kryptert      | Til du endrer den                        |
-| Dato, lengde og filnavn for hvert opptak     | Samme sted, ikke kryptert | Til du sletter opptaket                  |
+| Dato, lengde og filnavn for hvert opptak. Filnavnet er appens eget, ikke navnet på filen du importerte | Samme sted, ikke kryptert | Til du sletter opptaket |
+| Når et opptak starter og stopper, og hvor langt det er. Aldri lyd, tekst eller navn | Loggen til iOS, på enheten | Til iOS sletter den, også etter at du har slettet appen |
 
 Ingen brukerkonto. Ingen sporing. Ingen bruksstatistikk.
 
 Under «Om opptaket» ser du opplysningene Fróði lagrer når et opptak eller en
 lydfil kommer inn i appen: Når lyden ble tatt opp eller importert, hvor lenge
-den varer, og en sjekksum for den. Filnavnet i tabellen over er appens eget, ikke navnet på filen du importerte.
+den varer, og en sjekksum for den.
 
 Hvis du stopper et opptak mens enheten er låst, krypterer Fróði det når du har
 låst opp, senest neste gang du åpner appen. iOS holder filen låst så lenge
@@ -52,7 +53,7 @@ der den var. Appen endrer den ikke og sletter den ikke.
 Fróði lagrer filnavnet, formatet, størrelsen og opplysningene som stod i
 filen, for eksempel dato og tittel. De står under «Om opptaket». Filnavnet
 lagres slik det er. Fróði lagrer ikke stedet der filen ble tatt opp, selv om
-filen oppgir det (metadata).
+filen oppgir det.
 
 iOS laster ned filen før Fróði får den, hvis den ligger i iCloud Drive og
 ikke på enheten. Det er iOS som henter filen, fordi du valgte den. Fróði verken
@@ -108,8 +109,8 @@ i appen. [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md) viser hvordan.
 | Eksportere | Trykk på delingsikonet på opptakets side                                          |
 | Sletting   | Sveip opptaket i listen mot venstre og trykk på «Slett». Du kan ikke angre        |
 
-> **Viktig:** Alt forsvinner med én gang hvis du sletter appen, og du kan
-> ikke angre.
+> **Viktig:** Alt du har lagret i appen, forsvinner med én gang hvis du
+> sletter appen, og du kan ikke angre.
 
 ---
 
