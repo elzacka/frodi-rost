@@ -40,9 +40,12 @@ def literals(ref):
             word = re.fullmatch(r"[A-ZÆØÅ][a-zæøå]{2,}", text) is not None
             if not word and re.fullmatch(r"[A-Za-z0-9_\-\.\\\(\)/:%]+", text):
                 continue
+            if re.fullmatch(r"[dMyHhms.,: ]+", text):  # a date format, not text
+                continue
             if "privacy: .public" in text or text.startswith(("Recording ", "Live Activity ", "Interruption ", "Media services", "Seal of", "No container", "Empty recording")):
                 continue
-            if word or re.search(r"[æøåÆØÅ]", text) or (" " in text and text[0].isupper()):
+            # Lowercase phrases too: the list's status lines («lager tekst», «finner ut hvem som sa hva»).
+            if word or re.search(r"[æøåÆØÅ]", text) or (" " in text and text[0].isalpha()):
                 found.add(text)
     return found
 
