@@ -62,13 +62,13 @@ struct ChoiceSheet<Answers: View>: View {
 }
 
 extension View {
-    /// One answer in a `ChoiceSheet`, or one action behind a `SwipeRow`: a list-row-shaped button label; full width in the sheet, `inline` fits its word.
-    /// The destructive one is outlined in `recordingActive` (red reserved for loss), not filled: red has no `-on` colour, and an outline
-    /// says «careful» without shouting. 5,48:1 on Surface.
+    /// A `ChoiceSheet` answer (full width) or a `SwipeRow` action (`inline`: fits its word, one-line row tall whatever the row holds).
+    /// Destructive: outlined in `recordingActive`, not filled; red has no `-on` colour, and an outline says «careful». 5,48:1 on Surface.
     func choiceRow(destructive: Bool = false, inline: Bool = false) -> some View {
         font(.Frodi.bodyMedium)
             .foregroundStyle(destructive ? Color.Frodi.recordingActive : Color.Frodi.textPrimary)
-            .frame(maxWidth: inline ? nil : .infinity, minHeight: inline ? nil : ChoiceRow.height, maxHeight: inline ? .infinity : nil)
+            .padding(.vertical, inline ? Space.s3 : 0)
+            .frame(maxWidth: inline ? nil : .infinity, minHeight: ChoiceRow.height)
             .padding(.horizontal, Space.s4)
             .background(Color.Frodi.surface, in: RoundedRectangle(cornerRadius: Radius.control))
             .overlay(

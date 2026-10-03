@@ -11,6 +11,11 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Når appen ber om tilgang til mikrofonen, står det at den tar opp notater og
   samtaler
 
+### Rettet
+
+- Knappene du får frem ved å sveipe et opptak, er like store på alle opptak,
+  også på opptak med navn
+
 ## 1.0 (9) – 28.09.26
 
 Den første versjonen i App Store, godkjent av Apple 28.09.26.

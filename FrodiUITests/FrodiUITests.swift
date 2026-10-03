@@ -111,6 +111,54 @@ final class FrodiUITests: XCTestCase {
         XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "Opptaket forsvant etter «Behold»")
     }
 
+    /// A name makes a row taller; the actions behind it keep the height of a one-line row (device, 2026-10-03).
+    @MainActor
+    func test_swipeActions_keepTheirHeightOnANamedRow() {
+        let app = XCUIApplication()
+        app.launch()
+
+        for _ in 0..<2 {
+            app.buttons["Start opptak"].tap()
+            Thread.sleep(forTimeInterval: 2)
+            app.buttons["Stopp opptak"].tap()
+            Thread.sleep(forTimeInterval: 1)
+        }
+        let rows = app.scrollViews.otherElements.buttons
+        XCTAssertTrue(rows.element(boundBy: 1).waitForExistence(timeout: 10), "To rader mangler")
+
+        let name = "Intervju med kommunedirektøren om budsjettet for neste år"
+        rows.element(boundBy: 0).tap()
+        let title = app.navigationBars.buttons.matching(NSPredicate(format: "label CONTAINS %@", " | ")).firstMatch
+        XCTAssertTrue(title.waitForExistence(timeout: 5), "Tittelmenyen mangler")
+        title.tap()
+        let rename = app.buttons["Endre navn"]
+        XCTAssertTrue(rename.waitForExistence(timeout: 5), "«Endre navn» mangler")
+        rename.tap()
+        app.textFields.firstMatch.typeText(name)
+        app.buttons["Lagre"].tap()
+        app.navigationBars.buttons["Tilbake"].tap()
+
+        let named = rows.matching(NSPredicate(format: "label BEGINSWITH %@", name)).firstMatch
+        XCTAssertTrue(named.waitForExistence(timeout: 5), "Raden med navn mangler")
+        let plain = rows.element(boundBy: 1)
+        XCTAssertGreaterThan(named.frame.height, plain.frame.height, "Navnet gjorde ikke raden høyere")
+
+        func deleteHeight(behind row: XCUIElement) -> CGFloat {
+            row.swipeLeft()
+            let delete = app.buttons["Slett"].firstMatch
+            XCTAssertTrue(delete.waitForExistence(timeout: 5), "Sveipet viste ikke «Slett»")
+            let height = delete.frame.height
+            delete.tap()
+            app.buttons["Slett"].firstMatch.tap()
+            Thread.sleep(forTimeInterval: 1)
+            return height
+        }
+        let onNamed = deleteHeight(behind: named)
+        let onPlain = deleteHeight(behind: rows.element(boundBy: 0))
+        XCTAssertEqual(onNamed, onPlain, accuracy: 0.5, "«Slett» fulgte radens høyde")
+        XCTAssertGreaterThanOrEqual(onPlain, 44, "«Slett» er lavere enn 44 pt")
+    }
+
     /// The back button is the app's own, and UIKit switches off the left-edge swipe for a screen that hides the system's.
     /// `PopGestureKeeper` switches it back on; this tells if an iOS release breaks that. Lisenser is used: no recording needed to reach it.
     @MainActor
