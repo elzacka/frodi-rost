@@ -1,7 +1,6 @@
 #!/bin/bash
 # Gets nb-whisper-small CoreML and the Whisper tokenizer; run once after cloning (not in git, ~0.5 GB).
 # Pinned revisions, checked against Scripts/model-checksums.txt: CoreML runs in-process, so bundle only reviewed files.
-# New revision and regenerating the checksums: README, *Bygg*.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -11,7 +10,9 @@ MODEL="$DEST/nb-whisper-small"
 TOKENIZER="$DEST/tokenizer/models/openai/whisper-small"
 CHECKSUMS="$ROOT/Scripts/model-checksums.txt"
 
-# Commit ids on Hugging Face. The checksum list belongs to these two revisions.
+# Commit ids on Hugging Face; the checksum list belongs to these two. To change one: empty Frodi/Resources/Model, run this
+# script (it stops at the checksums), review the new files, then regenerate the list:
+# (cd Frodi/Resources/Model && find . -type f | sort | xargs shasum -a 256) > Scripts/model-checksums.txt
 MODEL_REVISION="cd3550b23ae5c90a37614c842656125d4676229e"
 TOKENIZER_REVISION="973afd24965f72e36ca33b3055d56a652f456b4d"
 
