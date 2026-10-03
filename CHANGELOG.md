@@ -10,6 +10,8 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 - Oppgir en importert fil hvor den ble tatt opp, lagrer Fróði ikke stedet
 - Når appen ber om tilgang til mikrofonen, står det at den tar opp notater og
   samtaler
+- «Om opptaket» forklarer hva en sjekksum er, og hvilken fil hver sjekksum
+  hører til
 
 ### Rettet
 

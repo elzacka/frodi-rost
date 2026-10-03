@@ -387,8 +387,8 @@ struct RecordingDetailView: View {
                     factList(origin)
 
                     Text(origin.source == .imported
-                         ? "Fróði låste disse opplysningene da filen ble importert. Du kan gi opptaket et nytt navn, men ikke endre dem. Med sjekksummene kan du bekrefte at en fil er originalen, og at lyden du eksporterer, er den samme som ble lagret."
-                         : "Fróði låste disse opplysningene da opptaket ble lagret. Du kan gi opptaket et nytt navn, men ikke endre dem. Med sjekksummen kan du bekrefte at lyden du eksporterer, er den samme som ble lagret.")
+                         ? "Disse opplysningene ble lagret da filen ble importert. Du kan endre navnet på opptaket, men ikke opplysningene. Er opplysningene eller lyden endret siden, står det en advarsel her i stedet.\n\nEn sjekksum er et fingeravtrykk av en fil. Endrer noen filen, får den et annet fingeravtrykk. Filen du importerte, har sjekksummen for originalen, og lydfilen du eksporterer, har sjekksummen for lyden."
+                         : "Disse opplysningene ble lagret sammen med opptaket. Du kan endre navnet på opptaket, men ikke opplysningene. Er opplysningene eller lyden endret siden, står det en advarsel her i stedet.\n\nEn sjekksum er et fingeravtrykk av en fil. Endrer noen filen, får den et annet fingeravtrykk. Lydfilen du eksporterer, har denne sjekksummen.")
                         .font(.Frodi.caption)
                         .foregroundStyle(Color.Frodi.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
