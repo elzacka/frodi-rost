@@ -28,7 +28,10 @@ enum Speakers {
             download: false,
             // Off for the same reason as WhisperKit's log: nothing about a recording belongs in the unified log.
             verbose: false,
-            logLevel: .none
+            logLevel: .none,
+            // About 25 % faster on the device, the same voices on the guided interview (2026-10-03). Loses voices of a
+            // second or less, such as a podcast jingle.
+            fullRedundancy: false
         )
     }
 
@@ -42,13 +45,20 @@ enum Speakers {
     /// Kept between texts: loading the models takes seconds.
     @MainActor private static var kit: SpeakerKit?
 
+    /// Loads the models, so the pass after the last piece does not wait for them (about 6 s on the device, measured 2026-10-03).
+    @MainActor
+    static func load() async throws {
+        guard kit == nil else { return }
+        guard let config else { throw TranscriptionError.modelMissing }
+        let loaded = try await SpeakerKit(config)
+        try await loaded.ensureModelsLoaded()
+        if kit == nil { kit = loaded }
+    }
+
     /// Who spoke when, over the whole file. One pass, not per piece, so a voice keeps its number all the way through.
     @MainActor
     static func turns(in fileURL: URL) async throws -> [Turn] {
-        if kit == nil {
-            guard let config else { throw TranscriptionError.modelMissing }
-            kit = try await SpeakerKit(config)
-        }
+        try await load()
         guard let kit else { return [] }
         let file = try AudioPieces(url: fileURL)
         let audio = try await file.samples(from: 0, to: file.duration)

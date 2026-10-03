@@ -114,6 +114,8 @@ enum Transcription {
 
                 let entries = WordList.entries(in: WordList.load())
                 let speakers = progress.speakers == true
+                // The speaker model loads while the text is made, so the pass after the last piece does not wait for it.
+                let loading = speakers ? Task { try? await Speakers.load() } : nil
                 try await transcriber().transcribe(fileURL: url, from: progress.position, words: speakers) { paragraphs, position in
                     // The listed names, spelled as listed, where the model nearly did.
                     progress.paragraphs.append(contentsOf: paragraphs.map { paragraph in
@@ -127,6 +129,7 @@ enum Transcription {
                     return !RecordingController.shared.isRecording
                 }
                 let done = progress.position >= duration - 0.5
+                await loading?.value
                 // Who said what. A failure leaves the text without labels, never without text.
                 if done, speakers, let turns = try? await Speakers.turns(in: url) {
                     progress.paragraphs = Speakers.label(progress.paragraphs, turns: turns) {

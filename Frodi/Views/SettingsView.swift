@@ -151,10 +151,10 @@ struct SettingsView: View {
         min(max(height, WordListField.minHeight), WordListField.maxHeight)
     }
 
-    /// Avansert adds who said what. A text already begun keeps the mode it began with.
+    /// Avansert adds who said what.
     private var mode: some View {
         Card("Tekstmodus") {
-            paragraph("Avansert viser også hvem som sa hva. Det blir mest riktig når én person snakker om gangen. Valget gjelder bare ny tekst.")
+            paragraph("Avansert viser også hvem som sa hva. Det blir mest riktig når én person snakker om gangen.")
 
             HStack(spacing: Space.s2) {
                 ForEach([TextMode.enkel, .avansert], id: \.self) { choice in
