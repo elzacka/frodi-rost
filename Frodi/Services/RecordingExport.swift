@@ -159,6 +159,9 @@ enum RecordingExport {
                     attributes: [.font: meta, .foregroundColor: secondary]
                 ))
             }
+            if let speaker = paragraph.speaker {
+                document.append(NSAttributedString(string: speaker + ": ", attributes: [.font: UIFont.boldSystemFont(ofSize: 12)]))
+            }
             document.append(NSAttributedString(
                 string: paragraph.text + "\n",
                 attributes: [.font: body, .paragraphStyle: spaced]

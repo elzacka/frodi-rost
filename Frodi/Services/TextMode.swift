@@ -7,6 +7,13 @@ enum TextMode: String {
 
     static let key = "textMode"
 
+    var label: String {
+        switch self {
+        case .enkel: "Enkel"
+        case .avansert: "Avansert"
+        }
+    }
+
     nonisolated static var current: TextMode {
         UserDefaults.standard.string(forKey: key).flatMap(TextMode.init(rawValue:)) ?? .enkel
     }

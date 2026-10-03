@@ -77,9 +77,9 @@ Visningene henter farger, skrift, avstand og hjørner fra tokenene i
 - Et opptak går aldri tapt. Filen på disk er opptaket, og raden i listen
   bygges opp igjen fra filen. Bare brukeren sletter lyd, og bare etter å ha
   bekreftet det
-- Ingen modus. Appen avgjør selv hva den gjør ulikt for et kort notat og et
-  intervju på en time, ut fra det den kan se, først og fremst lengden. Ingen
-  bryter
+- Én modus: Tekstmodus, Enkel eller Avansert (hvem sa hva). Ellers avgjør
+  appen selv hva den gjør ulikt for et kort notat og et intervju på en time,
+  ut fra det den kan se, først og fremst lengden
 - Skriv «intervju», aldri «revisjon», i tekst brukeren leser
 - Ingen emoji, verken i kode, commit-meldinger eller grensesnitt
 - Bare iPhone, bare stående, bare Norge. Ikke legg til engelsk grensesnitt

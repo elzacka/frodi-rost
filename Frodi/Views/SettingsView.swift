@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Settings: the two things you can set, what the app is, and the documents, as a sheet so you return to the list as you left it.
+/// Settings: the three things you can set, what the app is, and the documents, as a sheet so you return to the list as you left it.
 /// Order: settings, the card with version and address, then the documents (use, privacy, accessibility, security, licences).
 /// The prose lives in the documents; the page links to them rather than repeating them.
 struct SettingsView: View {
@@ -14,6 +14,8 @@ struct SettingsView: View {
     @State private var heightAtDragStart: Double?
     /// The same key `RecordingExport.TextFormat.chosen` reads.
     @AppStorage(RecordingExport.TextFormat.key) private var textFormat = RecordingExport.TextFormat.rtf
+    /// The same key `TextMode.current` reads.
+    @AppStorage(TextMode.key) private var textMode = TextMode.enkel
 
     var body: some View {
         NavigationStack {
@@ -22,6 +24,7 @@ struct SettingsView: View {
 
                 ScrollView {
                     VStack(spacing: Space.s4) {
+                        mode
                         wordList
                         export
                         about
@@ -148,6 +151,19 @@ struct SettingsView: View {
         min(max(height, WordListField.minHeight), WordListField.maxHeight)
     }
 
+    /// Avansert adds who said what. A text already begun keeps the mode it began with.
+    private var mode: some View {
+        Card("Tekstmodus") {
+            paragraph("Avansert viser også hvem som sa hva. Det blir mest riktig når én person snakker om gangen. Valget gjelder bare ny tekst.")
+
+            HStack(spacing: Space.s2) {
+                ForEach([TextMode.enkel, .avansert], id: \.self) { choice in
+                    pill(choice.label, chosen: textMode == choice, spoken: "Tekstmodus \(choice.label)") { textMode = choice }
+                }
+            }
+        }
+    }
+
     /// The one choice the export offers in advance. What to hand over, audio or
     /// text or both, is asked where the export is made; the shape of the text
     /// is decided here, once, because it is the same every time.
@@ -157,7 +173,7 @@ struct SettingsView: View {
 
             HStack(spacing: Space.s2) {
                 ForEach(RecordingExport.TextFormat.allCases, id: \.self) { format in
-                    formatChoice(format)
+                    pill(format.label, chosen: textFormat == format, spoken: "Tekst som \(format.label)") { textFormat = format }
                 }
             }
         }
@@ -165,12 +181,9 @@ struct SettingsView: View {
 
     /// A pill that is filled when chosen and outlined when not. The fill is
     /// the signal for sighted readers; VoiceOver hears «valgt».
-    private func formatChoice(_ format: RecordingExport.TextFormat) -> some View {
-        let chosen = textFormat == format
-        return Button {
-            textFormat = format
-        } label: {
-            Text(verbatim: format.label)
+    private func pill(_ label: String, chosen: Bool, spoken: String, choose: @escaping () -> Void) -> some View {
+        Button(action: choose) {
+            Text(verbatim: label)
                 .font(.Frodi.bodyMedium)
                 .foregroundStyle(chosen ? Color.Frodi.accentRecordOn : Color.Frodi.textPrimary)
                 .padding(.horizontal, Space.s4)
@@ -181,7 +194,7 @@ struct SettingsView: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Tekst som \(format.label)")
+        .accessibilityLabel(spoken)
         .accessibilityAddTraits(chosen ? .isSelected : [])
     }
 

@@ -20,6 +20,7 @@ enum Icon: String, CaseIterable {
     case skipForward = "forward_10"
     case resize = "drag_handle"
     case external = "open_in_new"
+    case edit = "edit"
 
     case microphone = "mic_fill"
     case stop = "stop_fill"

@@ -15,6 +15,9 @@ struct RecordingDetailView: View {
     @State private var partial: [TranscriptParagraph] = []
     @State private var showsTranscript = false
     @State private var renaming = false
+    /// The speaker being renamed, and the name typed so far.
+    @State private var renamingSpeaker: String?
+    @State private var speakerDraft = ""
     @State private var nameDraft = ""
     @State private var origin: OriginState = .none
     @State private var showsOrigin = false
@@ -80,7 +83,10 @@ struct RecordingDetailView: View {
         // The field holds the name, and a name is hidden when the text is. The
         // draft is kept; «Endre navn» opens it again.
         .onChange(of: concealment) { _, now in
-            if now != .none { renaming = false }
+            if now != .none {
+                renaming = false
+                renamingSpeaker = nil
+            }
         }
         .alert("Endre navn", isPresented: $renaming) {
             TextField("Navn", text: $nameDraft)
@@ -94,6 +100,21 @@ struct RecordingDetailView: View {
             }
         } message: {
             Text("Listen viser datoen hvis feltet er tomt.")
+        }
+        .alert("Endre navn", isPresented: .constant(renamingSpeaker != nil)) {
+            TextField("Navn", text: $speakerDraft)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.words)
+            Button("Avbryt", role: .cancel) { renamingSpeaker = nil }
+            Button("Lagre") {
+                if let speaker = renamingSpeaker {
+                    try? recording.setTranscript(Transcript.renaming(speaker, to: speakerDraft, in: transcript))
+                    try? context.save()
+                }
+                renamingSpeaker = nil
+            }
+        } message: {
+            Text("Fróði endrer navnet overalt i teksten. Gi to personer samme navn hvis det er samme person.")
         }
         .toolbarBackground(Color.Frodi.background, for: .navigationBar)
         .frodiBackButton()
@@ -196,7 +217,7 @@ struct RecordingDetailView: View {
                 .padding(.vertical, Space.s3)
 
                 if !partial.isEmpty {
-                    paragraphs(partial.map { ($0.start, $0.text) })
+                    paragraphs(partial.map { Transcript.Paragraph(mark: $0.start, text: $0.text) })
                         .hiddenWhileScreenCaptured()
                 }
             } else if Transcription.awaitsRequest(recording) {
@@ -301,25 +322,19 @@ struct RecordingDetailView: View {
 
     /// The text as paragraphs, each opened by the time it was said at. The mark is a button that moves the player there, so a reader
     /// checking a quote need not scrub. The number is shown, not only spoken, so it serves the sighted reader too.
-    private func paragraphs(_ items: [(mark: TimeInterval?, text: String)]) -> some View {
-        VStack(alignment: .leading, spacing: Space.s3) {
+    private func paragraphs(_ items: [Transcript.Paragraph]) -> some View {
+        // A named paragraph's 44 pt header already holds the air between paragraphs.
+        VStack(alignment: .leading, spacing: items.contains { $0.speaker != nil } ? Space.s1 : Space.s3) {
             ForEach(Array(items.enumerated()), id: \.offset) { _, item in
                 VStack(alignment: .leading, spacing: Space.s1) {
-                    if let mark = item.mark {
-                        Button {
-                            player.seek(to: mark)
-                            if !player.isPlaying { player.togglePlayback() }
-                        } label: {
-                            Text(verbatim: Transcript.mark(mark))
-                                .font(.Frodi.meta)
-                                .monospacedDigit()
-                                .foregroundStyle(Color.Frodi.textSecondary)
-                                .underline()
-                                .frame(minHeight: Disclosure.row / 2)
+                    // Avansert: the time and who said it on one line, both tall enough to tap.
+                    if let speaker = item.speaker {
+                        HStack(alignment: .lastTextBaseline, spacing: Space.s3) {
+                            if let mark = item.mark { markButton(mark, height: Disclosure.row) }
+                            speakerButton(speaker)
                         }
-                        .buttonStyle(.plain)
-                        .disabled(!player.isLoaded)
-                        .accessibilityLabel("Spill av fra \(spoken(mark))")
+                    } else if let mark = item.mark {
+                        markButton(mark, height: Disclosure.row / 2)
                     }
 
                     Text(verbatim: item.text)
@@ -328,6 +343,45 @@ struct RecordingDetailView: View {
                 }
             }
         }
+    }
+
+    private func markButton(_ mark: TimeInterval, height: CGFloat) -> some View {
+        Button {
+            player.seek(to: mark)
+            if !player.isPlaying { player.togglePlayback() }
+        } label: {
+            Text(verbatim: Transcript.mark(mark))
+                .font(.Frodi.meta)
+                .monospacedDigit()
+                .foregroundStyle(Color.Frodi.textSecondary)
+                .underline()
+                .frame(minHeight: height, alignment: .bottom)
+        }
+        .buttonStyle(.plain)
+        .disabled(!player.isLoaded)
+        .accessibilityLabel("Spill av fra \(spoken(mark))")
+    }
+
+    /// Renames that person throughout the text.
+    private func speakerButton(_ speaker: String) -> some View {
+        Button {
+            speakerDraft = speaker
+            renamingSpeaker = speaker
+        } label: {
+            // The pencil says the name can be changed; the time beside it is underlined for the same reason.
+            HStack(alignment: .lastTextBaseline, spacing: Space.s1) {
+                Text(verbatim: speaker)
+                    .font(.Frodi.bodyMedium)
+                    .foregroundStyle(Color.Frodi.textPrimary)
+                IconView(.edit, size: IconSize.external)
+                    .foregroundStyle(Color.Frodi.textSecondary)
+                    .accessibilityHidden(true)
+            }
+            .frame(minHeight: Disclosure.row, alignment: .bottom)
+        }
+        .buttonStyle(.plain)
+        .disabled(concealment != .none)
+        .accessibilityHint("Endrer navnet i hele teksten")
     }
 
     private var fraction: Double? {

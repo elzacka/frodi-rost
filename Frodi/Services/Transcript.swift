@@ -35,22 +35,69 @@ enum Transcript {
         speaker.map { String(localized: "Person \($0)") + ": " } ?? ""
     }
 
+    /// A paragraph as read back: its mark, its speaker in Avansert, its text.
+    struct Paragraph: Equatable {
+        var mark: TimeInterval?
+        var speaker: String?
+        var text: String
+    }
+
     /// Splits stored text back into paragraphs. The mark is nil where there is none.
-    static func paragraphs(in text: String) -> [(mark: TimeInterval?, text: String)] {
-        text
+    /// A speaker is read only when every marked paragraph opens with one and there are at least two, as `compose`
+    /// writes them; an Enkel paragraph that happens to open «Merk: …» stays text.
+    static func paragraphs(in text: String) -> [Paragraph] {
+        let marked: [Paragraph] = text
             .components(separatedBy: "\n\n")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
             .map { paragraph in
                 guard let match = paragraph.firstMatch(of: markPattern) else {
-                    return (nil, paragraph)
+                    return Paragraph(mark: nil, text: paragraph)
                 }
                 let hours = match.output.2.flatMap { Double($0) } ?? 0
                 let minutes = Double(match.output.3) ?? 0
                 let seconds = Double(match.output.4) ?? 0
                 let body = String(paragraph[match.range.upperBound...])
-                return (hours * 3600 + minutes * 60 + seconds, body)
+                return Paragraph(mark: hours * 3600 + minutes * 60 + seconds, text: body)
             }
+
+        let labelled = marked.filter { $0.mark != nil }.map { $0.text.firstMatch(of: speakerPattern) }
+        let names = Set(labelled.compactMap { $0.map { String($0.output.1) } })
+        guard !labelled.isEmpty, labelled.allSatisfy({ $0 != nil }), names.count > 1 else { return marked }
+        return marked.map { paragraph in
+            guard paragraph.mark != nil, let match = paragraph.text.firstMatch(of: speakerPattern) else { return paragraph }
+            return Paragraph(mark: paragraph.mark, speaker: String(match.output.1), text: String(paragraph.text[match.range.upperBound...]))
+        }
+    }
+
+    /// The speakers in the order they first speak.
+    static func speakers(in text: String) -> [String] {
+        var seen: [String] = []
+        for case let name? in paragraphs(in: text).map(\.speaker) where !seen.contains(name) { seen.append(name) }
+        return seen
+    }
+
+    /// The longest name a speaker can be given, and the characters it cannot hold: they would end the label.
+    static let longestName = 40
+
+    /// The text with one speaker renamed everywhere. Two speakers given the same name become one, which mends a voice
+    /// the diarization split in two; with one name left the labels go, as for one voice. An empty name changes nothing.
+    static func renaming(_ speaker: String, to name: String, in text: String) -> String {
+        let clean = String(name
+            .replacingOccurrences(of: ":", with: "")
+            .components(separatedBy: .newlines).joined(separator: " ")
+            .trimmingCharacters(in: .whitespaces)
+            .prefix(longestName))
+        guard !clean.isEmpty, clean != speaker else { return text }
+        let read = paragraphs(in: text)
+        let names = Set(read.compactMap(\.speaker).map { $0 == speaker ? clean : $0 })
+        return read
+            .map { paragraph in
+                let mark = paragraph.mark.map { "[\(Self.mark($0))] " } ?? ""
+                let label = names.count > 1 ? paragraph.speaker.map { "\($0 == speaker ? clean : $0): " } ?? "" : ""
+                return mark + label + paragraph.text
+            }
+            .joined(separator: "\n\n")
     }
 
     /// «4:07», «1:02:05». The seconds are rounded down; nobody scrubs to a tenth.
@@ -66,6 +113,11 @@ enum Transcript {
     /// stored constant: `Regex` is not `Sendable`, and a literal is cheap to build.
     private static var markPattern: Regex<(Substring, Substring, Substring?, Substring, Substring)> {
         /^(\[(?:(\d+):)?(\d+):(\d{2})\] )/
+    }
+
+    /// «Person 1: » or a name given since, at the start of a paragraph's text.
+    private static var speakerPattern: Regex<(Substring, Substring)> {
+        #/^([^:\n]{1,40}): /#
     }
 }
 

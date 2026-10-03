@@ -8,6 +8,8 @@ Listen starter med den første versjonen i App Store.
 
 ### Lagt til
 
+- Tekstmodus i Innstillinger. Med Avansert viser teksten hvem som sa hva, og
+  du kan gi personene navn
 - Under Lisenser i Innstillinger kan du trykke på en rad og lese hele
   lisensteksten
 - Innstillinger lenker til «Tilgjengelighet». Lenken til sikkerhetsdokumentet

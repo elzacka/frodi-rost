@@ -22,6 +22,10 @@ Fróði røst er laget av elzacka (Tazk). Skriv til **hei@tazk.no**.
 
 Ingen brukerkonto. Ingen sporing. Ingen bruksstatistikk.
 
+Med tekstmodus Avansert sammenligner appen stemmene i opptaket for å finne ut
+hvem som sa hva. Det skjer på enheten. Appen lagrer bare navnene i teksten,
+ingenting om selve stemmene.
+
 Appen sender ingenting selv. Hvis du har slått på deling med apputviklere i
 iOS, kan Apple sende krasjrapporter fra appen til utvikleren. De inneholder
 ikke lyd, tekst eller navn.

@@ -12,6 +12,7 @@ Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten
 - [Teksten](#teksten)
   - [Slik lages teksten](#slik-lages-teksten)
   - [Hvis teksten mangler](#hvis-teksten-mangler)
+  - [Hvem sa hva](#hvem-sa-hva)
 - [Ordliste](#ordliste)
 - [Spille av](#spille-av)
 - [Gi opptaket et navn](#gi-opptaket-et-navn)
@@ -135,6 +136,33 @@ lyden derfra.
 | «Fróði fikk ikke laget teksten denne gangen.» | Noe gikk galt. Trykk på «Prøv på nytt»      |
 
 I listen står de to siste kortere: «ingen tale» og «noe gikk galt».
+
+### Hvem sa hva
+
+Under Innstillinger velger du tekstmodus. Med Enkel får du teksten alene. Med
+Avansert viser teksten også hvem som sa hva. Fróði sammenligner stemmene i
+opptaket og kaller dem «Person 1», «Person 2» og så videre, i den rekkefølgen
+de snakker. På engelsk heter dette *speaker diarization*.
+
+Valget gjelder ny tekst. Hvis du vil ha navn i en tekst som allerede er
+laget, velger du Avansert, sveiper opptaket mot venstre og trykker på «Lag ny
+tekst». Med Avansert tar det under et halvt minutt ekstra å lage teksten til
+et opptak på en time. Et opptak med én stemme får ingen navn.
+
+Trykk på et navn over et avsnitt for å gi personen et annet navn. Navnet
+endres i hele teksten, og det følger med når du kopierer eller eksporterer.
+Hvis Fróði har delt én person i to, gir du begge samme navn.
+
+Slik blir det mest riktig:
+
+- La én person snakke om gangen. Fróði blander lettest stemmene når to
+  snakker samtidig.
+- Nikk i stedet for å si «ja» eller «mm» mens den andre snakker. Korte svar
+  havner ofte hos feil person.
+- Legg enheten midt mellom dere, så begge høres like godt.
+- Velg et stille rom uten musikk eller radio i bakgrunnen.
+- Be alle si navnet sitt i starten. Da ser du lett hvem som er hvem når du
+  gir dem navn.
 
 ## Ordliste
 
