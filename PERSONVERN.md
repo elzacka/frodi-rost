@@ -37,8 +37,7 @@ Ingen brukerkonto. Ingen sporing. Ingen bruksstatistikk.
 
 Under «Om opptaket» ser du opplysningene Fróði lagrer når et opptak eller en
 lydfil kommer inn i appen: Når lyden ble tatt opp eller importert, hvor lenge
-den varer, og en sjekksum for den. Filnavnet i tabellen over er appens eget, ikke navnet på filen du
-importerte.
+den varer, og en sjekksum for den. Filnavnet i tabellen over er appens eget, ikke navnet på filen du importerte.
 
 Hvis du stopper et opptak mens enheten er låst, krypterer Fróði det når du har
 låst opp, senest neste gang du åpner appen. iOS holder filen låst så lenge
