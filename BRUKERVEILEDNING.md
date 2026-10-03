@@ -36,8 +36,8 @@ Opptaket fortsetter når skjermen låser seg og når du bytter app, og det har
 ingen tidsgrense.
 
 Appen setter opptaket på pause hvis en samtale, Siri eller en annen app tar
-over mikrofonen. Opptaket fortsetter av seg selv når mikrofonen er ledig igjen.
-Appen lagrer det du har tatt opp, også hvis den ikke får mikrofonen tilbake.
+over mikrofonen, og fortsetter når mikrofonen er ledig igjen. Det du har tatt
+opp, går ikke tapt.
 
 > **Viktig:** Det er lov å ta opp en samtale du selv er med i. Si likevel fra
 > til de andre at du tar opp, og hva opptaket skal brukes til.
@@ -46,35 +46,24 @@ Appen lagrer det du har tatt opp, også hvis den ikke får mikrofonen tilbake.
 
 ## Importere en lydfil
 
-Fróði kan lage tekst av lydfiler med norsk tale, uansett hvilken app eller
-opptaker de kommer fra:
-
 1. Trykk på «Importer lydfil», ikonet med lydbølger og pluss øverst til
    venstre.
 2. Velg én eller flere lydfiler og trykk på «Åpne».
 
-> **Obs:** Resultatet avhenger av hvor lett det er å høre hva som blir sagt. En
-> podkastepisode gir en mer presis tekst enn for eksempel et YouTube-klipp der
-> flere snakker i munnen på hverandre.
-
 Fróði leser m4a, mp3, wav, aiff og de andre lydformatene iOS kan lese. Appen
-tar med begge kanalene hvis lyden er i stereo.
-
-Appen lagrer lyden i mono, i samme kvalitet som egne opptak. Det holder godt
-for tale, men kan være dårligere enn originalen. Ta vare på originalen hvis
+lagrer lyden i mono, med begge kanalene hvis lyden er i stereo, og i samme
+kvalitet som egne opptak. Det holder godt for tale. Ta vare på originalen hvis
 du trenger lyden i full kvalitet.
+
+Teksten blir mest presis når det er lett å høre hva som blir sagt, og ingen
+snakker i munnen på hverandre. Den lages etter samme regel som for andre
+opptak, se [Teksten](#teksten).
 
 Opptaket får filnavnet som navn og datoen som står i filen. Det får
 tidspunktet du importerte det hvis filen ikke har en dato som kan stemme.
 
-Teksten lages etter samme regel som for opptak du tar i appen. Se
-[Teksten](#teksten).
-
-Appen sier fra hvis den ikke kan lese filen. Filen kan være skadet eller i et
-format appen ikke kan lese.
-
-> **Obs:** Opptak fra Taleopptak ligger ikke i Filer. Del opptaket fra
-> Taleopptak og velg «Lagre i Filer». Da kan du importere det.
+Opptak fra Taleopptak ligger ikke i Filer. Del opptaket fra Taleopptak og velg
+«Lagre i Filer». Da kan du importere det.
 
 ## Handlingsknappen
 
@@ -83,22 +72,19 @@ iPhone 15 Pro og nyere.
 
 Ta det første opptaket i appen. Da spør den om tilgang til mikrofonen.
 Sett så opp knappen i Innstillinger på enheten: Handlingsknapp > Kontroll >
-Velg en kontroll > Fróði røst > «Start eller stopp opptak».
+Velg en kontroll > Fróði røst > «Start eller stopp opptak». Du kan også legge
+kontrollen til i Kontrollsenter.
 
 Hold knappen inne for å starte et opptak. Hold den inne igjen for å stoppe.
-Det virker også når enheten er låst, uten at du låser den opp.
+Det virker også når enheten er låst.
 
 Så lenge opptaket går, viser låseskjermen og Dynamic Island «Tar opp», hvor
 lenge det har vart og en stoppknapp. Første gang spør iOS «Vil du tillate
 løpende oppdateringer fra Fróði røst?». Svar «Tillat». Ellers stopper iOS
 opptak som handlingsknappen starter.
 
-Hvis appen er åpen når du starter et opptak, setter iOS musikk og annen lyd
-på pause til du er ferdig. Hvis du starter opptaket med knappen mens appen
-ikke er åpen, fortsetter lyden, men lavere, til du stopper opptaket.
-
-> **Tips:** Kontrollen finnes også i Kontrollsenter, der du kan legge den til
-> selv.
+Musikk og annen lyd tar pause mens du tar opp. Hvis du starter med knappen
+mens appen ikke er åpen, fortsetter lyden, men lavere.
 
 ## Teksten
 
@@ -130,16 +116,14 @@ tid.
 ### Slik lages teksten
 
 Modellen nb-whisper-small fra Nasjonalbiblioteket er innebygd i appen og
-kjører på enheten. Den setter tegn og store bokstaver selv og skriver dialekt
-om til bokmål.
-
-> **Tips:** Du trenger ikke si «punktum» eller «komma».
+kjører på enheten. Den setter tegn og store bokstaver selv, så du trenger ikke
+si «punktum» eller «komma».
 
 Teksten er ikke ordrett: Modellen skriver dialekt og muntlige former om til
 bokmål, og den kan høre feil. Sjekk sitater mot lyden.
 
-Teksten deles i avsnitt. Hvert avsnitt har et tidspunkt. Trykk på tidspunktet
-for å spille av lyden derfra.
+Teksten deles i avsnitt med tidspunkt. Trykk på tidspunktet for å spille av
+lyden derfra.
 
 ### Hvis teksten mangler
 
@@ -156,13 +140,12 @@ I listen står de to siste kortere: «ingen tale» og «noe gikk galt».
 
 Modellen kan bomme på navn og ord den ikke kjenner: Firmaer, personer,
 steder, forkortelser og standarder. Skriv dem inn i ordlisten under
-Innstillinger i appen, skilt med komma. Du gjør feltet høyere ved å dra i
-håndtaket nederst til høyre.
+Innstillinger i appen, skilt med komma. Dra i håndtaket nederst til høyre for
+å gjøre feltet høyere.
 
-Modellen henter listen før den lytter. Etterpå retter appen ord i teksten som
-nesten stemmer med et ord i listen. Ord på under fire bokstaver og tall rettes
-ikke. Bøyde former rettes heller ikke, så «internkontrollen» blir stående når
-listen har «internkontroll».
+Modellen får listen før den lytter, og appen retter etterpå ord som nesten
+stemmer med et ord i listen. Ord på under fire bokstaver, tall og bøyde former
+rettes ikke.
 
 > **Tips:** Hvis du endrer listen etter at teksten er laget, sveiper du
 > opptaket i listen mot venstre og trykker på «Lag ny tekst».
@@ -177,11 +160,7 @@ opptaket.
 
 Åpne opptaket og trykk på tittelen øverst. Velg «Endre navn», skriv navnet og
 trykk på «Lagre». Navnet står over datoen i listen, og som overskrift når du
-eksporterer teksten som `.rtf`.
-
-Tøm feltet for å fjerne navnet. Da viser listen datoen igjen.
-
-Et nytt navn endrer ikke det som står under «Om opptaket».
+eksporterer teksten som `.rtf`. Tøm feltet for å fjerne navnet.
 
 ## Om opptaket
 
@@ -198,15 +177,17 @@ eller lengden er endret utenfor appen, eller hvis lyden ikke stemmer med
 sjekksummen: «Fróði kan ikke bekrefte opplysningene om dette opptaket.» Under
 advarselen står opplysningene slik de ble lagret, hvis Fróði kan lese dem.
 
-Et opptak uten «Om opptaket» ble laget med en eldre versjon av appen, eller
-appen stoppet i det øyeblikket opptaket ble lagret.
+En sjekksum regnes ut fra innholdet i en fil og blir en annen hvis noen endrer
+filen. Slik finner du sjekksummen til en fil:
 
-En sjekksum er en rekke tall og bokstaver som regnes ut fra innholdet i en
-fil. To like filer har samme sjekksum, og sjekksummen blir en annen hvis noen
-endrer filen. På en Mac finner du sjekksummen til en fil med kommandoen
-`shasum -a 256 filnavn` i Terminal. På Windows bruker du kommandoen
-`Get-FileHash filnavn` i PowerShell. Filen er den samme som du importerte hvis
-den har samme sjekksum som originalen.
+| Maskin  | Kommando                                  |
+| ------- | ----------------------------------------- |
+| Mac     | `shasum -a 256 filnavn` i Terminal        |
+| Windows | `Get-FileHash filnavn` i PowerShell       |
+
+Filen er den samme som du importerte hvis den har samme sjekksum som
+originalen. På samme måte kan den som får både `.rtf`-filen og lydfilen,
+sjekke at lyden er den Fróði lagret.
 
 ## Kopiere teksten
 
@@ -216,19 +197,16 @@ i en annen app innen fem minutter.
 ## Eksportere
 
 Trykk på delingsikonet øverst til høyre på opptakets side. Hvis opptaket har
-tekst, velger du «Opptak og tekst», «Bare opptaket» eller «Bare teksten». Deretter
-kommer delingsmenyen i iOS, der du velger hvor filene skal sendes eller lagres.
+tekst, velger du «Opptak og tekst», «Bare opptaket» eller «Bare teksten».
+Deretter velger du i delingsmenyen hvor filene skal sendes eller lagres.
 
 Lyden eksporteres alltid som `.m4a`. Formatet for teksten velger du én gang,
 under Innstillinger i appen:
 
-| Format | Passer&nbsp;til                                                                                  |
-| ------ | ------------------------------------------------------------------------------------------------ |
+| Format | Passer&nbsp;til                                                                                                                                                                                 |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `.rtf` | Åpnes som dokument i Word, Pages og Notater. Har overskrift, dato, sjekksum for lydfilen og tidspunkt for hvert avsnitt. For en importert fil står også filnavnet og sjekksummen til originalen |
-| `.txt` | Ren tekst som kan limes inn hvor som helst                                                       |
-
-> **Tips:** Den som får både `.rtf`-filen og lydfilen, kan sjekke med
-> sjekksummen at lyden er den samme som ble lagret i Fróði.
+| `.txt` | Ren tekst som kan limes inn hvor som helst                                                                                                                                                      |
 
 > **Viktig:** Eksporter opptakene før du bytter enhet. En annen enhet kan
 > ikke lese dem, heller ikke fra en sikkerhetskopi.
@@ -248,7 +226,3 @@ Hva som lagres, og rettighetene dine: [PERSONVERN.md](PERSONVERN.md).
 ## Spørsmål eller feil
 
 Skriv til **hei@tazk.no**.
-
----
-
-[Til toppen](#brukerveiledning-for-fróði-røst)
