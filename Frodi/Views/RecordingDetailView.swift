@@ -387,8 +387,8 @@ struct RecordingDetailView: View {
                     factList(origin)
 
                     Text(origin.source == .imported
-                         ? "Disse opplysningene ble lagret da filen ble importert. Du kan endre navnet på opptaket, men ikke opplysningene. Er opplysningene eller lyden endret siden, står det en advarsel her i stedet.\n\nEn sjekksum er et fingeravtrykk av en fil. Endrer noen filen, får den et annet fingeravtrykk. Filen du importerte, har sjekksummen for originalen, og lydfilen du eksporterer, har sjekksummen for lyden."
-                         : "Disse opplysningene ble lagret sammen med opptaket. Du kan endre navnet på opptaket, men ikke opplysningene. Er opplysningene eller lyden endret siden, står det en advarsel her i stedet.\n\nEn sjekksum er et fingeravtrykk av en fil. Endrer noen filen, får den et annet fingeravtrykk. Lydfilen du eksporterer, har denne sjekksummen.")
+                         ? "Disse opplysningene ble lagret da filen ble importert. Du kan endre navnet på opptaket, men ikke opplysningene. Fróði viser en advarsel her i stedet hvis opplysningene eller lyden blir endret.\n\nEn sjekksum er en rekke tall og bokstaver som regnes ut fra innholdet i en fil. Sjekksummen blir en annen hvis noen endrer filen. Filen du importerte, har sjekksummen for originalen, og lydfilen du eksporterer, har sjekksummen for lyden."
+                         : "Disse opplysningene ble lagret sammen med opptaket. Du kan endre navnet på opptaket, men ikke opplysningene. Fróði viser en advarsel her i stedet hvis opplysningene eller lyden blir endret.\n\nEn sjekksum er en rekke tall og bokstaver som regnes ut fra innholdet i en fil. Sjekksummen blir en annen hvis noen endrer filen. Lydfilen du eksporterer, har denne sjekksummen.")
                         .font(.Frodi.caption)
                         .foregroundStyle(Color.Frodi.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -409,7 +409,7 @@ struct RecordingDetailView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             if let locked {
-                Text("Slik ble opplysningene låst:")
+                Text("Slik ble opplysningene lagret:")
                     .font(.Frodi.caption)
                     .foregroundStyle(Color.Frodi.textPrimary)
                 factList(locked)

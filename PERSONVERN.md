@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 29.09.26.
+Sist oppdatert 03.10.26.
 
 Alt skjer på enheten. Ingen datatrafikk ut eller inn. Appen har ingen adresse
 å sende til, og ingen tjeneste å spørre.
@@ -35,14 +35,14 @@ Fróði røst er laget av elzacka (Tazk). Skriv til **hei@tazk.no**.
 
 Ingen brukerkonto. Ingen sporing. Ingen bruksstatistikk.
 
-Under «Om opptaket» ser du opplysningene Fróði låser når et opptak eller en
+Under «Om opptaket» ser du opplysningene Fróði lagrer når et opptak eller en
 lydfil kommer inn i appen: Når lyden ble tatt opp eller importert, hvor lenge
 den varer, og en sjekksum for den. Filnavnet i tabellen over er appens eget, ikke navnet på filen du
 importerte.
 
-Stopper du et opptak mens enheten er låst, krypterer Fróði det når du har låst
-opp, senest neste gang du åpner appen. Så lenge enheten er låst, holder iOS
-filen låst, og ingen kan lese den.
+Hvis du stopper et opptak mens enheten er låst, krypterer Fróði det når du har
+låst opp, senest neste gang du åpner appen. iOS holder filen låst så lenge
+enheten er låst, og ingen kan lese den.
 
 ## Importerte filer
 
@@ -52,19 +52,19 @@ der den var. Appen endrer den ikke og sletter den ikke.
 
 Fróði lagrer filnavnet, formatet, størrelsen og opplysningene som stod i
 filen, for eksempel dato og tittel. De står under «Om opptaket». Filnavnet
-lagres slik det er. Oppgir filen hvor den ble tatt opp (metadata), lagrer ikke
-Fróði stedet.
+lagres slik det er. Fróði lagrer ikke stedet der filen ble tatt opp, selv om
+filen oppgir det (metadata).
 
-Ligger filen i iCloud Drive og ikke på enheten, laster iOS den ned før Fróði
-får den. Det er iOS som henter filen, fordi du valgte den. Fróði verken
+iOS laster ned filen før Fróði får den, hvis den ligger i iCloud Drive og
+ikke på enheten. Det er iOS som henter filen, fordi du valgte den. Fróði verken
 sender eller henter noe selv.
 
 ## Skjermen
 
 Teksten og «Om opptaket» skjules når skjermen tas opp eller speiles, og når
-du bytter app, så de ikke vises i appveksleren. Har du gitt et opptak et navn,
-viser appen datoen i stedet. Appen kan ikke hindre at noen tar skjermbilde av
-den.
+du bytter app, så de ikke vises i appveksleren. Appen viser da datoen i stedet
+for navnet du har gitt et opptak. Appen kan ikke hindre at noen tar
+skjermbilde av den.
 
 Mens du tar opp, viser låseskjermen og Dynamic Island at opptaket pågår, og
 hvor lenge det har vart. Ingenting fra selve opptaket vises der. Alle som har
@@ -93,8 +93,8 @@ teksten. Se [SECURITY.md](SECURITY.md).
 Nøkkelen finnes bare i enheten din. Ingen annen enhet kan lese opptakene,
 heller ikke en ny enhet du eier selv, og heller ikke fra en sikkerhetskopi.
 
-> **Viktig:** Mister du enheten, er opptakene borte for godt. Skal du bytte
-> enhet: Eksporter opptakene først.
+> **Viktig:** Opptakene er borte for godt hvis du mister enheten. Eksporter
+> opptakene før du bytter enhet.
 
 ## Rettighetene dine
 
@@ -109,8 +109,8 @@ i appen. [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md) viser hvordan.
 | Eksportere | Trykk på delingsikonet på opptakets side                                          |
 | Sletting   | Sveip opptaket i listen mot venstre og trykk på «Slett». Du kan ikke angre        |
 
-> **Viktig:** Sletter du appen, forsvinner alt med én gang, og du kan ikke
-> angre.
+> **Viktig:** Alt forsvinner med én gang hvis du sletter appen, og du kan
+> ikke angre.
 
 ---
 

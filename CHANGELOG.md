@@ -7,11 +7,14 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
 
 ### Endret
 
-- Oppgir en importert fil hvor den ble tatt opp, lagrer Fróði ikke stedet
+- Fróði lagrer ikke stedet der en importert fil ble tatt opp, selv om filen
+  oppgir det
 - Når appen ber om tilgang til mikrofonen, står det at den tar opp notater og
   samtaler
-- «Om opptaket» forklarer hva en sjekksum er, og hvilken fil hver sjekksum
-  hører til
+- «Om opptaket» forklarer med enklere ord hva en sjekksum er, og hvilken fil
+  hver sjekksum hører til
+- Brukerveiledningen, personvernerklæringen og «Om opptaket» sier det
+  viktigste først i hver setning
 
 ### Rettet
 
@@ -32,11 +35,11 @@ Appen er den samme som i build 8.
   som av egne opptak, og originalen blir liggende der den var
 - Du kan gi et opptak et navn: Trykk på tittelen på opptakets side og velg
   «Endre navn». Navnet står over datoen i listen
-- «Om opptaket» på opptakets side viser opplysningene Fróði låste da
+- «Om opptaket» på opptakets side viser opplysningene Fróði lagret da
   opptaket kom inn i appen: Når det kom inn, hvor langt det er og sjekksum for
   lyden. For en importert fil også filnavn, format, størrelse, opplysningene
-  som stod i filen og sjekksum for originalen. Er datoen, lengden eller lyden
-  endret utenfor appen, sier siden fra
+  som stod i filen og sjekksum for originalen. Siden sier fra hvis datoen,
+  lengden eller lyden er endret utenfor appen
 - `.rtf`-filen har navnet som overskrift og sjekksum for lydfilen
 
 ### Endret
@@ -69,9 +72,9 @@ Appen er den samme som i build 8.
 - Et opptak kan vare så lenge du vil. Grensen på ti minutter er borte
 - Teksten deles i avsnitt med tidspunkt. Trykk på tidspunktet for å høre
   stedet i opptaket
-- Er opptaket over ti minutter, lager appen teksten når du ber om den, og
-  viser hvor langt den har kommet. Blir den avbrutt, fortsetter den der den
-  slapp neste gang
+- Appen lager teksten når du ber om den hvis opptaket er over ti minutter, og
+  viser hvor langt den har kommet. Den fortsetter der den slapp neste gang
+  hvis noe avbryter den
 - Teksten eksporteres som `.rtf` eller `.txt`. Formatet velger du i Innstillinger;
   `.rtf` har overskrift og avsnitt
 - Når du eksporterer, velger du opptaket, teksten eller begge
@@ -88,8 +91,8 @@ Appen er den samme som i build 8.
 - Handlingsknappen starter opptak også når enheten er låst. Du setter den
   til kontrollen «Start eller stopp opptak» under Handlingsknapp > Kontroll.
   Kontrollen finnes også i Kontrollsenter
-- Starter du et opptak med handlingsknappen mens appen ikke er åpen,
-  fortsetter musikk og annen lyd, men lavere, til du stopper opptaket
+- Musikk og annen lyd fortsetter, men lavere, når du starter et opptak med
+  handlingsknappen mens appen ikke er åpen
 - Så lenge et opptak går, viser låseskjermen og Dynamic Island «Tar opp»,
   hvor lenge det har vart og en stoppknapp
 
@@ -122,8 +125,8 @@ Appen er den samme som i build 8.
 - Opptak kunne nekte å starte, fra knappen og fra handlingsknappen, rett
   etter at du hadde hørt på et opptak. Appen venter til avspilleren har
   sluppet lydsystemet før den tar opp
-- Er mikrofontilgangen avslått, står knappen «Åpne Innstillinger» under
-  meldingen om det
+- Knappen «Åpne Innstillinger» står under meldingen om at mikrofontilgangen
+  er avslått
 - En opptaksfil uten lyd, etterlatt av et krasj, fikk en rad som sto som
   «venter på tekst» for alltid. Filen fjernes, og raden med den
 - Med ordliste kunne modellen svare med tom tekst uten feilmelding. Rettet i
@@ -143,7 +146,7 @@ Appen er den samme som i build 8.
   låst opp
 - «Kopier»-knappen i tekstkortet erstatter markering av teksten. Det du
   kopierer, blir på enheten og forsvinner fra utklippstavlen etter fem minutter
-- Får ikke appen tak i nøkkelen, sier den fra og ber deg låse opp enheten
+- Appen sier fra og ber deg låse opp enheten hvis den ikke får tak i nøkkelen
 
 ### Endret
 
