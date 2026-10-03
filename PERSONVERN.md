@@ -46,7 +46,7 @@ enheten er låst, og ingen kan lese den.
 
 ## Importerte filer
 
-Du velger selv hvilke filer Fróði får, via filvelgeren i iOS. Appen får bare
+Du velger selv hvilke filer Fróði får, gjennom filvelgeren i iOS. Appen får bare
 de filene du velger, og ber ikke om noen tillatelse. Originalen blir liggende
 der den var. Appen endrer den ikke og sletter den ikke.
 
