@@ -109,10 +109,10 @@ final class FrodiUITests: XCTestCase {
         XCTAssertTrue(delete.waitForExistence(timeout: 5), "Sveipet viste ikke «Slett»")
         delete.tap()
 
-        XCTAssertTrue(app.staticTexts["Sikker på at du vil slette?"].waitForExistence(timeout: 5), "Raden spurte ikke")
+        XCTAssertTrue(app.staticTexts["Vil du slette opptaket?"].waitForExistence(timeout: 5), "Raden spurte ikke")
         app.buttons["Behold"].tap()
 
-        XCTAssertTrue(app.staticTexts["Sikker på at du vil slette?"].waitForNonExistence(timeout: 5), "Spørsmålet ble stående")
+        XCTAssertTrue(app.staticTexts["Vil du slette opptaket?"].waitForNonExistence(timeout: 5), "Spørsmålet ble stående")
         XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "Opptaket forsvant etter «Behold»")
     }
 

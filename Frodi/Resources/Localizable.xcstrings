@@ -35,7 +35,7 @@
     "Fróði kan ikke bekrefte opplysningene om dette opptaket. De kan være endret utenfor appen." : {
 
     },
-    "Fróði trenger tilgang til mikrofonen. Du gir tilgang i Innstillinger på enheten." : {
+    "Fróði trenger tilgang til mikrofonen." : {
 
     },
     "Ingen opptak ennå" : {
@@ -53,7 +53,7 @@
     "Navn og tekst blir ikke lagret" : {
 
     },
-    "Opptaket er langt. Trykk på «Lag tekst» når du vil ha teksten. Det tar noen minutter å lage tekst av en time med opptak. Hold appen åpen imens." : {
+    "Opptaket er langt. Det tar noen minutter å lage tekst av en time med opptak. Hold appen åpen imens." : {
 
     },
     "Opptaket er satt på pause og fortsetter når mikrofonen er ledig igjen." : {
@@ -62,7 +62,7 @@
     "røst" : {
 
     },
-    "Sikker på at du vil slette?" : {
+    "Vil du slette opptaket?" : {
 
     },
     "Slett" : {

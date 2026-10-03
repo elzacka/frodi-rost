@@ -153,7 +153,7 @@ struct SettingsView: View {
     /// is decided here, once, because it is the same every time.
     private var export: some View {
         Card("Eksport") {
-            paragraph("Lyden eksporteres alltid som .m4a. Velg format for teksten.")
+            paragraph("Velg format for teksten.")
 
             HStack(spacing: Space.s2) {
                 ForEach(RecordingExport.TextFormat.allCases, id: \.self) { format in

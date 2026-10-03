@@ -49,10 +49,8 @@ struct RecordingListView: View {
             .safeAreaInset(edge: .bottom) {
                 RecorderBar(controller: controller)
             }
-            .alert("Noe gikk galt", isPresented: .constant(errorMessage != nil)) {
+            .alert(errorMessage ?? "", isPresented: .constant(errorMessage != nil)) {
                 Button("OK") { errorMessage = nil }
-            } message: {
-                Text(verbatim: errorMessage ?? "").font(.Frodi.body)
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
@@ -225,7 +223,7 @@ struct RecordingListView: View {
                 Text("Slett").choiceRow(destructive: true, inline: true)
             }
         } question: {
-            Text("Sikker på at du vil slette?")
+            Text("Vil du slette opptaket?")
                 .font(.Frodi.bodyMedium)
                 .foregroundStyle(Color.Frodi.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)

@@ -20,8 +20,11 @@ Hver overskrift er en build lastet opp til App Store Connect, nyeste først.
   oppgir det
 - Når appen ber om tilgang til mikrofonen, står det at den tar opp notater og
   samtaler
-- «Om opptaket» forklarer med enklere ord hva en sjekksum er, og hvilken fil
-  hver sjekksum hører til
+- «Om opptaket» forklarer kort hva en sjekksum er, og at lydfilen du
+  eksporterer, har sjekksummen for lyden
+- Før du sletter et opptak, spør appen «Vil du slette opptaket?»
+- Meldingene om mikrofontilgang og lange opptak er kortere
+- En feilmelding i listen har selve feilen som overskrift, ikke «Noe gikk galt»
 - Tekstene i appen, brukerveiledningen og personvernerklæringen er skrevet
   om til mer naturlig norsk, med det viktigste først i hver setning
 - Når listen er tom, står det at brukerveiledningen under Innstillinger viser

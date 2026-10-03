@@ -200,7 +200,7 @@ struct RecordingDetailView: View {
                         .hiddenWhileScreenCaptured()
                 }
             } else if Transcription.awaitsRequest(recording) {
-                Text("Opptaket er langt. Trykk på «Lag tekst» når du vil ha teksten. Det tar noen minutter å lage tekst av en time med opptak. Hold appen åpen imens.")
+                Text("Opptaket er langt. Det tar noen minutter å lage tekst av en time med opptak. Hold appen åpen imens.")
                     .font(.Frodi.body)
                     .foregroundStyle(Color.Frodi.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -386,9 +386,10 @@ struct RecordingDetailView: View {
                 if showsOrigin {
                     factList(origin)
 
-                    Text(origin.source == .imported
-                         ? "Disse opplysningene ble lagret da filen ble importert. Du kan endre navnet på opptaket, men ikke opplysningene. Fróði viser en advarsel her i stedet hvis opplysningene eller lyden blir endret.\n\nEn sjekksum er en rekke tall og bokstaver som regnes ut fra innholdet i en fil. Sjekksummen blir en annen hvis noen endrer filen. Filen du importerte, har sjekksummen for originalen, og lydfilen du eksporterer, har sjekksummen for lyden."
-                         : "Disse opplysningene ble lagret sammen med opptaket. Du kan endre navnet på opptaket, men ikke opplysningene. Fróði viser en advarsel her i stedet hvis opplysningene eller lyden blir endret.\n\nEn sjekksum er en rekke tall og bokstaver som regnes ut fra innholdet i en fil. Sjekksummen blir en annen hvis noen endrer filen. Lydfilen du eksporterer, har denne sjekksummen.")
+                    Text((origin.source == .imported
+                          ? "Fróði lagret disse opplysningene da du importerte filen."
+                          : "Fróði lagret disse opplysningene sammen med opptaket.")
+                         + " Du kan ikke endre dem. Du får en advarsel her hvis noen har endret dem eller lyden utenfor appen.\n\nEn sjekksum regnes ut fra innholdet i en fil og blir en annen hvis noen endrer filen. Lydfilen du eksporterer, har sjekksummen for lyden.")
                         .font(.Frodi.caption)
                         .foregroundStyle(Color.Frodi.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
