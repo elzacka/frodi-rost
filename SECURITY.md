@@ -42,7 +42,7 @@ Include reproduction steps and impact. You will get an acknowledgement within
 | The latest App Store build  | Yes                                                |
 | Earlier builds              | Only if the finding still reproduces on the latest |
 
-Every uploaded build is listed in [CHANGELOG.md](CHANGELOG.md).
+Every App Store build is listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## Threat model
 
