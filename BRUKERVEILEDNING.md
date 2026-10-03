@@ -51,9 +51,9 @@ opp, går ikke tapt.
 2. Velg én eller flere lydfiler og trykk på «Åpne».
 
 Fróði leser m4a, mp3, wav, aiff og de andre lydformatene iOS kan lese. Appen
-lagrer lyden i mono, med begge kanalene hvis lyden er i stereo, og i samme
-kvalitet som egne opptak. Det holder godt for tale. Ta vare på originalen hvis
-du trenger lyden i full kvalitet.
+lagrer lyden i mono og blander begge kanalene hvis lyden er i stereo. Lyden
+får samme kvalitet som egne opptak. Det holder godt for tale. Ta vare på
+originalen hvis du trenger lyden i full kvalitet.
 
 Teksten blir mest presis når det er lett å høre hva som blir sagt, og ingen
 snakker i munnen på hverandre. Den lages etter samme regel som for andre
@@ -83,7 +83,7 @@ lenge det har vart og en stoppknapp. Første gang spør iOS «Vil du tillate
 løpende oppdateringer fra Fróði røst?». Svar «Tillat». Ellers stopper iOS
 opptak som handlingsknappen starter.
 
-Musikk og annen lyd tar pause mens du tar opp. Hvis du starter med knappen
+iOS setter musikk og annen lyd på pause mens du tar opp. Hvis du starter med knappen
 mens appen ikke er åpen, fortsetter lyden, men lavere.
 
 ## Teksten

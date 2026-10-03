@@ -47,16 +47,9 @@ The app assumes a passcode is set and iOS is not compromised.
 | Defended against | A locked device in someone else's hands, including forensic extraction after first unlock. A copy of a backup. Another app on the device. Anyone watching the screen, or the app switcher, while a transcript is open |
 | Not defended against | A compromised OS, or an exploit chain on an unlocked device. An unlocked device in someone else's hands. A screenshot. Whatever happens to a file after export |
 
-Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0, the
-latest release as of 2026-09-28, at MAS-L2 and MAS-P: the app holds a key
-that encrypts user data OWASP lists as high risk. The storage, crypto,
-authentication, platform and code controls were read against the code on
-2026-09-27, not tested with MASTG. The privacy controls were tested; see
-*Privacy*.
+Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0, the latest release as of 2026-09-28, at MAS-L2 and MAS-P: the app holds a key that encrypts user data OWASP lists as high risk. The storage, crypto, authentication, platform and code controls were read against the code on 2026-09-27, not tested with MASTG. The privacy controls were tested; see *Privacy*.
 
-Every applicable control is met except local authentication (AUTH-2,
-AUTH-3), enforced updates (CODE-2), reproducible builds (MASWE-0075) and
-MAS-R; see *Deliberate omissions*. MASVS-NETWORK does not apply.
+Every applicable control is met except local authentication (AUTH-2, AUTH-3), enforced updates (CODE-2), reproducible builds (MASWE-0075) and MAS-R; see *Deliberate omissions*. MASVS-NETWORK does not apply.
 
 ## What happens in each scenario
 
@@ -66,7 +59,7 @@ MAS-R; see *Deliberate omissions*. MASVS-NETWORK does not apply.
 | Device lost, wiped or replaced | Every recording and transcript is gone, by design: the key exists only in that device's Secure Enclave. Export before changing device |
 | Backup copied, or restored to another device | Unreadable. The key is bound to the device |
 | App deleted | The container goes with it. The Secure Enclave key may outlive the app as a keychain item and opens nothing. Log lines, which hold no content, stay until iOS rotates the log |
-| Recording stopped while the device is locked | Kept as plaintext under `.completeUnlessOpen`, unreadable until unlock. Sealed and transcribed at the unlock if the app runs, otherwise at the next launch. Never deleted |
+| Recording stopped while the device is locked | Kept as plaintext under `.completeUnlessOpen`, unreadable until unlock. Sealed and transcribed at the unlock if the app runs, otherwise when it next comes to the front. Never deleted |
 | A call, Siri or another app takes the microphone | The file so far is closed. The recording goes on in a new file when the microphone returns; the seal joins them. Nothing is written over |
 | Audio file imported | The system file picker gives the app that file only. Converted and sealed in the temporary folder, then moved in sealed with its row. The original is not written to. A file Core Audio cannot read is refused |
 | Database or recordings altered outside the app | Checked against the recording's origin. On a mismatch the recording page and an RTF export say the details cannot be confirmed. See *Origin* |
@@ -84,7 +77,7 @@ MAS-R; see *Deliberate omissions*. MASVS-NETWORK does not apply.
 | Area | Control | Where |
 | --- | --- | --- |
 | Isolation | iOS sandbox, no app group or shared container. The widget extension has its own sandbox and gets only the Live Activity's state: start time, recorded time, paused or not. It links no networking | System |
-| Attack surface | No URL schemes, document types, Handoff or Spotlight indexing. Files enter only through the system file picker, limited to audio. One extension and one App Intent, `ToggleRecordingIntent`, which runs without confirmation once microphone access is granted, since a confirmation would defeat the button while driving. The orange microphone indicator and the Live Activity, which iOS requires while recording, compensate. No App Shortcut and no Siri phrase | `Info.plist`, `ToggleRecordingIntent`, `IsolationTests` |
+| Attack surface | No URL schemes, document types, Handoff or Spotlight indexing. Files enter only through the system file picker, limited to audio. One extension and one App Intent, `ToggleRecordingIntent`. The control, the Live Activity's stop button and the Shortcuts app run it without confirmation once microphone access is granted, since a confirmation would defeat the button while driving. The orange microphone indicator and the Live Activity, which iOS requires while recording, compensate. No App Shortcut and no Siri phrase | `Info.plist`, `ToggleRecordingIntent`, `IsolationTests` |
 | Encryption at rest | AES-GCM with a random 256-bit key per item: recording, transcript, name, origin and word list. A sealed file altered by one byte fails to open (`VaultTests`). Decrypted text lives in memory only while a screen or an export needs it | `RecordingVault` |
 | Key wrapping | P-256 key in the Secure Enclave, `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`: usable only while unlocked, never backed up or migrated. Sealing needs only the public key, cached in memory; every open starts on an unlocked device. The key cannot be extracted, but code in the app's context can ask the Enclave to use it, and the access class is what limits that | `RecordingVault` |
 | File protection | `.complete` once sealed; `.completeUnlessOpen` only while a file is being written or awaits the seal. See *File protection* | `AudioStorage` |
@@ -105,7 +98,7 @@ MAS-R; see *Deliberate omissions*. MASVS-NETWORK does not apply.
 | State | Class | Reason |
 | --- | --- | --- |
 | Recording in progress | `.completeUnlessOpen` | `.complete` would block writes at the lock, exactly when recordings run. Linear PCM in CAF, so a file cut off by a crash still opens |
-| Stopped, awaiting seal | `.completeUnlessOpen`, closed | Unreadable until unlock, which is when the seal runs |
+| Stopped, awaiting seal | `.completeUnlessOpen`, closed | Unreadable until unlock. Sealed then if the app runs, otherwise when it next comes to the front |
 | Sealed recording, word list | `.complete` | Everything that opens them runs on an unlocked device |
 | Transcription progress | `.completeUnlessOpen` | Already ciphertext, and written after each piece, possibly after the lock |
 | Plaintext for transcription, import or export | `.completeUnlessOpen` | Created on an unlocked device and used in the same session. Removed in a `defer` or when the share sheet closes; the folder is emptied at launch |
@@ -113,19 +106,14 @@ MAS-R; see *Deliberate omissions*. MASVS-NETWORK does not apply.
 
 ## Origin
 
-Every recording gets an origin when it comes in: a sealed, write-once record
-of what it was. `Recording.recordOrigin` is the only writer and refuses a
-second write. A name is a separate field and leaves the origin alone.
+Every recording gets an origin when it comes in: a sealed, write-once record of what it was. `Recording.recordOrigin` is the only writer and refuses a second write. A name is a separate field and leaves the origin alone.
 
 | Recording | The origin holds |
 | --- | --- |
 | Made in the app | File stem, date, length, and the SHA-256 of the sealed audio: the bytes an export hands over as `.m4a` |
 | Imported | The same, the time of the import, and the picked file's name, size, codec, sample rate, channels, creation date, common metadata and SHA-256. Never a location |
 
-A changed byte fails AES-GCM. The file stem stops an origin moved onto
-another row. Date and length are compared with the row each time the
-recording page opens; the audio checksum when «Om opptaket» opens, since that
-reads the whole file. `OriginTests` covers each case.
+A changed byte fails AES-GCM. The file stem stops an origin moved onto another row. Date and length are compared with the row each time the recording page opens; the audio checksum when «Om opptaket» opens, since that reads the whole file. `OriginTests` covers each case.
 
 | Claim | Holds? |
 | --- | --- |
@@ -134,26 +122,15 @@ reads the whole file. `OriginTests` covers each case.
 | An imported file is the one that came in | The original's SHA-256 identifies the file, not who made it or when |
 | Exported audio is the audio that was locked | The RTF gives the audio's SHA-256; anyone holding both can check with `shasum -a 256` |
 
-No origin is written after the fact, since it would vouch for a past it never
-saw. A recording has none if the app died between the seal and the row
-update, or an import between moving its file in and saving its row.
+No origin is written after the fact, since it would vouch for a past it never saw. A recording has none if the app died between the seal and the row update, or an import between moving its file in and saving its row.
 
 ## No network
 
-The app makes no network requests and sends no telemetry. `IsolationTests`
-fails on an ATS exception, an undeclared background mode, declared collected
-data, or `URLSession`, `URLRequest`, `NWConnection` or `import Network` in
-the sources.
+The app makes no network requests and sends no telemetry. `IsolationTests` fails on an ATS exception, an undeclared background mode, declared collected data, or `URLSession`, `URLRequest`, `NWConnection` or `import Network` in the sources.
 
-The model loads with `download: false` and explicit local paths. That flag
-does not cover the tokenizer, which WhisperKit fetches from Hugging Face when
-it cannot read it locally; the app therefore checks both tokenizer files
-before creating WhisperKit, and a build phase fails a build without the
-model.
+The model loads with `download: false` and explicit local paths. That flag does not cover the tokenizer, which WhisperKit fetches from Hugging Face when it cannot read it locally; the app therefore checks both tokenizer files before creating WhisperKit, and a build phase fails a build without the model.
 
-Two requests happen because the user asked for them: iOS downloads a picked
-file that lives only in iCloud Drive, and Safari opens the four document
-links in Innstillinger.
+Two requests happen because the user asked for them: iOS downloads a picked file that lives only in iCloud Drive, and Safari opens the four document links in Innstillinger.
 
 > [!NOTE]
 > WhisperKit carries a copy of `swift-transformers`' `Hub` module, which
@@ -164,9 +141,7 @@ links in Innstillinger.
 
 ## Privacy
 
-The four MASVS-PRIVACY controls were tested on 2026-09-28 with the MASTG's
-static iOS privacy tests against build 1.0 (9) and read against the code.
-The table describes the code.
+The four MASVS-PRIVACY controls were tested on 2026-09-28 with the MASTG's static iOS privacy tests against build 1.0 (9) and read against the code. The table describes the code. Build 1.0 (9) keeps the location an imported file states in its origin, and its purpose string does not say what is recorded; both are fixed in the source (CHANGELOG.md, *Ikke utgitt*).
 
 | Control | How the app meets it | Checked by |
 | --- | --- | --- |
@@ -175,23 +150,13 @@ The table describes the code.
 | PRIVACY-3 Transparency | [PERSONVERN.md](PERSONVERN.md), linked in the app and the App Store listing. The privacy manifests declare no collected data | MASTG-TEST-0281: the binary names github.com, huggingface.co and tazk.no, none on DuckDuckGo's tracker list |
 | PRIVACY-4 User control | See, rename, export and delete each recording; edit the word list; withdraw microphone access; delete the app. Nothing is collected, so there is no consent to withdraw | PERSONVERN.md *Rettighetene dine*, read against the app |
 
-Not tested: MASTG-TEST-0361 and -0363, which hook the running app on a
-device. The App Store privacy label cannot be read through the App Store
-Connect API.
+Not tested: MASTG-TEST-0361 and -0363, which hook the running app on a device. The App Store privacy label cannot be read through the App Store Connect API.
 
 ## Build integrity
 
-What a fresh clone builds is what was reviewed. WhisperKit, the `WhisperKit`
-product of `argmax-oss-swift`, is pinned to one version and brings one
-package, `swift-argument-parser`, plus its own copy of `swift-transformers`'
-Hub and Tokenizers sources. `Package.resolved` is committed; versions and
-licences are in [TREDJEPART.md](TREDJEPART.md), which a test keeps in step.
+What a fresh clone builds is what was reviewed. WhisperKit, the `WhisperKit` product of `argmax-oss-swift`, is pinned to one version and brings one package, `swift-argument-parser`, plus its own copy of `swift-transformers`' Hub and Tokenizers sources. `Package.resolved` is committed; versions and licences are in [TREDJEPART.md](TREDJEPART.md), which a test keeps in step.
 
-The model is a third-party CoreML conversion of nb-whisper-small, fetched at
-a fixed revision and checked against `Scripts/model-checksums.txt`. The
-checksums prove the files are the ones measured on 2026-09-07, not that they
-are benign. Since the model never touches the network, what could be wrong
-with it is transcription quality and bias, not exfiltration.
+The model is a third-party CoreML conversion of nb-whisper-small, fetched at a fixed revision and checked against `Scripts/model-checksums.txt`. The checksums prove the files are the ones measured on 2026-09-07, not that they are benign. Since the model never touches the network, what could be wrong with it is transcription quality and bias, not exfiltration.
 
 ## Deliberate omissions
 

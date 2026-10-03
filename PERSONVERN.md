@@ -22,12 +22,12 @@ Fróði røst er laget av elzacka (Tazk). Skriv til **hei@tazk.no**.
 
 Ingen brukerkonto. Ingen sporing. Ingen bruksstatistikk.
 
-Hvis du har slått på deling med apputviklere i iOS, kan Apple sende
-krasjrapporter fra appen til utvikleren. De inneholder ikke lyd, tekst eller
-navn.
+Appen sender ingenting selv. Hvis du har slått på deling med apputviklere i
+iOS, kan Apple sende krasjrapporter fra appen til utvikleren. De inneholder
+ikke lyd, tekst eller navn.
 
-Et opptak du stopper mens enheten er låst, krypteres når du låser opp, eller
-neste gang du åpner appen. Til da holder iOS filen låst.
+Et opptak du stopper mens enheten er låst, krypteres senest neste gang du
+åpner appen. Ingen kan lese filen så lenge enheten er låst.
 
 ## Importerte filer
 

@@ -10,8 +10,8 @@ Versjon 1.0 ligger i [App Store](https://apple.co/4ryiAk4). Appen finnes bare i 
 
 ## Hva appen gjør
 
-- Tar opp lyd så lenge du vil, også når skjermen er låst, og starter og
-  stopper med handlingsknappen
+- Tar opp lyd så lenge du vil, også når skjermen er låst
+- Starter og stopper opptak med handlingsknappen, også når enheten er låst
 - Importerer lydfiler, som m4a, mp3 og wav
 - Tar vare på opptaket ved en telefonsamtale og hvis appen avsluttes midt i
 - Skriver bokmål med tegnsetting og stor forbokstav, også når du snakker dialekt
@@ -106,7 +106,12 @@ TEST_RUNNER_FRODI_FIXTURE=/full/sti/tekst.m4a xcodebuild -project Frodi.xcodepro
 # Loggen etter ScratchControlPress
 xcrun simctl spawn Frodi-Test log show --last 3m \
   --predicate 'subsystem == "com.Tazk.Frodi" OR (process == "chronod" AND eventMessage CONTAINS "control action")'
+
+# Filen ScratchKillMidRecording etterlater, skal kunne åpnes
+afinfo "$(xcrun simctl get_app_container booted com.Tazk.Frodi data)"/Documents/Opptak/*.caf
 ```
+
+For de andre testene bytter du ut variabelen og testnavnet.
 
 ## Arkitektur
 
@@ -116,7 +121,7 @@ fra `FrodiWidgets/`. Hvordan data beskyttes: [SECURITY.md](SECURITY.md).
 | Steg | Fil |
 | --- | --- |
 | Handlingsknappen kjører intenten gjennom appens kontroll. Widget-utvidelsen tegner kontrollen og Live Activity-en | `Intents/ToggleRecordingIntent.swift`, `Services/RecordingActivity.swift`, `FrodiWidgets/` |
-| Kontrolleren tar imot intenten og opptaksknappen, har ansvar for databasen og retter listen etter filmappen ved oppstart | `Services/RecordingController.swift` |
+| Kontrolleren tar imot intenten og trykk på opptaksknappen, har ansvar for databasen og retter listen etter filmappen ved oppstart | `Services/RecordingController.swift` |
 | Opptakeren skriver lyden til fil som PCM og fortsetter i en ny fil etter en samtale | `Services/AudioRecorder.swift` |
 | Importen gjør om en lydfil til samme format som opptakeren skriver | `Services/AudioImport.swift` |
 | Lagringen koder om til AAC, setter filene sammen og forsegler opptaket | `Services/AudioStorage.swift` |
