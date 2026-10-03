@@ -6,9 +6,11 @@ import Foundation
 protocol Transcriber {
     /// Turns audio from `start` to the end into paragraphs, a piece at a time. After each piece, its paragraphs and the position reached go to
     /// `piece`; returning false stops there, what was handed over is kept, and a later call from that position continues.
+    /// `words` adds each word's time to the paragraphs, for Avansert.
     func transcribe(
         fileURL: URL,
         from start: TimeInterval,
+        words: Bool,
         piece: ([TranscriptParagraph], TimeInterval) async -> Bool
     ) async throws
 }

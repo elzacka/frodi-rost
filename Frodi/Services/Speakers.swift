@@ -31,4 +31,94 @@ enum Speakers {
             logLevel: .none
         )
     }
+
+    /// One stretch of one voice, in seconds.
+    struct Turn: Equatable, Sendable {
+        var start: TimeInterval
+        var end: TimeInterval
+        var speaker: Int
+    }
+
+    /// Kept between texts: loading the models takes seconds.
+    @MainActor private static var kit: SpeakerKit?
+
+    /// Who spoke when, over the whole file. One pass, not per piece, so a voice keeps its number all the way through.
+    @MainActor
+    static func turns(in fileURL: URL) async throws -> [Turn] {
+        if kit == nil {
+            guard let config else { throw TranscriptionError.modelMissing }
+            kit = try await SpeakerKit(config)
+        }
+        guard let kit else { return [] }
+        let file = try AudioPieces(url: fileURL)
+        let audio = try await file.samples(from: 0, to: file.duration)
+        return try await kit.diarize(audioArray: audio).segments
+            .compactMap { segment in
+                segment.speaker.speakerId.map { Turn(start: Double(segment.startTime), end: Double(segment.endTime), speaker: $0) }
+            }
+            .sorted { $0.start < $1.start }
+    }
+
+    /// Splits paragraphs where the voice changes and numbers the voices in the order they are first heard.
+    /// A word belongs to the turn it overlaps most (right on the guided test interview, `dev_only/DECISIONS.md`).
+    /// One voice in the whole text gives no labels. `correct` applies the word list to text rebuilt from words.
+    nonisolated static func label(
+        _ paragraphs: [TranscriptParagraph],
+        turns: [Turn],
+        correct: (String) -> String
+    ) -> [TranscriptParagraph] {
+        let unlabelled = paragraphs.map { TranscriptParagraph(start: $0.start, end: $0.end, text: $0.text) }
+        guard !turns.isEmpty else { return unlabelled }
+
+        var split: [TranscriptParagraph] = []
+        for paragraph in paragraphs {
+            guard let words = paragraph.words, !words.isEmpty else {
+                split.append(TranscriptParagraph(
+                    start: paragraph.start, end: paragraph.end, text: paragraph.text,
+                    speaker: speaker(from: paragraph.start, to: paragraph.end, in: turns)
+                ))
+                continue
+            }
+            var parts: [(speaker: Int, words: [TimedWord])] = []
+            for word in words {
+                let voice = speaker(from: word.start, to: word.end, in: turns)
+                if parts.last?.speaker == voice { parts[parts.count - 1].words.append(word) } else { parts.append((voice, [word])) }
+            }
+            if parts.count == 1 {
+                split.append(TranscriptParagraph(start: paragraph.start, end: paragraph.end, text: paragraph.text, speaker: parts[0].speaker))
+            } else {
+                for part in parts {
+                    let text = correct(part.words.map(\.text).joined().trimmingCharacters(in: .whitespaces))
+                    guard !text.isEmpty else { continue }
+                    split.append(TranscriptParagraph(start: part.words[0].start, end: part.words[part.words.count - 1].end, text: text, speaker: part.speaker))
+                }
+            }
+        }
+
+        var numbers: [Int: Int] = [:]
+        for paragraph in split {
+            if let voice = paragraph.speaker, numbers[voice] == nil { numbers[voice] = numbers.count + 1 }
+        }
+        guard numbers.count > 1 else { return unlabelled }
+        return split.map { paragraph in
+            var numbered = paragraph
+            numbered.speaker = paragraph.speaker.flatMap { numbers[$0] }
+            return numbered
+        }
+    }
+
+    /// The voice with the largest share of the span; with none, the nearest turn.
+    private nonisolated static func speaker(from start: TimeInterval, to end: TimeInterval, in turns: [Turn]) -> Int {
+        var best: (speaker: Int, overlap: TimeInterval)?
+        for turn in turns {
+            let overlap = min(turn.end, end) - max(turn.start, start)
+            if overlap > 0, overlap > (best?.overlap ?? 0) { best = (turn.speaker, overlap) }
+        }
+        if let best { return best.speaker }
+        return turns.min { distance($0, start, end) < distance($1, start, end) }!.speaker
+    }
+
+    private nonisolated static func distance(_ turn: Turn, _ start: TimeInterval, _ end: TimeInterval) -> TimeInterval {
+        max(turn.start - end, start - turn.end, 0)
+    }
 }

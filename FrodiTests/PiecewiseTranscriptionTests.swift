@@ -21,7 +21,7 @@ struct PiecewiseTranscriptionTests {
     @MainActor
     private func transcribe(from start: TimeInterval, stopAfter limit: Int? = nil) async throws -> [Piece] {
         var pieces: [Piece] = []
-        try await WhisperTranscriber().transcribe(fileURL: Self.fixture!, from: start) { paragraphs, position in
+        try await WhisperTranscriber().transcribe(fileURL: Self.fixture!, from: start, words: false) { paragraphs, position in
             pieces.append(Piece(position: position, paragraphs: paragraphs))
             return limit.map { pieces.count < $0 } ?? true
         }
@@ -100,5 +100,28 @@ struct PiecewiseTranscriptionTests {
         let whole = try await transcribe(from: 0)
         let joined = words(first) + words(rest)
         #expect(abs(joined - words(whole)) <= 5, "\(joined) mot \(words(whole)) ord")
+    }
+
+    /// Avansert end to end: words with times from every paragraph, retried ones included, then the voices.
+    /// Prints the labelled text for a listening check; `FRODI_SPEAKERS` is the number of voices expected.
+    @MainActor
+    @Test("Avansert merker hvem som sa hva", .enabled(if: enabled))
+    func whoSaidWhat() async throws {
+        var paragraphs: [TranscriptParagraph] = []
+        try await WhisperTranscriber().transcribe(fileURL: Self.fixture!, from: 0, words: true) { piece, _ in
+            paragraphs += piece
+            return true
+        }
+        #expect(paragraphs.allSatisfy { $0.words?.isEmpty == false }, "Et avsnitt mangler ordtider")
+
+        let started = Date()
+        let turns = try await Speakers.turns(in: Self.fixture!)
+        let labelled = Speakers.label(paragraphs, turns: turns) { $0 }
+        let voices = Set(labelled.compactMap(\.speaker)).count
+        print("Hvem sa hva: \(voices) stemmer, \(String(format: "%.1f", Date().timeIntervalSince(started))) s")
+        print(Transcript.compose(labelled))
+        if let expected = ProcessInfo.processInfo.environment["FRODI_SPEAKERS"].flatMap(Int.init) {
+            #expect(voices == expected)
+        }
     }
 }

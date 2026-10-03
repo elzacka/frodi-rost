@@ -12,6 +12,9 @@ final class WhisperTranscriber: Transcriber {
     /// The word list as tokens, for the transcription running right now.
     private var promptTokens: [Int]?
 
+    /// Word times for the transcription running right now (Avansert).
+    private var wordTimestamps = false
+
     /// Loads the model if it is not already loaded. Returns nothing: `WhisperKit` is not `Sendable`, and Swift 6
     /// stops handing it out of an isolated method, so it stays in this class.
     private func load() async throws {
@@ -51,6 +54,7 @@ final class WhisperTranscriber: Transcriber {
     func transcribe(
         fileURL: URL,
         from start: TimeInterval,
+        words: Bool,
         piece: ([TranscriptParagraph], TimeInterval) async -> Bool
     ) async throws {
         try await load()
@@ -62,7 +66,11 @@ final class WhisperTranscriber: Transcriber {
         let duration = file.duration
         var position = start
         promptTokens = WordList.prompt(from: WordList.load()).flatMap { promptTokens(for: $0, whisper: whisper) }
-        defer { promptTokens = nil }
+        wordTimestamps = words
+        defer {
+            promptTokens = nil
+            wordTimestamps = false
+        }
 
         // The last fraction of a second is never a piece on its own.
         while position < duration - 0.1 {
@@ -102,13 +110,19 @@ final class WhisperTranscriber: Transcriber {
                 guard let first = result.segments.first?.start, let last = result.segments.last?.end else { continue }
                 let start = Double(first), end = Double(last)
                 var text = result.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                var words = Self.words(in: [result], shiftedBy: 0)
 
                 // The audio is at hand already, so a refused window costs no second read.
                 if text.isEmpty, end - start >= Self.shortestRetry {
-                    text = await retry(in: audio, from: start, to: end)
+                    (text, words) = await retry(in: audio, from: start, to: end)
                 }
                 guard !text.isEmpty else { continue }
-                paragraphs.append(TranscriptParagraph(start: offset + start, end: offset + end, text: text))
+                paragraphs.append(TranscriptParagraph(
+                    start: offset + start,
+                    end: offset + end,
+                    text: text,
+                    words: wordTimestamps ? words.map { TimedWord(start: offset + $0.start, end: offset + $0.end, text: $0.text) } : nil
+                ))
             }
             return paragraphs
         } catch let error as TranscriptionError {
@@ -141,11 +155,12 @@ final class WhisperTranscriber: Transcriber {
     /// Retries an empty piece by splitting it in two; halves are a different input than one window.
     /// The model sometimes answers speech with only the end marker. No decoder setting fixes it (2026-09-10): a higher temperature,
     /// `usePrefillPrompt: false`, `suppressBlank` all failed alike. Split again while a half is silent and long enough for speech.
-    private func retry(in audio: [Float], from start: Double, to end: Double) async -> String {
-        guard let whisper, end - start >= Self.shortestRetry else { return "" }
+    private func retry(in audio: [Float], from start: Double, to end: Double) async -> (String, [TimedWord]) {
+        guard let whisper, end - start >= Self.shortestRetry else { return ("", []) }
 
         let middle = (start + end) / 2
         var pieces: [String] = []
+        var words: [TimedWord] = []
 
         for (from, to) in [(start, middle), (middle, end)] {
             let first = max(Int(from * Double(WhisperKit.sampleRate)), 0)
@@ -162,10 +177,22 @@ final class WhisperTranscriber: Transcriber {
                 .joined(separator: " ")
                 .trimmingCharacters(in: .whitespacesAndNewlines)
 
-            pieces.append(text.isEmpty ? await retry(in: audio, from: from, to: to) : text)
+            if text.isEmpty {
+                let (again, againWords) = await retry(in: audio, from: from, to: to)
+                pieces.append(again)
+                words += againWords
+            } else {
+                pieces.append(text)
+                words += Self.words(in: results ?? [], shiftedBy: from)
+            }
         }
 
-        return pieces.filter { !$0.isEmpty }.joined(separator: " ")
+        return (pieces.filter { !$0.isEmpty }.joined(separator: " "), words)
+    }
+
+    private static func words(in results: [TranscriptionResult], shiftedBy shift: Double) -> [TimedWord] {
+        results.flatMap { $0.segments.flatMap { $0.words ?? [] } }
+            .map { TimedWord(start: shift + Double($0.start), end: shift + Double($0.end), text: $0.word) }
     }
 
     /// Shorter than this we do not split. A piece that is silent and short is
@@ -189,6 +216,8 @@ final class WhisperTranscriber: Transcriber {
     private func options(chunked: Bool) -> DecodingOptions {
         var options = Self.options(chunked: chunked)
         options.promptTokens = promptTokens
+        // Measured 2026-10-03: the same words with and without, and no measurable cost on the device.
+        options.wordTimestamps = wordTimestamps
         return options
     }
 

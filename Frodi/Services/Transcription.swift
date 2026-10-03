@@ -113,7 +113,8 @@ enum Transcription {
                 let duration = recording.duration
 
                 let entries = WordList.entries(in: WordList.load())
-                try await transcriber().transcribe(fileURL: url, from: progress.position) { paragraphs, position in
+                let speakers = progress.speakers == true
+                try await transcriber().transcribe(fileURL: url, from: progress.position, words: speakers) { paragraphs, position in
                     // The listed names, spelled as listed, where the model nearly did.
                     progress.paragraphs.append(contentsOf: paragraphs.map { paragraph in
                         var corrected = paragraph
@@ -125,7 +126,14 @@ enum Transcription {
                     TranscriptionState.shared.update(id, fraction: fraction(position, of: duration))
                     return !RecordingController.shared.isRecording
                 }
-                return progress.position >= duration - 0.5
+                let done = progress.position >= duration - 0.5
+                // Who said what. A failure leaves the text without labels, never without text.
+                if done, speakers, let turns = try? await Speakers.turns(in: url) {
+                    progress.paragraphs = Speakers.label(progress.paragraphs, turns: turns) {
+                        WordList.correct($0, entries: entries)
+                    }
+                }
+                return done
             }
 
             if finished {

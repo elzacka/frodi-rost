@@ -93,7 +93,7 @@ variabler med prefikset `TEST_RUNNER_`, og testen ser dem uten prefikset.
 
 | Test | Variabel | Gjør |
 | --- | --- | --- |
-| `FrodiTests/PiecewiseTranscriptionTests` | `FRODI_FIXTURE`, og `FRODI_WORDS` for en ordliste | Lager tekst av en lydfil på over tre minutter |
+| `FrodiTests/PiecewiseTranscriptionTests` | `FRODI_FIXTURE`, og `FRODI_WORDS` for en ordliste, `FRODI_SPEAKERS` for antall stemmer | Lager tekst av en lydfil på over tre minutter, også med hvem som sa hva |
 | `FrodiUITests/ScratchPlaybackShot`, `ScratchChoiceShot` | `FRODI_SHOTS=1` | Tar skjermbilder |
 | `FrodiUITests/ScratchControlPress` | `FRODI_SHOTS=1` | Trykker på kontrollen i Kontrollsenter. Loggen viser hvilken prosess som kjørte handlingen |
 | `FrodiUITests/ScratchKillMidRecording` | `FRODI_KILL=1` | Avslutter appen midt i et opptak og etterlater filen uten rad i databasen |

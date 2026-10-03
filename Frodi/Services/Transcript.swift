@@ -1,23 +1,38 @@
 import Foundation
 
-/// One paragraph of text and where in the audio it was said.
-struct TranscriptParagraph: Codable, Equatable, Sendable {
+/// One word and when it was said, as the model wrote it (with its leading space).
+struct TimedWord: Codable, Equatable, Sendable {
     var start: TimeInterval
     var end: TimeInterval
     var text: String
 }
 
+/// One paragraph of text and where in the audio it was said.
+struct TranscriptParagraph: Codable, Equatable, Sendable {
+    var start: TimeInterval
+    var end: TimeInterval
+    var text: String
+    /// Avansert: the words with their times, kept until the speakers are known.
+    var words: [TimedWord]?
+    /// Avansert: 1, 2, … in the order the voices are first heard.
+    var speaker: Int?
+}
+
 /// The text as stored and shown: paragraphs, each opened by the time it starts at, «[12:37] …», so a reader can find the passage in the audio.
 /// Text, not a structure, on purpose: the sealed transcript stays a string, and one made before the marks existed is one paragraph with no mark.
 enum Transcript {
-    /// «[m:ss] text», paragraphs separated by a blank line. A single paragraph
-    /// carries no mark; it can only start at the beginning.
+    /// «[m:ss] text», or «[m:ss] Person 1: text» in Avansert, paragraphs separated by a blank line.
+    /// A single paragraph carries no mark; it can only start at the beginning.
     static func compose(_ paragraphs: [TranscriptParagraph]) -> String {
         let kept = paragraphs.filter { !$0.text.isEmpty }
         if kept.count == 1 { return kept[0].text }
         return kept
-            .map { "[\(mark($0.start))] \($0.text)" }
+            .map { "[\(mark($0.start))] \(label($0.speaker))\($0.text)" }
             .joined(separator: "\n\n")
+    }
+
+    private static func label(_ speaker: Int?) -> String {
+        speaker.map { String(localized: "Person \($0)") + ": " } ?? ""
     }
 
     /// Splits stored text back into paragraphs. The mark is nil where there is none.
@@ -60,6 +75,9 @@ enum Transcript {
 struct TranscriptProgress: Codable, Sendable {
     var position: TimeInterval = 0
     var paragraphs: [TranscriptParagraph] = []
+    /// Avansert, fixed when the text is begun, so a run resumed after the setting changed finishes as it started.
+    /// Nil in progress saved before the setting existed, which reads as Enkel.
+    var speakers: Bool? = TextMode.current == .avansert
 
     static let suffix = ".tekst"
 
