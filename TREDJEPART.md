@@ -2,11 +2,8 @@
 
 Oppdatert 03.10.26.
 
-Listen i appen, under Innstillinger > Mer om appen > Lisenser, har de samme
-navnene og lisensene som denne filen. Trykk på en rad for å lese hele
-lisensteksten. Versjonene under Kode er de som står i
-`Package.resolved`. En test i `FrodiTests/DocumentTests.swift` feiler hvis de
-tre ikke stemmer overens.
+Den samme listen står i appen under Innstillinger > Mer om appen > Lisenser.
+Trykk på en rad der for å lese hele lisensteksten.
 
 ## Modell
 

@@ -3,18 +3,6 @@
 Reglene her gjelder alt som går inn i repoet. [README.md](README.md) sier
 hvordan du bygger og tester.
 
-**Innhold**
-
-- [Navn](#navn)
-- [Språk](#språk)
-- [Omfang](#omfang)
-- [Designsystem](#designsystem)
-- [Regler som ikke fravikes](#regler-som-ikke-fravikes)
-- [Prosjektfilen og versjonen](#prosjektfilen-og-versjonen)
-- [Før en build lastes opp](#før-en-build-lastes-opp)
-
----
-
 ## Navn
 
 | Form       | Skrives                                    | Brukes til                                     |
@@ -99,16 +87,3 @@ Visningene henter farger, skrift, avstand og hjørner fra tokenene i
 
 `Frodi.xcodeproj` lages av xcodegen fra `project.yml`. Rediger aldri
 `.xcodeproj` direkte. Versjonen står i `project.yml` og ingen andre steder.
-`swift Scripts/asc-status.swift` spør App Store Connect hva som er lastet
-opp, og stopper hvis buildnummeret alt er brukt.
-
-## Før en build lastes opp
-
-- Alle tester består på simulatoren `Frodi-Test`
-- Hver ny eller endret tekst i appen er lest gjennom av et menneske.
-  `Scripts/string-diff.py <commit for forrige build>` skriver ut listen
-- [CHANGELOG.md](CHANGELOG.md) har en overskrift for builden
-
----
-
-[Til toppen](#bidra-til-fróði-røst)
