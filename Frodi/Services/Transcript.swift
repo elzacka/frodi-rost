@@ -77,6 +77,13 @@ enum Transcript {
         return seen
     }
 
+    /// Whether the user has changed the names: anything but «Person 1», «Person 2», … in the order the diarization
+    /// writes them, so a merge that breaks the numbering counts too.
+    static func hasGivenNames(in text: String) -> Bool {
+        let names = speakers(in: text)
+        return names != names.indices.map { String(localized: "Person \($0 + 1)") }
+    }
+
     /// The longest name a speaker can be given, and the characters it cannot hold: they would end the label.
     static let longestName = 40
 
@@ -130,6 +137,8 @@ struct TranscriptProgress: Codable, Sendable {
     /// Avansert, fixed when the text is begun, so a run resumed after the setting changed finishes as it started.
     /// Nil in progress saved before the setting existed, which reads as Enkel.
     var speakers: Bool? = TextMode.current == .avansert
+    /// Speaker passes begun. After two that did not finish, the text is kept without labels.
+    var speakerAttempts: Int?
 
     static let suffix = ".tekst"
 

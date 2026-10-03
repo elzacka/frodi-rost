@@ -114,8 +114,10 @@ enum Transcription {
 
                 let entries = WordList.entries(in: WordList.load())
                 let speakers = progress.speakers == true
+                let tries = progress.speakerAttempts ?? 0
+                let labels = speakers && tries < 2
                 // The speaker model loads while the text is made, so the pass after the last piece does not wait for it.
-                let loading = speakers ? Task { try? await Speakers.load() } : nil
+                let loading = labels ? Task { try? await Speakers.load() } : nil
                 try await transcriber().transcribe(fileURL: url, from: progress.position, words: speakers) { paragraphs, position in
                     // The listed names, spelled as listed, where the model nearly did.
                     progress.paragraphs.append(contentsOf: paragraphs.map { paragraph in
@@ -129,9 +131,18 @@ enum Transcription {
                     return !RecordingController.shared.isRecording
                 }
                 let done = progress.position >= duration - 0.5
+                guard done, labels else { return done }
+                // A recording has the device: the speakers wait for a later run. A pass cannot be stopped once begun
+                // (SpeakerKit runs it in a task of its own), so the check comes before it.
+                guard !RecordingController.shared.isRecording else { return false }
                 await loading?.value
-                // Who said what. A failure leaves the text without labels, never without text.
-                if done, speakers, let turns = try? await Speakers.turns(in: url) {
+                guard !RecordingController.shared.isRecording else { return false }
+
+                // Who said what. A failure leaves the text without labels, never without text: the pass, which holds the
+                // whole file, is counted as it begins, and a recording whose pass ended the app twice gets no third.
+                progress.speakerAttempts = tries + 1
+                progress.save(for: fileName)
+                if let turns = try? await Speakers.turns(in: url) {
                     progress.paragraphs = Speakers.label(progress.paragraphs, turns: turns) {
                         WordList.correct($0, entries: entries)
                     }

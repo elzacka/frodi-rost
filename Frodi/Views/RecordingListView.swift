@@ -18,10 +18,19 @@ struct RecordingListView: View {
     /// The one row that is swiped open or asking, if any. One at a time: a
     /// swipe on another row closes this one.
     @State private var swipe: Swipe?
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private struct Swipe {
         let recording: Recording
         var stage: SwipeStage
+        var question: Question = .delete
+        let shown = Date()
+    }
+
+    /// What a row asks before acting: deleting, or a new text that would drop the names the user gave.
+    private enum Question {
+        case delete
+        case remake
     }
 
     var body: some View {
@@ -211,7 +220,7 @@ struct RecordingListView: View {
                     if let action = textAction(for: recording) {
                         Button(action.label) { action.run() }
                     }
-                    Button("Slett") { setStage(.asking, of: recording) }
+                    Button("Slett") { ask(.delete, of: recording) }
                 }
         } actions: {
             if let action = textAction(for: recording) {
@@ -219,39 +228,60 @@ struct RecordingListView: View {
                     Text(verbatim: action.label).choiceRow(inline: true)
                 }
             }
-            Button { setStage(.asking, of: recording) } label: {
+            Button { ask(.delete, of: recording) } label: {
                 Text("Slett").choiceRow(destructive: true, inline: true)
             }
         } question: {
-            Text("Vil du slette opptaket?")
-                .font(.Frodi.bodyMedium)
-                .foregroundStyle(Color.Frodi.textPrimary)
-                .fixedSize(horizontal: false, vertical: true)
-                // Where the row's title stood.
-                .padding(.leading, Space.s3)
-                .accessibilityAddTraits(.isHeader)
+            if swipe?.question == .remake {
+                // The question has a line of its own; the two answers are too wide beside it.
+                VStack(alignment: .trailing, spacing: Space.s2) {
+                    questionText("Vil du lage ny tekst? Navnene du har gitt, forsvinner.")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack(spacing: Space.s2) {
+                        Button { if settled() { makeText(recording) } } label: {
+                            answer("Lag ny tekst", among: ["Lag ny tekst", "Behold"]).choiceRow(inline: true)
+                        }
+                        Button { if settled() { setStage(.closed, of: recording) } } label: {
+                            answer("Behold", among: ["Lag ny tekst", "Behold"]).choiceRow(inline: true)
+                        }
+                    }
+                }
+            } else {
+                questionText("Vil du slette opptaket?")
 
-            Spacer(minLength: Space.s2)
+                Spacer(minLength: Space.s2)
 
-            // «Slett» stands where the text action stood and «Behold» where
-            // «Slett» did, so a second tap in the same place keeps the recording.
-            Button { delete(recording) } label: {
-                answer("Slett").choiceRow(destructive: true, inline: true)
-            }
-            Button { setStage(.closed, of: recording) } label: {
-                answer("Behold").choiceRow(inline: true)
+                // «Slett» stands where the text action stood and «Behold» where
+                // «Slett» did, so a second tap in the same place keeps the recording.
+                Button { if settled() { delete(recording) } } label: {
+                    answer("Slett", among: ["Slett", "Behold"]).choiceRow(destructive: true, inline: true)
+                }
+                Button { if settled() { setStage(.closed, of: recording) } } label: {
+                    answer("Behold", among: ["Slett", "Behold"]).choiceRow(inline: true)
+                }
             }
         }
     }
 
-    /// «Slett» and «Behold» in one size: each is laid out over both words, so
+    private func questionText(_ question: LocalizedStringKey) -> some View {
+        Text(question)
+            .font(.Frodi.bodyMedium)
+            .foregroundStyle(Color.Frodi.textPrimary)
+            .fixedSize(horizontal: false, vertical: true)
+            // Where the row's title stood.
+            .padding(.leading, Space.s3)
+            .accessibilityAddTraits(.isHeader)
+    }
+
+    /// The two answers in one size: each is laid out over both words, so
     /// the wider one sets the width of both at every text size.
-    private func answer(_ word: String) -> some View {
+    private func answer(_ word: String, among words: [String]) -> some View {
         ZStack {
-            Text("Slett").hidden()
-            Text("Behold").hidden()
+            ForEach(words, id: \.self) { Text(verbatim: $0).hidden() }
             Text(verbatim: word)
         }
+        // One line each, so both keep one size; at the accessibility sizes they wrap rather than leave the screen.
+        .fixedSize(horizontal: !dynamicTypeSize.isAccessibilitySize, vertical: false)
     }
 
     private func stage(of recording: Recording) -> SwipeStage {
@@ -261,6 +291,16 @@ struct RecordingListView: View {
 
     private func setStage(_ stage: SwipeStage, of recording: Recording) {
         swipe = stage == .closed ? nil : Swipe(recording: recording, stage: stage)
+    }
+
+    private func ask(_ question: Question, of recording: Recording) {
+        swipe = Swipe(recording: recording, stage: .asking, question: question)
+    }
+
+    /// Answers count half a second after the question appears, so a double tap on the action that asked confirms
+    /// nothing, wherever the answers land.
+    private func settled() -> Bool {
+        swipe.map { Date().timeIntervalSince($0.shown) > 0.5 } ?? true
     }
 
     /// The one text action a recording can take, or none while it transcribes: «Lag tekst» for a long recording waiting
@@ -275,13 +315,21 @@ struct RecordingListView: View {
             "Prøv på nytt"
         }
         return (label, {
-            setStage(.closed, of: recording)
-            if recording.hasTranscript {
-                recording.sealedTranscript = nil
-                try? context.save()
+            if let text = try? recording.transcript(), Transcript.hasGivenNames(in: text) {
+                ask(.remake, of: recording)
+            } else {
+                makeText(recording)
             }
-            Task { await transcribe(recording) }
         })
+    }
+
+    private func makeText(_ recording: Recording) {
+        setStage(.closed, of: recording)
+        if recording.hasTranscript {
+            recording.sealedTranscript = nil
+            try? context.save()
+        }
+        Task { await transcribe(recording) }
     }
 
     /// Transcribes everything that is waiting. Called at launch, so a recording

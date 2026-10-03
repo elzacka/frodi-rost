@@ -149,4 +149,21 @@ struct SpeakerLabelTests {
         let text = try NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.rtf], documentAttributes: nil).string
         #expect(text.contains("[0:35] Person 2: Tusen takk."))
     }
+
+    @Test("Bare navn brukeren har gitt, regnes som gitt")
+    func givenNames() {
+        #expect(!Transcript.hasGivenNames(in: labelled))
+        #expect(Transcript.hasGivenNames(in: Transcript.renaming("Person 2", to: "Julia", in: labelled)))
+        #expect(!Transcript.hasGivenNames(in: "[0:00] Merk: Én.\n\n[0:10] To."))
+        // A merge that breaks the numbering is a change too. Merging the last voice leaves numbers the diarization
+        // could have written, and that cannot be told from the text.
+        let threeVoices = labelled + "\n\n[0:50] Person 3: Bra."
+        #expect(Transcript.hasGivenNames(in: Transcript.renaming("Person 2", to: "Person 1", in: threeVoices)))
+    }
+
+    /// 1.0 (9) kept a place from an imported file, and origins are never rewritten.
+    @Test("Et sted fra en eldre import vises som «Sted»")
+    func oldLocationTag() {
+        #expect(RecordingDetailView.tagLabel("location") == "Sted")
+    }
 }

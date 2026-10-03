@@ -151,7 +151,8 @@ et opptak på en time. Et opptak med én stemme får ingen navn.
 
 Trykk på et navn over et avsnitt for å gi personen et annet navn. Navnet
 endres i hele teksten, og det følger med når du kopierer eller eksporterer.
-Hvis Fróði har delt én person i to, gir du begge samme navn.
+Hvis Fróði har delt én person i to, gir du begge samme navn. Navnene du har
+gitt, forsvinner hvis du lager ny tekst, så appen spør først.
 
 Slik blir det mest riktig:
 

@@ -110,6 +110,8 @@ final class FrodiUITests: XCTestCase {
         delete.tap()
 
         XCTAssertTrue(app.staticTexts["Vil du slette opptaket?"].waitForExistence(timeout: 5), "Raden spurte ikke")
+        // Answers count half a second after the question appears (RecordingListView.settled).
+        Thread.sleep(forTimeInterval: 0.6)
         app.buttons["Behold"].tap()
 
         XCTAssertTrue(app.staticTexts["Vil du slette opptaket?"].waitForNonExistence(timeout: 5), "Spørsmålet ble stående")
@@ -154,6 +156,8 @@ final class FrodiUITests: XCTestCase {
             XCTAssertTrue(delete.waitForExistence(timeout: 5), "Sveipet viste ikke «Slett»")
             let height = delete.frame.height
             delete.tap()
+            // Answers count half a second after the question appears (RecordingListView.settled).
+            Thread.sleep(forTimeInterval: 0.6)
             app.buttons["Slett"].firstMatch.tap()
             Thread.sleep(forTimeInterval: 1)
             return height

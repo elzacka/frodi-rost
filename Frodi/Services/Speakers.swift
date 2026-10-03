@@ -44,15 +44,23 @@ enum Speakers {
 
     /// Kept between texts: loading the models takes seconds.
     @MainActor private static var kit: SpeakerKit?
+    /// A load in progress, shared: SpeakerKit cannot be cancelled while it loads, so a second caller waits for the first.
+    @MainActor private static var loading: Task<Void, Error>?
 
     /// Loads the models, so the pass after the last piece does not wait for them (about 6 s on the device, measured 2026-10-03).
     @MainActor
     static func load() async throws {
-        guard kit == nil else { return }
+        if kit != nil { return }
+        if let loading { return try await loading.value }
         guard let config else { throw TranscriptionError.modelMissing }
-        let loaded = try await SpeakerKit(config)
-        try await loaded.ensureModelsLoaded()
-        if kit == nil { kit = loaded }
+        let task = Task {
+            let loaded = try await SpeakerKit(config)
+            try await loaded.ensureModelsLoaded()
+            kit = loaded
+        }
+        loading = task
+        defer { loading = nil }
+        try await task.value
     }
 
     /// Who spoke when, over the whole file. One pass, not per piece, so a voice keeps its number all the way through.

@@ -158,7 +158,7 @@ Not tested: MASTG-TEST-0361 and -0363, which hook the running app on a device. T
 
 What a fresh clone builds is what was reviewed. WhisperKit and SpeakerKit, two products of `argmax-oss-swift`, are pinned to one version and bring one package, `swift-argument-parser`, plus its own copy of `swift-transformers`' Hub and Tokenizers sources. `Package.resolved` is committed; versions and licences are in [TREDJEPART.md](TREDJEPART.md), which a test keeps in step.
 
-The model is a third-party CoreML conversion of nb-whisper-small, fetched at a fixed revision and checked against `Scripts/model-checksums.txt`. The speaker model, Argmax's CoreML conversion of pyannote community-1, is fetched and checked the same way. The checksums prove the files are the ones measured on 2026-09-07, not that they are benign. Since the model never touches the network, what could be wrong with it is transcription quality and bias, not exfiltration.
+The model is a third-party CoreML conversion of nb-whisper-small, fetched at a fixed revision and checked against `Scripts/model-checksums.txt`. The speaker model, Argmax's CoreML conversion of pyannote community-1, is fetched and checked the same way. The checksums prove the files are the ones measured on 2026-09-07 (nb-whisper, tokenizer) and 2026-10-03 (speaker model), not that they are benign. Since the model never touches the network, what could be wrong with it is transcription quality and bias, not exfiltration.
 
 ## Deliberate omissions
 

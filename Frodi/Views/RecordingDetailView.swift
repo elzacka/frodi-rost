@@ -329,9 +329,16 @@ struct RecordingDetailView: View {
                 VStack(alignment: .leading, spacing: Space.s1) {
                     // Avansert: the time and who said it on one line, both tall enough to tap.
                     if let speaker = item.speaker {
-                        HStack(alignment: .lastTextBaseline, spacing: Space.s3) {
-                            if let mark = item.mark { markButton(mark, height: Disclosure.row) }
-                            speakerButton(speaker)
+                        // Stacked when one line cannot hold both, as at the largest text sizes.
+                        ViewThatFits(in: .horizontal) {
+                            HStack(alignment: .lastTextBaseline, spacing: Space.s3) {
+                                if let mark = item.mark { markButton(mark, height: Disclosure.row) }
+                                speakerButton(speaker)
+                            }
+                            VStack(alignment: .leading, spacing: 0) {
+                                if let mark = item.mark { markButton(mark, height: Disclosure.row) }
+                                speakerButton(speaker)
+                            }
                         }
                     } else if let mark = item.mark {
                         markButton(mark, height: Disclosure.row / 2)
@@ -381,7 +388,7 @@ struct RecordingDetailView: View {
         }
         .buttonStyle(.plain)
         .disabled(concealment != .none)
-        .accessibilityHint("Endrer navnet i hele teksten")
+        .accessibilityHint("Endrer navnet overalt i teksten")
     }
 
     private var fraction: Double? {
@@ -568,7 +575,7 @@ struct RecordingDetailView: View {
 
     /// The common metadata keys a recorder or an editor writes, in Norwegian.
     /// Anything else keeps the key the file used.
-    private static func tagLabel(_ key: String) -> String {
+    static func tagLabel(_ key: String) -> String {
         switch key {
         case "title": "Tittel i filen"
         case "artist": "Artist"
@@ -583,6 +590,8 @@ struct RecordingDetailView: View {
         case "model": "Modell"
         case "copyrights": "Opphavsrett"
         case "language": "Språk"
+        // An origin sealed by 1.0 (9) can hold a place, and origins are written once.
+        case "location": "Sted"
         default: key
         }
     }

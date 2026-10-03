@@ -156,11 +156,17 @@ struct SettingsView: View {
         Card("Tekstmodus") {
             paragraph("Avansert viser også hvem som sa hva. Det blir mest riktig når én person snakker om gangen.")
 
-            HStack(spacing: Space.s2) {
-                ForEach([TextMode.enkel, .avansert], id: \.self) { choice in
-                    pill(choice.label, chosen: textMode == choice, spoken: "Tekstmodus \(choice.label)") { textMode = choice }
-                }
+            // Stacked when one line cannot hold both, as at the largest text sizes.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: Space.s2) { modePills }
+                VStack(alignment: .leading, spacing: Space.s2) { modePills }
             }
+        }
+    }
+
+    private var modePills: some View {
+        ForEach([TextMode.enkel, .avansert], id: \.self) { choice in
+            pill(choice.label, chosen: textMode == choice, spoken: "Tekstmodus \(choice.label)") { textMode = choice }
         }
     }
 
