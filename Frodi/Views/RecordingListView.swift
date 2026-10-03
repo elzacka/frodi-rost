@@ -155,7 +155,7 @@ struct RecordingListView: View {
                 .font(.Frodi.bodyMedium)
                 .foregroundStyle(Color.Frodi.textPrimary)
 
-            Text("Fróði får ikke åpnet databasen. Du kan ta opp og eksportere som vanlig, og lyden blir liggende på enheten. Navn, tekst og «Om opptaket» forsvinner når du lukker appen. Ikke slett appen: Da forsvinner opptakene også. Skriv til hei@tazk.no.")
+            Text("Fróði får ikke åpnet filen der navn, tekst og «Om opptaket» lagres. Det som er lagret der fra før, vises ikke. Du kan ta opp og eksportere som vanlig, og lyden blir liggende på enheten. Navn og tekst du lager nå, forsvinner når du lukker appen. Ikke slett appen: Da forsvinner opptakene også. Skriv til hei@tazk.no.")
                 .font(.Frodi.caption)
                 .foregroundStyle(Color.Frodi.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
