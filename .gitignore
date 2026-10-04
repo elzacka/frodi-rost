@@ -45,3 +45,6 @@ Claude outputs/
 
 # CoreML-modellen. Nesten en halv gigabyte, hentes av Scripts/fetch-model.sh
 Frodi/Resources/Model/
+
+# Python bytecode from Scripts/
+__pycache__/

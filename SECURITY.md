@@ -2,7 +2,7 @@
 
 Fróði røst records audio and transcribes it on the device. Nothing is transmitted.
 
-Last updated 2026-10-03.
+Last updated 2026-10-04.
 
 **Contents**
 
@@ -132,7 +132,7 @@ The model loads with `download: false` and explicit local paths. That flag does 
 
 The speaker model (SpeakerKit, speaker diarization) has one configuration, `Speakers.config`: the bundled folder and `download: false`. With a local folder SpeakerKit never calls its downloader. `BundledModelTests` runs that configuration with Hugging Face replaced by a closed port, so a configuration that would fetch fails the test; `IsolationTests` fails if SpeakerKit is created anywhere else.
 
-Two requests happen because the user asked for them: iOS downloads a picked file that lives only in iCloud Drive, and Safari opens the four document links in Innstillinger.
+Two requests happen because the user asked for them: iOS downloads a picked file that lives only in iCloud Drive, and Safari opens the three document links in Innstillinger.
 
 > [!NOTE]
 > WhisperKit carries a copy of `swift-transformers`' `Hub` module, which
@@ -143,7 +143,7 @@ Two requests happen because the user asked for them: iOS downloads a picked file
 
 ## Privacy
 
-The four MASVS-PRIVACY controls were tested on 2026-09-28 with the MASTG's static iOS privacy tests against build 1.0 (9) and read against the code. The table describes the code. Build 1.0 (9) keeps the location an imported file states in its origin, and its purpose string says «det du sier», not that conversations with others are recorded; both are fixed in the source (CHANGELOG.md, *Ikke utgitt*).
+The four MASVS-PRIVACY controls were tested on 2026-09-28 with the MASTG's static iOS privacy tests against build 1.0 (9) and read against the code. The table describes the code. Build 1.0 (9) keeps the location an imported file states in its origin, and its purpose string says «det du sier», not that conversations with others are recorded; both are fixed from build 1.1.0 (10) (CHANGELOG.md).
 
 | Control | How the app meets it | Checked by |
 | --- | --- | --- |

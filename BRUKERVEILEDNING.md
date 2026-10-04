@@ -1,6 +1,6 @@
 # Brukerveiledning for Fróði røst
 
-Oppdatert 03.10.26.
+Oppdatert 04.10.26.
 
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 
