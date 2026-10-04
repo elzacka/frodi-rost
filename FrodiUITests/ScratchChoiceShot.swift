@@ -36,11 +36,12 @@ final class ScratchChoiceShot: XCTestCase {
         app.buttons["Eksporter opptaket"].tap()
         Thread.sleep(forTimeInterval: 1)
         attach("eksport")
-        if app.buttons["Avbryt"].exists {
-            app.buttons["Avbryt"].tap()
+        // The choice sheet with a text, the share sheet without one.
+        for close in ["Avbryt", "Lukk"] where app.buttons[close].exists {
+            app.buttons[close].tap()
             Thread.sleep(forTimeInterval: 1)
         }
-        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Tilbake"].tap()
 
         app.buttons["Innstillinger"].tap()
         Thread.sleep(forTimeInterval: 1)
