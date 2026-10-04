@@ -1,7 +1,7 @@
 import XCTest
 
-/// A tool, not a test, like `ScratchPlaybackShot`: pictures of the swiped row, its question, the export sheet and the Eksport
-/// card in Innstillinger. Runs only with `TEST_RUNNER_FRODI_SHOTS=1`. The export sheet needs a recording with text; a silent
+/// A tool, not a test, like `ScratchPlaybackShot`: the swiped row, its question, the export sheet, the Eksport card and the
+/// zip's share sheet. Runs only with `TEST_RUNNER_FRODI_SHOTS=1`. The export sheet needs a recording with text; a silent
 /// simulator recording has none: force the question in `RecordingDetailView` for the run, then put it back.
 final class ScratchChoiceShot: XCTestCase {
     @MainActor
@@ -49,6 +49,10 @@ final class ScratchChoiceShot: XCTestCase {
         app.swipeUp()
         Thread.sleep(forTimeInterval: 1)
         attach("innstillinger")
+
+        app.buttons["Eksporter alle opptak"].tap()
+        Thread.sleep(forTimeInterval: 3)
+        attach("eksporter-alle")
     }
 
     @MainActor

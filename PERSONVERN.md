@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 03.10.26.
+Sist oppdatert 04.10.26.
 
 Alt skjer på enheten. Ingen datatrafikk ut eller inn.
 
@@ -83,8 +83,8 @@ Opptakene og alt om dem finnes bare på enheten din. Derfor er det ingen å be
 om innsyn hos, ingen databehandlere og ingen overføring til utlandet.
 Rettighetene utøver du selv, i appen:
 
-| Rettighet  | Slik&nbsp;gjør&nbsp;du&nbsp;det                                            |
-| ---------- | -------------------------------------------------------------------------- |
-| Innsyn     | Åpne opptaket i appen                                                      |
-| Eksportere | Trykk på delingsikonet på opptakets side                                   |
-| Sletting   | Sveip opptaket i listen mot venstre og trykk på «Slett». Du kan ikke angre |
+| Rettighet  | Slik&nbsp;gjør&nbsp;du&nbsp;det                                                            |
+| ---------- | ------------------------------------------------------------------------------------------ |
+| Innsyn     | Åpne opptaket i appen                                                                      |
+| Eksportere | Trykk på delingsikonet på opptakets side, eller på «Eksporter alle opptak» i Innstillinger |
+| Sletting   | Sveip opptaket i listen mot venstre og trykk på «Slett». Du kan ikke angre                 |

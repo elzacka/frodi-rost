@@ -19,10 +19,10 @@ struct ExportTests {
         return Calendar(identifier: .gregorian).date(from: components)!
     }
 
-    private func sealedRecording(transcript: String?) throws -> Recording {
+    private func sealedRecording(transcript: String?, createdAt: Date = Date()) throws -> Recording {
         let name = "\(UUID().uuidString).m4a.enc"
         try RecordingVault.seal(Data("lyd".utf8)).write(to: AudioStorage.directory.appendingPathComponent(name))
-        let recording = Recording(duration: 1, fileName: name)
+        let recording = Recording(createdAt: createdAt, duration: 1, fileName: name)
         if let transcript { try recording.setTranscript(transcript) }
         return recording
     }
@@ -101,5 +101,39 @@ struct ExportTests {
             documentAttributes: nil
         )
         #expect(opened.string.contains("Blåbær og søt frø"))
+    }
+
+    /// Everything in one zip, two recordings from the same minute under two
+    /// names, and a recording whose file is gone named rather than blocking the rest.
+    @Test("Alle opptak i én zip-fil")
+    func exportAllZipsEveryRecording() async throws {
+        let first = try sealedRecording(transcript: transcript, createdAt: date)
+        let second = try sealedRecording(transcript: nil, createdAt: date)
+        let missing = Recording(createdAt: date, duration: 1, fileName: "\(UUID().uuidString).m4a.enc")
+        defer { [first, second].forEach { AudioStorage.delete(fileName: $0.fileName) } }
+
+        let result = try await RecordingExport.prepareAll([first, second, missing], format: .rtf)
+        defer { RecordingExport.cleanUp([result.zip]) }
+
+        let data = try Data(contentsOf: result.zip)
+        let names = String(decoding: data, as: UTF8.self)
+        #expect(data.prefix(4) == Data([0x50, 0x4B, 0x03, 0x04]))
+        #expect(names.contains("frodi-2026-09-14-1030.m4a"))
+        #expect(names.contains("frodi-2026-09-14-1030.rtf"))
+        #expect(names.contains("frodi-2026-09-14-1030-2.m4a"))
+        #expect(!names.contains("frodi-2026-09-14-1030-3"))
+        #expect(result.skipped.map(\.fileName) == [missing.fileName])
+        // Only the zip is left: the plaintext it was made from is gone.
+        let left = try FileManager.default.contentsOfDirectory(atPath: result.zip.deletingLastPathComponent().path)
+        #expect(left == [result.zip.lastPathComponent])
+    }
+
+    /// When nothing opens, there is no zip to share, and the reason is the error.
+    @Test("Ingen zip når ingen opptak åpner")
+    func exportAllFailsWhenNothingOpens() async throws {
+        let missing = Recording(duration: 1, fileName: "\(UUID().uuidString).m4a.enc")
+        await #expect(throws: (any Error).self) {
+            try await RecordingExport.prepareAll([missing])
+        }
     }
 }

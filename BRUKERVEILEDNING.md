@@ -230,6 +230,12 @@ Trykk på delingsikonet øverst til høyre på opptakets side. Hvis opptaket har
 tekst, velger du «Opptak og tekst», «Bare opptaket» eller «Bare teksten».
 Deretter velger du i delingsmenyen hvor filene skal sendes eller lagres.
 
+Under Innstillinger kan du eksportere alle opptakene samtidig. Trykk på
+«Eksporter alle opptak». Fróði samler lyden og teksten til hvert opptak i én
+zip-fil, og i delingsmenyen velger du hvor den skal lagres. Enheten trenger
+ledig plass til en kopi av alle opptakene mens zip-filen lages. Appen sier fra
+hvis et opptak ikke kom med.
+
 Lyden eksporteres alltid som `.m4a`. Formatet for teksten velger du én gang,
 under Innstillinger i appen:
 

@@ -31,13 +31,15 @@ enum RecordingExport {
     }
 
     /// Writes audio and text to temporary files ready for sharing. The recording is a SwiftData object and cannot cross
-    /// threads, so only extracted values are passed.
+    /// threads, so only extracted values are passed. `stem` names the files; the date and minute when nil.
     static func prepare(
         _ recording: Recording,
         content: Content = .both,
-        format: TextFormat = .chosen
+        format: TextFormat = .chosen,
+        stem: String? = nil
     ) async throws -> [URL] {
         try await write(
+            stem: stem ?? "frodi-\(Self.stamp(recording.createdAt))",
             fileName: recording.fileName,
             createdAt: recording.createdAt,
             duration: recording.duration,
@@ -49,11 +51,90 @@ enum RecordingExport {
         )
     }
 
+    /// Every recording, audio and text, in one zip: the way to a backup or a new device, since the sealed files open only
+    /// here. A recording that cannot be opened is left out and returned, so one bad file does not block the rest; a full
+    /// disk or a cancel stops it all. `progress` gets the number of the recording being written.
+    static func prepareAll(
+        _ recordings: [Recording],
+        format: TextFormat = .chosen,
+        progress: (Int) -> Void = { _ in }
+    ) async throws -> (zip: URL, skipped: [Recording]) {
+        let folder = AudioStorage.scratchDirectory
+            .appendingPathComponent("Eksport-\(UUID().uuidString)", isDirectory: true)
+        let contents = folder.appendingPathComponent("frodi-eksport-\(Self.stamp(.now, format: "yyyy-MM-dd"))", isDirectory: true)
+        try FileManager.default.createDirectory(at: contents, withIntermediateDirectories: true)
+
+        do {
+            var skipped: [Recording] = []
+            var lastError: Error?
+            var stems: Set<String> = []
+            for (index, recording) in recordings.enumerated() {
+                try Task.checkCancellation()
+                progress(index + 1)
+
+                // Two recordings in the same minute would share a name, and the
+                // document names its audio, so the stem is fixed before writing.
+                let base = "frodi-\(Self.stamp(recording.createdAt))"
+                var stem = base
+                var n = 2
+                while !stems.insert(stem).inserted { stem = "\(base)-\(n)"; n += 1 }
+
+                do {
+                    let urls = try await prepare(recording, content: .both, format: format, stem: stem)
+                    defer { cleanUp(urls) }
+                    for url in urls {
+                        try FileManager.default.moveItem(at: url, to: contents.appendingPathComponent(url.lastPathComponent))
+                    }
+                } catch where isOutOfSpace(error) {
+                    throw error
+                } catch {
+                    skipped.append(recording)
+                    lastError = error
+                }
+            }
+            // Nothing opened: the cause is likely shared, such as a locked device, and its message says what to do.
+            if let lastError, skipped.count == recordings.count { throw lastError }
+
+            let zip = folder.appendingPathComponent(contents.lastPathComponent + ".zip")
+            try await archive(contents, to: zip)
+            try? FileManager.default.removeItem(at: contents)
+            return (zip, skipped)
+        } catch {
+            try? FileManager.default.removeItem(at: folder)
+            throw error
+        }
+    }
+
+    /// Foundation reports a full disk in either domain, depending on the call that hit it.
+    private static func isOutOfSpace(_ error: Error) -> Bool {
+        let error = error as NSError
+        return (error.domain == NSCocoaErrorDomain && error.code == NSFileWriteOutOfSpaceError)
+            || (error.domain == NSPOSIXErrorDomain && error.code == Int(ENOSPC))
+    }
+
+    /// The system's own zip: a coordinated read `.forUploading` hands over the folder as an archive, so no dependency.
+    /// The archive is gone when the block returns, so it is moved out inside it.
+    @concurrent
+    private static func archive(_ folder: URL, to target: URL) async throws {
+        var coordination: NSError?
+        var move: Error?
+        NSFileCoordinator().coordinate(readingItemAt: folder, options: .forUploading, error: &coordination) { zipped in
+            do {
+                try FileManager.default.moveItem(at: zipped, to: target)
+                try (target as NSURL).setResourceValue(URLFileProtection.completeUnlessOpen, forKey: .fileProtectionKey)
+            } catch {
+                move = error
+            }
+        }
+        if let error = coordination ?? move { throw error }
+    }
+
     /// Reading, decrypting and writing a whole audio file is slow for long recordings. `@concurrent` keeps it off the
     /// main thread: `SWIFT_APPROACHABLE_CONCURRENCY` would run a `nonisolated async` function on the caller's actor
     /// (the view), which froze the interface until the share sheet came up (measured 2026-09-09).
     @concurrent
     private static func write(
+        stem: String,
         fileName: String,
         createdAt: Date,
         duration: TimeInterval,
@@ -65,7 +146,6 @@ enum RecordingExport {
     ) async throws -> [URL] {
         var urls: [URL] = []
 
-        let stamp = Self.stamp(createdAt)
         let folder = AudioStorage.scratchDirectory
             .appendingPathComponent("Eksport-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
@@ -73,7 +153,7 @@ enum RecordingExport {
         // A recording stopped on a locked device is still PCM until the next unlock;
         // the export then carries the format it actually has.
         let container = fileName.hasSuffix(AudioStorage.pendingSuffix) ? "caf" : "m4a"
-        let audioName = "frodi-\(stamp).\(container)"
+        let audioName = "\(stem).\(container)"
         let wantsDocument = transcript?.isEmpty == false && format == .rtf
         // The document names the audio by its checksum, so it is read for a text
         // alone too. The bytes are the same at every export: the vault opens the
@@ -87,7 +167,7 @@ enum RecordingExport {
         }
 
         if let transcript, !transcript.isEmpty {
-            let file = folder.appendingPathComponent("frodi-\(stamp).\(format.rawValue)")
+            let file = folder.appendingPathComponent("\(stem).\(format.rawValue)")
             let data = switch format {
             case .txt: utf8WithBOM(transcript)
             case .rtf: try rtf(
@@ -192,9 +272,9 @@ enum RecordingExport {
         }
     }
 
-    private static func stamp(_ date: Date) -> String {
+    private static func stamp(_ date: Date, format: String = "yyyy-MM-dd-HHmm") -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd-HHmm"
+        formatter.dateFormat = format
         formatter.locale = Locale(identifier: "nb_NO")
         return formatter.string(from: date)
     }

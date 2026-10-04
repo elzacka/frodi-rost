@@ -90,7 +90,7 @@ Every applicable control is met except local authentication (AUTH-2, AUTH-3), en
 | Screen capture | What is hidden is read once, at the app's root, so every view follows one reading | `CaptureGuard`, `ConcealmentReader` |
 | Keyboard | Autocorrection and predictive text are off in both text fields, so typed names stay out of the keyboard's learned dictionary, which lives outside the sandbox. The rename is the app's own field, since the system's ignores the setting | `SettingsView`, `RecordingDetailView` |
 | Pasteboard | «Kopier» writes `localOnly` with a five-minute expiry, so Universal Clipboard does not carry it. No text selection, which would write to the general pasteboard; a test fails if it returns | `RecordingDetailView`, `IsolationTests` |
-| Export | Decrypted into the temporary directory, handed to the share sheet, removed when it closes | `RecordingExport`, `ShareSheet` |
+| Export | Decrypted into the temporary directory, handed to the share sheet, removed when it closes. «Eksporter alle opptak» zips every recording with the system's `NSFileCoordinator` (`.forUploading`), removes the plaintext once zipped, and stops and cleans up if Innstillinger closes first | `RecordingExport`, `ShareSheet` |
 | Memory safety | Enhanced Security entitlements: hardware memory tagging without soft mode, guard objects on freed memory, read-only platform memory, restricted library loading and Mach messages. Tagging needs an A19 chip or later. A test reads the entitlements from the signed binary; on an iPhone 17 Pro an out-of-bounds read and a use-after-free both stop the app | `project.yml`, `Frodi.entitlements`, `IsolationTests` |
 
 ## File protection

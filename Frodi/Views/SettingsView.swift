@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 /// Settings: the three things you can set, what the app is, and the documents, as a sheet so you return to the list as you left it.
@@ -16,6 +17,15 @@ struct SettingsView: View {
     @AppStorage(RecordingExport.TextFormat.key) private var textFormat = RecordingExport.TextFormat.rtf
     /// The same key `TextMode.current` reads.
     @AppStorage(TextMode.key) private var textMode = TextMode.enkel
+
+    @Query(sort: \Recording.createdAt) private var recordings: [Recording]
+    /// The recording being written into the zip, counted from one, and how many; nil when no export runs.
+    @State private var packing: (at: Int, of: Int)?
+    @State private var exportAll: Task<Void, Never>?
+    @State private var zip: [URL] = []
+    @State private var skipped: [Date] = []
+    @State private var showsSkipped = false
+    @State private var exportError: String?
 
     var body: some View {
         NavigationStack {
@@ -41,6 +51,41 @@ struct SettingsView: View {
                 // closes. The icon also carries no type, so the question of Inter beside the
                 // system title goes away. VoiceOver needs the name the button does not write.
                 ToolbarButton(icon: .close, label: "Lukk", placement: .topBarTrailing) { dismiss() }
+            }
+            .sheet(isPresented: .constant(!zip.isEmpty)) {
+                ShareSheet(urls: zip) {
+                    RecordingExport.cleanUp(zip)
+                    zip = []
+                    showsSkipped = !skipped.isEmpty
+                }
+            }
+            .alert("Ikke med i zip-filen", isPresented: $showsSkipped) {
+                Button("OK") { skipped = [] }
+            } message: {
+                Text(verbatim: skipped.map { "Opptak \($0.recordingStamp)" }.joined(separator: "\n"))
+            }
+            .alert("Kunne ikke eksportere", isPresented: .constant(exportError != nil)) {
+                Button("OK") { exportError = nil }
+            } message: {
+                Text(verbatim: exportError ?? "")
+            }
+        }
+        // Plaintext of every recording is written while it runs; closing the sheet stops it and removes what was written.
+        .onDisappear { exportAll?.cancel() }
+    }
+
+    private func startExportAll() {
+        let all = recordings
+        exportAll = Task {
+            defer { packing = nil }
+            do {
+                let result = try await RecordingExport.prepareAll(all) { packing = ($0, all.count) }
+                if Task.isCancelled { RecordingExport.cleanUp([result.zip]); return }
+                skipped = result.skipped.map(\.createdAt)
+                zip = [result.zip]
+            } catch is CancellationError {
+            } catch {
+                exportError = error.localizedDescription
             }
         }
     }
@@ -169,9 +214,8 @@ struct SettingsView: View {
         }
     }
 
-    /// The one choice the export offers in advance. What to hand over, audio or
-    /// text or both, is asked where the export is made; the shape of the text
-    /// is decided here, once, because it is the same every time.
+    /// The one choice the export offers in advance: what to hand over is asked where the export is made, the shape of
+    /// the text is decided here, once, because it is the same every time. Exporting everything belongs to no recording.
     private var export: some View {
         Card("Eksport") {
             paragraph("Velg format for teksten.")
@@ -179,6 +223,21 @@ struct SettingsView: View {
             HStack(spacing: Space.s2) {
                 ForEach(RecordingExport.TextFormat.allCases, id: \.self) { format in
                     pill(format.label, chosen: textFormat == format, spoken: "Tekst som \(format.label)") { textFormat = format }
+                }
+            }
+
+            if !recordings.isEmpty {
+                Button(action: startExportAll) {
+                    Text("Eksporter alle opptak").choiceRow()
+                }
+                .buttonStyle(.plain)
+                .disabled(packing != nil)
+                .accessibilityHint("Samler alle opptak og tekster i én zip-fil")
+
+                if let packing {
+                    Text("Pakker \(packing.at) av \(packing.of) opptak …")
+                        .font(.Frodi.meta)
+                        .foregroundStyle(Color.Frodi.textSecondary)
                 }
             }
         }
