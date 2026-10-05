@@ -17,7 +17,7 @@ Versjon 1.0 ligger i [App Store](https://apple.co/4ryiAk4). Appen finnes bare i 
 - Skriver bokmål med tegnsetting og stor forbokstav, også når du snakker dialekt
 - Deler teksten i avsnitt med tidspunkt du kan trykke på for å spille av derfra
 - Forsegler opplysningene om hvert opptak og sier fra hvis de er endret utenfor appen
-- Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`
+- Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`, ett opptak om gangen eller alle i én zip-fil
 
 [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md) viser hvordan.
 
