@@ -1,8 +1,10 @@
 import SwiftData
 import SwiftUI
+import UIKit
 
 @main
 struct FrodiApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     private let container: ModelContainer
 
     init() {
@@ -33,5 +35,15 @@ struct FrodiApp: App {
                 .tint(Color.Frodi.accentRecord)
         }
         .modelContainer(container)
+    }
+}
+
+/// Apple's keyboard only: a keyboard from another company, given Full Access, can send what is typed, and names are typed here.
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier
+    ) -> Bool {
+        extensionPointIdentifier != .keyboard
     }
 }

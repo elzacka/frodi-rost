@@ -1,6 +1,6 @@
 # Personvern i Fróði røst
 
-Sist oppdatert 04.10.26.
+Sist oppdatert 06.10.26.
 
 Alt skjer på enheten. Ingen datatrafikk ut eller inn.
 
@@ -30,8 +30,12 @@ Appen sender ingenting selv. Hvis du har slått på deling med apputviklere i
 iOS, kan Apple sende krasjrapporter fra appen til utvikleren. De inneholder
 ikke lyd, tekst eller navn.
 
+Appen bruker alltid Apples tastatur. Et tastatur fra et annet selskap kan
+sende det du skriver, ut av enheten hvis du har gitt det full tilgang.
+
 Et opptak du stopper mens enheten er låst, krypteres senest neste gang du
-åpner appen. Ingen kan lese filen så lenge enheten er låst.
+åpner appen. Ingen kan lese filen så lenge enheten er låst med kode. Hvis
+enheten ikke har kode, sier appen fra i Innstillinger.
 
 ## Importerte filer
 

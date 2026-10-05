@@ -10,11 +10,13 @@ Listen starter med den første versjonen i App Store.
 
 - «Eksporter alle opptak» i Innstillinger samler lyden og teksten til alle
   opptakene i én zip-fil
+- Innstillinger sier fra hvis enheten ikke har kode
 
 ### Endret
 
 - Forklaringen under «Om opptaket» sier at lydfilen du eksporterer, har samme
   sjekksum som den som står der
+- Appen bruker alltid Apples tastatur
 
 ## 1.1.0 (12) – 04.10.26
 

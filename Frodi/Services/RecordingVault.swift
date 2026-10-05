@@ -1,5 +1,6 @@
 import CryptoKit
 import Foundation
+import LocalAuthentication
 import Security
 import os
 
@@ -34,6 +35,13 @@ enum RecordingVault {
                 String(localized: "Fróði får ikke låst opp opptaket. Det ble kryptert på en annen enhet.")
             }
         }
+    }
+
+    /// False only when the device has no passcode: then file protection and the Enclave key guard nothing on a locked device.
+    static var deviceHasPasscode: Bool {
+        var error: NSError?
+        return LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
+            || error?.code != LAError.passcodeNotSet.rawValue
     }
 
     // MARK: - Encryption

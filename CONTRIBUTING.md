@@ -73,6 +73,8 @@ Visningene henter farger, skrift, avstand og hjørner fra tokenene i
 - Hvert tekstfelt har autokorrektur slått av, så det brukeren skriver, ikke
   havner i tastaturets ordbok. Systemets eget felt for å gi nytt navn følger
   ikke den innstillingen, så appen har sitt eget
+- Appen godtar bare Apples tastatur (`AppDelegate`). Et tastatur fra et annet
+  selskap med full tilgang kan sende det som skrives. En test passer på dette
 - `versionIdentifier` i en SwiftData-modell som er tatt i bruk, endres aldri
 - Et opptak går aldri tapt. Filen på disk er opptaket, og raden i listen
   bygges opp igjen fra filen. Bare brukeren sletter lyd, og bare etter å ha

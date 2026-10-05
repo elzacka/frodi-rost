@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 /// Settings: the three things you can set, what the app is, and the documents, as a sheet so you return to the list as you left it.
-/// Order: settings, the card with version and address, then the documents (use, privacy, security, licences).
+/// Order: a passcode notice if none is set, settings, the card with version and address, then the documents.
 /// The prose lives in the documents; the page links to them rather than repeating them.
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -26,6 +26,8 @@ struct SettingsView: View {
     @State private var skipped: [Date] = []
     @State private var showsSkipped = false
     @State private var exportError: String?
+    /// Read when the sheet opens, so a passcode set in iOS meanwhile is seen the next time.
+    @State private var hasPasscode = RecordingVault.deviceHasPasscode
 
     var body: some View {
         NavigationStack {
@@ -34,6 +36,7 @@ struct SettingsView: View {
 
                 ScrollView {
                     VStack(spacing: Space.s4) {
+                        if !hasPasscode { passcode }
                         mode
                         wordList
                         export
@@ -103,6 +106,13 @@ struct SettingsView: View {
             paragraph("Modellen nb-whisper-small fra Nasjonalbiblioteket er innebygd i appen og kjører på enheten.")
             paragraph("Versjon \(Self.versionNumber)")
             paragraph("Spørsmål eller feil: hei@tazk.no")
+        }
+    }
+
+    /// Shown only without a passcode, the one case where the encryption protects nothing while the device is locked.
+    private var passcode: some View {
+        Card("Enheten har ingen kode") {
+            paragraph("Uten kode kan alle som har enheten, åpne opptakene og lese tekstene. Slå på kode i iOS-innstillingene. Da kan ingen lese dem mens enheten er låst.")
         }
     }
 

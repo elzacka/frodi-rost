@@ -2,7 +2,7 @@
 
 Fróði røst records audio and transcribes it on the device. Nothing is transmitted.
 
-Last updated 2026-10-04.
+Last updated 2026-10-06.
 
 **Contents**
 
@@ -40,16 +40,16 @@ Every App Store build is listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## Threat model
 
-The app assumes a passcode is set and iOS is not compromised.
+The app assumes iOS is not compromised, an exception to MAS-L2, which does not trust the OS. It checks for a passcode and says so in Innstillinger when none is set.
 
 | | Adversary |
 | --- | --- |
 | Defended against | A locked device in someone else's hands, including forensic extraction after first unlock. A copy of a backup. Another app on the device. Anyone watching the screen, or the app switcher, while a transcript is open |
 | Not defended against | A compromised OS, or an exploit chain on an unlocked device. An unlocked device in someone else's hands. A screenshot. Whatever happens to a file after export |
 
-Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0, the latest release as of 2026-09-28, at MAS-L2 and MAS-P: the app holds a key that encrypts user data OWASP lists as high risk. The storage, crypto, authentication, platform and code controls were read against the code on 2026-09-27, not tested with MASTG. The privacy controls were tested; see *Privacy*.
+Measured against [OWASP MASVS](https://mas.owasp.org/MASVS/) v2.1.0 and MASWE v1.0.0, the latest releases as of 2026-10-06, at MAS-L2 and MAS-P: the app holds a key that encrypts user data OWASP lists as high risk. The storage, crypto, authentication, platform and code controls were read against the code on 2026-10-06, not tested with MASTG. The privacy controls were tested; see *Privacy*.
 
-Every applicable control is met except local authentication (AUTH-2, AUTH-3), enforced updates (CODE-2), reproducible builds (MASWE-0075) and MAS-R; see *Deliberate omissions*. MASVS-NETWORK does not apply.
+Every applicable control is met except local authentication (AUTH-2, AUTH-3), enforced updates (CODE-2), key rotation (MASWE-0015), passcode enforcement (MASWE-0017), screenshot blocking (MASWE-0038), reproducible builds (MASWE-0075) and MAS-R; see *Deliberate omissions*. MASVS-NETWORK does not apply.
 
 ## What happens in each scenario
 
@@ -71,6 +71,7 @@ Every applicable control is met except local authentication (AUTH-2, AUTH-3), en
 | Transcript copied with «Kopier» | Stays on this device and expires after five minutes. Once pasted, it is the other app's data |
 | Recording exported | Every guarantee here ends. Files and AirDrop keep the decrypted copy on the device; Mail, Messages and iCloud Drive do not |
 | Device unlocked, app open, in someone else's hands | Readable, as with any app; see *Deliberate omissions* |
+| Device without a passcode | Readable by anyone holding it: file protection and the key's access class need a passcode. Innstillinger says so |
 
 ## Controls
 
@@ -88,7 +89,8 @@ Every applicable control is met except local authentication (AUTH-2, AUTH-3), en
 | Logging | WhisperKit runs with `verbose: false` and `logLevel: .none`. The app logs recording events: start, stop and length, interruptions, deferred seals, failed imports by error code. Never content, a name or an imported file's name. File names are UUIDs | `AudioRecorder`, `WhisperTranscriber` |
 | Privacy manifest | No tracking, no tracking domains, no collected data. Accessed APIs: file timestamps (C617.1) and `UserDefaults` (CA92.1). A test asserts that set | `PrivacyInfo.xcprivacy`, `IsolationTests` |
 | Screen capture | What is hidden is read once, at the app's root, so every view follows one reading | `CaptureGuard`, `ConcealmentReader` |
-| Keyboard | Autocorrection and predictive text are off in both text fields, so typed names stay out of the keyboard's learned dictionary, which lives outside the sandbox. The rename is the app's own field, since the system's ignores the setting | `SettingsView`, `RecordingDetailView` |
+| Keyboard | Apple's keyboard only: the app refuses the keyboard extension point, since a third-party keyboard with Full Access can send what is typed. Autocorrection and predictive text are off in all three text fields (word list, recording name, speaker name), so typed names stay out of the keyboard's learned dictionary, which lives outside the sandbox. The rename is the app's own field, since the system's ignores the setting | `AppDelegate`, `SettingsView`, `RecordingDetailView`, `IsolationTests` |
+| Passcode | `LAContext.canEvaluatePolicy(.deviceOwnerAuthentication)` read each time Innstillinger opens; `passcodeNotSet` shows a card saying the recordings are open to anyone holding the device | `RecordingVault`, `SettingsView` |
 | Pasteboard | «Kopier» writes `localOnly` with a five-minute expiry, so Universal Clipboard does not carry it. No text selection, which would write to the general pasteboard; a test fails if it returns | `RecordingDetailView`, `IsolationTests` |
 | Export | Decrypted into the temporary directory, handed to the share sheet, removed when it closes. «Eksporter alle opptak» zips every recording with the system's `NSFileCoordinator` (`.forUploading`), removes the plaintext once zipped, and stops and cleans up if Innstillinger closes first | `RecordingExport`, `ShareSheet` |
 | Memory safety | Enhanced Security entitlements: hardware memory tagging without soft mode, guard objects on freed memory, read-only platform memory, restricted library loading and Mach messages. Tagging needs an A19 chip or later. A test reads the entitlements from the signed binary; on an iPhone 17 Pro an out-of-bounds read and a use-after-free both stop the app | `project.yml`, `Frodi.entitlements`, `IsolationTests` |
@@ -170,6 +172,8 @@ The model is a third-party CoreML conversion of nb-whisper-small, fetched at a f
 | No jailbreak detection (MAS-R) | A compromised OS can lie to the check, and the threat model excludes it. The source is public for audit instead |
 | No forced update | It would need a network request. An organisation that needs a minimum version enforces it through MDM |
 | No advisory feed | Dependencies are pinned, and advisories for `argmax-oss-swift` and `swift-argument-parser` are checked by hand before a release |
+| A passcode warned about, not enforced | A key bound to the passcode is deleted when the passcode is removed, and every recording with it. The warning sits in Innstillinger only, so the main screen stays clear for the car and the interview |
+| No key rotation | Each item has its own random key, and the Enclave key cannot be extracted. Rotating the Enclave key would mean re-wrapping every item for no gain against these adversaries |
 | No overwrite on delete | The file is ciphertext with its key wrapped inside it, and iOS deletes by discarding the per-file key |
 | No trusted timestamp | A timestamp authority needs a network request. The origin's date is the device clock's |
 | No reproducible build | The App Store encrypts and re-signs what it serves, so a build from source cannot be compared with it. Public source, pinned dependencies and model checksums stand in its place |

@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import Testing
+import UIKit
 @testable import Frodi
 
 /// The app's promise is that nothing leaves the device. These tests guard that
@@ -101,6 +102,15 @@ struct IsolationTests {
             let code = try String(contentsOf: url, encoding: .utf8)
             #expect(!code.contains("UIPasteboard"), "\(url.lastPathComponent) skriver til utklippstavlen utenom kopiknappen")
         }
+    }
+
+    /// Asked through the app's own delegate, so the test fails if the adaptor is dropped as well as if the answer changes.
+    @Test("Bare Apples tastatur kan skrive i appen")
+    @MainActor
+    func onlyApplesKeyboard() throws {
+        let delegate = try #require(UIApplication.shared.delegate)
+        let allowed = delegate.application?(UIApplication.shared, shouldAllowExtensionPointIdentifier: .keyboard)
+        #expect(allowed == false, "Tastaturer fra andre kan sende det som skrives")
     }
 
     /// `audio` is the only background mode: a recording goes on after the screen locks, nothing else runs without the

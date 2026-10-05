@@ -1,6 +1,6 @@
 # Brukerveiledning for Fróði røst
 
-Oppdatert 04.10.26.
+Oppdatert 06.10.26.
 
 Fróði røst tar opp lyd og gjør den om til norsk tekst. Alt skjer på enheten.
 
@@ -258,6 +258,9 @@ Da er opptaket og teksten borte fra enheten, og du kan ikke angre.
 ## Personvern
 
 Hva som lagres, og rettighetene dine: [PERSONVERN.md](PERSONVERN.md).
+
+Appen bruker alltid Apples tastatur når du skriver. Personvernerklæringen
+forklarer hvorfor.
 
 ## Spørsmål eller feil
 
