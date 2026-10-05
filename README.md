@@ -16,7 +16,7 @@ Versjon 1.0 ligger i [App Store](https://apple.co/4ryiAk4). Appen finnes bare i 
 - Tar vare på opptaket ved en telefonsamtale og hvis appen avsluttes midt i
 - Skriver bokmål med tegnsetting og stor forbokstav, også når du snakker dialekt
 - Deler teksten i avsnitt med tidspunkt du kan trykke på for å spille av derfra
-- Låser opplysningene om hvert opptak og sier fra hvis de er endret utenfor appen
+- Forsegler opplysningene om hvert opptak og sier fra hvis de er endret utenfor appen
 - Eksporterer lyd som `.m4a` og tekst som `.txt` eller `.rtf`
 
 [BRUKERVEILEDNING.md](BRUKERVEILEDNING.md) viser hvordan.

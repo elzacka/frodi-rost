@@ -11,6 +11,11 @@ Listen starter med den første versjonen i App Store.
 - «Eksporter alle opptak» i Innstillinger samler lyden og teksten til alle
   opptakene i én zip-fil
 
+### Endret
+
+- Forklaringen under «Om opptaket» sier at lydfilen du eksporterer, har samme
+  sjekksum som den som står der
+
 ## 1.1.0 (12) – 04.10.26
 
 ### Endret

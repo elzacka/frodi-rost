@@ -451,7 +451,7 @@ struct RecordingDetailView: View {
                     Text((origin.source == .imported
                           ? "Fróði lagret disse opplysningene da du importerte filen."
                           : "Fróði lagret disse opplysningene sammen med opptaket.")
-                         + " Du kan ikke endre dem. Du får en advarsel her hvis noen har endret dem eller lyden utenfor appen.\n\nEn sjekksum regnes ut fra innholdet i en fil og blir en annen hvis noen endrer filen. Lydfilen du eksporterer, har sjekksummen for lyden.")
+                         + " Du kan ikke endre dem. Du får en advarsel her hvis noen har endret dem eller lyden utenfor appen.\n\nEn sjekksum regnes ut fra innholdet i en fil og blir en annen hvis noen endrer filen. Lydfilen du eksporterer, har samme sjekksum som den som står her.")
                         .font(.Frodi.caption)
                         .foregroundStyle(Color.Frodi.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
